@@ -4,4 +4,5 @@ Thank you to everyone who has contributed to this project.
 
 ## Development Team
 
-- Developer Name — [@github-username](https://github.com/github-username)
+<!-- - Developer Name — [@github-username](https://github.com/github-username) -->
+- Mikey Nichols — [@mnichols08](https://github.com/mnichols08)
