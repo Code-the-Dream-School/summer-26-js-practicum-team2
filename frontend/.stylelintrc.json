@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json.schemastore.org/stylelintrc.json",
+  "//": "Design-system guardrails for US 1.3 / T-1.3.15. Bans raw hex codes and raw px values so components must use design tokens. See ../docs/design-system.md (landing via US 1.3 / T-1.3.14).",
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "no-empty-source": null,
+    "color-no-hex": [
+      true,
+      {
+        "message": "Use a design token (e.g. var(--color-primary)) instead of a raw hex code. See docs/design-system.md."
+      }
+    ],
+    "declaration-property-unit-disallowed-list": [
+      {
+        "font-size": ["px"],
+        "line-height": ["px"],
+        "border-radius": ["px"],
+        "margin": ["px"],
+        "margin-top": ["px"],
+        "margin-right": ["px"],
+        "margin-bottom": ["px"],
+        "margin-left": ["px"],
+        "padding": ["px"],
+        "padding-top": ["px"],
+        "padding-right": ["px"],
+        "padding-bottom": ["px"],
+        "padding-left": ["px"],
+        "gap": ["px"],
+        "column-gap": ["px"],
+        "row-gap": ["px"],
+        "width": ["px"],
+        "min-width": ["px"],
+        "max-width": ["px"],
+        "height": ["px"],
+        "min-height": ["px"],
+        "max-height": ["px"]
+      },
+      {
+        "message": "Use a design-system token (var(--space-*), var(--font-size-*), var(--radius-*)) instead of a raw px value. See docs/design-system.md."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "//": "Token definition files are the one place raw hex + px values are allowed.",
+      "files": ["**/design-tokens/**/*.css", "**/tokens.css"],
+      "rules": {
+        "color-no-hex": null,
+        "declaration-property-unit-disallowed-list": null
+      }
+    }
+  ],
+  "ignoreFiles": ["dist/**", "node_modules/**", "build/**"]
+}
