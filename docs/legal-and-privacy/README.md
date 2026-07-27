@@ -1,4 +1,4 @@
-# Legal & Privacy — US 1.8
+# Legal & Privacy
 
 This folder holds the content deliverables for **US 1.8 — Legal and privacy foundation**. Frontend routes, the consent banner component, signup enforcement, and analytics gating live in their own branches (T-1.8.5 through T-1.8.9, and T-1.8.11) and consume the copy stored here.
 
@@ -40,7 +40,7 @@ This folder holds the content deliverables for **US 1.8 — Legal and privacy fo
 
 ## Follow-up before this story can close
 
-1. Route the four docs (privacy policy, terms of service, consent banner, legal copy) to a mentor reviewer. Reviewer fills the `Mentor reviewer` / `Mentor review date` rows in each doc's header and bumps **Last Updated** in `privacy-policy.md` / `terms-of-service.md` if wording changed.
+1. Route the four docs (privacy policy, terms of service, consent banner, legal copy) to a mentor reviewer. 
 2. Once US 1.5 finalizes the tech stack, fill in the concrete provider names in the third-party services table in `privacy-policy.md` §5. TOS §11 refers back to that table.
 3. Replace `[App Name]`, `[Organization or Team Name]`, `[State and Country]`, `[County and State]`, `[Privacy Contact Email]`, `[Support Email]`, and `[Business or Organization Mailing Address]` placeholders with real values before the app is launched publicly.
 4. Frontend/backend tickets (T-1.8.5 – T-1.8.9, T-1.8.11) pick up the copy from this folder and implement the routes, banner, checkbox enforcement, and analytics gating.

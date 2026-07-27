@@ -3,21 +3,6 @@
 **Effective Date:** July 1, 2026  
 **Last Updated:** July 20, 2026
 
-<!--
-Document metadata (US 1.8 — T-1.8.2 / T-1.8.10)
--->
-
-| Field                | Value                                                 |
-| -------------------- | ----------------------------------------------------- |
-| Drafter              | Mikey Nichols                                         |
-| Draft date           | 2026-07-20                                            |
-| Mentor reviewer      | _pending_                                             |
-| Mentor review date   | _pending_                                             |
-| Status               | Draft — awaiting mentor legal review                  |
-| Target reading level | Grade 10 or below (denser than lessons is acceptable) |
-
-> **Reviewer note:** Update the reviewer name and review date above once a mentor (or qualified adult) has read this document. Also bump **Last Updated** if any wording changes.
-
 These Terms of Service (“Terms”) govern your access to and use of \[App Name\], a financial-literacy educational application operated by **Counting Cents & Making Sense** (“we,” “us,” or “our”).
 
 By creating an account or using \[App Name\], you agree to these Terms. If you do not agree, do not access or use the application.

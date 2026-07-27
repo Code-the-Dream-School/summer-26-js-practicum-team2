@@ -2,20 +2,6 @@
 
 Shared copy strings that must appear consistently across the application (footer, onboarding, etc.). Frontend and content contributors should import or copy from this file rather than rewriting the wording, so language stays consistent and reviewable in one place.
 
-<!--
-Document metadata (US 1.8 — T-1.8.4 / T-1.8.10)
--->
-
-| Field              | Value                                |
-| ------------------ | ------------------------------------ |
-| Drafter            | Mikey Nichols                        |
-| Draft date         | 2026-07-20                           |
-| Mentor reviewer    | _pending_                            |
-| Mentor review date | _pending_                            |
-| Status             | Draft — awaiting mentor legal review |
-
-> **Reviewer note:** Once a mentor (or other qualified adult) has approved the wording below, fill in the reviewer name and date above and update the **Last Updated** stamps in `privacy-policy.md` and `terms-of-service.md` if any wording here changed.
-
 ---
 
 ## 1. "Not financial advice" disclaimer

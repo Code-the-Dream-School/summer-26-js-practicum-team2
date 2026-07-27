@@ -1,19 +1,5 @@
 ### Consent Banner
 
-<!--
-Document metadata (US 1.8 — T-1.8.3 / T-1.8.10)
--->
-
-| Field              | Value                                |
-| ------------------ | ------------------------------------ |
-| Drafter            | Mikey Nichols                        |
-| Draft date         | 2026-07-20                           |
-| Mentor reviewer    | _pending_                            |
-| Mentor review date | _pending_                            |
-| Status             | Draft — awaiting mentor legal review |
-
-> **Reviewer note:** Update the reviewer name and date above once a mentor has approved the wording. The frontend banner component (T-1.8.6) must use this exact text — no dark patterns, no pre-checked options, both buttons equally prominent.
-
 ---
 
 **Your privacy choices**

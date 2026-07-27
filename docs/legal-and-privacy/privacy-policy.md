@@ -1,22 +1,5 @@
 # Privacy Policy
 
-**Effective Date:** July 1, 2026  
-**Last Updated:** July 20, 2026
-
-<!--
-Document metadata (US 1.8 — T-1.8.1 / T-1.8.10)
--->
-
-| Field              | Value                                |
-| ------------------ | ------------------------------------ |
-| Drafter            | Mikey Nichols                        |
-| Draft date         | 2026-07-20                           |
-| Mentor reviewer    | _pending_                            |
-| Mentor review date | _pending_                            |
-| Status             | Draft — awaiting mentor legal review |
-
-> **Reviewer note:** Update the reviewer name and review date above once a mentor (or qualified adult) has read this document. Also bump **Last Updated** if any wording changes.
-
 \[App Name\] is a financial-literacy learning application operated by **Counting Cents & Making Sense** (“we,” “us,” or “our”). The application provides educational lessons, quizzes, progress tracking, and other features intended to help users learn about budgeting, saving, credit, debt, and financial stability.
 
 This Privacy Policy explains what information we collect, how we use it, how we protect it, and the choices available to users and parents or legal guardians.
