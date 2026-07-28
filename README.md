@@ -8,8 +8,8 @@ A full-stack web application with a React frontend and a Node/Express backend th
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https://your-frontend-url.com  
-- **Frontend Repo:** /frontend  
+- **Frontend Live Site:** https://your-frontend-url.com
+- **Frontend Repo:** /frontend
 - **Backend Repo:** /backend
 
 ## 🧠 Problem Statement
@@ -35,27 +35,29 @@ Focus on the **user problem**, not the technology.
 
 Add screenshots or GIFs of key features here.
 
-
-
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - React
 - JavaScript (ES6+)
 - HTML5
-- CSS3 / Tailwind / Bootstrap
+- CSS3 / Tailwind
 - Vite or Create React App
 
 ### Backend
+
 - Node.js
 - Express.js
 - REST API
 
 ### Database
+
 - MongoDB (Mongoose) **or**
 - PostgreSQL (Prisma / Knex / Sequelize)
 
 ### Tooling
+
 - Git & GitHub
 - dotenv (environment variables)
 - ESLint / Prettier
@@ -66,16 +68,33 @@ Add screenshots or GIFs of key features here.
 project-root/
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/        
-│   │   ├── styles/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── index.html
-│   └── package.json
+|   |   ├── app             # Application-level configuration
+│   │   │
+│   │   │    └── router/    # Routes and navigation configuration
+│   │   │
+│   │   ├── assets/         # Images, icons, and other static assets
+│   │   │
+│   │   ├── components/     # Reusable React components
+│   │   │   ├── layout/     # Shared page layout components
+│   │   │   └── ui/         # Reusable UI components
+│   │   │
+│   │   ├── context/        # Global React contexts
+│   │   │
+│   │   ├── hooks/          # Shared custom React hooks
+│   │   │
+│   │   ├── pages/          # Route-level page components
+│   │   │
+│   │   ├── services/       # API requests and external services
+│   │   │
+│   │   ├── styles/         # Shared styles and Tailwind customization()
+│   │   │
+│   │   ├── utils/          # Shared helper functions
+│   │   │
+│   │   ├── App.jsx         # Main application component
+│   │   │
+│   │   ├── index.css       # Global styles and Tailwind import
+│   │   │
+│   │   └── main.jsx        # Application entry point
 │
 ├── backend/
 │   ├── controllers/
@@ -93,9 +112,10 @@ project-root/
 ## ⚙️ Setup & Installation
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- npm or yarn
-- MongoDB or PostgreSQL (local or cloud)
+
+- Node.js (v24+ recommended)
+- npm
+- MongoDB
 
 ### Backend Setup
 
@@ -130,13 +150,21 @@ http://localhost:5173
 ## 🧪 Available Scripts
 
 ### Frontend
+
+Run commands from the `frontend` directory.
+
 ```bash
-npm run dev
-npm run build
-npm run preview
+npm run dev # start the development server
+npm run build # create the production build
+npm run preview # preview the production build
+npm run lint # check code with ESLint
+npm run lint:fix # fix supported ESLint issues
+npm run format # format files with Prettier
+npm run format:check # check formatting without changing files
 ```
 
 ### Backend
+
 ```bash
 npm run dev
 npm start
@@ -158,16 +186,17 @@ DELETE /api/items/:id
 ## 🤝 Team & Collaboration
 
 ### Team Members
+
 - Name — Role
 - Name — Role
 - Name — Role
 
 ### Workflow
+
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
 - Code reviews before merging to `main`
-
 
 ## 🧩 Development Process
 
