@@ -1,4 +1,4 @@
-# Frontend Best Practices 
+# Frontend Best Practices
 
 This document outlines **React-specific best practices** for building maintainable,
 performant frontend applications. It is intended for students working on real-world
@@ -15,6 +15,7 @@ The frontend is responsible for:
 - Displaying loading and error states
 
 The frontend **is not** responsible for:
+
 - Business rules
 - Data persistence
 - Security logic
@@ -25,11 +26,13 @@ The frontend **is not** responsible for:
 ### 1️⃣ Keep Components Small and Focused
 
 Each component should ideally:
+
 - do **one thing**
 - be easy to read
 - be reusable
 
 ❌ Too much responsibility:
+
 ```jsx
 function Dashboard() {
   // fetch data
@@ -39,6 +42,7 @@ function Dashboard() {
 ```
 
 ✅ Better:
+
 ```text
 Dashboard
 ├── DashboardLayout
@@ -51,6 +55,7 @@ Dashboard
 Avoid putting fetch logic directly in UI-heavy components.
 
 ❌ Bad:
+
 ```jsx
 function Hello() {
   useEffect(() => {
@@ -60,19 +65,20 @@ function Hello() {
 ```
 
 ✅ Better:
+
 ```js
 // services/helloApi.js
 export const getHello = async () => {
-  const res = await fetch('/api/hello');
-  return res.json();
-};
+  const res = await fetch('/api/hello')
+  return res.json()
+}
 ```
 
 ```jsx
 function Hello() {
   useEffect(() => {
-    getHello().then(setMessage);
-  }, []);
+    getHello().then(setMessage)
+  }, [])
 }
 ```
 
@@ -81,6 +87,7 @@ function Hello() {
 ### 3️⃣ Minimize Unnecessary Re-Renders
 
 React re-renders when:
+
 - state changes
 - props change
 - parent re-renders
@@ -88,14 +95,16 @@ React re-renders when:
 Avoid unnecessary state.
 
 ❌ Bad:
+
 ```jsx
-const [count, setCount] = useState(0);
-const doubled = count * 2;
+const [count, setCount] = useState(0)
+const doubled = count * 2
 ```
 
 ✅ Better:
+
 ```jsx
-const doubled = count * 2;
+const doubled = count * 2
 ```
 
 Derived values should not be state.
@@ -106,14 +115,14 @@ Only optimize **when necessary**, not everywhere.
 
 ```jsx
 const expensiveValue = useMemo(() => {
-  return heavyCalculation(data);
-}, [data]);
+  return heavyCalculation(data)
+}, [data])
 ```
 
 ```jsx
 const handleClick = useCallback(() => {
-  setCount(c => c + 1);
-}, []);
+  setCount((c) => c + 1)
+}, [])
 ```
 
 These prevent unnecessary recalculations and re-renders.
@@ -121,14 +130,16 @@ These prevent unnecessary recalculations and re-renders.
 ### 5️⃣ Avoid Inline Functions in Props (When It Matters)
 
 ❌ Can cause re-renders:
+
 ```jsx
 <Button onClick={() => handleSave()} />
 ```
 
 ✅ Better:
+
 ```jsx
-const onSave = useCallback(handleSave, []);
-<Button onClick={onSave} />
+const onSave = useCallback(handleSave, [])
+;<Button onClick={onSave} />
 ```
 
 ## 🧯 Prevent Memory Leaks
@@ -136,6 +147,7 @@ const onSave = useCallback(handleSave, []);
 ### 6️⃣ Clean Up Side Effects
 
 Always clean up:
+
 - timers
 - intervals
 - event listeners
@@ -143,11 +155,11 @@ Always clean up:
 ```jsx
 useEffect(() => {
   const id = setInterval(() => {
-    console.log('tick');
-  }, 1000);
+    console.log('tick')
+  }, 1000)
 
-  return () => clearInterval(id);
-}, []);
+  return () => clearInterval(id)
+}, [])
 ```
 
 Without cleanup, memory leaks occur.
@@ -156,15 +168,15 @@ Without cleanup, memory leaks occur.
 
 ```jsx
 useEffect(() => {
-  const controller = new AbortController();
+  const controller = new AbortController()
 
   fetch('/api/data', { signal: controller.signal })
-    .then(res => res.json())
+    .then((res) => res.json())
     .then(setData)
-    .catch(() => {});
+    .catch(() => {})
 
-  return () => controller.abort();
-}, []);
+  return () => controller.abort()
+}, [])
 ```
 
 Prevents state updates on unmounted components.
@@ -174,6 +186,7 @@ Prevents state updates on unmounted components.
 ### 8️⃣ Lift State Only When Necessary
 
 State should live:
+
 - as low as possible
 - as high as necessary
 
@@ -184,15 +197,17 @@ Avoid global state too early.
 `useEffect` is for **side effects**, not regular logic.
 
 ❌ Bad:
+
 ```jsx
 useEffect(() => {
-  setTotal(price * qty);
-}, [price, qty]);
+  setTotal(price * qty)
+}, [price, qty])
 ```
 
 ✅ Better:
+
 ```jsx
-const total = price * qty;
+const total = price * qty
 ```
 
 ## 🧪 Rendering & Lists
@@ -200,13 +215,15 @@ const total = price * qty;
 ### 🔟 Always Use Stable Keys
 
 ❌ Bad:
+
 ```jsx
 items.map((item, index) => <Item key={index} />)
 ```
 
 ✅ Good:
+
 ```jsx
-items.map(item => <Item key={item.id} />)
+items.map((item) => <Item key={item.id} />)
 ```
 
 Stable keys prevent UI bugs and re-renders.
@@ -216,7 +233,7 @@ Stable keys prevent UI bugs and re-renders.
 ### 1️⃣1️⃣ Use Environment Variables
 
 ```js
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL
 ```
 
 Never hardcode production URLs.
