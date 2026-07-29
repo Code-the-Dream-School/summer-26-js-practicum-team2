@@ -4,13 +4,31 @@ _Companion to `financial_literacy_app_mvp_backlog.md` (Epic 1 · User Story 4)._
 
 ---
 
-## Persona A (Primary) — "First-checking-account Freshman"
+## Persona A (Primary) — "Working Single Mom of Two"
 
-<!-- pending curriculum team -->
+Meet Abigail! Abigail is a single mom with twin 14-year-olds. 
 
-## Persona B (Secondary) — "First-paycheck Recent Grad"
+She manages all her family’s expenses, including paying for her children’s activities. 
 
-<!-- pending curriculum team -->
+For fun, Abigail likes to go rock climbing and swim at a private pool.
+
+She rents a 2 bedroom apartment and is an Registered Nurse at the local hospital. 
+
+## Persona B (Secondary) — "College Freshman"
+
+Meet Ramona! Ramona is an 18-year-old college student who just started her freshman year of college. 
+
+Ramona has a part-time federal work-study job at a dining hall on her school’s campus. 
+
+Ramona receives federal student loans to cover her tuition and room and board, so the money she earns from her job goes towards groceries, textbooks, fun concerts, and bowling league.
+
+Ramona lives on campus. Her room and board is covered by her student loans. She has access to a free gym on campus.
+Ramona’s additional expenses include:
+Groceries
+Bowling League
+Textbooks
+Concert Tickets
+
 
 ---
 
