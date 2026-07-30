@@ -4,6 +4,7 @@ const variants = {
   warning: 'bg-warning text-neutral-800',
 }
 
+// StatusBadge component for displaying status indicators with different variants
 export default function StatusBadge({ variant = 'default', className = '', children, ...props }) {
   const styles = variants[variant] || variants.default
 

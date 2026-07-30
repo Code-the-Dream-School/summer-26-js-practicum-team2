@@ -45,6 +45,7 @@ export default function Modal({
   }
 
   return (
+    // Native HTML <dialog> element used for the modal
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
@@ -82,7 +83,7 @@ export default function Modal({
       {/* Main content */}
       <div className="px-6 py-5">{children}</div>
 
-      {/* Footer */}
+      {/* Optional Footer */}
       {footer && (
         <footer className="flex flex-wrap justify-end gap-3 border-t border-neutral-200 bg-surface-raised px-6 py-4">
           {footer}

@@ -3,6 +3,7 @@ const variants = {
   rectangle: 'min-h-24 rounded-md',
 }
 
+// Skeleton component for displaying loading placeholders with different variants
 export default function Skeleton({
   variant = 'rectangle',
   width,
@@ -28,19 +29,9 @@ export default function Skeleton({
 }
 
 export function SkeletonLine(props) {
-  return (
-    <Skeleton
-      variant="line"
-      {...props}
-    />
-  )
+  return <Skeleton variant="line" {...props} />
 }
 
 export function SkeletonRectangle(props) {
-  return (
-    <Skeleton
-      variant="rectangle"
-      {...props}
-    />
-  )
+  return <Skeleton variant="rectangle" {...props} />
 }

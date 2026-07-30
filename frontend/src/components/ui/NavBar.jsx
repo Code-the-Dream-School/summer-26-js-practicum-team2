@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import logo from '../../assets/logo.svg'
 
+// Declares menu links for the navigation bar
 const menuLinks = [
   { label: 'About', href: '/about' },
   { label: 'Privacy & Terms', href: '/privacy' },
@@ -11,18 +12,20 @@ const menuLinks = [
 ]
 
 export default function NavBar() {
+  // State to track whether the mobile menu is open
   const [isOpen, setIsOpen] = useState(false)
-
+  // Listen for esc key to close the hamburger menu
   useEffect(() => {
     function handleEscape(event) {
       if (event.key === 'Escape') {
         setIsOpen(false)
       }
     }
-
+    // Attach the event listener for the escape key
     window.addEventListener('keydown', handleEscape)
 
     return () => {
+      // Clean up the event listener for the escape key
       window.removeEventListener('keydown', handleEscape)
     }
   }, [])
@@ -35,19 +38,17 @@ export default function NavBar() {
       {/* Main navigation */}
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="/" aria-label="Sprout home">
-          <img
-            src={logo}
-            alt=""
-            className="w-32 lg:w-36"
-          />
+          <img src={logo} alt="" className="w-32 lg:w-36" />
         </a>
 
         {/* Desktop links */}
         <ul className="hidden items-center gap-2 md:flex">
+          {/* Map through the menu links and render them as list items */}
           {menuLinks.map((link) => (
             <li key={link.label}>
               <a
                 href={link.href}
+                // Open external links in a new tab
                 target={link.href.startsWith('http') ? '_blank' : undefined}
                 rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
                 className={
@@ -59,10 +60,7 @@ export default function NavBar() {
                 {link.label}
 
                 {link.href.startsWith('http') && (
-                  <span className="sr-only">
-                    {' '}
-                    (opens in a new tab)
-                  </span>
+                  <span className="sr-only"> (opens in a new tab)</span>
                 )}
               </a>
             </li>
@@ -88,11 +86,7 @@ export default function NavBar() {
         <div className="fixed inset-0 z-50 bg-surface-app md:hidden">
           <div className="flex h-20 items-center justify-between border-b border-neutral-200 px-4">
             <a href="/" onClick={() => setIsOpen(false)}>
-              <img
-                src={logo}
-                alt="Sprout"
-                className="w-32"
-              />
+              <img src={logo} alt="Sprout" className="w-32" />
             </a>
 
             <button
@@ -107,12 +101,11 @@ export default function NavBar() {
 
           <ul>
             {menuLinks.map((link) => (
-              <li
-                key={link.label}
-                className="border-b border-neutral-300"
-              >
+              // Render each menu link as a list item in the mobile navigation
+              <li key={link.label} className="border-b border-neutral-300">
                 <a
                   href={link.href}
+                  // Open external links in a new tab
                   target={link.href.startsWith('http') ? '_blank' : undefined}
                   rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
                   onClick={() => setIsOpen(false)}
@@ -123,10 +116,6 @@ export default function NavBar() {
               </li>
             ))}
           </ul>
-
-          <p className="absolute bottom-0 w-full bg-surface-inset py-6 text-center text-small">
-            Copyright {new Date().getFullYear()}
-          </p>
         </div>
       )}
     </nav>

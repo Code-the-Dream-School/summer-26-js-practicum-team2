@@ -32,6 +32,7 @@ export default function Toast({
   // Don't show anything if the toast is closed
   if (!isOpen) return null
 
+  // Determine the styles for the toast based on its variant
   const styles = variantClasses[variant] || variantClasses.default
 
   return (
