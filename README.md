@@ -4,7 +4,7 @@
 
 Sprout is a friendly, gamified money-basics app for college freshmen and
 recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
-and a per-lesson plant-growth reward loop help first-checking-account and
+and a per-lesson plant-growth reward loop help first-checking-accout and
 first-paycheck learners feel in control of their money — without a lecture.
 
 See [`docs/brand.md`](docs/brand.md) for the full brand identity and
@@ -13,9 +13,9 @@ for logo usage rules.
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https://summer-26-js-practicum-team2.netlify.app/
+- **Frontend Live Site:** https:/sprout-ctd.netlify.app/
 - **Frontend Repo:** /frontend
-- **Backend Live Site:** https://summer-26-js-practicum-team2-backend.onrender.com
+- **Backend Live Site:** https://sprout-backend-x46w.onrender.com
 - **Backend Repo:** /backend
 
 ## 🧠 Problem Statement
@@ -44,7 +44,7 @@ first-paycheck recent grad.
 
 ## 📸 Screenshots
 
-Add screenshots or GIFs of key features here.
+<!-- Add screenshots or GIFs of key features here. -->
 
 ## 🛠 Tech Stack
 
@@ -144,7 +144,7 @@ JWT_SECRET=your_secret_key
 ```
 
 Backend runs on:  
-http://localhost:8080
+http://localhost:5000
 
 ### Frontend Setup
 
@@ -216,7 +216,7 @@ DELETE /api/items/:id
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
-- Code reviews before merging to `main`
+- Code reviews before merging to `main`m `develpment` or `docs`
 
 ## 🧩 Development Process
 
