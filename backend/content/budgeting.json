@@ -18,6 +18,85 @@
       "description": "Ramona is an 18 year old Freshman college student who works part-time on campus."
     }
   ],
+  "budgets": [
+    {
+      "budgetId": "abigail-complete-budget",
+      "characterRef": "abigail",
+      "type": "budget-summary",
+      "title": "Abigail's Budget",
+      "showTotals": true,
+
+      "income": [
+        {
+          "id": "paycheck",
+          "name": "Registered Nurse Paycheck",
+          "amount": 5800
+        },
+        {
+          "id": "childSupport",
+          "name": "Child Support",
+          "amount": 1230
+        }
+      ],
+
+      "fixedExpenses": {
+        "needs": [
+          {
+            "id": "rent",
+            "name": "Rent",
+            "amount": 1200
+          },
+          {
+            "id": "carPayment",
+            "name": "Car Payment",
+            "amount": 300
+          }
+        ],
+        "wants": [
+          {
+            "id": "sportsActivities",
+            "name": "Sports Activities for Kids",
+            "amount": 40
+          },
+          {
+            "id": "rockClimbing",
+            "name": "Rock Climbing Membership",
+            "amount": 80
+          }
+        ]
+      },
+
+      "variableExpenses": {
+        "needs": [
+          {
+            "id": "groceries",
+            "name": "Groceries",
+            "amount": 420
+          },
+          {
+            "id": "gasoline",
+            "name": "Gasoline",
+            "amount": 14
+          },
+          {
+            "id": "electricity",
+            "name": "Electricity",
+            "amount": 95
+          }
+        ],
+
+        "wants": []
+      },
+
+      "summary": {
+        "totalIncome": 7030,
+        "totalFixedExpenses": 1625,
+        "totalVariableExpenses": 529,
+        "totalExpenses": 2154,
+        "netCashFlow": 4876
+      }
+    }
+  ],
   "lessons": [
     {
       "id": "1.1",
@@ -119,6 +198,24 @@
         },
         {
           "id": "1.1.3",
+          "title": "Ramona introduction",
+          "microLessonContent": [
+            {
+              "type": "characterIntro",
+              "text": "Meet Ramona! She is an 18-year-old college Freshman."
+            },
+            {
+              "type": "paragraph",
+              "text": "Ramona has a part-time federal work-study job at her campus dining hall."
+            },
+            {
+              "type": "paragraph",
+              "text": "Ramona receives federal student loans to cover her tuition, room, and board.\nThe money she earns from her job goes towards groceries, textbooks, fun concerts, and her bowling league. "
+            }
+          ]
+        },
+        {
+          "id": "1.1.4",
           "title": "Cash Flow",
           "microLessonContent": [
             {
@@ -153,15 +250,15 @@
               "type": "knowledgeCheck",
               "id": "1.1.3-q2",
               "questionType": "multipleChoice",
-              "question": "Beaver earns $2,000 and spends $1500. What is Beaver's cash flow?",
+              "question": "Ramona earns $1,200 per month and spends $1,000 per month. How much does Beaver have at the end of each month?",
               "answerChoices": [
-                { "key": "a", "text": "$300" },
-                { "key": "b", "text": "-$700" },
-                { "key": "c", "text": "$1000" },
+                { "key": "a", "text": "$200" },
+                { "key": "b", "text": "-$200" },
+                { "key": "c", "text": "$2,200" },
                 { "key": "d", "text": "$500" }
               ],
               "correctResponse": "d",
-              "explanation": "Beaver's Cash Flow monitors how much cash is moving into and out of Beaver's account. $2,000 minus $1,500 equals $500.Beaver has more incoming money than outgoing money so Beaver has positive Cash Flow"
+              "explanation": "Ramona's Cash Flow monitors how much cash is moving into and out of Ramona's account. Within the same month, Ramona's Income( $1,200) - Ramona's Expenses ( $1500) = Ramona's Cash Flow ( $500). Ramona has more incoming money than outgoing money so Ramona has positive Cash Flow."
             },
             {
               "type": "knowledgeCheck",
@@ -190,24 +287,6 @@
       "microLessons": [
         {
           "id": "1.2.1",
-          "title": "Ramona introduction",
-          "microLessonContent": [
-            {
-              "type": "characterIntro",
-              "text": "Meet Ramona! She is an 18-year-old college Freshman."
-            },
-            {
-              "type": "paragraph",
-              "text": "Ramona has a part-time federal work-study job at her campus dining hall."
-            },
-            {
-              "type": "paragraph",
-              "text": "Ramona receives federal student loans to cover her tuition, room, and board. The money she earns from her job goes towards groceries, textbooks, fun concerts, and her bowling league."
-            }
-          ]
-        },
-        {
-          "id": "1.2.2",
           "title": "Sources of Income",
           "microLessonContent": [
             {
@@ -278,7 +357,7 @@
           ]
         },
         {
-          "id": "1.2.3",
+          "id": "1.2.2",
           "title": "Calculating Income",
           "microLessonContent": [
             {
@@ -356,7 +435,7 @@
           ]
         },
         {
-          "id": "1.2.4",
+          "id": "1.2.3",
           "title": "Gross vs Net Income",
           "microLessonContent": [
             {
@@ -599,6 +678,59 @@
     },
     {
       "id": "1.4",
+      "title": "Fixed vs Variable Expenses",
+      "learningGoal": "By the end of this lesson, you'll be able to identify the difference between fixed and variable expenses, as well as categorize common expenses into each type.",
+      "estimatedMin": 10,
+      "passingScore": 70,
+      "microLessons": [
+        {
+          "id": "1.4.1",
+          "title": "Fixed vs Variable Expense",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Let's take a look at some of Abigail's monthly expenses."
+            },
+            {
+              "type": "budget-summary",
+              "budgetId": "abigail-complete-budget"
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "PLACEHOLDER lesson and question",
+              "questionType": "multipleChoice",
+              "question": "",
+              "answerChoices": [
+                { "key": "a", "text": "" },
+                { "key": "b", "text": "" },
+                { "key": "c", "text": "" },
+                { "key": "d", "text": "" }
+              ],
+              "correctResponse": "d",
+              "explanation": ""
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "PLACEHOLDER lesson and question id",
+              "questionType": "multiSelect",
+              "question": "",
+              "answerChoices": [
+                { "key": "a", "text": "" },
+                { "key": "b", "text": "" },
+                { "key": "c", "text": "" },
+                { "key": "d", "text": "" }
+              ],
+              "correctResponse": ["b", "d"],
+              "explanation": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.5",
       "title": "",
       "learningGoal": "",
       "estimatedMin": 10,
@@ -611,6 +743,67 @@
             {
               "type": "",
               "text": ""
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "PLACEHOLDER lesson and question",
+              "questionType": "multipleChoice",
+              "question": "",
+              "answerChoices": [
+                { "key": "a", "text": "" },
+                { "key": "b", "text": "" },
+                { "key": "c", "text": "" },
+                { "key": "d", "text": "" }
+              ],
+              "correctResponse": "d",
+              "explanation": ""
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "PLACEHOLDER lesson and question id",
+              "questionType": "multiSelect",
+              "question": "",
+              "answerChoices": [
+                { "key": "a", "text": "" },
+                { "key": "b", "text": "" },
+                { "key": "c", "text": "" },
+                { "key": "d", "text": "" }
+              ],
+              "correctResponse": ["b", "d"],
+              "explanation": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.6",
+      "title": "Tracking Your Expenses",
+      "learningGoal": "By the end of this lesson, you'll be able to track your expenses, compare your spending to your budget, and make adjustments based on your spending habits.",
+      "estimatedMin": 10,
+      "passingScore": 70,
+      "microLessons": [
+        {
+          "id": "1.6.1",
+          "title": "Tracking Expenses",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Now that Abigail has her budget, the next step is to track her spending over the next 2 months to see if her budget is accurate and learn about her spending habits."
+            },
+            {
+              "type": "paragraph",
+              "text": "There's several different ways that Abigail can track her spending including:"
+            },
+            {
+              "type": "unorderedList",
+              "items": ["Pen and Paper", "Spreadsheets", "An App"]
+            },
+            {
+              "type": "paragraph",
+              "text": "Abigail decides that the best method that works for her is an app on her phone."
             }
           ],
           "knowledgeChecks": [
