@@ -1,26 +1,37 @@
-# Project Name
+# Sprout
 
-Short, clear description of what this application does and who it’s for.  
-(1–2 sentences max.)
+**Plant your money. Watch it grow.**
 
-**Example:**  
-A full-stack web application with a React frontend and a Node/Express backend that allows users to create, manage, and track data stored in a database.
+Sprout is a friendly, gamified money-basics app for college freshmen and
+recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
+and a per-lesson plant-growth reward loop help first-checking-accout and
+first-paycheck learners feel in control of their money — without a lecture.
+
+See [`docs/brand.md`](docs/brand.md) for the full brand identity and
+[`docs/brand-identity/logo-usage.md`](docs/brand-identity/logo-usage.md)
+for logo usage rules.
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https://your-frontend-url.com  
-- **Frontend Repo:** /frontend  
+- **Frontend Live Site:** https:/sprout-ctd.netlify.app/
+- **Frontend Repo:** /frontend
+- **Backend Live Site:** https://sprout-backend-x46w.onrender.com
 - **Backend Repo:** /backend
 
 ## 🧠 Problem Statement
 
-What problem does this project solve?
+Most young adults handle their first checking account, paycheck, and rent
+payment with no formal money education. Existing personal-finance apps
+either lecture, push wealth-management products, or assume the user already
+speaks fluent finance — none of which fits a college freshman or a
+first-paycheck recent grad.
 
-- Who is this application for?
-- What pain point does it address?
-- Why does this solution matter?
-
-Focus on the **user problem**, not the technology.
+- **Who is this for?** Single moms (Persona A, "Working Single Mom of Two") and Freshman in College (Persona B, "College Freshman").
+- **Pain point:** They want to feel smarter about money but don't want a
+  lecture, an advisor pitch, or a 30-minute reading assignment. They want a way to learn in between classes or shifts
+- **Why this matters:** Small, confident money habits formed early
+  compound. Sprout keeps the learning loop short (3–5 min per lesson) and
+  makes the reward visible via the plant-growth mechanic.
 
 ## 🎯 Features
 
@@ -33,29 +44,30 @@ Focus on the **user problem**, not the technology.
 
 ## 📸 Screenshots
 
-Add screenshots or GIFs of key features here.
-
-
+<!-- Add screenshots or GIFs of key features here. -->
 
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - React
 - JavaScript (ES6+)
 - HTML5
-- CSS3 / Tailwind / Bootstrap
+- CSS3 / Tailwind
 - Vite or Create React App
 
 ### Backend
+
 - Node.js
 - Express.js
 - REST API
 
 ### Database
-- MongoDB (Mongoose) **or**
-- PostgreSQL (Prisma / Knex / Sequelize)
+
+- MongoDB (Mongoose) 
 
 ### Tooling
+
 - Git & GitHub
 - dotenv (environment variables)
 - ESLint / Prettier
@@ -66,16 +78,33 @@ Add screenshots or GIFs of key features here.
 project-root/
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/        
-│   │   ├── styles/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── index.html
-│   └── package.json
+|   |   ├── app             # Application-level configuration
+│   │   │
+│   │   │    └── router/    # Routes and navigation configuration
+│   │   │
+│   │   ├── assets/         # Images, icons, and other static assets
+│   │   │
+│   │   ├── components/     # Reusable React components
+│   │   │   ├── layout/     # Shared page layout components
+│   │   │   └── ui/         # Reusable UI components
+│   │   │
+│   │   ├── context/        # Global React contexts
+│   │   │
+│   │   ├── hooks/          # Shared custom React hooks
+│   │   │
+│   │   ├── pages/          # Route-level page components
+│   │   │
+│   │   ├── services/       # API requests and external services
+│   │   │
+│   │   ├── styles/         # Shared styles and Tailwind customization()
+│   │   │
+│   │   ├── utils/          # Shared helper functions
+│   │   │
+│   │   ├── App.jsx         # Main application component
+│   │   │
+│   │   ├── index.css       # Global styles and Tailwind import
+│   │   │
+│   │   └── main.jsx        # Application entry point
 │
 ├── backend/
 │   ├── controllers/
@@ -93,9 +122,10 @@ project-root/
 ## ⚙️ Setup & Installation
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- npm or yarn
-- MongoDB or PostgreSQL (local or cloud)
+
+- Node.js (v24+ recommended)
+- npm
+- MongoDB
 
 ### Backend Setup
 
@@ -114,7 +144,7 @@ JWT_SECRET=your_secret_key
 ```
 
 Backend runs on:  
-http://localhost:8080
+http://localhost:5000
 
 ### Frontend Setup
 
@@ -130,13 +160,21 @@ http://localhost:5173
 ## 🧪 Available Scripts
 
 ### Frontend
+
+Run commands from the `frontend` directory.
+
 ```bash
-npm run dev
-npm run build
-npm run preview
+npm run dev # start the development server
+npm run build # create the production build
+npm run preview # preview the production build
+npm run lint # check code with ESLint
+npm run lint:fix # fix supported ESLint issues
+npm run format # format files with Prettier
+npm run format:check # check formatting without changing files
 ```
 
 ### Backend
+
 ```bash
 npm run dev
 npm start
@@ -157,17 +195,28 @@ DELETE /api/items/:id
 
 ## 🤝 Team & Collaboration
 
-### Team Members
-- Name — Role
-- Name — Role
-- Name — Role
+### Practicum Lead
+- Frank Stepanski - [@frankstepanski](https://github.com/frankstepanski)
+
+### Mentors
+
+- Mario Martinez - [@mntri4](https://github.com/mntri4)
+- Hector Gonzalez - [@hectarek](https://github.com/hectarek)
+
+### Developers
+
+- Berenice Rojas — [@berenicerojas](https://github.com/berenicerojas)
+- Danylo Hetmanenko — [@DanyloHet](https://github.com/DanyloHet)
+- Kristen Wishart — [@kwishart24](https://github.com/kwishart24)
+- Maryzabeth Philip — [@BytesofStrength](https://github.com/BytesOfStrength)
+- Mikey Nichols — [@mnichols08](https://github.com/mnichols08)
 
 ### Workflow
+
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
-- Code reviews before merging to `main`
-
+- Code reviews before merging to `main`m `develpment` or `docs`
 
 ## 🧩 Development Process
 
