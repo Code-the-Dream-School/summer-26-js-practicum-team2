@@ -1,0 +1,650 @@
+{
+  "id": "budgeting-and-cash-flow-basics",
+  "title": "Budgeting and Cash Flow Basics",
+  "tags": ["budget", "cashflow", "income", "expenses"],
+  "metadata": {
+    "applicationName": "Sprout",
+    "author": "Sprout"
+  },
+  "characters": [
+    {
+      "characterId": "abigail",
+      "name": "Abigail",
+      "description": "Abigail is a single mom with twin 14 year old twins who works as a Registered Nurse."
+    },
+    {
+      "characterId": "ramona",
+      "name": "Ramona",
+      "description": "Ramona is an 18 year old Freshman college student who works part-time on campus."
+    }
+  ],
+  "lessons": [
+    {
+      "id": "1.1",
+      "title": "What is Cash Flow and a Budget?",
+      "learningGoal": "By the end of this lesson, you'll understand what a budget is, why it's important, and how to calculate basic cash flow.",
+      "estimatedMin": 5,
+      "passingScore": 70,
+      "microLessons": [
+        {
+          "id": "1.1.1",
+          "title": "Abigail introduction",
+          "microLessonContent": [
+            {
+              "type": "characterIntro",
+              "text": "Meet Abigail! Abigail is a single mom with twin 14-year-olds."
+            },
+            {
+              "type": "paragraph",
+              "text": "She manages all her family's expenses, including paying for her children's activities."
+            },
+            {
+              "type": "paragraph",
+              "text": "For fun, Abigail likes to go rock climbing and swim at her apartment complex's pool."
+            }
+          ]
+        },
+        {
+          "id": "1.1.2",
+          "title": "What is a Budget?",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Juggling everything going on in her life, Abigail feels like she isn't in control of her money."
+            },
+            {
+              "type": "paragraph",
+              "text": "She wishes that she had a clearer view of her spending so she could cut unnecessary spending and save up for a future vacation."
+            },
+            {
+              "type": "callout",
+              "text": "To help her feel in control of her money, Abigail has decided to create a budget. "
+            },
+            {
+              "type": "paragraph",
+              "text": "A budget is simply a plan for your money. It's a tool you can use to help make financial decisions."
+            },
+            {
+              "type": "paragraph",
+              "text": "Budgets involve two main categories: income and expenses."
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.1.2-q2",
+              "questionType": "multipleChoice",
+              "question": "What is the purpose of a budget?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "To help you feel in control of your money"
+                },
+                { "key": "b", "text": "A plan for your money" },
+                { "key": "c", "text": "Includes your income and expenses" },
+                { "key": "d", "text": "All of the above" }
+              ],
+              "correctResponse": "d",
+              "explanation": "The purpose of a budget helps you feel in control of your money by laying out all your income and expenses and creating a plan for your money."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.1.2-q3",
+              "questionType": "trueFalse",
+              "question": " True or False? You should create a budget to help you track where your money is going.",
+              "correctResponse": true,
+              "explanation": "Creating a budget does help you track where your money is going."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.1.2-q4",
+              "questionType": "multipleChoice",
+              "question": "When creating a budget, what are the two main categories that you need to track?",
+              "answerChoices": [
+                { "key": "a", "text": "Income and expenses" },
+                {
+                  "key": "b",
+                  "text": "Credit card debt and unused balance of credit card"
+                },
+                {
+                  "key": "c",
+                  "text": "Retirement accounts and interest from a CD that will mature 5 years from now."
+                },
+                { "key": "d", "text": "Student loan debt" }
+              ],
+              "correctResponse": "a",
+              "explanation": "Budgeting manages the money that you earn (income) with the expenses that you have."
+            }
+          ]
+        },
+        {
+          "id": "1.1.3",
+          "title": "Cash Flow",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Cash flow is tracking the money you earn and the money you're spending."
+            },
+            {
+              "type": "formula",
+              "text": "Money In (Income) - Money Out (Expenses) = Cash Flow"
+            },
+            {
+              "type": "example",
+              "text": "As a Registered Nurse (RN), Abigail earns $7,500 per month. Her total monthly expenses are $2,154.\n\n$7,500 (Income) - $2,154 (Expenses) = $5,346 (Net Cash Flow)\nSo Abigail's total cash flow each month is about $5,346."
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.1.3-q1",
+              "questionType": "multipleChoice",
+              "question": "How do you calculate cash flow?",
+              "answerChoices": [
+                { "key": "a", "text": "Expenses - Income = Cash Flow" },
+                { "key": "b", "text": "Income + Expenses = Cash Flow" },
+                { "key": "c", "text": "Income - Expenses = Cash Flow" },
+                { "key": "d", "text": "Income x Expenses = Cash Flow" }
+              ],
+              "correctResponse": "c",
+              "explanation": "Cash flow describes the movement of cash moving into and out of an account over a specific period. Income - Expenses = Cash Flow."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.1.3-q2",
+              "questionType": "multipleChoice",
+              "question": "Beaver earns $2,000 and spends $1500. What is Beaver's cash flow?",
+              "answerChoices": [
+                { "key": "a", "text": "$300" },
+                { "key": "b", "text": "-$700" },
+                { "key": "c", "text": "$1000" },
+                { "key": "d", "text": "$500" }
+              ],
+              "correctResponse": "d",
+              "explanation": "Beaver's Cash Flow monitors how much cash is moving into and out of Beaver's account. $2,000 minus $1,500 equals $500.Beaver has more incoming money than outgoing money so Beaver has positive Cash Flow"
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.1.3-q3",
+              "questionType": "multiSelect",
+              "question": "What are the two numbers you need to calculate cash flow (select all that apply)?",
+              "answerChoices": [
+                { "key": "a", "text": "Credit score" },
+                { "key": "b", "text": "Income" },
+                { "key": "c", "text": "Bank Account Numbers" },
+                { "key": "d", "text": "Expenses" }
+              ],
+              "correctResponse": ["b", "d"],
+              "explanation": "Cash Flow considers incoming cash from all sources of income and all cash that is outgoing to pay for expenses within a period of time."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.2",
+      "title": "Income",
+      "learningGoal": "By the end of this lesson, you'll be able to identify different sources of income, calculate monthly income, and explain the difference between gross pay and net pay.",
+      "estimatedMin": 5,
+      "passingScore": 70,
+      "microLessons": [
+        {
+          "id": "1.2.1",
+          "title": "Ramona introduction",
+          "microLessonContent": [
+            {
+              "type": "characterIntro",
+              "text": "Meet Ramona! She is an 18-year-old college Freshman."
+            },
+            {
+              "type": "paragraph",
+              "text": "Ramona has a part-time federal work-study job at her campus dining hall."
+            },
+            {
+              "type": "paragraph",
+              "text": "Ramona receives federal student loans to cover her tuition, room, and board. The money she earns from her job goes towards groceries, textbooks, fun concerts, and her bowling league."
+            }
+          ]
+        },
+        {
+          "id": "1.2.2",
+          "title": "Sources of Income",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "There are many different sources of income.Some common sources of income include:"
+            },
+            {
+              "type": "unorderedList",
+              "items": [
+                "Paychecks from a job",
+
+                "Tips",
+                "Freelancing",
+                "Child Support",
+                "Alimony from a divorce or separation",
+                "Government Benefits like Social Security or Unemployment Benefits",
+                "Rental Income",
+                "Investment Income"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Abigail, our single mom of two, makes income as a Registered nurse and receives child support from her ex-husband. So, her two sources of income are her paychecks and monthly child support."
+            },
+            {
+              "type": "paragraph",
+              "text": "Ramona, on the other hand, only has income from her part-time campus position. So her sole source of income is from her paychecks."
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.2-q1",
+              "questionType": "multipleChoice",
+              "question": "What is an example of income?",
+              "answerChoices": [
+                { "key": "a", "text": "Groceries" },
+                { "key": "b", "text": "Paycheck" },
+                { "key": "c", "text": "Electric Bill" },
+                { "key": "d", "text": "Car Payment" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Paychecks, child support, interest earned on investments, and sales of goods are just some examples of sources of income."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.2-q2",
+              "questionType": "trueFalse",
+              "question": "True or False? Income only includes the money you make from a job.",
+              "correctResponse": false,
+              "explanation": "There are multiple types of income. Paychecks, child support, interest earned on investments, and sales of goods are just some examples of sources of income."
+            },
+
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.2-q3",
+              "questionType": "multiSelect",
+              "question": "Select Abigail's source(s) of income (select all that apply)",
+              "answerChoices": [
+                { "key": "a", "text": "Car Payment" },
+                { "key": "b", "text": "Gasoline" },
+                { "key": "c", "text": "Paycheck" },
+                { "key": "d", "text": "Child Support" }
+              ],
+              "correctResponse": ["c", "d"],
+              "explanation": "Abigail's sources of income include both her paycheck and child support payments."
+            }
+          ]
+        },
+        {
+          "id": "1.2.3",
+          "title": "Calculating Income",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Abigail receives a bi-weekly paycheck from her job and a monthly child support check."
+            },
+            {
+              "type": "paragraph",
+              "text": "Paychecks are commonly paid on a weekly, bi-weekly, or semi-monthly schedule."
+            },
+            {
+              "type": "paragraph",
+              "text": "Abigail is paid bi-weekly, which means she receives a paycheck every two weeks for a total of 26 paychecks per year."
+            },
+            {
+              "type": "paragraph",
+              "text": "If Abigail were paid semi-monthly, she would receive 24 paychecks per year on the same two dates each month. "
+            },
+            {
+              "type": "paragraph",
+              "text": "Common semi-monthly pay dates are the 1st and 15th or the 15th and last day of the month."
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.3-q1",
+              "questionType": "multiSelect",
+              "question": "Select the most common pay frequencies for paychecks (select all that apply):",
+              "answerChoices": [
+                { "key": "a", "text": "Weekly" },
+                { "key": "b", "text": "Yearly" },
+                { "key": "c", "text": "Semi-Monthly" },
+                { "key": "d", "text": "Bi-Weekly" }
+              ],
+              "correctResponse": ["a", "c", "d"],
+              "explanation": "Paychecks are usually paid weekly, bi-weekly, and semi-monthly. The decision is made by the employer."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.3-q2",
+              "questionType": "multipleChoice",
+              "question": "How many paychecks does Abigail receive per year since she is paid on a bi-weekly basis?",
+              "answerChoices": [
+                { "key": "a", "text": "26" },
+                { "key": "b", "text": "24" },
+                { "key": "c", "text": "20" },
+                { "key": "d", "text": "30" }
+              ],
+              "correctResponse": "a",
+              "explanation": "Bi-weekly paychecks will total 26 paychecks per year. Semi-monthly paychecks will count towards 24 paychecks per year."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.3-q3",
+              "questionType": "trueFalse",
+              "question": "True or false? Semi-monthly paychecks are paid on the same 2 dates every month?",
+              "correctResponse": true,
+              "explanation": " Usually, semi-monthly paychecks are paid to employees consistently on the same 2 dates every month."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.3-q4",
+              "questionType": "multipleChoice",
+              "question": "Let's help Abigail calculate her income.\n\nAbigail works a full-time job as a nurse at the local hospital. She makes $84,000 a year after taxes are taken out. What is her monthly income? (Hint: Divide total yearly income by 12 to get monthly income)",
+              "answerChoices": [
+                { "key": "a", "text": "$5,000" },
+                { "key": "b", "text": "$7,000" },
+                { "key": "c", "text": "$10,000" },
+                { "key": "d", "text": "$84,000" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Divide the total yearly income by 12. Abigail earns $84,000/12 = $7,000 per month"
+            }
+          ]
+        },
+        {
+          "id": "1.2.4",
+          "title": "Gross vs Net Income",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "When Abigail looks at her latest paystub, she sees that she made a total of $3,500 for the past 2 weeks. However, she only receives $2,700 in her bank account. Why is that?"
+            },
+            {
+              "type": "callout",
+              "text": ""
+            },
+            {
+              "type": "paragraph",
+              "text": "The total amount that Abigail sees on her paycheck of $3,500 is called her gross pay."
+            },
+            {
+              "type": "paragraph",
+              "text": "Gross pay is the total amount of money earned in that pay period before any deductions. The $3,500 is her gross pay."
+            },
+            {
+              "type": "paragraph",
+              "text": "So then why did she receive $800 less in her bank account?"
+            },
+            {
+              "type": "paragraph",
+              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'.Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or retirement plans."
+            },
+            {
+              "type": "formula",
+              "text": "Gross Pay - Taxes/Benefits = Net Pay (Take Home Pay)"
+            }
+          ],
+
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.4-q1",
+              "questionType": "multipleChoice",
+              "question": "Gross Pay is:",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "The amount you take home after deductions"
+                },
+                {
+                  "key": "b",
+                  "text": "The total amount earned before deductions"
+                },
+                { "key": "c", "text": "The amount deducted for taxes" },
+                {
+                  "key": "d",
+                  "text": "The amount deposited into your bank account"
+                }
+              ],
+              "correctResponse": "b",
+              "explanation": "Gross pay is your total pay before you take out taxes and any employer benefits you might be paying into."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.4-q2",
+              "questionType": "multipleChoice",
+              "question": "Net pay is:",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "The total amount earned before deductions"
+                },
+                { "key": "b", "text": "The amount received after deductions" },
+                { "key": "c", "text": "The amount withheld for taxes" },
+                { "key": "d", "text": "The amount earned from overtime" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Net pay is your “take home pay”. It's your total pay (gross pay) minus the payroll deductions."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.4-q3",
+              "questionType": "multipleChoice",
+              "question": "If Ramona works 20 hours per week for $15 per hour, what is Ramona's gross pay for one week?",
+              "answerChoices": [
+                { "key": "a", "text": "$300" },
+                { "key": "b", "text": "$200" },
+                { "key": "c", "text": "$500" },
+                { "key": "d", "text": "$150" }
+              ],
+              "correctResponse": "a",
+              "explanation": "$15 x 20 = $300"
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.2.4-q4",
+              "questionType": "multipleChoice",
+              "question": "What is the correct formula for calculating your net pay?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Payroll deductions - Gross Pay = Net Pay"
+                },
+                {
+                  "key": "b",
+                  "text": "Gross Pay - Payroll deductions = Net Pay"
+                },
+                {
+                  "key": "c",
+                  "text": "Gross Pay + Payroll Deductions = Net Pay"
+                },
+                {
+                  "key": "d",
+                  "text": "Payroll Deductions x Gross Pay = Net Pay"
+                }
+              ],
+              "correctResponse": "b",
+              "explanation": "Gross Pay - Payroll deductions = Net Pay. Net pay is your “take home pay”. It's your total pay (gross pay) minus the payroll deductions."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.3",
+      "title": "Understanding Needs vs Wants",
+      "learningGoal": "By the end of this lesson, you'll be able to identify the difference between needs and wants, as well as categorizing common expenses into each group.",
+      "estimatedMin": 5,
+      "passingScore": 70,
+      "microLessons": [
+        {
+          "id": "1.3.1",
+          "title": "Needs vs Wants",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Learning the difference between a need and a want empowers you to create a budget."
+            },
+            {
+              "type": "callout",
+              "text": "Needs are essential expenses for survival or well-being such as medical care, transportation, food, and shelter."
+            },
+            {
+              "type": "paragraph",
+              "text": "Wants are anything non-essential that enhances your life."
+            },
+            {
+              "type": "paragraph",
+              "text": "Needs and wants depend on your personal situation - what is a 'want' for one person might be a 'need' for another person."
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.3.1-q1",
+              "questionType": "multipleChoice",
+              "question": "What would be an example of a need?",
+              "answerChoices": [
+                { "key": "a", "text": "Plushies" },
+                { "key": "b", "text": "Going to the Movies" },
+                { "key": "c", "text": "Food" },
+                { "key": "d", "text": "Concert Tickets" }
+              ],
+              "correctResponse": "c",
+              "explanation": " As fun as plushies, going to the movies and concerts are, you will survive without these things. However, without food, you would not be able to survive."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.3.1-q2",
+              "questionType": "multipleChoice",
+              "question": "What would be an example of a want?",
+              "answerChoices": [
+                { "key": "a", "text": "Food" },
+                { "key": "b", "text": "Shelter" },
+                { "key": "c", "text": "Transportation to work" },
+                { "key": "d", "text": "a new boardgame" }
+              ],
+              "correctResponse": "d",
+              "explanation": "Food, shelter, and transportation to work are all important for survival and are basic needs. A new boardgame is fun, but you will survive without it."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.3.1-q3",
+              "questionType": "trueFalse",
+              "question": "True or false? Needs and wants are the same for everyone.",
+              "correctResponse": false,
+              "explanation": "Needs and wants are different for each person. Something one person considers a need may be a want for someone else. For example, a car may be a need for someone who commutes to work, but a want for someone who has reliable public transportation."
+            }
+          ]
+        },
+        {
+          "id": "1.3.2",
+          "title": "Categorize Abigail's and Ramona's Expenses",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Let's help Abigail and Ramona decide which of their expenses are needs and which are wants."
+            },
+            {
+              "type": "paragraph",
+              "text": "Abigail lives in an apartment complex that has a gym and pool that's included in the price of rent. Her other expenses include: "
+            },
+
+            {
+              "type": "unorderedList",
+              "items": [
+                "Rent",
+                "Groceries",
+                "Rock Climbing Membership",
+                "Electricity Bill",
+                "Gas for the car"
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Ramona lives on campus. Her room and board is covered by her student loans. She has access to a free gym on campus. Ramona's additional expenses include:"
+            },
+            {
+              "type": "unorderedList",
+              "items": [
+                "Groceries",
+                "Bowling league Fees",
+                "College Textbooks",
+                "Concert Tickets"
+              ]
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.3.2-q1",
+              "questionType": "multipleChoice",
+              "question": "Which of Abigail's expenses is a want?",
+              "answerChoices": [
+                { "key": "a", "text": "Rent" },
+                { "key": "b", "text": "Groceries" },
+                { "key": "c", "text": "Rock Climbing Membership" },
+                { "key": "d", "text": "Electricity Bill" }
+              ],
+              "correctResponse": "c",
+              "explanation": "For Abigail, rock climbing is a recreational activity, making it a want rather than an essential expense needed for daily living."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.4",
+      "title": "",
+      "learningGoal": "",
+      "estimatedMin": 10,
+      "passingScore": 70,
+      "microLessons": [
+        {
+          "id": "",
+          "title": "Fixed vs Variable Expense",
+          "microLessonContent": [
+            {
+              "type": "",
+              "text": ""
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "PLACEHOLDER lesson and question",
+              "questionType": "multipleChoice",
+              "question": "",
+              "answerChoices": [
+                { "key": "a", "text": "" },
+                { "key": "b", "text": "" },
+                { "key": "c", "text": "" },
+                { "key": "d", "text": "" }
+              ],
+              "correctResponse": "d",
+              "explanation": ""
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "PLACEHOLDER lesson and question id",
+              "questionType": "multiSelect",
+              "question": "",
+              "answerChoices": [
+                { "key": "a", "text": "" },
+                { "key": "b", "text": "" },
+                { "key": "c", "text": "" },
+                { "key": "d", "text": "" }
+              ],
+              "correctResponse": ["b", "d"],
+              "explanation": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
