@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 function HomePage() {
   return (
     <section className="space-y-6">
@@ -13,12 +15,12 @@ function HomePage() {
         decisions.
       </p>
 
-      <a
-        href="/dev/components"
+      <Link
+        to="/dev/components"
         className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
       >
         &lt;View Component Library /&gt;
-      </a>
+      </Link>
     </section>
   )
 }
