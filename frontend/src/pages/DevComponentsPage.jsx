@@ -6,6 +6,7 @@ import { SkeletonLine, SkeletonRectangle } from '../components/ui/Skeleton.jsx'
 import Toast from '../components/ui/Toast.jsx'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
+import Card from '../components/ui/Card.jsx'
 
 function DevComponentsPage() {
   const [emailValue, setEmailValue] = useState('not-an-email')
@@ -99,6 +100,41 @@ function DevComponentsPage() {
       <p className="text-sm text-slate-600">
         Use Tab to verify the visible focus ring on buttons and inputs.
       </p>
+
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-semibold text-slate-900">Cards</h2>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <p className="text-caption font-semibold uppercase tracking-wide text-primary">
+              Default
+            </p>
+            <h3 className="mt-1 font-heading text-h4 font-bold text-heading">Card title</h3>
+            <p className="mt-2 text-small text-neutral-600">
+              Container primitive with default state.
+            </p>
+          </Card>
+
+          <Card interactive>
+            <p className="text-caption font-semibold uppercase tracking-wide text-primary">
+              Interactive
+            </p>
+            <h3 className="mt-1 font-heading text-h4 font-bold text-heading">Hover me</h3>
+            <p className="mt-2 text-small text-neutral-600">
+              Adds hover affordance for clickable containers.
+            </p>
+          </Card>
+
+          <Card selected>
+            <p className="text-caption font-semibold uppercase tracking-wide text-primary">
+              Selected
+            </p>
+            <h3 className="mt-1 font-heading text-h4 font-bold text-heading">Current selection</h3>
+            <p className="mt-2 text-small text-neutral-600">Shows persistent selected emphasis.</p>
+          </Card>
+        </div>
+      </div>
+
       <Button
         type="button"
         onClick={() => setIsModalOpen(true)}
@@ -163,16 +199,12 @@ function DevComponentsPage() {
             }
           />
 
-          <div
-            aria-label="Loading lesson preview"
-            aria-busy="true"
-            className="space-y-4 rounded-lg border border-neutral-200 bg-surface-raised p-6"
-          >
+          <Card aria-label="Loading lesson preview" aria-busy="true" className="space-y-4 p-6">
             <SkeletonRectangle height={144} />
             <SkeletonLine width="45%" />
             <SkeletonLine />
             <SkeletonLine width="80%" />
-          </div>
+          </Card>
         </div>
       </div>
 
