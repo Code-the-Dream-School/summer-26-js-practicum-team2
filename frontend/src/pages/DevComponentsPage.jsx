@@ -7,10 +7,13 @@ import Toast from '../components/ui/Toast.jsx'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
 import Card from '../components/ui/Card.jsx'
+import Textarea from '../components/ui/Textarea.jsx'
 
 function DevComponentsPage() {
   const [emailValue, setEmailValue] = useState('not-an-email')
   const [emailError, setEmailError] = useState('Please enter a valid email address.')
+  const [notesValue, setNotesValue] = useState('')
+  const [notesError, setNotesError] = useState('Please enter at least 10 characters.')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [toast, setToast] = useState({
@@ -36,6 +39,10 @@ function DevComponentsPage() {
 
   const syncEmailError = (input) => {
     setEmailError(input.validity.valid ? '' : input.validationMessage)
+  }
+
+  const syncNotesError = (input) => {
+    setNotesError(input.validity.valid ? '' : input.validationMessage)
   }
 
   return (
@@ -89,6 +96,45 @@ function DevComponentsPage() {
             disabled
           />
           <Input
+            label="Focused"
+            placeholder="Tab here to verify focus styles"
+            helperText="Use tab key to see the focus ring."
+            className="md:col-span-2"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-slate-900">Textareas</h2>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Textarea label="Default" placeholder="Share your goals" />
+          <Textarea
+            label="With helper text"
+            placeholder="Add context for your support request"
+            helperText="Include account details only if needed."
+          />
+          <Textarea
+            label="Error"
+            required
+            minLength={10}
+            value={notesValue}
+            onChange={(event) => {
+              setNotesValue(event.target.value)
+              syncNotesError(event.target)
+            }}
+            onBlur={(event) => syncNotesError(event.target)}
+            error={notesError || undefined}
+            helperText="Please provide at least 10 characters."
+            placeholder="Describe the issue"
+          />
+          <Textarea
+            label="Disabled"
+            defaultValue="Unavailable while syncing"
+            helperText="This field becomes editable later."
+            disabled
+          />
+          <Textarea
             label="Focused"
             placeholder="Tab here to verify focus styles"
             helperText="Use tab key to see the focus ring."
