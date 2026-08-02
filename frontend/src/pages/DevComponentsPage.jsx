@@ -8,6 +8,7 @@ import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
 import Card from '../components/ui/Card.jsx'
 import Textarea from '../components/ui/Textarea.jsx'
+import ProgressBar from '../components/ui/ProgressBar.jsx'
 
 function DevComponentsPage() {
   const [emailValue, setEmailValue] = useState('not-an-email')
@@ -177,6 +178,49 @@ function DevComponentsPage() {
             </p>
             <h3 className="mt-1 font-heading text-h4 font-bold text-heading">Current selection</h3>
             <p className="mt-2 text-small text-neutral-600">Shows persistent selected emphasis.</p>
+          </Card>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-slate-900">Progress Bars</h2>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="space-y-3">
+            <p className="text-caption font-semibold uppercase tracking-wide text-primary">
+              Lesson progress
+            </p>
+            <p className="text-small text-neutral-600">4 of 6 lessons completed</p>
+            <ProgressBar value={67} showValue label="Lesson progress" />
+            <ProgressBar value={42} tone="warning" showValue label="Lesson progress warning" />
+            <ProgressBar value={18} tone="danger" showValue label="Lesson progress at risk" />
+          </Card>
+
+          <Card className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-caption font-semibold uppercase tracking-wide text-primary">
+                Daily goal
+              </p>
+              <p className="mt-1 text-small text-neutral-600">20 minutes of 30 minutes</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <ProgressBar
+                variant="circular"
+                value={34}
+                size="sm"
+                tone="warning"
+                label="Daily goal warning"
+              />
+              <ProgressBar variant="circular" value={67} size="md" label="Daily goal progress" />
+              <ProgressBar
+                variant="circular"
+                value={92}
+                size="lg"
+                tone="success"
+                label="Daily goal complete"
+              />
+            </div>
           </Card>
         </div>
       </div>
