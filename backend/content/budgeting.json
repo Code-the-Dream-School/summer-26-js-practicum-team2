@@ -18,6 +18,7 @@
       "description": "Ramona is an 18 year old Freshman college student who works part-time on campus."
     }
   ],
+
   "budgets": [
     {
       "budgetId": "abigail-complete-budget",
@@ -95,6 +96,30 @@
         "totalExpenses": 2154,
         "netCashFlow": 4876
       }
+    }
+  ],
+
+  "tables": [
+    {
+      "tableId": "abigail-basic-expenses",
+      "title": "Abigail's Monthly Expenses",
+      "headers": ["Expense", "Cost per Month"],
+      "expenseRefs": [
+        "rent",
+        "carPayment",
+        "electricity",
+        "groceries",
+        "gasoline"
+      ]
+    },
+    {
+      "tableId": "abigail-income",
+      "title": "Income Sources",
+      "headers": ["Income Source", "Monthly Net Pay"],
+      "rows": [
+        ["Nursing", "$5,800"],
+        ["Child Support", "$1,230"]
+      ]
     }
   ],
   "lessons": [
@@ -692,38 +717,84 @@
               "text": "Let's take a look at some of Abigail's monthly expenses."
             },
             {
-              "type": "budget-summary",
-              "budgetId": "abigail-complete-budget"
+              "type": "table",
+              "budgetId": "abigail-basic-expenses"
+            },
+            {
+              "type": "paragraph",
+              "text": "Abigail notices that some expenses stay the same every month:"
+            },
+            {
+              "type": "unorderedList",
+              "items": ["Rent", "Car Payment"]
+            },
+            {
+              "type": "paragraph",
+              "text": "These expenses are the same amount each month and don't change.\n\nShe also notices that some expenses change from month to month:"
+            },
+            {
+              "type": "unorderedList",
+              "items": ["Groceries", "Gasoline", "Electricity"]
+            },
+            {
+              "type": "paragraph",
+              "text": "These expenses might fluctuate each month based on the amount used each time or fluctuating prices.\n\nFor example, Abigail's electricity bill is higher in the summer and winter due to her A/C and heat being powered by electricity.\n\nDuring the spring and fall, she doesn't need to run the heat or A/C as much, so her bill is much lower.\n\nExpenses that stay the same every month are called fixed expenses. Expenses that change from month to month are variable expenses."
             }
           ],
           "knowledgeChecks": [
             {
               "type": "knowledgeCheck",
-              "id": "PLACEHOLDER lesson and question",
+              "id": "1.4.1-q1",
               "questionType": "multipleChoice",
-              "question": "",
+              "question": "Which of these is an example of a fixed expense?",
               "answerChoices": [
-                { "key": "a", "text": "" },
-                { "key": "b", "text": "" },
-                { "key": "c", "text": "" },
-                { "key": "d", "text": "" }
+                { "key": "a", "text": "Rent" },
+                { "key": "b", "text": "Electric Bill" },
+                { "key": "c", "text": "Gas for your Car" },
+                { "key": "d", "text": "Food" }
               ],
-              "correctResponse": "d",
-              "explanation": ""
+              "correctResponse": "a",
+              "explanation": "Rent is a fixed expense because it usually stays the same amount each month."
             },
             {
               "type": "knowledgeCheck",
-              "id": "PLACEHOLDER lesson and question id",
-              "questionType": "multiSelect",
-              "question": "",
+              "id": "1.4.1-q2",
+              "questionType": "multipleChoice",
+              "question": "Which is an example of a variable expense?",
               "answerChoices": [
-                { "key": "a", "text": "" },
-                { "key": "b", "text": "" },
-                { "key": "c", "text": "" },
-                { "key": "d", "text": "" }
+                { "key": "a", "text": "Health Insurance Premium" },
+                { "key": "b", "text": "Car Payment" },
+                { "key": "c", "text": "Electricity Bill" },
+                { "key": "d", "text": "Rent" }
               ],
-              "correctResponse": ["b", "d"],
-              "explanation": ""
+              "correctResponse": "c",
+              "explanation": "Electricity is a variable expense because the amount you use each month can change."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.4.1-q3",
+              "questionType": "trueFalse",
+              "question": "True or false: A variable expense can be different each month?",
+              "answerChoices": [
+                { "key": "a", "text": "True" },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "a",
+              "explanation": "Variable expenses can increase or decrease, so they may be different each month."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.4.1-q4",
+              "questionType": "multipleChoice",
+              "question": "Abigail's electric bill was $80 in April and $110 in July. Why is electricity considered a variable expense?",
+              "answerChoices": [
+                { "key": "a", "text": "It is paid once a year" },
+                { "key": "b", "text": "The amount can change each month" },
+                { "key": "c", "text": "It is always optional" },
+                { "key": "d", "text": "It never changes" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Abigail's electric bill was different in April and July, showing that electricity costs can vary from month to month."
             }
           ]
         }
@@ -856,8 +927,8 @@
                   "text": "Choosing a method that works best for you"
                 },
                 { "key": "b", "text": "Consistency" },
-                { "key": "a", "text": "Hopes and prayers" },
-                { "key": "b", "text": "Never looking at your expenses" }
+                { "key": "c", "text": "Hopes and prayers" },
+                { "key": "d", "text": "Never looking at your expenses" }
               ],
               "correctResponse": ["a", "b"],
               "explanation": "Successful expense tracking depends on using a method you like and keeping up with it regularly."
