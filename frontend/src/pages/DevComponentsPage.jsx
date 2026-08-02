@@ -37,7 +37,9 @@ function DevComponentsPage() {
         </p>
         <h1 className="text-2xl font-bold text-slate-900">Shared Component Checklist</h1>
         <p className="text-small text-neutral-700">
-          This page demonstrates every acceptance criterion for tasks T-1.3.5 through T-1.3.13.
+          This page is for demonstrating the components that are available in the shared component
+          library. It is not intended to be a final design or implementation of any specific page or
+          feature.
         </p>
       </header>
 
