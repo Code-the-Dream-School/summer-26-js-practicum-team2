@@ -1,18 +1,5 @@
-// helper function to clamp a value between a minimum and maximum
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
-}
-
-const circularSizeMap = {
-  sm: 72,
-  md: 108,
-  lg: 144,
-}
-
-const circularStrokeMap = {
-  sm: 8,
-  md: 10,
-  lg: 12,
 }
 
 const toneStyles = {
@@ -34,13 +21,18 @@ const toneStyles = {
   },
 }
 
+const circularSizes = {
+  sm: 56,
+  md: 76,
+  lg: 96,
+}
+
 export default function ProgressBar({
   value,
   min = 0,
   max = 100,
   variant = 'linear',
   size = 'md',
-  strokeWidth,
   tone = 'primary',
   showValue = false,
   label,
@@ -56,15 +48,9 @@ export default function ProgressBar({
   const selectedTone = toneStyles[tone] || toneStyles.primary
 
   if (variant === 'circular') {
-    const sizeKey = typeof size === 'string' ? size : null
-    const resolvedSize =
-      typeof size === 'number' ? size : circularSizeMap[sizeKey] || circularSizeMap.md
-    const resolvedStrokeWidth =
-      typeof strokeWidth === 'number'
-        ? strokeWidth
-        : circularStrokeMap[sizeKey] || circularStrokeMap.md
-
-    const radius = (resolvedSize - resolvedStrokeWidth) / 2
+    const resolvedSize = circularSizes[size] || circularSizes.md
+    const stroke = 8
+    const radius = (resolvedSize - stroke) / 2
     const circumference = 2 * Math.PI * radius
     const dashOffset = circumference - (percent / 100) * circumference
 
@@ -83,7 +69,6 @@ export default function ProgressBar({
           width={resolvedSize}
           height={resolvedSize}
           viewBox={`0 0 ${resolvedSize} ${resolvedSize}`}
-          aria-hidden="true"
         >
           <circle
             cx={resolvedSize / 2}
@@ -92,7 +77,7 @@ export default function ProgressBar({
             fill="none"
             stroke="currentColor"
             className="text-neutral-200"
-            strokeWidth={resolvedStrokeWidth}
+            strokeWidth={stroke}
           />
           <circle
             cx={resolvedSize / 2}
@@ -101,15 +86,14 @@ export default function ProgressBar({
             fill="none"
             stroke="currentColor"
             className={selectedTone.circularRing}
-            strokeWidth={resolvedStrokeWidth}
+            strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={dashOffset}
             transform={`rotate(-90 ${resolvedSize / 2} ${resolvedSize / 2})`}
           />
         </svg>
-
-        <span className="absolute font-semibold text-heading">{roundedPercent}%</span>
+        <span className="absolute text-sm font-semibold text-heading">{roundedPercent}%</span>
       </div>
     )
   }

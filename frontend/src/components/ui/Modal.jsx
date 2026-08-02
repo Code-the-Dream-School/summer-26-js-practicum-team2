@@ -12,6 +12,7 @@ export default function Modal({
   className = '',
 }) {
   const dialogRef = useRef(null)
+  const previousFocusRef = useRef(null)
 
   const titleId = useId()
   const descriptionId = useId()
@@ -23,11 +24,23 @@ export default function Modal({
     if (!dialog) return
 
     if (isOpen && !dialog.open) {
+      previousFocusRef.current = document.activeElement
       dialog.showModal()
+
+      const focusTarget = dialog.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      if (focusTarget instanceof HTMLElement) {
+        focusTarget.focus()
+      }
     }
 
     if (!isOpen && dialog.open) {
       dialog.close()
+
+      if (previousFocusRef.current instanceof HTMLElement) {
+        previousFocusRef.current.focus()
+      }
     }
   }, [isOpen])
 
@@ -44,6 +57,34 @@ export default function Modal({
     }
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key !== 'Tab') return
+
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    const focusableElements = Array.from(
+      dialog.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => !element.hasAttribute('disabled'))
+
+    if (focusableElements.length === 0) return
+
+    const first = focusableElements[0]
+    const last = focusableElements[focusableElements.length - 1]
+
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first.focus()
+    }
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
+      last.focus()
+    }
+  }
+
   return (
     // Native HTML <dialog> element used for the modal
     <dialog
@@ -52,6 +93,7 @@ export default function Modal({
       aria-describedby={description ? descriptionId : undefined}
       onCancel={handleCancel}
       onClick={handleBackdropClick}
+      onKeyDown={handleKeyDown}
       className={`fixed inset-0 z-50 m-auto max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border border-neutral-200 bg-surface-app p-0 text-foreground shadow-lg backdrop:bg-neutral-800/60 ${className}`}
     >
       {/* Header */}

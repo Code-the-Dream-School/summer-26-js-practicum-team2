@@ -1,115 +1,115 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import logo from '../../assets/logo.svg'
 
-// Declares menu links for the navigation bar
-const menuLinks = [
+const primaryLinks = [
+  { label: 'Home', href: '/' },
+  { label: 'Components', href: '/dev/components' },
   { label: 'About', href: '/about' },
   { label: 'Privacy & Terms', href: '/privacy' },
-  { label: 'GitHub', href: 'https://github.com/Code-the-Dream-School' },
+  { label: 'GitHub', href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2' },
   { label: 'Contact', href: '/contact' },
-  { label: 'Login', href: '/login' },
-  { label: 'Sign Up', href: '/register', primary: true },
+  { label: 'Help', href: '/help' },
 ]
 
-export default function NavBar() {
-  // State to track whether the mobile menu is open
+export default function NavBar({
+  signedIn = false,
+  avatarLabel = 'A',
+  xp = 120,
+  streak = 4,
+  className = '',
+}) {
   const [isOpen, setIsOpen] = useState(false)
-  // Listen for esc key to close the hamburger menu
-  useEffect(() => {
-    function handleEscape(event) {
-      if (event.key === 'Escape') {
-        setIsOpen(false)
-      }
-    }
-    // Attach the event listener for the escape key
-    window.addEventListener('keydown', handleEscape)
 
-    return () => {
-      // Clean up the event listener for the escape key
-      window.removeEventListener('keydown', handleEscape)
-    }
-  }, [])
+  const authLinks = signedIn
+    ? [
+        { label: 'Dashboard', href: '/' },
+        { label: 'Profile', href: '/profile' },
+      ]
+    : [
+        { label: 'Login', href: '/login' },
+        { label: 'Signup', href: '/register' },
+      ]
+
+  const mobileLinks = [...primaryLinks, ...authLinks]
 
   return (
     <nav
       aria-label="Primary navigation"
-      className="border-b border-neutral-200 bg-surface-app shadow-sm"
+      className={`border-b border-neutral-200 bg-surface-app shadow-sm ${className}`.trim()}
     >
-      {/* Main navigation */}
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="/" aria-label="Sprout home">
           <img src={logo} alt="" className="w-32 lg:w-36" />
         </a>
 
-        {/* Desktop links */}
-        <ul className="hidden items-center gap-2 md:flex">
-          {/* Map through the menu links and render them as list items */}
-          {menuLinks.map((link) => (
+        <ul className="hidden items-center gap-1 md:flex">
+          {primaryLinks.map((link) => (
             <li key={link.label}>
               <a
                 href={link.href}
-                // Open external links in a new tab
                 target={link.href.startsWith('http') ? '_blank' : undefined}
                 rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                className={
-                  link.primary
-                    ? 'rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover'
-                    : 'rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset'
-                }
+                className="rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset"
               >
                 {link.label}
-
-                {link.href.startsWith('http') && (
-                  <span className="sr-only"> (opens in a new tab)</span>
-                )}
               </a>
             </li>
           ))}
+
+          {!signedIn ? (
+            <>
+              <li>
+                <a
+                  href="/login"
+                  className="rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset"
+                >
+                  Login
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/register"
+                  className="rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover"
+                >
+                  Signup
+                </a>
+              </li>
+            </>
+          ) : (
+            <li>
+              <div className="flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-pill border border-primary font-semibold text-heading">
+                  {avatarLabel}
+                </span>
+                <span className="text-sm font-semibold text-heading">{xp} XP</span>
+                <span className="text-sm text-neutral-600">{streak} day streak</span>
+              </div>
+            </li>
+          )}
         </ul>
 
-        {/* Mobile menu button */}
         <button
           type="button"
-          aria-label="Open navigation menu"
+          aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
-          onClick={() => setIsOpen(true)}
-          className="flex h-11 w-11 flex-col items-center justify-center gap-1.5 border-2 border-heading md:hidden"
+          onClick={() => setIsOpen((value) => !value)}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-neutral-300 text-2xl text-heading md:hidden"
         >
-          <span className="h-0.5 w-6 bg-current" />
-          <span className="h-0.5 w-6 bg-current" />
-          <span className="h-0.5 w-6 bg-current" />
+          {isOpen ? 'x' : '='}
         </button>
       </div>
 
-      {/* Mobile navigation */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 bg-surface-app md:hidden">
-          <div className="flex h-20 items-center justify-between border-b border-neutral-200 px-4">
-            <a href="/" onClick={() => setIsOpen(false)}>
-              <img src={logo} alt="Sprout" className="w-32" />
-            </a>
-
-            <button
-              type="button"
-              aria-label="Close navigation menu"
-              onClick={() => setIsOpen(false)}
-              className="text-3xl text-heading"
-            >
-              ×
-            </button>
-          </div>
-
-          <ul>
-            {menuLinks.map((link) => (
-              // Render each menu link as a list item in the mobile navigation
-              <li key={link.label} className="border-b border-neutral-300">
+      {isOpen ? (
+        <div className="border-t border-neutral-200 px-4 py-3 md:hidden">
+          <ul className="space-y-2">
+            {mobileLinks.map((link) => (
+              <li key={link.label}>
                 <a
                   href={link.href}
-                  // Open external links in a new tab
                   target={link.href.startsWith('http') ? '_blank' : undefined}
                   rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
                   onClick={() => setIsOpen(false)}
-                  className="block py-4 text-center text-lg font-bold text-heading hover:bg-surface-raised"
+                  className="block rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset"
                 >
                   {link.label}
                 </a>
@@ -117,7 +117,7 @@ export default function NavBar() {
             ))}
           </ul>
         </div>
-      )}
+      ) : null}
     </nav>
   )
 }
