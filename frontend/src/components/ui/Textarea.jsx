@@ -43,7 +43,7 @@ function Textarea({
         disabled={disabled}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={describedBy}
-        className={`min-h-28 w-full rounded-lg border px-3.5 py-2.5 text-sm shadow-sm outline-none transition-all duration-200 focus:ring-4 disabled:cursor-not-allowed ${textareaStateClasses} ${className}`}
+        className={`min-h-28 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition-all duration-200 focus:ring-4 disabled:cursor-not-allowed ${textareaStateClasses} ${className}`}
         {...props}
       />
 
