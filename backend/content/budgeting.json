@@ -803,37 +803,151 @@
             },
             {
               "type": "paragraph",
-              "text": "Abigail decides that the best method that works for her is an app on her phone."
+              "text": "Abigail decides that the best method that works for her is an app on her phone.\n\nUsing the app, Abigail is able to categorize each of her purchases and can see where each cent is going.\n\nThe key to expense tracking is consistency and choosing a tracking method that works best for you.\n\nEach week, Abigail sets aside time to review her purchases to make sure they are categorized correctly in the app and to keep an eye on her spending."
             }
           ],
           "knowledgeChecks": [
             {
               "type": "knowledgeCheck",
-              "id": "PLACEHOLDER lesson and question",
-              "questionType": "multipleChoice",
-              "question": "",
+              "id": "1.6.1-q1",
+              "questionType": "multiSelect",
+              "question": "What are different ways to keep track of your spending? Select all that apply.",
               "answerChoices": [
-                { "key": "a", "text": "" },
-                { "key": "b", "text": "" },
-                { "key": "c", "text": "" },
-                { "key": "d", "text": "" }
+                { "key": "a", "text": "Pen and Paper" },
+                { "key": "b", "text": "Spreadsheets" },
+                { "key": "c", "text": "In your Brain" },
+                { "key": "d", "text": "An App" }
               ],
-              "correctResponse": "d",
-              "explanation": ""
+              "correctResponse": ["a", "b", "d"],
+              "explanation": "Pen and paper, spreadsheets, and apps can all help you track your spending, while relying only on memory is not reliable."
             },
             {
               "type": "knowledgeCheck",
-              "id": "PLACEHOLDER lesson and question id",
-              "questionType": "multiSelect",
-              "question": "",
+              "id": "1.6.1-q2",
+              "questionType": "trueFalse",
+              "question": "True or false? The best way to keep track of your spending is just in your head.",
               "answerChoices": [
-                { "key": "a", "text": "" },
-                { "key": "b", "text": "" },
-                { "key": "c", "text": "" },
-                { "key": "d", "text": "" }
+                { "key": "a", "text": "True" },
+                { "key": "b", "text": "False" }
               ],
-              "correctResponse": ["b", "d"],
-              "explanation": ""
+              "correctResponse": "b",
+              "explanation": "Tracking expenses in your head can make it easy to forget purchases or miss important details."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.6.1-q3",
+              "questionType": "trueFalse",
+              "question": "True or false? The method you choose to track your expenses at the beginning is the method you need to stick with the rest of your life.",
+              "answerChoices": [
+                { "key": "a", "text": "True" },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Choose a method that works best for you and don't be afraid to change it if it is no longer working."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.6.1-q4",
+              "questionType": "multiSelect",
+              "question": "What is the key to success when tracking your expenses? Select all that apply.",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Choosing a method that works best for you"
+                },
+                { "key": "b", "text": "Consistency" },
+                { "key": "a", "text": "Hopes and prayers" },
+                { "key": "b", "text": "Never looking at your expenses" }
+              ],
+              "correctResponse": ["a", "b"],
+              "explanation": "Successful expense tracking depends on using a method you like and keeping up with it regularly."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.6.1-q5",
+              "questionType": "trueFalse",
+              "question": "True or false? Tracking your spending is enough.",
+              "answerChoices": [
+                { "key": "a", "text": "True" },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Tracking your spending is important, but you also need to review and use that information to make informed financial decisions."
+            }
+          ]
+        },
+        {
+          "id": "1.6.2",
+          "title": "Compare Spending to Budget",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Now that Abigail has been tracking her spending for a month, it's time for her monthly budget review.\n\nAbigail compares her budget line by line with her spending that she's been tracking in her app.\n\nAfter comparing her budget and spending habits, she notices that she spends closer to $500 on groceries per month.\n\nShe readjusts her budget to increase the amount of money she spends on groceries to $500.\n\nShe also notices that she's not using the rock climbing membership as much as she thought she would, so she decides to cancel her monthly fee for now.\n\nTip: Review your budget monthly.\n\nBy tracking and reviewing your spending month-by-month, you'll be able to identify trends in your spending habits.\n\nUnderstanding your habits is the first step in making a change to your money management habits."
+            }
+          ],
+          "knowledgeChecks": [
+            {
+              "type": "knowledgeCheck",
+              "id": "1.6.2-q1",
+              "questionType": "multipleChoice",
+              "question": "Why is it important to compare your actual spending to your budget each month?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "To make sure your paycheck was deposited"
+                },
+                {
+                  "key": "b",
+                  "text": "To see if you are staying on track with your spending and make adjustments if needed"
+                },
+                {
+                  "key": "c",
+                  "text": "To increase all of your budget categories"
+                },
+                { "key": "d", "text": "To calculate your gross income" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Comparing your spending to your budget helps you identify differences and make changes to stay on track."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.6.2-q2",
+              "questionType": "multipleChoice",
+              "question": "What is one benefit of tracking your expenses and reviewing your budget every month?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "It helps you identify spending trends and habits over time"
+                },
+                { "key": "b", "text": "It guarantees you'll never overspend" },
+                {
+                  "key": "c",
+                  "text": "It automatically increases your income"
+                },
+                { "key": "d", "text": "It eliminates all unexpected expenses" }
+              ],
+              "correctResponse": "a",
+              "explanation": "Regularly reviewing your spending helps you understand where your money goes and spot patterns over time."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.6.2-q3",
+              "questionType": "multipleChoice",
+              "question": "After reviewing her spending, Abigail noticed she was spending about $500 per month on groceries instead of the amount she originally budgeted. What should she do?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Ignore the difference and keep her budget the same"
+                },
+                { "key": "b", "text": "Stop buying groceries altogether" },
+                {
+                  "key": "c",
+                  "text": "Adjust her grocery budget to better match her actual spending"
+                },
+                { "key": "d", "text": "Remove groceries from her budget" }
+              ],
+              "correctResponse": "c",
+              "explanation": "If Abigail consistently spends more on groceries than planned, she should update her budget to reflect her actual expenses."
             }
           ]
         }
