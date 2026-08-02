@@ -108,16 +108,16 @@ export default function ProgressBar({
           aria-valuemax={safeMax}
           aria-valuenow={progressValue}
           aria-valuetext={`${roundedPercent}%`}
-          className="h-3 w-full overflow-hidden rounded-pill bg-neutral-200"
+          className="h-2.5 w-full overflow-hidden rounded-lg bg-neutral-200"
         >
           <div
-            className={`h-full rounded-pill transition-[width] duration-300 ${selectedTone.linearFill}`}
+            className={`h-full rounded-lg transition-[width] duration-300 ${selectedTone.linearFill}`}
             style={{ width: `${percent}%` }}
           />
         </div>
 
         {showValue ? (
-          <span className="text-small font-semibold text-heading">{roundedPercent}%</span>
+          <span className="text-sm font-semibold text-heading">{roundedPercent}%</span>
         ) : null}
       </div>
     </div>

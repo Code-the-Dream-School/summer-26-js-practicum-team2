@@ -30,9 +30,9 @@ function Input({
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       {label ? (
-        <label htmlFor={inputId} className="text-sm font-medium text-heading">
+        <label htmlFor={inputId} className="text-sm font-semibold text-heading">
           {label}
         </label>
       ) : null}
@@ -43,7 +43,7 @@ function Input({
         disabled={disabled}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={describedBy}
-        className={`w-full rounded-lg border px-3 py-2 text-body shadow-sm outline-none transition-colors duration-200 focus:ring-4 disabled:cursor-not-allowed ${inputStateClasses} ${className}`}
+        className={`w-full rounded-lg border px-3.5 py-2.5 text-sm shadow-sm outline-none transition-all duration-200 focus:ring-4 disabled:cursor-not-allowed ${inputStateClasses} ${className}`}
         {...props}
       />
 

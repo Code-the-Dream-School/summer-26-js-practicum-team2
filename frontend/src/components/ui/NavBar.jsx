@@ -6,7 +6,10 @@ const primaryLinks = [
   { label: 'Components', href: '/dev/components' },
   { label: 'About', href: '/about' },
   { label: 'Privacy & Terms', href: '/privacy' },
-  { label: 'GitHub', href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2' },
+  {
+    label: 'GitHub',
+    href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2',
+  },
   { label: 'Contact', href: '/contact' },
   { label: 'Help', href: '/help' },
 ]
@@ -35,11 +38,11 @@ export default function NavBar({
   return (
     <nav
       aria-label="Primary navigation"
-      className={`border-b border-neutral-200 bg-surface-app shadow-sm ${className}`.trim()}
+      className={`border-b border-neutral-200 bg-surface-app/95 shadow-sm backdrop-blur ${className}`.trim()}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="/" aria-label="Sprout home">
-          <img src={logo} alt="" className="w-32 lg:w-36" />
+          <img src={logo} alt="" className="w-28 sm:w-32 lg:w-36" />
         </a>
 
         <ul className="hidden items-center gap-1 md:flex">
@@ -49,7 +52,7 @@ export default function NavBar({
                 href={link.href}
                 target={link.href.startsWith('http') ? '_blank' : undefined}
                 rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                className="rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset"
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset"
               >
                 {link.label}
               </a>
@@ -61,7 +64,7 @@ export default function NavBar({
               <li>
                 <a
                   href="/login"
-                  className="rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset"
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset"
                 >
                   Login
                 </a>
@@ -69,7 +72,7 @@ export default function NavBar({
               <li>
                 <a
                   href="/register"
-                  className="rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover"
+                  className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
                 >
                   Signup
                 </a>
@@ -77,8 +80,8 @@ export default function NavBar({
             </>
           ) : (
             <li>
-              <div className="flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-pill border border-primary font-semibold text-heading">
+              <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
                   {avatarLabel}
                 </span>
                 <span className="text-sm font-semibold text-heading">{xp} XP</span>
@@ -93,14 +96,14 @@ export default function NavBar({
           aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
           onClick={() => setIsOpen((value) => !value)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-neutral-300 text-2xl text-heading md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-surface-raised text-2xl text-heading shadow-sm md:hidden"
         >
           {isOpen ? 'x' : '='}
         </button>
       </div>
 
       {isOpen ? (
-        <div className="border-t border-neutral-200 px-4 py-3 md:hidden">
+        <div className="border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden">
           <ul className="space-y-2">
             {mobileLinks.map((link) => (
               <li key={link.label}>
@@ -109,7 +112,7 @@ export default function NavBar({
                   target={link.href.startsWith('http') ? '_blank' : undefined}
                   rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-md px-3 py-2 font-semibold text-heading hover:bg-surface-inset"
+                  className="block rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset"
                 >
                   {link.label}
                 </a>

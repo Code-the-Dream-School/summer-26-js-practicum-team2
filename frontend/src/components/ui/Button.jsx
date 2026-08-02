@@ -10,15 +10,15 @@ export default function Button({
   const isDisabled = disabled || loading
   const styles = {
     primary:
-      'border border-primary bg-primary text-on-primary hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
+      'border border-primary bg-primary text-on-primary shadow-sm hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
     secondary:
-      'border border-primary bg-surface-app text-heading hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
+      'border border-neutral-300 bg-surface-app text-heading shadow-sm hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
     ghost:
-      'border border-transparent bg-transparent text-primary hover:bg-surface-inset focus:border-primary focus:ring-primary/20',
+      'border border-transparent bg-transparent text-primary shadow-none hover:bg-surface-inset focus:border-primary focus:ring-primary/20',
   }
 
   const baseClass =
-    'inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-3 py-2 font-semibold transition-colors duration-200 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50'
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold leading-none transition-all duration-200 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
     <button

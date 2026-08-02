@@ -13,7 +13,7 @@ export default function Card({
 
   if (interactive) {
     stateClasses =
-      'border-neutral-200 bg-surface-raised shadow-sm transition-colors duration-200 hover:border-primary-hover hover:shadow-md'
+      'border-neutral-200 bg-surface-raised shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-md'
   }
 
   if (selected) {
@@ -51,7 +51,7 @@ export default function Card({
   return (
     <article
       onClick={onClick}
-      className={`rounded-lg border p-4 text-foreground ${interactive ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-app' : ''} ${stateClasses} ${className}`.trim()}
+      className={`rounded-2xl border p-5 text-foreground ${interactive ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-app' : ''} ${stateClasses} ${className}`.trim()}
       {...a11yProps}
       {...props}
     >
