@@ -7,9 +7,6 @@ recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
 and a per-lesson plant-growth reward loop help first-checking-accout and
 first-paycheck learners feel in control of their money — without a lecture.
 
-See [`docs/brand.md`](docs/brand.md) for the full brand identity and
-[`docs/brand-identity/logo-usage.md`](docs/brand-identity/logo-usage.md)
-for logo usage rules.
 
 ## 🚀 Live Demo
 
@@ -216,7 +213,7 @@ DELETE /api/items/:id
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
-- Code reviews before merging to `main`, `develpment`, or `docs`
+- Code reviews before merging to `main`, `develpment` or `docs`
 
 ## 🧩 Development Process
 
