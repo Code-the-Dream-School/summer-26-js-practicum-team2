@@ -4,15 +4,7 @@ import logo from '../../assets/logo.svg'
 
 const primaryLinks = [
   { label: 'Home', href: '/' },
-  { label: 'Components', href: '/dev/components' },
   { label: 'About', href: '/about' },
-  { label: 'Privacy & Terms', href: '/privacy' },
-  {
-    label: 'GitHub',
-    href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2',
-  },
-  { label: 'Contact', href: '/contact' },
-  { label: 'Help', href: '/help' },
 ]
 
 export default function NavBar({
