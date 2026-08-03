@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router/dom'
 import MainLayout from '../../components/layout/MainLayout.jsx'
 import HomePage from '../../pages/HomePage.jsx'
 import NotFoundPage from '../../pages/NotFoundPage.jsx'
+import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import { ROUTES } from './routes.js'
 
 const router = createBrowserRouter([
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: ROUTES.DEV_COMPONENTS,
+        element: <DevComponentsPage />,
       },
       {
         path: '*',
