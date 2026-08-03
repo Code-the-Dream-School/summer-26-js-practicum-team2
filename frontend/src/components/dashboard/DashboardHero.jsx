@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 // Static content for testing and showing the dashboard hero card
 const content = {
   new: {
@@ -23,9 +25,23 @@ const content = {
   },
 }
 
-export default function DashboardHero({ name = 'Learner', status = 'new', streak = 0 }) {
+export default function DashboardHero({
+  name = 'Learner',
+  status = 'new',
+  streak = 0,
+  goal,
+  progress,
+  ctaLabel,
+  ctaTo,
+}) {
   // Maps the status to content and defines it as `current`
-  const current = content[status]
+  const current = content[status] || content.new
+  // Destructure the content for easier access and allow overrides from props
+  const resolvedGoal = goal || current.goal
+  // If progress is provided as a prop, use it; otherwise, use the default from content
+  const resolvedProgress = Number.isFinite(progress) ? progress : current.progress
+  // If ctaLabel is provided as a prop, use it; otherwise, use the default from content
+  const resolvedCtaLabel = ctaLabel || current.button
 
   return (
     <section className="rounded-lg border border-neutral-200 bg-surface-raised p-6 text-foreground shadow-sm">
@@ -39,24 +55,33 @@ export default function DashboardHero({ name = 'Learner', status = 'new', streak
 
       <div className="mt-6 rounded-lg bg-surface-inset p-4">
         <p className="text-small font-semibold text-neutral-600">Today's goal</p>
-        <p className="mt-1 font-semibold">{current.goal}</p>
+        <p className="mt-1 font-semibold">{resolvedGoal}</p>
 
         <div
           className="mt-3 h-2 overflow-hidden rounded-full bg-neutral-200"
           role="progressbar"
-          aria-valuenow={current.progress}
+          aria-valuenow={resolvedProgress}
           aria-valuemin={0}
           aria-valuemax={100}
         >
-          <div className="h-full bg-primary" style={{ width: `${current.progress}%` }} />
+          <div className="h-full bg-primary" style={{ width: `${resolvedProgress}%` }} />
         </div>
 
-        <button
-          type="button"
-          className="mt-4 rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover focus:outline-2 focus:outline-offset-2 focus:outline-focus"
-        >
-          {current.button}
-        </button>
+        {ctaTo ? (
+          <Link
+            to={ctaTo}
+            className="mt-4 inline-flex rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover focus:outline-2 focus:outline-offset-2 focus:outline-focus"
+          >
+            {resolvedCtaLabel}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="mt-4 rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover focus:outline-2 focus:outline-offset-2 focus:outline-focus"
+          >
+            {resolvedCtaLabel}
+          </button>
+        )}
       </div>
     </section>
   )
