@@ -52,12 +52,10 @@ Add screenshots or GIFs of key features here.
 - REST API
 
 ### Database
-
 - MongoDB (Mongoose) **or**
 - PostgreSQL (Prisma / Knex / Sequelize)
 
 ### Tooling
-
 - Git & GitHub
 - dotenv (environment variables)
 - ESLint / Prettier
@@ -186,13 +184,11 @@ DELETE /api/items/:id
 ## 🤝 Team & Collaboration
 
 ### Team Members
-
 - Name — Role
 - Name — Role
 - Name — Role
 
 ### Workflow
-
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
