@@ -7,7 +7,6 @@ recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
 and a per-lesson plant-growth reward loop help first-checking-accout and
 first-paycheck learners feel in control of their money — without a lecture.
 
-
 ## 🚀 Live Demo
 
 - **Frontend Live Site:** https:/sprout-ctd.netlify.app/
@@ -61,7 +60,7 @@ first-paycheck recent grad.
 
 ### Database
 
-- MongoDB (Mongoose) 
+- MongoDB (Mongoose)
 
 ### Tooling
 
@@ -193,6 +192,7 @@ DELETE /api/items/:id
 ## 🤝 Team & Collaboration
 
 ### Practicum Lead
+
 - Frank Stepanski - [@frankstepanski](https://github.com/frankstepanski)
 
 ### Mentors
@@ -213,7 +213,7 @@ DELETE /api/items/:id
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
-- Code reviews before merging to `main`, `develpment` or `docs`
+- Code reviews before merging to `main`, `development`, or `docs`
 
 ## 🧩 Development Process
 
