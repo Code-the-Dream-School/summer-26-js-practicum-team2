@@ -4,6 +4,8 @@ import MainLayout from '../../components/layout/MainLayout.jsx'
 import HomePage from '../../pages/HomePage.jsx'
 import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import { ROUTES } from './routes.js'
+import LearningPathPage from '../../pages/LearningPathPage.jsx'
+import LessonPage from '../../pages/LessonPage.jsx'
 
 const router = createBrowserRouter([
   {
