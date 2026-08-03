@@ -15,12 +15,20 @@ function HomePage() {
         decisions.
       </p>
 
-      <Link
-        to="/dev/components"
-        className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
-      >
-        &lt;View Component Library /&gt;
-      </Link>
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          to="/dashboard"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+        >
+          Open dashboard preview
+        </Link>
+        <Link
+          to="/dev/components"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+        >
+          &lt;View Component Library /&gt;
+        </Link>
+      </div>
     </section>
   )
 }
