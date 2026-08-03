@@ -26,7 +26,7 @@ export default function NavBar({
 
   const authLinks = signedIn
     ? [
-        { label: 'Dashboard', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
         { label: 'Profile', href: '/profile' },
       ]
     : [
@@ -89,15 +89,17 @@ export default function NavBar({
               </li>
             </>
           ) : (
-            <li>
-              <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
-                  {avatarLabel}
-                </span>
-                <span className="text-sm font-semibold text-heading">{xp} XP</span>
-                <span className="text-sm text-neutral-600">{streak} day streak</span>
-              </div>
-            </li>
+            <>
+              <li>
+                <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
+                    {avatarLabel}
+                  </span>
+                  <span className="text-sm font-semibold text-heading">{xp} XP</span>
+                  <span className="text-sm text-neutral-600">{streak} day streak</span>
+                </div>
+              </li>
+            </>
           )}
         </ul>
 
