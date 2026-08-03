@@ -28,7 +28,12 @@ export default function Button({
       className={`${baseClass} ${styles[variant] || styles.primary} ${className}`.trim()}
       {...props}
     >
-      {loading && <span aria-hidden="true" />}
+      {loading && (
+        <span
+          aria-hidden="true"
+          className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+        />
+      )}
       <span>{loading ? 'Loading...' : children}</span>
     </button>
   )
