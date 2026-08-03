@@ -8,8 +8,8 @@ A full-stack web application with a React frontend and a Node/Express backend th
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https://your-frontend-url.com
-- **Frontend Repo:** /frontend
+- **Frontend Live Site:** https://your-frontend-url.com  
+- **Frontend Repo:** /frontend  
 - **Backend Repo:** /backend
 
 ## 🧠 Problem Statement
@@ -35,29 +35,27 @@ Focus on the **user problem**, not the technology.
 
 Add screenshots or GIFs of key features here.
 
+
+
 ## 🛠 Tech Stack
 
 ### Frontend
-
 - React
 - JavaScript (ES6+)
 - HTML5
-- CSS3 / Tailwind
+- CSS3 / Tailwind / Bootstrap
 - Vite or Create React App
 
 ### Backend
-
 - Node.js
 - Express.js
 - REST API
 
 ### Database
-
 - MongoDB (Mongoose) **or**
 - PostgreSQL (Prisma / Knex / Sequelize)
 
 ### Tooling
-
 - Git & GitHub
 - dotenv (environment variables)
 - ESLint / Prettier
@@ -186,13 +184,11 @@ DELETE /api/items/:id
 ## 🤝 Team & Collaboration
 
 ### Team Members
-
 - Name — Role
 - Name — Role
 - Name — Role
 
 ### Workflow
-
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
