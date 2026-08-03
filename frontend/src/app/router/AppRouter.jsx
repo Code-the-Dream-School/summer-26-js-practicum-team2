@@ -4,6 +4,7 @@ import MainLayout from '../../components/layout/MainLayout.jsx'
 import Dashboard from '../../pages/Dashboard.jsx'
 import HomePage from '../../pages/HomePage.jsx'
 import NotFoundPage from '../../pages/NotFoundPage.jsx'
+import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import { ROUTES } from './routes.js'
 
 const router = createBrowserRouter([
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.DASHBOARD,
         element: <Dashboard />,
+      },
+      {
+        path: ROUTES.DEV_COMPONENTS,
+        element: <DevComponentsPage />,
       },
       {
         path: '*',
