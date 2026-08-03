@@ -6,6 +6,7 @@ import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import PrivacyPage from '../../pages/PrivacyPage.jsx'
 import TermsPage from '../../pages/TermsPage.jsx'
+import RegisterPage from '../../pages/RegisterPage.jsx'
 import { ROUTES } from './routes.js'
 
 const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: ROUTES.REGISTER,
+        element: <RegisterPage />,
       },
       {
         path: ROUTES.DEV_COMPONENTS,
