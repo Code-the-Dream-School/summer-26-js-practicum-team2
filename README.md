@@ -213,7 +213,7 @@ DELETE /api/items/:id
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
-- Code reviews before merging to `main`m `develpment` or `docs`
+- Code reviews before merging to `main`, `develpment` or `docs`
 
 ## 🧩 Development Process
 
