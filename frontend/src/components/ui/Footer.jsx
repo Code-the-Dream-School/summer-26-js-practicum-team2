@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 const footerLinks = [
   { label: 'Home', to: '/' },
   { label: 'Privacy Policy', to: '/privacy' },
+  { label: 'Terms of Use', to: '/terms' },
   {
     label: 'GitHub',
     href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2',
