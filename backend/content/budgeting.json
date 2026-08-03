@@ -101,6 +101,12 @@
 
   "tables": [
     {
+      "tableId": "abigail-income",
+      "title": "Income Sources",
+      "headers": ["Income Source", "Monthly Net Pay"],
+      "incomeRefs": ["paycheck", "childSupport"]
+    },
+    {
       "tableId": "abigail-basic-expenses",
       "title": "Abigail's Monthly Expenses",
       "headers": ["Expense", "Cost per Month"],
@@ -113,12 +119,17 @@
       ]
     },
     {
-      "tableId": "abigail-income",
-      "title": "Income Sources",
-      "headers": ["Income Source", "Monthly Net Pay"],
-      "rows": [
-        ["Nursing", "$5,800"],
-        ["Child Support", "$1,230"]
+      "tableId": "abigail-all-expenses",
+      "title": "Abigail's Monthly Expenses",
+      "headers": ["Expense", "Monthly Amount"],
+      "expenseRefs": [
+        "rockClimbing",
+        "rent",
+        "sportsActivities",
+        "carPayment",
+        "electricity",
+        "groceries",
+        "gasoline"
       ]
     }
   ],
@@ -171,11 +182,10 @@
             {
               "type": "paragraph",
               "text": "Budgets involve two main categories: income and expenses."
-            }
-          ],
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
+              "text": "Budgets involve two main categories: income and expenses.",
               "id": "1.1.2-q2",
               "questionType": "multipleChoice",
               "question": "What is the purpose of a budget?",
@@ -196,7 +206,14 @@
               "id": "1.1.2-q3",
               "questionType": "trueFalse",
               "question": " True or False? You should create a budget to help you track where your money is going.",
-              "correctResponse": true,
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "True"
+                },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "a",
               "explanation": "Creating a budget does help you track where your money is going."
             },
             {
@@ -254,9 +271,7 @@
             {
               "type": "example",
               "text": "As a Registered Nurse (RN), Abigail earns $7,500 per month. Her total monthly expenses are $2,154.\n\n$7,500 (Income) - $2,154 (Expenses) = $5,346 (Net Cash Flow)\nSo Abigail's total cash flow each month is about $5,346."
-            }
-          ],
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.1.3-q1",
@@ -339,9 +354,7 @@
             {
               "type": "paragraph",
               "text": "Ramona, on the other hand, only has income from her part-time campus position. So her sole source of income is from her paychecks."
-            }
-          ],
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.2.2-q1",
@@ -361,7 +374,14 @@
               "id": "1.2.2-q2",
               "questionType": "trueFalse",
               "question": "True or False? Income only includes the money you make from a job.",
-              "correctResponse": false,
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "True"
+                },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "b",
               "explanation": "There are multiple types of income. Paychecks, child support, interest earned on investments, and sales of goods are just some examples of sources of income."
             },
 
@@ -404,9 +424,7 @@
             {
               "type": "paragraph",
               "text": "Common semi-monthly pay dates are the 1st and 15th or the 15th and last day of the month."
-            }
-          ],
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.2.3-q1",
@@ -440,7 +458,14 @@
               "id": "1.2.3-q3",
               "questionType": "trueFalse",
               "question": "True or false? Semi-monthly paychecks are paid on the same 2 dates every month?",
-              "correctResponse": true,
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "True"
+                },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "a",
               "explanation": " Usually, semi-monthly paychecks are paid to employees consistently on the same 2 dates every month."
             },
             {
@@ -490,10 +515,7 @@
             {
               "type": "formula",
               "text": "Gross Pay - Taxes/Benefits = Net Pay (Take Home Pay)"
-            }
-          ],
-
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.2.4-q1",
@@ -604,9 +626,7 @@
             {
               "type": "paragraph",
               "text": "Needs and wants depend on your personal situation - what is a 'want' for one person might be a 'need' for another person."
-            }
-          ],
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.3.1-q1",
@@ -640,7 +660,14 @@
               "id": "1.3.1-q3",
               "questionType": "trueFalse",
               "question": "True or false? Needs and wants are the same for everyone.",
-              "correctResponse": false,
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "True"
+                },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "b",
               "explanation": "Needs and wants are different for each person. Something one person considers a need may be a want for someone else. For example, a car may be a need for someone who commutes to work, but a want for someone who has reliable public transportation."
             }
           ]
@@ -680,9 +707,7 @@
                 "College Textbooks",
                 "Concert Tickets"
               ]
-            }
-          ],
-          "knowledgeChecks": [
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.3.2-q1",
@@ -733,15 +758,29 @@
               "text": "These expenses are the same amount each month and don't change.\n\nShe also notices that some expenses change from month to month:"
             },
             {
+              "type": "paragraph",
+              "text": "She also notices that some expenses change from month to month:"
+            },
+            {
               "type": "unorderedList",
               "items": ["Groceries", "Gasoline", "Electricity"]
             },
             {
               "type": "paragraph",
-              "text": "These expenses might fluctuate each month based on the amount used each time or fluctuating prices.\n\nFor example, Abigail's electricity bill is higher in the summer and winter due to her A/C and heat being powered by electricity.\n\nDuring the spring and fall, she doesn't need to run the heat or A/C as much, so her bill is much lower.\n\nExpenses that stay the same every month are called fixed expenses. Expenses that change from month to month are variable expenses."
-            }
-          ],
-          "knowledgeChecks": [
+              "text": "These expenses might fluctuate each month based on the amount used each time or fluctuating prices."
+            },
+            {
+              "type": "paragraph",
+              "text": "For example, Abigail's electricity bill is higher in the summer and winter due to her A/C and heat being powered by electricity."
+            },
+            {
+              "type": "paragraph",
+              "text": "During the spring and fall, she doesn't need to run the heat or A/C as much, so her bill is much lower."
+            },
+            {
+              "type": "paragraph",
+              "text": "Expenses that stay the same every month are called fixed expenses. Expenses that change from month to month are variable expenses."
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.4.1-q1",
@@ -802,48 +841,309 @@
     },
     {
       "id": "1.5",
-      "title": "",
-      "learningGoal": "",
+      "title": "Creating a Budget",
+      "learningGoal": "By the end of this lesson, you'll be able to create a basic budget by listing income and expenses, categorizing expenses, and calculating monthly cash flow.",
       "estimatedMin": 10,
       "passingScore": 70,
       "microLessons": [
         {
-          "id": "",
-          "title": "Fixed vs Variable Expense",
+          "id": "1.5.1",
+          "title": "Adding Income to a Budget",
           "microLessonContent": [
             {
-              "type": "",
-              "text": ""
-            }
-          ],
-          "knowledgeChecks": [
+              "type": "paragraph",
+              "text": "Let's help Abigail put her budget together."
+            },
             {
-              "type": "knowledgeCheck",
-              "id": "PLACEHOLDER lesson and question",
-              "questionType": "multipleChoice",
-              "question": "",
-              "answerChoices": [
-                { "key": "a", "text": "" },
-                { "key": "b", "text": "" },
-                { "key": "c", "text": "" },
-                { "key": "d", "text": "" }
-              ],
-              "correctResponse": "d",
-              "explanation": ""
+              "type": "paragraph",
+              "text": "The first step to creating a budget is adding up your monthly net income."
+            },
+            {
+              "type": "paragraph",
+              "text": "For Abigail, she receives $5,800 after taxes and $1,230 for child support."
+            },
+            {
+              "type": "paragraph",
+              "text": "Since child support is non-taxable income, her gross and net monthly child support income is the same, $1,230."
+            },
+            {
+              "type": "paragraph",
+              "text": "Here's what it looks like when she adds all her sources of income to her budget:"
+            },
+            {
+              "type": "table",
+              "tableId": "abigail-income"
             },
             {
               "type": "knowledgeCheck",
-              "id": "PLACEHOLDER lesson and question id",
-              "questionType": "multiSelect",
-              "question": "",
+              "id": "1.5.1-q1",
+              "questionType": "trueFalse",
+              "question": "True or false? To create your budget, you use your gross income.",
               "answerChoices": [
-                { "key": "a", "text": "" },
-                { "key": "b", "text": "" },
-                { "key": "c", "text": "" },
-                { "key": "d", "text": "" }
+                { "key": "a", "text": "True" },
+                { "key": "b", "text": "False" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Budgets should be based on your net income, which is the money you take home after taxes and deductions."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.1-q2",
+              "questionType": "multipleChoice",
+              "question": "Which of the following income sources should be included when creating a monthly budget?",
+              "answerChoices": [
+                { "key": "a", "text": "Only income from a job" },
+                { "key": "b", "text": "Only taxable income" },
+                {
+                  "key": "c",
+                  "text": "All regular income sources, including non-taxable income like child support"
+                },
+                {
+                  "key": "d",
+                  "text": "Only income deposited into a checking account"
+                }
+              ],
+              "correctResponse": "c",
+              "explanation": "Include all regular sources of income in your budget so you have an accurate picture of your monthly money coming in."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.1-q3",
+              "questionType": "multipleChoice",
+              "question": "Given Abigail's net income of $5,800 from nursing and $1,230 from child support, how much is Abigail's total monthly net income?",
+              "answerChoices": [
+                { "key": "a", "text": "$4,570" },
+                { "key": "b", "text": "$7,030" },
+                {
+                  "key": "c",
+                  "text": "$6,030"
+                },
+                {
+                  "key": "d",
+                  "text": "$6,000"
+                }
+              ],
+              "correctResponse": "b",
+              "explanation": "Abigail's total monthly net income is $7,030 because $5,800 + $1,230 = $7,030"
+            }
+          ]
+        },
+        {
+          "id": "1.5.2",
+          "title": "Adding Expenses to a Budget",
+          "microLessonContent": [
+            {
+              "type": "paragraph",
+              "text": "Let's take a look at Abigail's monthly expenses."
+            },
+            {
+              "type": "paragraph",
+              "text": "First, Abigail lists out all of her expenses over the past month and how much she spent on each item."
+            },
+            {
+              "type": "paragraph",
+              "text": "If she's unsure of exactly how much she spent, she uses an estimate for now until she can track her spending to get a more accurate number."
+            },
+            {
+              "type": "paragraph",
+              "text": "Here's a list of Abigail's expenses and how much she paid the past month:"
+            },
+            {
+              "type": "table",
+              "tableId": "abigail-all-expenses"
+            },
+            {
+              "type": "paragraph",
+              "text": "When creating a budget, we want to categorize our expenses and then divide those expenses into two categories, fixed and variable expenses."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.2-q1",
+              "questionType": "multiSelect",
+              "question": "Which of Abigail's expenses are fixed expenses? Select all that apply.",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Rock Climbing Membership, Rent"
+                },
+                {
+                  "key": "b",
+                  "text": "Sports Activities for Kids"
+                },
+                {
+                  "key": "c",
+                  "text": "Car Payment"
+                },
+                { "key": "d", "text": "Electricity, Groceries, Gasoline" }
+              ],
+              "correctResponse": ["a", "b", "c"],
+              "explanation": "These are fixed expenses because the amount is usually the same each month."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.2-q2",
+              "questionType": "multipleChoice",
+              "question": "Which of Abigail's expenses are variable? Select all that apply.",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Rock Climbing Membership, Rent"
+                },
+                {
+                  "key": "b",
+                  "text": "Sports Activities for Kids"
+                },
+                {
+                  "key": "c",
+                  "text": "Car Payment"
+                },
+                { "key": "d", "text": "Electricity, Groceries, Gasoline" }
+              ],
+              "correctResponse": "d",
+              "explanation": "These are variable expenses because their costs can change from month to month based on usage and needs."
+            },
+            {
+              "type": "paragraph",
+              "text": "Now that we have categorized Abigail's expenses, here is what her budget looks like with her income:"
+            },
+            {
+              "type": "budget-summary",
+              "budgetId": "abigail-complete-budget",
+              "show": {
+                "income": true,
+                "fixedExpenses": true,
+                "variableExpenses": true,
+                "needsWantsBreakdown": false,
+                "totals": true,
+                "cashFlow": false
+              }
+            },
+            {
+              "type": "paragraph",
+              "text": "To keep Abigail's budget more organized and easier to analyze her spending, let's categorize her expenses even further into needs and wants."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.2-q3",
+              "questionType": "multiSelect",
+              "question": "Within Abigail's fixed expenses, which ones could be categorized as needs? Select all that apply.",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Rock Climbing Membership"
+                },
+                {
+                  "key": "b",
+                  "text": "Rent"
+                },
+                {
+                  "key": "c",
+                  "text": "Sports Activities for Kids"
+                },
+                { "key": "d", "text": "Car Payment" }
               ],
               "correctResponse": ["b", "d"],
-              "explanation": ""
+              "explanation": "Rent and a car payment are typically necessary expenses for housing and transportation, so they can be considered needs."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.2-q4",
+              "questionType": "multiSelect",
+              "question": "Within Abigail's variable expenses, which ones could be categorized as needs? Select all that apply.",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Electricity"
+                },
+                {
+                  "key": "b",
+                  "text": "Groceries"
+                },
+                {
+                  "key": "c",
+                  "text": "Gasoline"
+                }
+              ],
+              "correctResponse": ["a", "b", "c"],
+              "explanation": "Electricity, groceries, and gasoline are often needed for daily living, making them examples of variable expenses that can also be needs."
+            },
+            {
+              "type": "paragraph",
+              "text": "Great! Now here's Abigail's budget organized by needs and wants:"
+            },
+            {
+              "type": "budget-summary",
+              "budgetId": "abigail-complete-budget",
+              "show": {
+                "income": true,
+                "fixedExpenses": true,
+                "variableExpenses": true,
+                "needsWantsBreakdown": true,
+                "totals": true,
+                "cashFlow": false
+              }
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.2-q5",
+              "questionType": "multipleChoice",
+              "question": "Now that we have Abigail's total income and expenses, what is the formula to calculate her cash flow?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "Expenses - Income  = Cash Flow"
+                },
+                {
+                  "key": "b",
+                  "text": "Income + Expenses = Cash Flow"
+                },
+                {
+                  "key": "c",
+                  "text": "Expenses x Income = Cash Flow"
+                },
+                { "key": "d", "text": "Income - Expenses = Cash Flow" }
+              ],
+              "correctResponse": "d",
+              "explanation": "Cash flow is calculated by subtracting your expenses from your income to see how much money you have left over."
+            },
+            {
+              "type": "knowledgeCheck",
+              "id": "1.5.2-q6",
+              "questionType": "multipleChoice",
+              "question": "What would Abigail's cash flow be if her income totals to $7,030 and all her expenses total to $2,154?",
+              "answerChoices": [
+                {
+                  "key": "a",
+                  "text": "-$4,876"
+                },
+                {
+                  "key": "b",
+                  "text": "$4,876"
+                },
+                {
+                  "key": "c",
+                  "text": "$11,906"
+                },
+                { "key": "d", "text": "-$11,906" }
+              ],
+              "correctResponse": "b",
+              "explanation": "Abigail's cash flow is $4,876 because $7,030 (income) - $2,154 (expenses) = $4,876."
+            },
+            {
+              "type": "paragraph",
+              "text": "Great job helping Abigail with her budget! Here's her completed budget:"
+            },
+            {
+              "type": "budget-summary",
+              "budgetId": "abigail-complete-budget",
+              "show": {
+                "income": true,
+                "fixedExpenses": true,
+                "variableExpenses": true,
+                "needsWantsBreakdown": true,
+                "totals": true,
+                "cashFlow": true
+              }
             }
           ]
         }
@@ -874,10 +1174,20 @@
             },
             {
               "type": "paragraph",
-              "text": "Abigail decides that the best method that works for her is an app on her phone.\n\nUsing the app, Abigail is able to categorize each of her purchases and can see where each cent is going.\n\nThe key to expense tracking is consistency and choosing a tracking method that works best for you.\n\nEach week, Abigail sets aside time to review her purchases to make sure they are categorized correctly in the app and to keep an eye on her spending."
-            }
-          ],
-          "knowledgeChecks": [
+              "text": "Abigail decides that the best method that works for her is an app on her phone."
+            },
+            {
+              "type": "paragraph",
+              "text": "Using the app, Abigail is able to categorize each of her purchases and can see where each cent is going."
+            },
+            {
+              "type": "paragraph",
+              "text": "The key to expense tracking is consistency and choosing a tracking method that works best for you."
+            },
+            {
+              "type": "paragraph",
+              "text": "Each week, Abigail sets aside time to review her purchases to make sure they are categorized correctly in the app and to keep an eye on her spending."
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.6.1-q1",
@@ -953,10 +1263,36 @@
           "microLessonContent": [
             {
               "type": "paragraph",
-              "text": "Now that Abigail has been tracking her spending for a month, it's time for her monthly budget review.\n\nAbigail compares her budget line by line with her spending that she's been tracking in her app.\n\nAfter comparing her budget and spending habits, she notices that she spends closer to $500 on groceries per month.\n\nShe readjusts her budget to increase the amount of money she spends on groceries to $500.\n\nShe also notices that she's not using the rock climbing membership as much as she thought she would, so she decides to cancel her monthly fee for now.\n\nTip: Review your budget monthly.\n\nBy tracking and reviewing your spending month-by-month, you'll be able to identify trends in your spending habits.\n\nUnderstanding your habits is the first step in making a change to your money management habits."
-            }
-          ],
-          "knowledgeChecks": [
+              "text": "Now that Abigail has been tracking her spending for a month, it's time for her monthly budget review."
+            },
+            {
+              "type": "paragraph",
+              "text": "Abigail compares her budget line by line with her spending that she's been tracking in her app."
+            },
+            {
+              "type": "paragraph",
+              "text": "After comparing her budget and spending habits, she notices that she spends closer to $500 on groceries per month."
+            },
+            {
+              "type": "paragraph",
+              "text": "She readjusts her budget to increase the amount of money she spends on groceries to $500."
+            },
+            {
+              "type": "paragraph",
+              "text": "She also notices that she's not using the rock climbing membership as much as she thought she would, so she decides to cancel her monthly fee for now."
+            },
+            {
+              "type": "paragraph",
+              "text": "Tip: Review your budget monthly."
+            },
+            {
+              "type": "paragraph",
+              "text": "By tracking and reviewing your spending month-by-month, you'll be able to identify trends in your spending habits."
+            },
+            {
+              "type": "paragraph",
+              "text": "Understanding your habits is the first step in making a change to your money management habits."
+            },
             {
               "type": "knowledgeCheck",
               "id": "1.6.2-q1",
