@@ -5,6 +5,8 @@ import HomePage from '../../pages/HomePage.jsx'
 import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import { ROUTES } from './routes.js'
+import LearningPathPage from '../../pages/LearningPathPage.jsx'
+import LessonPage from '../../pages/LessonPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -14,6 +16,14 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: ROUTES.LEARN,
+        element: <LearningPathPage />,
+      },
+      {
+        path: ROUTES.LESSON,
+        element: <LessonPage />,
       },
       {
         path: ROUTES.DEV_COMPONENTS,
