@@ -169,7 +169,8 @@ const login = async (req, res, next) => {
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
 const logout = async (req, res) => {
-  res.clearCookie("session_token", getCookieOptions(req, 0));
+  const { maxAge, ...cookieOptions } = getCookieOptions(req);
+  res.clearCookie("session_token", cookieOptions);
   return res.status(StatusCodes.NO_CONTENT).send();
 };
 
@@ -211,7 +212,7 @@ const forgotPassword = async (req, res, next) => {
     if (!email) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Please Provide an email address." });
+        .json({ message: "Please provide an email address." });
     }
     const user = await User.findOne({ email });
     if (!user) {
