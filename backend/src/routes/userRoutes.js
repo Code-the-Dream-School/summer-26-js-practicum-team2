@@ -9,10 +9,10 @@ const {
   resetPassword,
 } = require("../controllers/userController");
 const jwtMiddleware = require("../middleware/jwtMiddleware");
-const { signupLimiter, loginLimiter } = require("../middleware/rateLimiter");
+const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 
 // POST /api/v1/users/register
-router.post("/register", signupLimiter, register);
+router.post("/register", registerLimiter, register);
 // GET/ verify ? token = (new endpoint for email verification link clicks)
 router.get("/verify", verifyEmail);
 // POST /api/v1/users/login
