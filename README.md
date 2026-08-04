@@ -4,8 +4,8 @@
 
 Sprout is a friendly, gamified money-basics app for college freshmen and
 recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
-and a per-lesson plant-growth reward loop help first-checking-accout and
-first-paycheck learners feel in control of their money — without a lecture.
+and a per-lesson plant-growth reward loop help first-paycheck learners
+feel in control of their money — without a lecture.
 
 ## 🚀 Live Demo
 
