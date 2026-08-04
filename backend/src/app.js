@@ -63,11 +63,13 @@ app.use(limiter);
 app.use(errorHandlerMiddleware);
 
 // Routes
-app.use("/api/hello", helloRoutes);
+app.use('/api/hello', helloRoutes);
+app.use("/api/v1/users", userRoutes);
 
 // Root route
 app.get("/", (req, res) => {
   res.redirect(process.env.CLIENT_URL);
 });
+app.use(errorHandlerMiddleware);
 
 module.exports = app;
