@@ -1,39 +1,46 @@
 {
   "learningPaths": [
     {
-      "id": "budgeting",
-      "title": "Budgeting & Cash Flow Foundations",
-      "description": "Learn budgeting, cash flow, income, expenses, and expense tracking.",
-      "file": "budgeting.json",
-      "order": 1
-    },
-    {
-      "id": "savings",
-      "title": "Savings",
-      "description": "Learn the importance of an emergency fund and how to build one.",
-      "file": "savings.json",
-      "order": 2
-    },
-    {
-      "id": "credit",
-      "title": "Credit",
-      "description": "Learn what a credit score and credit report are and how to build credit.",
-      "file": "credit.json",
-      "order": 3
-    },
-    {
-      "id": "debt",
-      "title": "Debt",
-      "description": "Learn how to manage debt and different strategies on paying down debt.",
-      "file": "debt.json",
-      "order": 4
-    },
-    {
-      "id": "investing",
-      "title": "Investing",
-      "description": "Learn different investment vehicles and the stock market.",
-      "file": "investing.json",
-      "order": 5
+      "id": "personal-finance-fundamentals",
+      "name": "Personal Finance Fundamentals",
+
+      "modules": [
+        {
+          "id": "cash-flow",
+          "title": "Cash Flow",
+          "description": "Learn budgeting, cash flow, income, expenses, and expense tracking.",
+          "file": "budgeting.json",
+          "order": 1
+        },
+        {
+          "id": "savings",
+          "title": "Savings",
+          "description": "Learn the importance of an emergency fund and how to build one.",
+          "file": "savings.json",
+          "order": 2
+        },
+        {
+          "id": "credit",
+          "title": "Credit",
+          "description": "Learn what a credit score and credit report are and how to build credit.",
+          "file": "credit.json",
+          "order": 3
+        },
+        {
+          "id": "debt",
+          "title": "Debt",
+          "description": "Learn how to manage debt and different strategies on paying down debt.",
+          "file": "debt.json",
+          "order": 4
+        },
+        {
+          "id": "investing",
+          "title": "Investing",
+          "description": "Learn different investment vehicles and the stock market.",
+          "file": "investing.json",
+          "order": 5
+        }
+      ]
     }
   ]
 }
