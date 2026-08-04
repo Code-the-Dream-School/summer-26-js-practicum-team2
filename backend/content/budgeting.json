@@ -1,6 +1,6 @@
 {
-  "id": "budgeting-and-cash-flow-basics",
-  "title": "Budgeting and Cash Flow Basics",
+  "id": "cash-flow",
+  "title": "Cash Flow",
   "tags": ["budget", "cashflow", "income", "expenses"],
   "metadata": {
     "applicationName": "Sprout",
@@ -143,7 +143,7 @@
       "microLessons": [
         {
           "id": "1.1.1",
-          "title": "Abigail introduction",
+          "title": "Meet Abigail!",
           "microLessonContent": [
             {
               "type": "characterIntro",
