@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 import manifest from '../content/manifest.json'
 import LearningPathNode from '../components/learningPath/LearningPathNode'
 // import LessonCard from '../components/layout/LessonCard'
