@@ -1,5 +1,5 @@
 {
-  "id": "budgeting-and-cash-flow-basics",
+  "id": "cash-flow",
   "title": "Budgeting and Cash Flow Basics",
   "tags": ["budget", "cashflow", "income", "expenses"],
   "metadata": {
@@ -143,7 +143,7 @@
       "microLessons": [
         {
           "id": "1.1.1",
-          "title": "Abigail introduction",
+          "title": "Meet Abigail!",
           "microLessonContent": [
             {
               "type": "characterIntro",
