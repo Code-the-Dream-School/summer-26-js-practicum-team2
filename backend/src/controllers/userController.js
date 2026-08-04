@@ -84,7 +84,7 @@ const register = async (req, res, next) => {
 };
 //user story 2.1.8 - Login
 
-const logon = async (req, res, next) => {
+const login = async (req, res, next) => {
   try {
     const { error, value } = loginSchema.validate(req.body, {
       abortEarly: false,
@@ -168,7 +168,7 @@ const logon = async (req, res, next) => {
 // user story 2.1 -Post logout
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
-const logoff = async (req, res) => {
+const logout = async (req, res) => {
   res.clearCookie("session_token", getCookieOptions(req, 0));
   return res.status(StatusCodes.NO_CONTENT).send();
 };
@@ -290,8 +290,8 @@ const resetPassword = async (req, res, next) => {
 
 module.exports = {
   register,
-  logon,
-  logoff,
+  login,
+  logout,
   verifyEmail,
   forgotPassword,
   resetPassword,

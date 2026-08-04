@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const {
   register,
-  logon,
-  logoff,
+  login,
+  logout,
   verifyEmail,
   forgotPassword,
   resetPassword,
@@ -16,9 +16,9 @@ router.post("/register", registerLimiter, register);
 // GET/ verify ? token = (new endpoint for email verification link clicks)
 router.get("/verify", verifyEmail);
 // POST /api/v1/users/login
-router.post("/login", loginLimiter, logon);
+router.post("/login", loginLimiter, login);
 // POST /api/v1/users/logout
-router.post("/logout", jwtMiddleware, logoff);
+router.post("/logout", jwtMiddleware, logout);
 
 //forgot password and reset password
 
