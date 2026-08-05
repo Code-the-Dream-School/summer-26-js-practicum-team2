@@ -1,32 +1,13 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
 import { ROUTES } from '../app/router/routes.js'
-
-function fakeLoginRequest(values) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (values.email === 'locked@example.com') {
-        reject({
-          message: 'Your account is locked. Please reset your password.',
-          field: 'email',
-          fieldMessage: 'This account is locked.',
-        })
-        return
-      }
-
-      if (values.password === 'wrong-password') {
-        reject({ message: 'Invalid email or password.' })
-        return
-      }
-
-      resolve()
-    }, 800)
-  })
-}
+import useAuth from '../hooks/useAuth.js'
 
 function LoginPage() {
+  const navigate = useNavigate()
+  const { login } = useAuth()
   const [formValues, setFormValues] = useState({ email: '', password: '', rememberMe: false })
   const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' })
   const [bannerError, setBannerError] = useState('')
@@ -93,17 +74,29 @@ function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      await fakeLoginRequest(formValues)
+      await login({
+        email: formValues.email,
+        password: formValues.password,
+        remember: formValues.rememberMe,
+      })
       setFormValues({ email: '', password: '', rememberMe: false })
       setFieldErrors({ email: '', password: '' })
-      setSuccessMessage('Signed in. This is a demo login, so nothing actually happened.')
+      setSuccessMessage('Signed in successfully.')
+      navigate(ROUTES.HOME)
     } catch (error) {
       setBannerError(error.message || 'We could not sign you in. Please try again.')
 
-      if (error.field === 'email') {
+      if (Array.isArray(error.errors) && error.errors.some((item) => item.toLowerCase().includes('email'))) {
         setFieldErrors((current) => ({
           ...current,
-          email: error.fieldMessage || 'Please check this email.',
+          email: 'Please check this email.',
+        }))
+      }
+
+      if (Array.isArray(error.errors) && error.errors.some((item) => item.toLowerCase().includes('password'))) {
+        setFieldErrors((current) => ({
+          ...current,
+          password: 'Please check your password.',
         }))
       }
     } finally {

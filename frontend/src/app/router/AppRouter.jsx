@@ -9,6 +9,7 @@ import PrivacyPage from '../../pages/PrivacyPage.jsx'
 import TermsPage from '../../pages/TermsPage.jsx'
 import RegisterPage from '../../pages/RegisterPage.jsx'
 import PasswordResetPage from '../../pages/PasswordResetPage.jsx'
+import VerifyEmailPage from '../../pages/VerifyEmailPage.jsx'
 import { ROUTES } from './routes.js'
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.LOGIN,
         element: <LoginPage />,
+      },
+      {
+        path: ROUTES.VERIFY_EMAIL,
+        element: <VerifyEmailPage />,
       },
       {
         path: ROUTES.PASSWORD_RESET,
