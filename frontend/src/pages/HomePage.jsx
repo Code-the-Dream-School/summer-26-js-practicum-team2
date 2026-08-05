@@ -1,10 +1,17 @@
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import Toast from '../components/ui/Toast.jsx'
+import { ROUTES } from '../app/router/routes.js'
+import useAuth from '../hooks/useAuth.js'
 
 function HomePage() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const toast = location.state?.toast || null
+
+  if (isAuthenticated) {
+    return <Navigate to={ROUTES.DASHBOARD} replace />
+  }
 
   const closeToast = () => {
     navigate(location.pathname, { replace: true, state: null })
@@ -34,13 +41,13 @@ function HomePage() {
 
       <div className="flex flex-wrap items-center gap-3">
         <Link
-          to="/dashboard"
+          to={ROUTES.DASHBOARD}
           className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
         >
           Open dashboard preview
         </Link>
         <Link
-          to="/dev/components"
+          to={ROUTES.DEV_COMPONENTS}
           className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
         >
           &lt;View Component Library /&gt;
