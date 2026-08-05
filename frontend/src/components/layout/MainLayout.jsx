@@ -28,6 +28,7 @@ function MainLayout() {
       </main>
       
       <Footer />
+      
     </div>
   )
 }
