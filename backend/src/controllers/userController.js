@@ -6,6 +6,10 @@ const { sendVerificationEmail } = require("../utils/sendEmail");
 const User = require("../models/user.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { registerSchema, loginSchema } = require("../validation/userValidation");
+// Client URL for email verification links
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+// Determine if the environment is development or production
+const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 
 //we want  sameSite cookies to be lax as per userStory 2.1
 const getCookieOptions = (req, maxAge) => ({
@@ -56,8 +60,9 @@ const register = async (req, res, next) => {
       verification_token: verificationToken,
       verification_token_expires_at: tokenExpiresAt,
     });
-    const verifyUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/verify?token=${verificationToken}`;
+    const verifyUrl = `${CLIENT_URL}/verify?token=${verificationToken}`;
 
+    // Send verification email to the user
     await sendVerificationEmail(
       newUser.email,
       "Verify your email address",
@@ -68,6 +73,7 @@ const register = async (req, res, next) => {
     <p>This link expires in 24 hours.</p>`,
     );
 
+    // Return a success response with the new user's details (excluding sensitive information)
     return res.status(StatusCodes.CREATED).json({
       message: "Registration successful. Please check for verification email.",
       user: {
@@ -77,6 +83,15 @@ const register = async (req, res, next) => {
         role: newUser.role,
         created_at: newUser.createdAt || newUser.created_at,
       },
+      // Include dev verification details in the response if in development environment
+      ...(IS_DEV_ENV
+        ? {
+            devVerification: {
+              token: verificationToken,
+              verifyUrl,
+            },
+          }
+        : {}),
     });
   } catch (err) {
     return next(err);
@@ -199,9 +214,36 @@ const verifyEmail = async (req, res, next) => {
     user.verification_token_expires_at = undefined;
     await user.save();
 
-    return res
-      .status(StatusCodes.OK)
-      .json({ message: "Verified email. Continue Login" });
+    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+    const csrfToken = crypto.randomUUID();
+    const sessionToken = jwt.sign(
+      { id: user._id, role: user.role, csrfToken },
+      process.env.JWT_SECRET,
+      { expiresIn: "14d" },
+    );
+
+    res.cookie(
+      "session_token",
+      sessionToken,
+      getCookieOptions(req, FOURTEEN_DAYS),
+    );
+
+    req.app.emit?.("login_success", {
+      userId: user._id,
+      email: user.email,
+      ip: req.ip,
+    });
+
+    return res.status(StatusCodes.OK).json({
+      message: "Email verified successfully. You are now signed in.",
+      csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
     return next(err);
   }
@@ -216,12 +258,10 @@ const forgotPassword = async (req, res, next) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(StatusCodes.OK)
-        .json({
-          message:
-            "If an account with the email exists, a password reset link will be provided to that email.",
-        });
+      return res.status(StatusCodes.OK).json({
+        message:
+          "If an account with the email exists, a password reset link will be provided to that email.",
+      });
     }
     const resetToken = crypto.randomBytes(32).toString("hex");
     const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
@@ -230,7 +270,7 @@ const forgotPassword = async (req, res, next) => {
     user.password_reset_expires_at = resetTokenExpiresAt;
     await user.save();
 
-    const resetUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+    const resetUrl = `${CLIENT_URL}/reset-password?token=${resetToken}`;
 
     await sendVerificationEmail(
       user.email,
@@ -241,12 +281,18 @@ const forgotPassword = async (req, res, next) => {
           <p><a href= "${resetUrl}" > ${resetUrl}</a></p>
           <p>Reset link will expire in 1 hour.</p>`,
     );
-    return res
-      .status(StatusCodes.OK)
-      .json({
-        message:
-          "If an account with the email exists, a password reset link will be provided to that email.",
-      });
+    return res.status(StatusCodes.OK).json({
+      message:
+        "If an account with the email exists, a password reset link will be provided to that email.",
+      ...(IS_DEV_ENV
+        ? {
+            devPasswordReset: {
+              token: resetToken,
+              resetUrl,
+            },
+          }
+        : {}),
+    });
   } catch (err) {
     return next(err);
   }
@@ -268,12 +314,10 @@ const resetPassword = async (req, res, next) => {
     });
 
     if (!user) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({
-          message:
-            "Expired password reset token or invalid password reset token.",
-        });
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message:
+          "Expired password reset token or invalid password reset token.",
+      });
     }
 
     user.password_hash = await hashPassword(newPassword);
@@ -281,9 +325,30 @@ const resetPassword = async (req, res, next) => {
     user.password_reset_expires_at = undefined;
     await user.save();
 
-    return res
-      .status(StatusCodes.OK)
-      .json({ message: "Password is reset. Log in with your new password." });
+    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+    const csrfToken = crypto.randomUUID();
+    const sessionToken = jwt.sign(
+      { id: user._id, role: user.role, csrfToken },
+      process.env.JWT_SECRET,
+      { expiresIn: "14d" },
+    );
+
+    res.cookie(
+      "session_token",
+      sessionToken,
+      getCookieOptions(req, FOURTEEN_DAYS),
+    );
+
+    return res.status(StatusCodes.OK).json({
+      message: "Password reset successful. You are now signed in.",
+      csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
     return next(err);
   }
