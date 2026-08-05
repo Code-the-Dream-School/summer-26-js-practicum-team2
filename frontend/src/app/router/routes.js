@@ -7,4 +7,6 @@ export const ROUTES = {
   LEARN: '/learn',
   LESSON: '/lesson',
   PROFILE: '/profile',
+  PRIVACY: '/privacy',
+  TERMS: '/terms',
 }

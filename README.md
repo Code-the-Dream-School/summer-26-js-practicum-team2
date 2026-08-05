@@ -1,26 +1,33 @@
-# Project Name
+# Sprout
 
-Short, clear description of what this application does and who it’s for.  
-(1–2 sentences max.)
+**Plant your money. Watch it grow.**
 
-**Example:**  
-A full-stack web application with a React frontend and a Node/Express backend that allows users to create, manage, and track data stored in a database.
+Sprout is a friendly, gamified money-basics app for college freshmen and
+recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
+and a per-lesson plant-growth reward loop help first-paycheck learners
+feel in control of their money — without a lecture.
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https://your-frontend-url.com
+- **Frontend Live Site:** https:/sprout-ctd.netlify.app/
 - **Frontend Repo:** /frontend
+- **Backend Live Site:** https://sprout-backend-x46w.onrender.com
 - **Backend Repo:** /backend
 
 ## 🧠 Problem Statement
 
-What problem does this project solve?
+Most young adults handle their first checking account, paycheck, and rent
+payment with no formal money education. Existing personal-finance apps
+either lecture, push wealth-management products, or assume the user already
+speaks fluent finance — none of which fits a college freshman or a
+first-paycheck recent grad.
 
-- Who is this application for?
-- What pain point does it address?
-- Why does this solution matter?
-
-Focus on the **user problem**, not the technology.
+- **Who is this for?** Single moms (Persona A, "Working Single Mom of Two") and Freshman in College (Persona B, "College Freshman").
+- **Pain point:** They want to feel smarter about money but don't want a
+  lecture, an advisor pitch, or a 30-minute reading assignment. They want a way to learn in between classes or shifts
+- **Why this matters:** Small, confident money habits formed early
+  compound. Sprout keeps the learning loop short (3–5 min per lesson) and
+  makes the reward visible via the plant-growth mechanic.
 
 ## 🎯 Features
 
@@ -33,7 +40,7 @@ Focus on the **user problem**, not the technology.
 
 ## 📸 Screenshots
 
-Add screenshots or GIFs of key features here.
+<!-- Add screenshots or GIFs of key features here. -->
 
 ## 🛠 Tech Stack
 
@@ -53,8 +60,7 @@ Add screenshots or GIFs of key features here.
 
 ### Database
 
-- MongoDB (Mongoose) **or**
-- PostgreSQL (Prisma / Knex / Sequelize)
+- MongoDB (Mongoose)
 
 ### Tooling
 
@@ -134,7 +140,7 @@ JWT_SECRET=your_secret_key
 ```
 
 Backend runs on:  
-http://localhost:8080
+http://localhost:5000
 
 ### Frontend Setup
 
@@ -185,18 +191,29 @@ DELETE /api/items/:id
 
 ## 🤝 Team & Collaboration
 
-### Team Members
+### Practicum Lead
 
-- Name — Role
-- Name — Role
-- Name — Role
+- Frank Stepanski - [@frankstepanski](https://github.com/frankstepanski)
+
+### Mentors
+
+- Mario Martinez - [@mntri4](https://github.com/mntri4)
+- Hector Gonzalez - [@hectarek](https://github.com/hectarek)
+
+### Developers
+
+- Berenice Rojas — [@berenicerojas](https://github.com/berenicerojas)
+- Danylo Hetmanenko — [@DanyloHet](https://github.com/DanyloHet)
+- Kristen Wishart — [@kwishart24](https://github.com/kwishart24)
+- Maryzabeth Philip — [@BytesofStrength](https://github.com/BytesOfStrength)
+- Mikey Nichols — [@mnichols08](https://github.com/mnichols08)
 
 ### Workflow
 
 - GitHub Issues for task tracking
 - Feature branches for development
 - Pull Requests required for all merges
-- Code reviews before merging to `main`
+- Code reviews before merging to `main`, `development`, or `docs`
 
 ## 🧩 Development Process
 
