@@ -6,4 +6,6 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   LESSONS: '/lessons',
   PROFILE: '/profile',
+  PRIVACY: '/privacy',
+  TERMS: '/terms',
 }
