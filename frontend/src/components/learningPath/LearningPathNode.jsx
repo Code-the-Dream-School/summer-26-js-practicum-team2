@@ -1,17 +1,19 @@
-function LearningPathNode({ module, status }) {
+import Card from '../ui/Card'
+
+function LearningPathNode({ node, status }) {
   return (
-    <div>
-      <button>
-        {status === 'completed'}
-        {status === 'current'}
-        {status === 'locked'}
+    <Card>
+      <div>
+        {status === 'completed' && '✅'}
+        {status === 'current' && '🟢'}
+        {status === 'locked' && '🔒'}
+      </div>
 
-        {module.title}
-      </button>
-
-      <h3>{module.title}</h3>
-      <p>{module.description}</p>
-    </div>
+      <h3>
+        {node.microLessonId}: {node.microLessonTitle}
+      </h3>
+      <p>{node.description}</p>
+    </Card>
   )
 }
 

@@ -1,5 +1,5 @@
 {
-  "id": "cash-flow",
+  "id": "cashFlow",
   "title": "Budgeting and Cash Flow Basics",
   "tags": ["budget", "cashflow", "income", "expenses"],
   "metadata": {
@@ -110,13 +110,7 @@
       "tableId": "abigail-basic-expenses",
       "title": "Abigail's Monthly Expenses",
       "headers": ["Expense", "Cost per Month"],
-      "expenseRefs": [
-        "rent",
-        "carPayment",
-        "electricity",
-        "groceries",
-        "gasoline"
-      ]
+      "expenseRefs": ["rent", "carPayment", "electricity", "groceries", "gasoline"]
     },
     {
       "tableId": "abigail-all-expenses",
@@ -701,12 +695,7 @@
             },
             {
               "type": "unorderedList",
-              "items": [
-                "Groceries",
-                "Bowling league Fees",
-                "College Textbooks",
-                "Concert Tickets"
-              ]
+              "items": ["Groceries", "Bowling league Fees", "College Textbooks", "Concert Tickets"]
             },
             {
               "type": "knowledgeCheck",
