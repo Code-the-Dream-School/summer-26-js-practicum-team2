@@ -1,12 +1,12 @@
 // API service for interacting with the backend.
 // Base URL is determined by the VITE_API_BASE_URL environment variable, which can be set in the .env file.
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')
-// The USERS_BASE_PATH is constructed by appending the users API path to the base URL.
 const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`
+const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`
 
 // Helper function to make API requests to the backend.
 async function apiRequest(path, options = {}) {
-  const { method = 'GET', body, csrfToken, headers = {} } = options
+  const { method = 'GET', body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options
 
   const requestHeaders = {
     'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ async function apiRequest(path, options = {}) {
     requestHeaders['X-CSRF-TOKEN'] = csrfToken
   }
 
-  const response = await fetch(`${USERS_BASE_PATH}${path}`, {
+  const response = await fetch(`${basePath}${path}`, {
     method,
     credentials: 'include',
     headers: requestHeaders,
@@ -67,4 +67,21 @@ export const resetPasswordRequest = (token, newPassword) =>
   apiRequest('/reset-password', {
     method: 'POST',
     body: { token, newPassword },
+  })
+
+export const getDashboard = () =>
+  apiRequest('', {
+    method: 'GET',
+    basePath: DASHBOARD_BASE_PATH,
+  })
+
+export const trackDashboardEvent = ({ type, csrfToken, ...payload }) =>
+  apiRequest('/events', {
+    method: 'POST',
+    csrfToken,
+    body: {
+      type,
+      ...payload,
+    },
+    basePath: DASHBOARD_BASE_PATH,
   })
