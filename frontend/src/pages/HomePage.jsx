@@ -15,12 +15,21 @@ function HomePage() {
         decisions.
       </p>
 
-      <Link
-        to="/dev/components"
-        className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
-      >
-        &lt;View Component Library /&gt;
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link
+          to="/quizzes/budgeting-cash-flow"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+        >
+          Start budgeting quiz
+        </Link>
+
+        <Link
+          to="/dev/components"
+          className="inline-flex min-h-11 items-center justify-center rounded-md border border-neutral-300 bg-surface-app px-5 py-2.5 font-semibold text-heading hover:bg-surface-raised"
+        >
+          View component library
+        </Link>
+      </div>
     </section>
   )
 }
