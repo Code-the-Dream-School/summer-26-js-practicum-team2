@@ -1,9 +1,17 @@
 import manifest from './manifest.json'
-import budgeting from './budgeting.json'
+import cashFlow from './budgeting.json'
+// import savings from './savings.json'
+// import credit from './credit.json'
+// import debt from './debt.json'
+// import investing from './investing.json'
 
-export const curriculum = {
+export const modules = {
   manifest,
   modules: {
-    budgeting,
+    cashFlow,
+    // savings,
+    // credit,
+    // debt,
+    // investing,
   },
 }

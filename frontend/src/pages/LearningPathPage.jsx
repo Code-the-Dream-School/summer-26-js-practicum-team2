@@ -1,14 +1,22 @@
 // import { useEffect, useState } from 'react'
-import manifest from '../content/manifest.json'
+// import modules from '../content/index.js'
+import cashFlow from '../content/budgeting.json'
 import LearningPathNode from '../components/learningPath/LearningPathNode'
 // import LessonCard from '../components/layout/LessonCard'
 
 function LearningPathPage() {
+  //Mock Progress
+  const progress = {
+    currentModule: 'cashFlow',
+    currentLessonId: '1.1',
+    currentMicroLessonId: '1.1.1',
+  }
+
+  if (!progress) {
+    return <div>Loading...</div>
+  }
+
   //Setting state for user progress
-  const path = manifest.learningPaths[0]
-
-  const modules = manifest.learningPaths[0].modules
-
   //For getting progress from backend
 
   //   const [progress, setProgress] = useState(null)
@@ -19,36 +27,45 @@ function LearningPathPage() {
   //       .then((data) => setProgress(data))
   //   }, [])
 
-  //Mock Progress
-  const progress = {
-    currentModuleId: 'budgeting',
-    currentLessonId: 'cash-flow',
-    currentMicroLessonId: 'intro',
-  }
+  //Use progress to determine which module to load
 
-  if (!progress) {
-    return <div>Loading...</div>
-  }
+  //const currentModule = modules[progress.currentModuleId]
 
-  const currentIndex = modules.findIndex((module) => module.id === progress.currentModuleId)
+  const currentModule = cashFlow
+
+  //Build path from current module
+  const learningPath = currentModule.lessons.flatMap((lesson) =>
+    lesson.microLessons.map((microLesson) => ({
+      lessonId: lesson.id,
+      lessonTitle: lesson.title,
+
+      microLessonId: microLesson.id,
+
+      microLessonTitle: microLesson.title,
+    })),
+  )
+
+  const currentIndex = learningPath.findIndex(
+    (node) => node.microLessonId === progress.currentMicroLessonId,
+  )
 
   return (
     <div>
-      <h1>{path.name}</h1>
-      {/* Rendering the modules to create the path */}
-      {/* {modules.map((module) => (
-        <div key={module.id}>{module.title}</div>
-      ))} */}
+      <h1>{currentModule.title}</h1>
 
-      {modules.map((module, index) => {
+      {learningPath.map((node, index) => {
         let status = 'locked'
 
         if (index < currentIndex) status = 'completed'
 
         if (index === currentIndex) status = 'current'
 
-        return <LearningPathNode key={module.id} module={module} status={status} />
+        return <LearningPathNode key={node.microLessonId} node={node} status={status} />
       })}
+      {/* Rendering the modules to create the path */}
+      {/* {modules.map((module) => (
+        <div key={module.id}>{module.title}</div>
+      ))} */}
     </div>
   )
 }
