@@ -1,0 +1,285 @@
+{
+  "info": {
+    "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
+    "name": "Local Backend API",
+    "description": "Requests for testing the local Express backend during development.",
+    "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "csrfToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetUrl",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Hello",
+      "item": [
+        {
+          "name": "GET Hello",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hello",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hello"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "const devVerification = responseJson?.devVerification;",
+                  "if (devVerification?.token) {",
+                  "  pm.collectionVariables.set('verificationToken', devVerification.token);",
+                  "  console.log('Verification token saved:', devVerification.token);",
+                  "}",
+                  "if (devVerification?.verifyUrl) {",
+                  "  pm.collectionVariables.set('verificationUrl', devVerification.verifyUrl);",
+                  "  console.log('Verification URL saved:', devVerification.verifyUrl);",
+                  "}",
+                  "if (!devVerification) {",
+                  "  console.warn('No devVerification object returned. Confirm NODE_ENV is not production.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@example.com\",\n  \"password\": \"P@ssword123!\",\n  \"confirmPassword\": \"P@ssword123!\",\n  \"tos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/verify?token={{verificationToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "verify"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{verificationToken}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson && responseJson.csrfToken) {",
+                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "}",
+                  "const setCookieHeader = pm.response.headers.get('Set-Cookie');",
+                  "if (setCookieHeader) {",
+                  "  pm.collectionVariables.set('sessionCookie', setCookieHeader);",
+                  "}",
+                  "console.log('CSRF token saved:', responseJson.csrfToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test.user@example.com\",\n  \"password\": \"P@ssword123!\",\n  \"remember\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "const devPasswordReset = responseJson?.devPasswordReset;",
+                  "if (devPasswordReset?.token) {",
+                  "  pm.collectionVariables.set('resetToken', devPasswordReset.token);",
+                  "  console.log('Reset token saved:', devPasswordReset.token);",
+                  "}",
+                  "if (devPasswordReset?.resetUrl) {",
+                  "  pm.collectionVariables.set('resetUrl', devPasswordReset.resetUrl);",
+                  "  console.log('Reset URL saved:', devPasswordReset.resetUrl);",
+                  "}",
+                  "if (!devPasswordReset) {",
+                  "  console.warn('No devPasswordReset object returned. Confirm NODE_ENV is not production and user exists.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test.user@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "forgot-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"N3wP@ssword!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "reset-password"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

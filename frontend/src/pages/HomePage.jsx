@@ -1,8 +1,25 @@
-import { Link } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
+import Toast from '../components/ui/Toast.jsx'
 
 function HomePage() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const toast = location.state?.toast || null
+
+  const closeToast = () => {
+    navigate(location.pathname, { replace: true, state: null })
+  }
+
   return (
     <section className="space-y-6">
+      <Toast
+        isOpen={Boolean(toast?.message)}
+        message={toast?.message || ''}
+        onClose={closeToast}
+        duration={4500}
+        variant={toast?.type === 'success' ? 'success' : 'default'}
+      />
+
       {/* Page introduction */}
       <p className="text-small font-semibold uppercase tracking-wide text-primary">
         Financial education platform

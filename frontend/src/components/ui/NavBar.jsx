@@ -10,8 +10,10 @@ const primaryLinks = [
 export default function NavBar({
   signedIn = false,
   avatarLabel = 'A',
-  xp = 120,
-  streak = 4,
+  xp = 0,
+  streak = 0,
+  onLogout,
+  isSigningOut = false,
   className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -91,6 +93,16 @@ export default function NavBar({
                   <span className="text-sm text-neutral-600">{streak} day streak</span>
                 </div>
               </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  disabled={isSigningOut}
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSigningOut ? 'Signing out...' : 'Logout'}
+                </button>
+              </li>
             </>
           )}
         </ul>
@@ -132,6 +144,21 @@ export default function NavBar({
                 )}
               </li>
             ))}
+            {signedIn ? (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false)
+                    onLogout?.()
+                  }}
+                  disabled={isSigningOut}
+                  className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-heading transition-colors hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSigningOut ? 'Signing out...' : 'Logout'}
+                </button>
+              </li>
+            ) : null}
           </ul>
         </div>
       ) : null}
