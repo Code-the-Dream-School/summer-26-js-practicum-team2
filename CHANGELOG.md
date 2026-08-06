@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.2.1]
+
+### Changed
+
+- Update environment configuration and API paths
+
+---
+
 ## [0.2.0]
 
 ### Added
