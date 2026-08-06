@@ -1,23 +1,27 @@
 import { Link } from 'react-router'
+import dabbingBeaverImg from '../assets/dabbingBeaver.svg'
+import abigailImg from '../assets/abigail.svg'
+import ramonaImg from '../assets/ramona.svg'
 
 function HomePage() {
   return (
     <>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
         {/* COMPONENT: Hero Section */}
-        <section className="flex flex-col-reverse items-center justify-between gap-8 py-12 md:py-20 lg:flex-row" aria-label="Introduction">
-          <div className="flex flex-col space-y-6 lg:max-w-xl">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-              Financial education platform
-            </p>
+        <section
+          className="flex flex-col items-center justify-between py-12 md:py-20 lg:flex-row"
+          aria-label="Introduction"
+        >
+          <div className="flex flex-col space-y-6
+           lg:max-w-xl">
             <h1 className="text-h1 font-bold tracking-tight text-heading">
               Master money in five minutes a day.
             </h1>
             <p className="max-w-2xl leading-normal text-foreground">
-              Bite-sized lessons on budgeting, saving, and credit — built for students and new grads starting out on their own.
+              Bite-sized lessons on budgeting, saving, and credit — built for students and new grads
+              starting out on their own.
             </p>
-            
+
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
                 to="/signup"
@@ -36,115 +40,151 @@ function HomePage() {
           </div>
 
           <div className="w-full max-w-md lg:max-w-xl">
-            <picture>
-              <source srcSet="assets/hero-team.webp" type="image/webp" />
-              <img 
-                src="assets/hero-team.png" 
-                alt="Three smiling team member avatars alongside an approachable beaver mascot greeting you" 
-                width="500" 
-                height="400" 
-                className="mx-auto h-auto w-full object-contain"
-                loading="eager" 
+              <img
+                src={dabbingBeaverImg}
+                alt="An approachable beaver mascot greeting you"
+                className="mx-5 h-auto object-contain inline-block w-1/5"
+                loading="eager"
               />
-            </picture>
+
+              <img
+                src={abigailImg}
+                alt="Female avatar in a blue sweater greeting you"
+                className="mx-5 h-auto object-contain inline-block w-1/5"
+                loading="eager"
+              />
+
+              <img
+                src={ramonaImg}
+                alt="Female avatar in a purple sweater greeting you"
+                className="mx-5 h-auto object-contain inline-block w-1/5"
+                loading="eager"
+              />
           </div>
         </section>
 
         {/* COMPONENT: Benefits Section */}
         <section id="benefits" className="py-12 md:py-20" aria-labelledby="benefits-title">
           <div className="text-center mb-12">
-            <h2 id="benefits-title" className="text-h2 font-bold tracking-tight text-heading">Why Choose Our App</h2>
+            <h2 id="benefits-title" className="text-h2 font-bold tracking-tight text-heading">
+              Why Choose Our App
+            </h2>
           </div>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <article className="flex flex-col items-center text-center p-6 bg-surface-raised rounded-xl shadow-sm border border-neutral-200">
-              <div className="text-3xl mb-4" aria-hidden="true">⚡</div>
+              <div className="text-3xl mb-4" aria-hidden="true">
+                ⚡
+              </div>
               <h3 className="text-xl font-semibold text-heading mb-2">No Jargon</h3>
-              <p className="text-foreground leading-normal">Learn budgeting basics without the finance jargon.</p>
+              <p className="text-foreground leading-normal">
+                Learn budgeting basics without the finance jargon.
+              </p>
             </article>
             <article className="flex flex-col items-center text-center p-6 bg-surface-raised rounded-xl shadow-sm border border-neutral-200">
-              <div className="text-3xl mb-4" aria-hidden="true">📱</div>
+              <div className="text-3xl mb-4" aria-hidden="true">
+                📱
+              </div>
               <h3 className="text-xl font-semibold text-heading mb-2">Gamified Progress</h3>
-              <p className="text-foreground leading-normal">Track streaks and earn badges as you progress.</p>
+              <p className="text-foreground leading-normal">
+                Track streaks and earn badges as you progress.
+              </p>
             </article>
             <article className="flex flex-col items-center text-center p-6 bg-surface-raised rounded-xl shadow-sm border border-neutral-200">
-              <div className="text-3xl mb-4" aria-hidden="true">🔒</div>
+              <div className="text-3xl mb-4" aria-hidden="true">
+                🔒
+              </div>
               <h3 className="text-xl font-semibold text-heading mb-2">100% Free</h3>
-              <p className="text-foreground leading-normal">Free forever — no bank account required.</p>
+              <p className="text-foreground leading-normal">
+                Free forever — no bank account required.
+              </p>
             </article>
           </div>
         </section>
 
         {/* REQUIRED CHECKLIST COMPONENT: How-It-Works Section */}
-        <section id="how-it-works" className="py-12 md:py-20 border-t border-neutral-200" aria-labelledby="how-title">
+        <section
+          id="how-it-works"
+          className="py-12 md:py-20 border-t border-neutral-200"
+          aria-labelledby="how-title"
+        >
           <div className="text-center mb-12">
-            <h2 id="how-title" className="text-h2 font-bold tracking-tight text-heading">How It Works</h2>
+            <h2 id="how-title" className="text-h2 font-bold tracking-tight text-heading">
+              How It Works
+            </h2>
           </div>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div className="flex flex-col items-center text-center p-6 bg-surface-input rounded-xl shadow-sm border border-neutral-200 relative">
-              <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">1</span>
+              <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">
+                1
+              </span>
               <h3 className="text-xl font-semibold text-heading mb-2 mt-2">Pick a Topic</h3>
-              <p className="text-foreground leading-normal">Choose from modules covering Credit Cards, Emergency Funds, or Student Loans.</p>
+              <p className="text-foreground leading-normal">
+                Choose from modules covering Credit Cards, Emergency Funds, or Student Loans.
+              </p>
             </div>
             <div className="flex flex-col items-center text-center p-6 bg-surface-input rounded-xl shadow-sm border border-neutral-200 relative">
-              <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">2</span>
+              <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">
+                2
+              </span>
               <h3 className="text-xl font-semibold text-heading mb-2 mt-2">5-Min Daily Lesson</h3>
-              <p className="text-foreground leading-normal">Read interactive, simplified concepts designed to fit straight into a busy schedule.</p>
+              <p className="text-foreground leading-normal">
+                Read interactive, simplified concepts designed to fit straight into a busy schedule.
+              </p>
             </div>
             <div className="flex flex-col items-center text-center p-6 bg-surface-input rounded-xl shadow-sm border border-neutral-200 relative">
-              <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">3</span>
+              <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">
+                3
+              </span>
               <h3 className="text-xl font-semibold text-heading mb-2 mt-2">Test Your Knowledge</h3>
-              <p className="text-foreground leading-normal">Complete quick summary checkpoints to solidify your learning and lock in streaks.</p>
+              <p className="text-foreground leading-normal">
+                Complete quick summary checkpoints to solidify your learning and lock in streaks.
+              </p>
             </div>
           </div>
         </section>
 
         {/* COMPONENT: FAQ Section */}
-        <section id="faq" className="py-12 md:py-20 border-t border-neutral-200" aria-labelledby="faq-title">
+        <section
+          id="faq"
+          className="py-12 md:py-20 border-t border-neutral-200"
+          aria-labelledby="faq-title"
+        >
           <div className="max-w-3xl mx-auto">
-            <h2 id="faq-title" className="text-h2 font-bold tracking-tight text-heading text-center mb-12">Frequently Asked Questions</h2>
+            <h2
+              id="faq-title"
+              className="text-h2 font-bold tracking-tight text-heading text-center mb-12"
+            >
+              Frequently Asked Questions
+            </h2>
             <div className="space-y-6">
               <div className="p-6 bg-surface-raised rounded-lg border border-neutral-200">
                 <h4 className="text-lg font-semibold text-heading mb-2">1. Is it free?</h4>
-                <p className="text-foreground leading-normal">Yes — every lesson, quiz, and badge is free. There's no paid tier and no ads. We built this so anyone starting out can learn money basics without a paywall.</p>
+                <p className="text-foreground leading-normal">
+                  Yes — every lesson, quiz, and badge is free. There's no paid tier and no ads. We
+                  built this so anyone starting out can learn money basics without a paywall.
+                </p>
               </div>
               <div className="p-6 bg-surface-raised rounded-lg border border-neutral-200">
-                <h4 className="text-lg font-semibold text-heading mb-2">2. How long does it take?</h4>
-                <p className="text-foreground leading-normal">Most lessons take three to five minutes, and a full topic runs about a week at one lesson a day. You can go faster or slower — your progress saves automatically.</p>
+                <h4 className="text-lg font-semibold text-heading mb-2">
+                  2. How long does it take?
+                </h4>
+                <p className="text-foreground leading-normal">
+                  Most lessons take three to five minutes, and a full topic runs about a week at one
+                  lesson a day. You can go faster or slower — your progress saves automatically.
+                </p>
               </div>
               <div className="p-6 bg-surface-raised rounded-lg border border-neutral-200">
                 <h4 className="text-lg font-semibold text-heading mb-2">3. Who is it for?</h4>
-                <p className="text-foreground leading-normal">It's designed for first-time earners: students opening their first checking account and recent grads getting their first paycheck. No prior finance knowledge is assumed.</p>
+                <p className="text-foreground leading-normal">
+                  It's designed for first-time earners: students opening their first checking
+                  account and recent grads getting their first paycheck. No prior finance knowledge
+                  is assumed.
+                </p>
               </div>
             </div>
           </div>
         </section>
-
-        {/* Developer Sandbox Link (Kept safe from your original file) */}
-        <div className="py-8 border-t border-neutral-200 text-center">
-          <Link to="/dev/components" className="text-xs font-mono text-neutral-500 hover:text-primary">
-            &lt;View Project Component Library /&gt;
-          </Link>
-        </div>
       </main>
-
-      {/* COMPONENT: Footer Section */}
-      <footer className="bg-surface-raised border-t border-neutral-200 py-12" role="contentinfo">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8 space-y-6">
-          <div className="flex flex-wrap justify-center gap-6 text-sm font-medium text-neutral-600">
-            <Link to="/about" className="hover:text-primary">About</Link>
-            <Link to="/privacy" className="hover:text-primary">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-primary">Terms of Service</Link>
-            <a href="https://github.com" className="hover:text-primary">GitHub</a>
-            <Link to="/contact" className="hover:text-primary">Contact</Link>
-          </div>
-          <p className="text-xs text-neutral-500 max-w-2xl mx-auto leading-normal">
-            Disclaimer: The content on this platform is for educational purposes only and does not constitute formal financial advice.
-          </p>
-          <p className="text-xs text-neutral-400">
-            &copy; 2026 Financial Literacy App. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </>
   )
 }
