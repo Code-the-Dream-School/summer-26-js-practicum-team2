@@ -5,6 +5,7 @@ export const ROUTES = {
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
   LESSONS: '/lessons',
+  QUIZ: '/quizzes/:lessonId',
   PROFILE: '/profile',
   PRIVACY: '/privacy',
   TERMS: '/terms',

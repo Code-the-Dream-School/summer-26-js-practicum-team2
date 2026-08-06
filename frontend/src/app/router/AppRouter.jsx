@@ -6,6 +6,7 @@ import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import PrivacyPage from '../../pages/PrivacyPage.jsx'
 import TermsPage from '../../pages/TermsPage.jsx'
+import QuizPage from '../../pages/QuizPage.jsx'
 import { ROUTES } from './routes.js'
 
 const router = createBrowserRouter([
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.TERMS,
         element: <TermsPage />,
+      },
+      {
+        path: ROUTES.QUIZ,
+        element: <QuizPage />,
       },
       {
         path: '*',
