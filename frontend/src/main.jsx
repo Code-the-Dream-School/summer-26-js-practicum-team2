@@ -10,25 +10,25 @@ createRoot(document.getElementById('root')).render(
 );
 
 
-///mycode///
-const userIsSignedIn = false; 
+// ///mycode///
+// const userIsSignedIn = false; 
 
-function initializeUserInterfaceAuthRouter() {
-    if (!userIsSignedIn) return;
+// function initializeUserInterfaceAuthRouter() {
+//     if (!userIsSignedIn) return;
 
-    const primaryButtonCTA = document.getElementById('primary-cta');
-    const navigationBarCTA = document.getElementById('nav-cta');
+//     const primaryButtonCTA = document.getElementById('primary-cta');
+//     const navigationBarCTA = document.getElementById('nav-cta');
     
   
-    if (primaryButtonCTA) {
-        primaryButtonCTA.textContent = "Continue learning";
-        primaryButtonCTA.setAttribute('href', '/dashboard');
-    }
+//     if (primaryButtonCTA) {
+//         primaryButtonCTA.textContent = "Continue learning";
+//         primaryButtonCTA.setAttribute('href', '/dashboard');
+//     }
     
-    if (navigationBarCTA) {
-        navigationBarCTA.textContent = "Continue learning";
-        navigationBarCTA.setAttribute('href', '/dashboard');
-    }
-}
+//     if (navigationBarCTA) {
+//         navigationBarCTA.textContent = "Continue learning";
+//         navigationBarCTA.setAttribute('href', '/dashboard');
+//     }
+// }
 
-document.addEventListener('DOMContentLoaded', initializeUserInterfaceAuthRouter);
+// document.addEventListener('DOMContentLoaded', initializeUserInterfaceAuthRouter);
