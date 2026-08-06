@@ -10,8 +10,10 @@ const primaryLinks = [
 export default function NavBar({
   signedIn = false,
   avatarLabel = 'A',
-  xp = 120,
-  streak = 4,
+  xp = 0,
+  streak = 0,
+  onLogout,
+  isSigningOut = false,
   className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -81,15 +83,27 @@ export default function NavBar({
               </li>
             </>
           ) : (
-            <li>
-              <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
-                  {avatarLabel}
-                </span>
-                <span className="text-sm font-semibold text-heading">{xp} XP</span>
-                <span className="text-sm text-neutral-600">{streak} day streak</span>
-              </div>
-            </li>
+            <>
+              <li>
+                <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
+                    {avatarLabel}
+                  </span>
+                  <span className="text-sm font-semibold text-heading">{xp} XP</span>
+                  <span className="text-sm text-neutral-600">{streak} day streak</span>
+                </div>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  disabled={isSigningOut}
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSigningOut ? 'Signing out...' : 'Logout'}
+                </button>
+              </li>
+            </>
           )}
         </ul>
 
@@ -130,6 +144,21 @@ export default function NavBar({
                 )}
               </li>
             ))}
+            {signedIn ? (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false)
+                    onLogout?.()
+                  }}
+                  disabled={isSigningOut}
+                  className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-heading transition-colors hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSigningOut ? 'Signing out...' : 'Logout'}
+                </button>
+              </li>
+            ) : null}
           </ul>
         </div>
       ) : null}
