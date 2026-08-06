@@ -23,6 +23,10 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: ROUTES.DASHBOARD,
+        element: <Dashboard />,
+      },
+      {
         path: ROUTES.REGISTER,
         element: <RegisterPage />,
       },

@@ -1,106 +1,106 @@
-import { useState } from 'react'
 import { Link } from 'react-router'
 import DashboardHero from '../components/dashboard/DashboardHero.jsx'
 import RecentActivityCard from '../components/dashboard/RecentActivityCard.jsx'
 import UnitProgressRow from '../components/dashboard/UnitProgressRow.jsx'
 import Card from '../components/ui/Card.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
+import Skeleton from '../components/ui/Skeleton.jsx'
+import { ROUTES } from '../app/router/routes.js'
+import useAuth from '../hooks/useAuth.js'
+import useDashboardData from '../hooks/useDashboardData.js'
 
-// Just some mockup data for the dashboard. Will come from the API in the future
-const dashboardData = {
-  nextAction: {
-    title: 'Start Budgeting Basics',
-    description: 'Ready to start? Begin with Budgeting Basics',
-    ctaLabel: 'Start lesson',
-    href: '/lessons',
-  },
-  units: [
-    {
-      id: 'budgeting',
-      name: 'Budgeting Basics',
-      icon: '💡',
-      completedLessons: 0,
-      totalLessons: 4,
-      progressPercent: 0,
-    },
-    {
-      id: 'saving',
-      name: 'Smart Saving',
-      icon: '🏦',
-      completedLessons: 0,
-      totalLessons: 4,
-      progressPercent: 0,
-    },
-    {
-      id: 'credit',
-      name: 'Credit Confidence',
-      icon: '💳',
-      completedLessons: 0,
-      totalLessons: 3,
-      progressPercent: 0,
-    },
-  ],
-  recentActivity: [],
+function DashboardSkeleton() {
+  return (
+    <section className="space-y-6" aria-hidden="true">
+      <Skeleton className="h-56 rounded-2xl border border-neutral-200 bg-surface-raised" />
+      <Skeleton className="h-36 rounded-2xl border border-neutral-200 bg-surface-raised" />
+      <div className="space-y-3">
+        <Skeleton className="h-20 rounded-2xl border border-neutral-200 bg-surface-raised" />
+        <Skeleton className="h-20 rounded-2xl border border-neutral-200 bg-surface-raised" />
+        <Skeleton className="h-20 rounded-2xl border border-neutral-200 bg-surface-raised" />
+      </div>
+    </section>
+  )
 }
 
 function Dashboard() {
-  // Randomly select a name and status for the user.
-  //  This is just for fun and to make the dashboard feel more alive without actual data flowing yet
-  const [{ name, status, streak }] = useState(() => {
-    const names = ['Berenice', 'Hector', 'Kristen', 'Maryzabeth', 'Mario', 'Mikey']
-    const statuses = ['new', 'in-progress', 'complete']
-
-    return {
-      name: names[Math.floor(Math.random() * names.length)],
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      streak: Math.floor(Math.random() * 100),
-    }
+  const { user, isAuthenticated } = useAuth()
+  const { dashboard, isLoading, error } = useDashboardData({
+    userId: user?.id,
+    isAuthenticated,
   })
 
-  // Destructure the mockup data for easier access
-  const { nextAction, units, recentActivity } = dashboardData
-  // Calculate the overall progress percentage across all units
+  if (!isAuthenticated) {
+    return (
+      <EmptyState
+        icon="🔐"
+        title="Sign in to view your dashboard"
+        message="Track your progress, streaks, and next lesson after you sign in."
+        action={
+          <Link
+            to={ROUTES.LOGIN}
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+          >
+            Go to sign in
+          </Link>
+        }
+      />
+    )
+  }
+
+  if (isLoading && !dashboard) {
+    return <DashboardSkeleton />
+  }
+
+  if (error && !dashboard) {
+    return (
+      <EmptyState
+        icon="⚠️"
+        title="We could not load your dashboard"
+        message={error}
+        action={
+          <Link
+            to={ROUTES.HOME}
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+          >
+            Back to home
+          </Link>
+        }
+      />
+    )
+  }
+
+  const { hero, nextAction, units = [], recentActivity = [] } = dashboard || {}
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0)
-  // Calculate the total completed lessons across all units
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0)
-  // Calculate the overall progress percentage across all units
-  const overallPercent =
-    totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
+  const hasNoProgress = completedLessons === 0
 
   return (
     <section className="space-y-6">
-      <DashboardHero
-        name={name}
-        status={status}
-        streak={streak}
-        goal={nextAction.title}
-        progress={overallPercent}
-        ctaLabel={nextAction.ctaLabel}
-        ctaTo={nextAction.href}
-      />
+      <DashboardHero hero={hero} />
 
       <Card className="space-y-3">
         <p className="text-small font-semibold uppercase tracking-wide text-primary">
           Recommended next
         </p>
-        <h2 className="font-heading text-h4 font-bold text-heading">{nextAction.title}</h2>
-        <p className="text-neutral-600">{nextAction.description}</p>
+        <h2 className="font-heading text-h4 font-bold text-heading">{nextAction?.title}</h2>
+        <p className="text-neutral-600">{nextAction?.description}</p>
         <Link
-          to={nextAction.href}
+          to={nextAction?.href || '/lessons'}
           className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
         >
-          {nextAction.ctaLabel}
+          {nextAction?.ctaLabel || 'Continue learning'}
         </Link>
       </Card>
 
-      {completedLessons === 0 ? (
+      {hasNoProgress ? (
         <EmptyState
           icon="🌱"
           title="Welcome to your progress dashboard"
           message="Ready to start? Begin with Budgeting Basics"
           action={
             <Link
-              to={nextAction.href}
+              to={nextAction?.href || '/lessons/budgeting-basics-1'}
               className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
             >
               Begin with Budgeting Basics
