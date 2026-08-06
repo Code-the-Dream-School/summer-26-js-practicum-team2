@@ -34,8 +34,9 @@ const registerSchema = Joi.object({
       "any.only": "Passwords do not match.",
       "any.required": "Please confirm password.",
     }),
-  tos: Joi.boolean().valid(true).optional().messages({
+  tos: Joi.boolean().valid(true).required().messages({
     "any.only": "Please accept the terms of service.",
+    "any.required": "Please accept the terms of service.",
   }),
 });
 const loginSchema = Joi.object({
