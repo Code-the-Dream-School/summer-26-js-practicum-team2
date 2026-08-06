@@ -45,6 +45,14 @@ const userSchema = new mongoose.Schema(
       enum: ["learner", "admin"],
       default: "learner",
     },
+    tos_agreement: {
+      type: Boolean,
+      required: true,
+    },
+    tos_agreement_at: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
