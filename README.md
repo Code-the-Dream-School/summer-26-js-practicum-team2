@@ -134,13 +134,37 @@ npm run dev
 Create a `.env` file inside the `backend` folder:
 
 ```env
-PORT=5000
-DATABASE_URL=your_database_url
-JWT_SECRET=your_secret_key
+# Local MongoDB
+MONGO_URI=mongodb://localhost:27017/summer-26-js-practicum-team2
+# Cloud MongoDB (uncomment and replace <username> and <password> with your credentials)
+#MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/summer-26-js-practicum-team2?retryWrites=true&w=majority
+
+# SMTP configuration for sending emails
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password_or_smtp_password
+FROM_EMAIL=your_email@gmail.com
+# Optional: keep auth flows working in local dev when SMTP is unavailable.
+# In production keep this false so mail failures surface immediately.
+EMAIL_FAIL_OPEN=true
+
+# Auth & Frontend URLs
+JWT_SECRET=your_super_secret_jwt_key_here
+CLIENT_URL=http://localhost:5173
+
+# Comma-separated frontend origins allowed to call this API (for CORS credentials)
+# Example: CORS_ORIGINS=https://development--sprout-ctd.netlify.app,https://sprout-ctd.netlify.app,http://localhost:5173
+CORS_ORIGINS=https://development--sprout-ctd.netlify.app,https://sprout-ctd.netlify.app,http://localhost:5173
+
+# Cookie settings for cross-site deployments (Netlify + Render)
+# For production cross-site auth: COOKIE_SAME_SITE=none and COOKIE_SECURE=true
+COOKIE_SAME_SITE=lax
+COOKIE_SECURE=false
 ```
 
 Backend runs on:  
-http://localhost:5000
+http://localhost:8080
 
 ### Frontend Setup
 
@@ -173,7 +197,33 @@ npm run format:check # check formatting without changing files
 
 ```bash
 npm run dev
-npm start
+```
+
+### Running Frontend & Backend Concurrently
+
+The root folder includes two development dependencies: **Concurrently** and **dotenv-cli**.
+
+It also includes two scripts.
+
+The first script is:
+
+```bash
+npm run setup
+```
+````
+
+This script installs the root development dependencies, then installs the dependencies for both the `backend` and `frontend` folders.
+
+The second script is:
+
+```bash
+npm run dev
+```
+
+This script uses **dotenv-cli** to load environment variables from the root `.env` file. If a port is defined there, it can be passed to the backend and frontend as needed.
+
+It also uses **Concurrently** to start both the frontend and backend development servers at the same time from a single terminal.
+
 ```
 
 ## 🔐 API Overview
