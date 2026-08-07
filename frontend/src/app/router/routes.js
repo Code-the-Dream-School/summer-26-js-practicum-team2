@@ -5,7 +5,7 @@ export const ROUTES = {
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
   LEARN: '/learn',
-  LESSON: '/lesson',
+  LESSON: '/lesson/:moduleId/:lessonId/:microLessonId',
   PROFILE: '/profile',
   PRIVACY: '/privacy',
   TERMS: '/terms',
