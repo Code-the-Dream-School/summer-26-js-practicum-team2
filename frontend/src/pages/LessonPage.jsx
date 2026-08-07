@@ -1,6 +1,6 @@
 // import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { modules } from '../content/index.js'
+import { modules } from '../../../content/index.js'
 // import budgeting from '../content/budgeting.json'
 import LessonCard from '../components/lessons/LessonCard'
 
