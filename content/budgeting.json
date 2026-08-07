@@ -1,6 +1,6 @@
 {
-  "id": "cash-flow",
-  "title": "Cash Flow",
+  "id": "cashFlow",
+  "title": "Budgeting and Cash Flow Basics",
   "tags": ["budget", "cashflow", "income", "expenses"],
   "metadata": {
     "applicationName": "Sprout",
@@ -110,13 +110,7 @@
       "tableId": "abigail-basic-expenses",
       "title": "Abigail's Monthly Expenses",
       "headers": ["Expense", "Cost per Month"],
-      "expenseRefs": [
-        "rent",
-        "carPayment",
-        "electricity",
-        "groceries",
-        "gasoline"
-      ]
+      "expenseRefs": ["rent", "carPayment", "electricity", "groceries", "gasoline"]
     },
     {
       "tableId": "abigail-all-expenses",
@@ -674,7 +668,7 @@
         },
         {
           "id": "1.3.2",
-          "title": "Categorize Abigail's and Ramona's Expenses",
+          "title": "Categorizing Expenses",
           "microLessonContent": [
             {
               "type": "paragraph",
@@ -701,12 +695,7 @@
             },
             {
               "type": "unorderedList",
-              "items": [
-                "Groceries",
-                "Bowling league Fees",
-                "College Textbooks",
-                "Concert Tickets"
-              ]
+              "items": ["Groceries", "Bowling league Fees", "College Textbooks", "Concert Tickets"]
             },
             {
               "type": "knowledgeCheck",
