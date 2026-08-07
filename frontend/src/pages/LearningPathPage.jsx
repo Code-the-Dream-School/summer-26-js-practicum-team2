@@ -34,6 +34,8 @@ function LearningPathPage() {
   //Build path from current module
   const learningPath = currentModule.lessons.flatMap((lesson) =>
     lesson.microLessons.map((microLesson) => ({
+      moduleId: currentModule.id,
+
       lessonId: lesson.id,
       lessonTitle: lesson.title,
 

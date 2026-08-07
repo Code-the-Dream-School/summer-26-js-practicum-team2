@@ -28,8 +28,8 @@ const LearningPathNode = forwardRef(({ node, status }, ref) => {
         size="circle"
         disabled={status === 'locked'}
         onClick={() => {
-          if (status === 'current') {
-            navigate('/lesson')
+          if (status !== 'locked') {
+            navigate(`/lesson/${node.moduleId}/${node.lessonId}/${node.microLessonId}`)
           }
         }}
       >
