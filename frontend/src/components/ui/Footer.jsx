@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 const footerLinks = [
   { label: 'Home', to: '/' },
   { label: 'Privacy Policy', to: '/privacy' },
-  { label: 'Terms of Use', to: '/terms' },
+  { label: 'Terms', to: '/terms' },
   {
     label: 'GitHub',
     href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2',
@@ -34,6 +34,10 @@ function Footer() {
         <p className="max-w-3xl rounded-2xl border border-neutral-200 bg-surface-raised px-4 py-3 text-sm leading-6 text-neutral-700 shadow-sm">
           Disclaimer: Sprout is an educational product and not financial advice. Use the lessons to
           build knowledge, but consult a qualified professional for personal financial decisions.
+        </p>
+
+        <p className="text-xs text-neutral-400">
+          &copy; 2026 Financial Literacy App. All rights reserved.
         </p>
       </div>
     </footer>
