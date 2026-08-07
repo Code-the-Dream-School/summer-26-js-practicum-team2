@@ -1,4 +1,5 @@
 // import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 // import modules from '../content/index.js'
 import cashFlow from '../content/budgeting.json'
 import LearningPathNode from '../components/learningPath/LearningPathNode'
@@ -11,10 +12,6 @@ function LearningPathPage() {
     currentModule: 'cashFlow',
     currentLessonId: '1.2',
     currentMicroLessonId: '1.2.1',
-  }
-
-  if (!progress) {
-    return <div>Loading...</div>
   }
 
   //Setting state for user progress
@@ -50,6 +47,20 @@ function LearningPathPage() {
     (node) => node.microLessonId === progress.currentMicroLessonId,
   )
 
+  //For scrolling to the current microLesson node in the learning path
+  const currentNodeRef = useRef(null)
+
+  useEffect(() => {
+    currentNodeRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }, [])
+
+  if (!progress) {
+    return <div>Loading...</div>
+  }
+
   return (
     <Card>
       <h2 className="text-center mb-6 text-lg font-semibold text-slate-900">
@@ -57,10 +68,31 @@ function LearningPathPage() {
       </h2>
 
       {currentModule.lessons.map((lesson) => (
-        <div key={lesson.id} className="mb-12">
-          <h2 className="mb-6 text-xl font-semibold text-heading">
-            {lesson.id}: {lesson.title}
-          </h2>
+        <div key={lesson.id} className="mb-12 flex flex-col items-center ">
+          {/* Original*/}
+          {/* <div className="mb-8 flex w-full flex-col items-center gap-8 sm:flex-row">
+            <div className="hidden h-px flex-1 bg-neutral-300 sm:block" />
+            <h2 className="mb-3 text-center text-xl font-semibold text-heading">{lesson.title}</h2>
+            <div className="hidden h-px flex-1 bg-neutral-300 sm:block" />
+          </div> */}
+
+          {/* Mobile*/}
+          <div className="mb-8 w-full block md:hidden">
+            <div className="flex flex-col items-center block md:hidden" />
+            <h2 className="mb-2 text-center text-xl font-semibold text-heading block md:hidden">
+              {lesson.title}
+            </h2>
+            <div className="h-px w-full bg-neutral-300 block md:hidden" />
+          </div>
+
+          {/* Tablet/Desktop*/}
+          <div className="mb-8 w-full items-center gap-4 hidden md:flex">
+            <div className="h-px flex-1 bg-neutral-300 hidden md:flex" />
+            <h2 className="px-8 text-xl font-semibold text-heading hidden md:flex">
+              {lesson.title}
+            </h2>
+            <div className="h-px flex-1 bg-neutral-300 hidden md:flex" />
+          </div>
 
           {lesson.microLessons.map((microLesson) => {
             const node = {
@@ -81,7 +113,14 @@ function LearningPathPage() {
 
             if (nodeIndex === currentIndex) status = 'current'
 
-            return <LearningPathNode key={microLesson.id} node={node} status={status} />
+            return (
+              <LearningPathNode
+                key={microLesson.id}
+                node={node}
+                status={status}
+                ref={nodeIndex === currentIndex ? currentNodeRef : null}
+              />
+            )
           })}
         </div>
       ))}
