@@ -36,6 +36,8 @@ const corsOptions = {
   credentials: true,
 };
 
+// Trust proxy for rate limiting and secure cookies
+app.set("trust proxy", 1);
 // Security & best‑practice middleware
 app.use(helmet());
 app.use(cors(corsOptions));
