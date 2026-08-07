@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
+import useAuth from '../hooks/useAuth.js'
 import {
   setConsentPreference,
   getConsentPreference,
@@ -9,7 +10,7 @@ import {
 } from '../utils/legalConsent.js'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const PASSWORD_HAS_NUMBER = /\d/
+const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/
 
 // Just a list of random names and emails and function to randomly select one. This is just for fun and to laughs.
 const namesAndEmails = [
@@ -67,6 +68,7 @@ const selectRandomNameAndEmail = () =>
   namesAndEmails[Math.floor(Math.random() * namesAndEmails.length)]
 
 function RegisterPage() {
+  const { register } = useAuth()
   const [formValues, setFormValues] = useState({
     name: '',
     email: '',
@@ -80,7 +82,7 @@ function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const selectedUser = selectRandomNameAndEmail()
+  const selectedUser = useMemo(() => selectRandomNameAndEmail(), [])
 
   const validateForm = (values, tosChecked) => {
     const nextErrors = {}
@@ -97,8 +99,9 @@ function RegisterPage() {
 
     if (!values.password) {
       nextErrors.password = 'Please enter a password.'
-    } else if (values.password.length < 8 || !PASSWORD_HAS_NUMBER.test(values.password)) {
-      nextErrors.password = 'Password must be at least 8 characters and include at least 1 number.'
+    } else if (values.password.length < 8 || !PASSWORD_PATTERN.test(values.password)) {
+      nextErrors.password =
+        'Password must include uppercase, lowercase, number, and special character.'
     }
 
     if (!values.confirmPassword) {
@@ -189,14 +192,22 @@ function RegisterPage() {
     setIsSubmitting(true)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 900))
+      await register({
+        ...formValues,
+        tos: agreed,
+      })
       trackAnalyticsEvent('signup_submitted', { email: formValues.email })
-      setSuccess('Account ready. This is a demo form, so nothing actually happened.')
+      setSuccess('Registration successful. Please check your email for verification.')
       setFormValues({ name: '', email: '', password: '', confirmPassword: '' })
       setAgreed(false)
       setTouched({})
       setFieldErrors({})
       setConsentPreference('rejected')
+    } catch (submitError) {
+      if (Array.isArray(submitError.errors) && submitError.errors.length > 0) {
+        setSummaryErrors(submitError.errors)
+      }
+      setError(submitError.message || 'Unable to register right now. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -260,7 +271,7 @@ function RegisterPage() {
             onChange={handleChange}
             onBlur={handleBlur}
             error={inlineErrors.password}
-            helperText="Use at least 8 characters and include at least 1 number."
+            helperText="Use at least 8 chars with upper/lowercase, 1 number, and 1 symbol."
             placeholder="Create a password"
             disabled={isSubmitting}
             required

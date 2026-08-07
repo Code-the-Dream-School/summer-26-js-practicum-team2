@@ -1,9 +1,18 @@
-import { Link } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import dabbingBeaverImg from '../assets/dabbingBeaver.svg'
 import abigailImg from '../assets/abigail.svg'
 import ramonaImg from '../assets/ramona.svg'
+import Toast from '../components/ui/Toast.jsx'
 
 function HomePage() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const toast = location.state?.toast || null
+
+  const closeToast = () => {
+    navigate(location.pathname, { replace: true, state: null })
+  }
+
   return (
     <>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -39,7 +48,7 @@ function HomePage() {
             </div>
           </div>
 
-          
+
           <div className="w-full max-w-md md:py-3 lg:max-w-xl mt-8">
             <img src={dabbingBeaverImg} alt="An approachable beaver mascot greeting you" className="mx-5 h-auto object-contain inline-block w-1/5" loading="eager" />
             <img src={abigailImg} alt="Female avatar in a blue sweater greeting you" className="mx-5 h-auto object-contain inline-block w-1/5" loading="eager" />
