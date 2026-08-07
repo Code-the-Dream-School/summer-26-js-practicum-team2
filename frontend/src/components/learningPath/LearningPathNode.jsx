@@ -1,8 +1,9 @@
 // import Card from '../ui/Card'
 import { useNavigate } from 'react-router'
+import { forwardRef } from 'react'
 import Button from '../ui/Button'
 
-function LearningPathNode({ node, status }) {
+const LearningPathNode = forwardRef(({ node, status }, ref) => {
   let variant = 'disabled'
   const navigate = useNavigate()
 
@@ -15,10 +16,13 @@ function LearningPathNode({ node, status }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <h1 className="mt-2 text-center text-lg font-semibold text-heading">
+    <div
+      ref={ref}
+      className={`flex w-full flex-col items-center gap-2 ${status === 'current' ? 'scroll-mt-32' : ''}`}
+    >
+      <h3 className="mt-2 items-center text-center text-lg font-semibold text-heading">
         {node.microLessonTitle}
-      </h1>
+      </h3>
       <Button
         variant={variant}
         size="circle"
@@ -28,7 +32,6 @@ function LearningPathNode({ node, status }) {
             navigate('/lesson')
           }
         }}
-        className="aspect-square h-5 rounded-full p-0 flex items-center justify-center"
       >
         {/* <div>
         {status === 'completed' && '✅'}
@@ -36,7 +39,7 @@ function LearningPathNode({ node, status }) {
         {status === 'locked' && '🔒'}
       </div> */}
 
-        <p className="text-lg font-medium">{node.microLessonId}</p>
+        <p className="text-lg font-bold">{node.microLessonId}</p>
 
         {/* <h3>
         {node.microLessonId}: {node.microLessonTitle}
@@ -45,6 +48,6 @@ function LearningPathNode({ node, status }) {
       <div className="h-12 w-1 bg-neutral-300" />
     </div>
   )
-}
+})
 
 export default LearningPathNode
