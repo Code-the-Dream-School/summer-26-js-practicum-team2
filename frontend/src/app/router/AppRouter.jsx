@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import LoginPage from '../../pages/LoginPage.jsx'
 import MainLayout from '../../components/layout/MainLayout.jsx'
+import Dashboard from '../../pages/DashboardPage.jsx'
 import HomePage from '../../pages/HomePage.jsx'
 import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: ROUTES.DASHBOARD,
+        element: <Dashboard />,
       },
       {
         path: ROUTES.REGISTER,

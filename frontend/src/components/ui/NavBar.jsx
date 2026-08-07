@@ -20,7 +20,7 @@ export default function NavBar({
 
   const authLinks = signedIn
     ? [
-        { label: 'Dashboard', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
         { label: 'Profile', href: '/profile' },
       ]
     : [
