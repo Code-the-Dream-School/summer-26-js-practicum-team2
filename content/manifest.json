@@ -6,7 +6,7 @@
 
       "modules": [
         {
-          "id": "cash-flow",
+          "id": "cashFlow",
           "title": "Cash Flow",
           "description": "Learn budgeting, cash flow, income, expenses, and expense tracking.",
           "file": "budgeting.json",
