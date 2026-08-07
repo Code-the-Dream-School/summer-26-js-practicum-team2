@@ -9,11 +9,11 @@ function HomePage() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* COMPONENT: Hero Section */}
         <section
-          className="flex flex-col items-center justify-between py-12 md:py-20 lg:flex-row"
+          className="flex flex-col items-center justify-between py-12 md:py-3 lg:flex-row"
           aria-label="Introduction"
         >
-          <div className="flex flex-col space-y-6
-           lg:max-w-xl">
+          <div className="flex flex-col space-y-5
+           lg:max-w-x1">
             <h1 className="text-h1 font-bold tracking-tight text-heading">
               Master money in five minutes a day.
             </h1>
@@ -39,27 +39,11 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="w-full max-w-md lg:max-w-xl">
-              <img
-                src={dabbingBeaverImg}
-                alt="An approachable beaver mascot greeting you"
-                className="mx-5 h-auto object-contain inline-block w-1/5"
-                loading="eager"
-              />
-
-              <img
-                src={abigailImg}
-                alt="Female avatar in a blue sweater greeting you"
-                className="mx-5 h-auto object-contain inline-block w-1/5"
-                loading="eager"
-              />
-
-              <img
-                src={ramonaImg}
-                alt="Female avatar in a purple sweater greeting you"
-                className="mx-5 h-auto object-contain inline-block w-1/5"
-                loading="eager"
-              />
+          
+          <div className="w-full max-w-md md:py-3 lg:max-w-xl mt-8">
+            <img src={dabbingBeaverImg} alt="An approachable beaver mascot greeting you" className="mx-5 h-auto object-contain inline-block w-1/5" loading="eager" />
+            <img src={abigailImg} alt="Female avatar in a blue sweater greeting you" className="mx-5 h-auto object-contain inline-block w-1/5" loading="eager" />
+            <img src={ramonaImg} alt="Female avatar in a purple sweater greeting you" className="mx-5 h-auto object-contain inline-block w-1/5" loading="eager" />
           </div>
         </section>
 
