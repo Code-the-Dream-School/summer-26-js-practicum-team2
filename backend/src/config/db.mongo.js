@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const connectMongo = async () => {
   try {
-    const mongoUri = process.env.MONGO_URI;
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/summer-26-js-practicum-team2';
 
     if (!mongoUri) {
       throw new Error(
