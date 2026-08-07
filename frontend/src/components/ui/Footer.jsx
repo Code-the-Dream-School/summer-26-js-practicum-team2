@@ -35,6 +35,10 @@ function Footer() {
           Disclaimer: Sprout is an educational product and not financial advice. Use the lessons to
           build knowledge, but consult a qualified professional for personal financial decisions.
         </p>
+
+        <p className="text-xs text-neutral-400">
+          &copy; 2026 Financial Literacy App. All rights reserved.
+        </p>
       </div>
     </footer>
   )

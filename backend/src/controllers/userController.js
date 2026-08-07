@@ -64,6 +64,8 @@ const register = async (req, res, next) => {
       email,
       password_hash,
       role: "learner",
+      tos_agreement: true,
+      tos_agreement_at: new Date(),
       email_verified_at: null,
       verification_token: verificationToken,
       verification_token_expires_at: tokenExpiresAt,
@@ -89,6 +91,8 @@ const register = async (req, res, next) => {
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
+        tos_agreement: newUser.tos_agreement,
+        tos_agreement_at: newUser.tos_agreement_at,
         created_at: newUser.createdAt || newUser.created_at,
       },
       // Include dev verification details in the response if in development environment
