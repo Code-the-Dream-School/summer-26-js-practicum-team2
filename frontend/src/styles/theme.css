@@ -1,1 +1,88 @@
-//Just an example of a theme file.
+@theme {
+  /* Brand colors */
+  --color-primary: #18816a;
+  --color-primary-hover: #105647;
+  --color-primary-alt: #41e3c0;
+  --color-accent: #54dec0;
+
+  /* Status colors */
+  --color-success: #18816a;
+  --color-warning: #ffddd8;
+  --color-danger: #b42318;
+
+  /* Text colors */
+  --color-foreground: #061e19;
+  --color-heading: #105647;
+  --color-on-primary: #f2fcfa;
+
+  /* Surface colors */
+  --color-surface-app: #f2fcfa;
+  --color-surface-raised: #eafbf7;
+  --color-surface-inset: #d4f7ef;
+  --color-surface-input: #ffffff;
+
+  /* Focus */
+  --color-focus: #105647;
+
+  /* Neutral scale */
+  --color-neutral-50: #f4faf8;
+  --color-neutral-100: #e3ece9;
+  --color-neutral-200: #cedcd8;
+  --color-neutral-300: #b4c7c2;
+  --color-neutral-400: #91a9a3;
+  --color-neutral-500: #6a847e;
+  --color-neutral-600: #4e6660;
+  --color-neutral-700: #263e39;
+  --color-neutral-800: #061e19;
+
+  /* Fonts */
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Fonts sizes */
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 1.2;
+
+  --text-h2: 1.875rem;
+  --text-h2--line-height: 1.2;
+
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.2;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.2;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.5;
+
+  /* Fonts weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-loose: 1.75;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgb(17 24 39 / 6%);
+  --shadow-md: 0 4px 8px rgb(17 24 39 / 8%);
+  --shadow-lg: 0 12px 24px rgb(17 24 39 / 12%);
+
+  /* Default tailwind spacing can be used they are the same we dont need to add enything specific */
+}
