@@ -6,6 +6,7 @@ const { sendVerificationEmail } = require("../utils/sendEmail");
 const User = require("../models/user.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { registerSchema, loginSchema } = require("../validation/userValidation");
+const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here"
 // Client URL for email verification links
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 // Determine if the environment is development or production
@@ -166,7 +167,7 @@ const login = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const token = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: tokenExpiry },
     );
     // HttpOnly session cookies
@@ -196,9 +197,23 @@ const login = async (req, res, next) => {
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
 const logout = async (req, res) => {
-  const { maxAge, ...cookieOptions } = getCookieOptions(req);
+  const cookieOptions = {
+    path: "/",
+    httpOnly: true,
+    secure: COOKIE_SECURE,
+    sameSite: COOKIE_SAME_SITE.toLowerCase(),
+  };
+
+  const hasSessionCookie = Boolean(req.cookies?.session_token);
   res.clearCookie("session_token", cookieOptions);
-  return res.status(StatusCodes.NO_CONTENT).send();
+
+  if (!hasSessionCookie) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "No user is authenticated.",
+    });
+  }
+
+  return res.status(StatusCodes.OK).json({ message: "Logout successful." });
 };
 
 // GET/ Verify -email
@@ -230,7 +245,7 @@ const verifyEmail = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const sessionToken = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "14d" },
     );
 
@@ -341,7 +356,7 @@ const resetPassword = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const sessionToken = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "14d" },
     );
 
