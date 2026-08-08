@@ -23,9 +23,12 @@ function LessonPage() {
 
   const navigate = useNavigate()
 
-  console.log(moduleId)
-  console.log(lessonId)
-  console.log(microLessonId)
+  // console.log(moduleId)
+  // console.log(lessonId)
+  // console.log(microLessonId)
+
+  console.log('moduleId from URL:', moduleId)
+  console.log('modules:', modules)
 
   //useEffect to update progress state when URL params change
   // useEffect(() => {

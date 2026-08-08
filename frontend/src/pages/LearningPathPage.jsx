@@ -63,6 +63,8 @@ function LearningPathPage() {
     return <div>Loading...</div>
   }
 
+ 
+
   return (
     <Card>
       <h2 className="text-center mb-6 text-lg font-semibold text-slate-900">
@@ -98,6 +100,8 @@ function LearningPathPage() {
 
           {lesson.microLessons.map((microLesson) => {
             const node = {
+              moduleId: currentModule.id,
+
               lessonId: lesson.id,
               lessonTitle: lesson.title,
 
