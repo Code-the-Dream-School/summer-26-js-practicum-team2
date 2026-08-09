@@ -1,6 +1,7 @@
 export default function Card({
   children,
   className = '',
+  variant = 'default',
   interactive = false,
   selected = false,
   onClick,
@@ -9,11 +10,18 @@ export default function Card({
   tabIndex,
   ...props
 }) {
-  let stateClasses = 'border-neutral-200 bg-surface-raised shadow-sm'
+  const variantClasses = {
+    default: 'border-neutral-200 bg-surface-raised shadow-sm',
+    quiz: 'border-neutral-200 bg-[#e8faf5] shadow-md',
+    choice: 'border-neutral-200 bg-white shadow-sm',
+    success: 'border-success bg-[#ddf5e9] shadow-sm',
+    danger: 'border-danger bg-[#ffe0df] shadow-sm',
+  }
+
+  let stateClasses = variantClasses[variant] || variantClasses.default
 
   if (interactive) {
-    stateClasses =
-      'border-neutral-200 bg-surface-raised shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-md'
+    stateClasses = `${stateClasses} transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-md`
   }
 
   if (selected) {
