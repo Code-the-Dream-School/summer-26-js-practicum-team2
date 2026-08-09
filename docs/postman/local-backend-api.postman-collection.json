@@ -35,6 +35,11 @@
       "key": "resetUrl",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "sessionCookie",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -66,18 +71,24 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const responseJson = pm.response.json();",
-                  "const devVerification = responseJson?.devVerification;",
-                  "if (devVerification?.token) {",
-                  "  pm.collectionVariables.set('verificationToken', devVerification.token);",
-                  "  console.log('Verification token saved:', devVerification.token);",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "const devVerification = responseJson?.devVerification || {};",
+                  "const setVariable = (name, value) => {",
+                  "  if (value === undefined || value === null || value === '') return;",
+                  "  pm.collectionVariables.set(name, String(value));",
+                  "  pm.variables.set(name, String(value));",
+                  "};",
+                  "if (devVerification.token) {",
+                  "  setVariable('verificationToken', devVerification.token);",
+                  "  console.log('Verification token saved:', pm.collectionVariables.get('verificationToken'));",
                   "}",
-                  "if (devVerification?.verifyUrl) {",
-                  "  pm.collectionVariables.set('verificationUrl', devVerification.verifyUrl);",
-                  "  console.log('Verification URL saved:', devVerification.verifyUrl);",
+                  "if (devVerification.verifyUrl) {",
+                  "  setVariable('verificationUrl', devVerification.verifyUrl);",
+                  "  console.log('Verification URL saved:', pm.collectionVariables.get('verificationUrl'));",
                   "}",
-                  "if (!devVerification) {",
-                  "  console.warn('No devVerification object returned. Confirm NODE_ENV is not production.');",
+                  "if (!devVerification.token && !devVerification.verifyUrl) {",
+                  "  console.warn('No devVerification data returned. Check the register response body.');",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -112,6 +123,21 @@
         },
         {
           "name": "Verify Email",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const fallbackToken = pm.collectionVariables.get('verificationToken') || pm.variables.get('verificationToken') || '';",
+                  "if (fallbackToken) {",
+                  "  pm.variables.set('verificationToken', fallbackToken);",
+                  "  console.log('Using verification token:', fallbackToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -136,13 +162,26 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const responseJson = pm.response.json();",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
                   "if (responseJson && responseJson.csrfToken) {",
                   "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
-                  "const setCookieHeader = pm.response.headers.get('Set-Cookie');",
-                  "if (setCookieHeader) {",
-                  "  pm.collectionVariables.set('sessionCookie', setCookieHeader);",
+                  "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
+                  "if (setCookieHeaders.length) {",
+                  "  const cookiePairs = setCookieHeaders",
+                  "    .map((header) => header.value || '')",
+                  "    .flatMap((value) => value.split(',').map((part) => part.trim()).filter(Boolean))",
+                  "    .filter((part) => part.includes('='))",
+                  "    .map((part) => part.split(';')[0].trim())",
+                  "    .filter(Boolean);",
+                  "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
+                  "  if (sessionCookie) {",
+                  "    pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "    pm.variables.set('sessionCookie', sessionCookie);",
+                  "    console.log('Session cookie saved:', sessionCookie);",
+                  "  }",
                   "}",
                   "console.log('CSRF token saved:', responseJson.csrfToken);"
                 ],
@@ -178,6 +217,35 @@
         },
         {
           "name": "Logout",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const savedCookie = pm.collectionVariables.get('sessionCookie') || pm.variables.get('sessionCookie') || '';",
+                  "if (savedCookie) {",
+                  "  pm.variables.set('sessionCookie', savedCookie);",
+                  "  console.log('Using session cookie:', savedCookie);",
+                  "}",
+                  "if (!savedCookie) {",
+                  "  console.warn('No session cookie is currently stored. Login first to set one.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('sessionCookie', '');",
+                  "pm.variables.set('sessionCookie', '');",
+                  "console.log('Session cookie cleared after logout.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -207,18 +275,24 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const responseJson = pm.response.json();",
-                  "const devPasswordReset = responseJson?.devPasswordReset;",
-                  "if (devPasswordReset?.token) {",
-                  "  pm.collectionVariables.set('resetToken', devPasswordReset.token);",
-                  "  console.log('Reset token saved:', devPasswordReset.token);",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "const devPasswordReset = responseJson?.devPasswordReset || {};",
+                  "const setVariable = (name, value) => {",
+                  "  if (value === undefined || value === null || value === '') return;",
+                  "  pm.collectionVariables.set(name, String(value));",
+                  "  pm.variables.set(name, String(value));",
+                  "};",
+                  "if (devPasswordReset.token) {",
+                  "  setVariable('resetToken', devPasswordReset.token);",
+                  "  console.log('Reset token saved:', pm.collectionVariables.get('resetToken'));",
                   "}",
-                  "if (devPasswordReset?.resetUrl) {",
-                  "  pm.collectionVariables.set('resetUrl', devPasswordReset.resetUrl);",
-                  "  console.log('Reset URL saved:', devPasswordReset.resetUrl);",
+                  "if (devPasswordReset.resetUrl) {",
+                  "  setVariable('resetUrl', devPasswordReset.resetUrl);",
+                  "  console.log('Reset URL saved:', pm.collectionVariables.get('resetUrl'));",
                   "}",
-                  "if (!devPasswordReset) {",
-                  "  console.warn('No devPasswordReset object returned. Confirm NODE_ENV is not production and user exists.');",
+                  "if (!devPasswordReset.token && !devPasswordReset.resetUrl) {",
+                  "  console.warn('No devPasswordReset data returned. Check the forgot-password response body.');",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -253,6 +327,21 @@
         },
         {
           "name": "Reset Password",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const fallbackToken = pm.collectionVariables.get('resetToken') || pm.variables.get('resetToken') || '';",
+                  "if (fallbackToken) {",
+                  "  pm.variables.set('resetToken', fallbackToken);",
+                  "  console.log('Using reset token:', fallbackToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
