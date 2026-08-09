@@ -1,0 +1,34 @@
+{
+  "name": "sprout-ctd",
+  "version": "1.0.0",
+  "description": "Sprout is a financial literacy demo app designed for Code the Dream Summer Practicum 2026. It is a full-stack learning app to help us learn how to work together on a project together.",
+  "keywords": [
+    "collaboration",
+    "react",
+    "nodejs",
+    "teamwork",
+    "opensource",
+    "finance",
+    "quiz"
+  ],
+  "homepage": "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2#readme",
+  "bugs": {
+    "url": "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2.git"
+  },
+  "license": "ISC",
+  "author": "DanyloHet,kwishart24,berenicerojas,BytesOfStrength,mnichols08",
+  "type": "commonjs",
+  "main": "README.md",
+  "scripts": {
+    "setup": "npm i && cd backend && npm i && cd ../frontend && npm i",
+    "dev": "dotenv -e .env -- concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.4",
+    "dotenv-cli": "^11.0.0"
+  }
+}
