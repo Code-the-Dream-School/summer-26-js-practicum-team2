@@ -110,7 +110,13 @@
       "tableId": "abigail-basic-expenses",
       "title": "Abigail's Monthly Expenses",
       "headers": ["Expense", "Cost per Month"],
-      "expenseRefs": ["rent", "carPayment", "electricity", "groceries", "gasoline"]
+      "expenseRefs": [
+        "rent",
+        "carPayment",
+        "electricity",
+        "groceries",
+        "gasoline"
+      ]
     },
     {
       "tableId": "abigail-all-expenses",
@@ -487,10 +493,6 @@
               "text": "When Abigail looks at her latest paystub, she sees that she made a total of $3,500 for the past 2 weeks. However, she only receives $2,700 in her bank account. Why is that?"
             },
             {
-              "type": "callout",
-              "text": ""
-            },
-            {
               "type": "paragraph",
               "text": "The total amount that Abigail sees on her paycheck of $3,500 is called her gross pay."
             },
@@ -504,7 +506,7 @@
             },
             {
               "type": "paragraph",
-              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'.Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or retirement plans."
+              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'. Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or retirement plans."
             },
             {
               "type": "formula",
@@ -695,7 +697,12 @@
             },
             {
               "type": "unorderedList",
-              "items": ["Groceries", "Bowling league Fees", "College Textbooks", "Concert Tickets"]
+              "items": [
+                "Groceries",
+                "Bowling league Fees",
+                "College Textbooks",
+                "Concert Tickets"
+              ]
             },
             {
               "type": "knowledgeCheck",
