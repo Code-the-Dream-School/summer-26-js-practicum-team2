@@ -2,8 +2,24 @@ import { Link } from 'react-router'
 import dabbingBeaverImg from '../assets/dabbingBeaver.svg'
 import abigailImg from '../assets/abigail.svg'
 import ramonaImg from '../assets/ramona.svg'
+import Toast from '../components/ui/Toast.jsx'
+import { ROUTES } from '../app/router/routes.js'
+import useAuth from '../hooks/useAuth.js'
 
 function HomePage() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const toast = location.state?.toast || null
+
+  if (isAuthenticated) {
+    return <Navigate to={ROUTES.DASHBOARD} replace />
+  }
+
+  const closeToast = () => {
+    navigate(location.pathname, { replace: true, state: null })
+  }
+
   return (
     <>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

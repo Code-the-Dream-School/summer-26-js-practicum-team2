@@ -80,7 +80,7 @@ function PasswordResetPage() {
       setSuccessMessage(response?.message || 'Password reset successful. You are now signed in.')
       setNewPassword('')
       setConfirmPassword('')
-      navigate(ROUTES.HOME, {
+      navigate(ROUTES.DASHBOARD, {
         state: {
           toast: {
             type: 'success',

@@ -82,18 +82,24 @@ function LoginPage() {
       setFormValues({ email: '', password: '', rememberMe: false })
       setFieldErrors({ email: '', password: '' })
       setSuccessMessage('Signed in successfully.')
-      navigate(ROUTES.HOME)
+      navigate(ROUTES.DASHBOARD)
     } catch (error) {
       setBannerError(error.message || 'We could not sign you in. Please try again.')
 
-      if (Array.isArray(error.errors) && error.errors.some((item) => item.toLowerCase().includes('email'))) {
+      if (
+        Array.isArray(error.errors) &&
+        error.errors.some((item) => item.toLowerCase().includes('email'))
+      ) {
         setFieldErrors((current) => ({
           ...current,
           email: 'Please check this email.',
         }))
       }
 
-      if (Array.isArray(error.errors) && error.errors.some((item) => item.toLowerCase().includes('password'))) {
+      if (
+        Array.isArray(error.errors) &&
+        error.errors.some((item) => item.toLowerCase().includes('password'))
+      ) {
         setFieldErrors((current) => ({
           ...current,
           password: 'Please check your password.',

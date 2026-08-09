@@ -73,7 +73,7 @@ function VerifyEmailPage() {
         // If the verification is successful, we set the status to 'success' and navigate to the home page after a short delay.
         setStatus('success')
         setTimeout(() => {
-          navigate(ROUTES.HOME, {
+          navigate(ROUTES.DASHBOARD, {
             replace: true,
             state: {
               toast: {
@@ -152,8 +152,11 @@ function VerifyEmailPage() {
             </Link>
           )}
           {isSuccess ? (
-            <Link to={ROUTES.HOME} className="text-sm font-semibold text-primary hover:underline">
-              Continue to home
+            <Link
+              to={ROUTES.DASHBOARD}
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              Continue to dashboard
             </Link>
           ) : null}
           {!isSuccess ? (
