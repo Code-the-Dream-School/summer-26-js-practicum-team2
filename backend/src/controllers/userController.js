@@ -12,20 +12,12 @@ const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 // Determine if the environment is development or production
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
-const EMAIL_FAIL_OPEN = process.env.EMAIL_FAIL_OPEN === "true";
-const COOKIE_SAME_SITE =
-  process.env.COOKIE_SAME_SITE ||
-  (process.env.NODE_ENV === "production" ? "none" : "lax");
-const COOKIE_SECURE =
-  process.env.COOKIE_SECURE != null
-    ? process.env.COOKIE_SECURE === "true"
-    : process.env.NODE_ENV === "production";
 
 //we want  sameSite cookies to be lax as per userStory 2.1
 const getCookieOptions = (req, maxAge) => ({
   httpOnly: true,
-  secure: COOKIE_SAME_SITE.toLowerCase() === "none" ? true : COOKIE_SECURE,
-  sameSite: COOKIE_SAME_SITE.toLowerCase(),
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
   path: "/",
   maxAge,
 });
@@ -231,8 +223,8 @@ const logout = async (req, res) => {
   const cookieOptions = {
     path: "/",
     httpOnly: true,
-    secure: COOKIE_SECURE,
-    sameSite: COOKIE_SAME_SITE.toLowerCase(),
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
   };
 
   const hasSessionCookie = Boolean(req.cookies?.session_token);
