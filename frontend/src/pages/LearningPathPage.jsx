@@ -11,7 +11,7 @@ function LearningPathPage() {
   const progress = {
     currentModule: 'cashFlow',
     currentLessonId: '1.2',
-    currentMicroLessonId: '1.2.1',
+    currentMicroLessonId: '1.2.3',
   }
 
   //Setting state for user progress
@@ -98,6 +98,8 @@ function LearningPathPage() {
 
           {lesson.microLessons.map((microLesson) => {
             const node = {
+              moduleId: currentModule.id,
+
               lessonId: lesson.id,
               lessonTitle: lesson.title,
 
