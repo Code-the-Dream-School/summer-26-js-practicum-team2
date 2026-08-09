@@ -40,6 +40,21 @@
       "key": "sessionCookie",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "testUserEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserPassword",
+      "value": "P@ssword123!",
+      "type": "string"
+    },
+    {
+      "key": "newTestUserPassword",
+      "value": "N3wP@ssword!",
+      "type": "string"
     }
   ],
   "item": [
@@ -48,6 +63,24 @@
       "item": [
         {
           "name": "GET Hello",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /api/hello returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('GET /api/hello returns expected message', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Hello World');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -68,11 +101,42 @@
           "name": "Register",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const timestamp = Date.now();",
+                  "const generatedEmail = `test.user+${timestamp}@example.com`;",
+                  "pm.collectionVariables.set('testUserEmail', generatedEmail);",
+                  "pm.variables.set('testUserEmail', generatedEmail);",
+                  "if (!pm.collectionVariables.get('testUserPassword')) {",
+                  "  pm.collectionVariables.set('testUserPassword', 'P@ssword123!');",
+                  "}",
+                  "if (!pm.collectionVariables.get('newTestUserPassword')) {",
+                  "  pm.collectionVariables.set('newTestUserPassword', 'N3wP@ssword!');",
+                  "}",
+                  "pm.variables.set('testUserPassword', pm.collectionVariables.get('testUserPassword'));",
+                  "pm.variables.set('newTestUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
+                  "console.log('Using generated test email:', generatedEmail);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('POST /register returns 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Register response confirms success', function () {",
+                  "  pm.expect(responseJson.message).to.include('Registration successful');",
+                  "});",
+                  "pm.test('Register response has user object', function () {",
+                  "  pm.expect(responseJson.user).to.be.an('object');",
+                  "  pm.expect(responseJson.user.email).to.eql(pm.collectionVariables.get('testUserEmail'));",
+                  "});",
                   "const devVerification = responseJson?.devVerification || {};",
                   "const setVariable = (name, value) => {",
                   "  if (value === undefined || value === null || value === '') return;",
@@ -106,7 +170,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@example.com\",\n  \"password\": \"P@ssword123!\",\n  \"confirmPassword\": \"P@ssword123!\",\n  \"tos\": true\n}",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"{{testUserEmail}}\",\n  \"password\": \"{{testUserPassword}}\",\n  \"confirmPassword\": \"{{testUserPassword}}\",\n  \"tos\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -136,6 +200,25 @@
                 ],
                 "type": "text/javascript"
               }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /verify returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Verify email response confirms sign-in', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Email verified successfully. You are now signed in.');",
+                  "});",
+                  "pm.test('Verify email response includes csrf token', function () {",
+                  "  pm.expect(responseJson.csrfToken).to.be.a('string').and.not.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
           ],
           "request": {
@@ -162,8 +245,17 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('POST /login returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Login response confirms success', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Login successful!');",
+                  "});",
+                  "pm.test('Login response includes csrf token', function () {",
+                  "  pm.expect(responseJson.csrfToken).to.be.a('string').and.not.empty;",
+                  "});",
                   "if (responseJson && responseJson.csrfToken) {",
                   "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
@@ -183,6 +275,9 @@
                   "    console.log('Session cookie saved:', sessionCookie);",
                   "  }",
                   "}",
+                  "pm.test('Login response captures session cookie', function () {",
+                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
+                  "});",
                   "console.log('CSRF token saved:', responseJson.csrfToken);"
                 ],
                 "type": "text/javascript"
@@ -200,7 +295,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test.user@example.com\",\n  \"password\": \"P@ssword123!\",\n  \"remember\": true\n}",
+              "raw": "{\n  \"email\": \"{{testUserEmail}}\",\n  \"password\": \"{{testUserPassword}}\",\n  \"remember\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -238,9 +333,59 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('First logout returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('First logout confirms success message', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Logout successful.');",
+                  "});",
                   "pm.collectionVariables.set('sessionCookie', '');",
                   "pm.variables.set('sessionCookie', '');",
                   "console.log('Session cookie cleared after logout.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout Again (Expect No Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Second logout returns 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Second logout confirms no authenticated user', function () {",
+                  "  pm.expect(responseJson.message).to.eql('No user is authenticated.');",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -275,8 +420,14 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('POST /forgot-password returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Forgot password returns expected message', function () {",
+                  "  pm.expect(responseJson.message).to.include('password reset link');",
+                  "});",
                   "const devPasswordReset = responseJson?.devPasswordReset || {};",
                   "const setVariable = (name, value) => {",
                   "  if (value === undefined || value === null || value === '') return;",
@@ -310,7 +461,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test.user@example.com\"\n}",
+              "raw": "{\n  \"email\": \"{{testUserEmail}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -340,6 +491,28 @@
                 ],
                 "type": "text/javascript"
               }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /reset-password returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Reset password confirms success', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Password reset successful. You are now signed in.');",
+                  "});",
+                  "pm.test('Reset password returns signed-in user', function () {",
+                  "  pm.expect(responseJson.user).to.be.an('object');",
+                  "  pm.expect(responseJson.user.email).to.eql(pm.collectionVariables.get('testUserEmail'));",
+                  "});",
+                  "pm.collectionVariables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
+                  "pm.variables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));"
+                ],
+                "type": "text/javascript"
+              }
             }
           ],
           "request": {
@@ -353,7 +526,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"N3wP@ssword!\"\n}",
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newTestUserPassword}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
