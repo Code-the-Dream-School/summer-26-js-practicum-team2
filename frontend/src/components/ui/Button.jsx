@@ -15,6 +15,9 @@ export default function Button({
       'border border-neutral-300 bg-surface-app text-heading shadow-sm hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
     ghost:
       'border border-transparent bg-transparent text-primary shadow-none hover:bg-surface-inset focus:border-primary focus:ring-primary/20',
+    quiz: 'border border-primary bg-primary text-on-primary shadow-[0_8px_16px_rgba(16,86,71,0.2)] hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
+    quizSecondary:
+      'border border-neutral-300 bg-white text-heading shadow-[0_6px_12px_rgba(6,30,25,0.08)] hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
   }
 
   const baseClass =
