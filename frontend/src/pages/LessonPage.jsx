@@ -75,36 +75,55 @@ function LessonPage() {
     (microLesson) => microLesson.id === microLessonId,
   )
 
+  //Helper function for next button
   function handleNext() {
+    console.log('NEXT LESSON CLICKED')
     const nextMicroLesson = lesson.microLessons[currentMicroLessonIndex + 1]
 
-    if (!nextMicroLesson) {
+    //Still inside current lesson
+    if (nextMicroLesson) {
+      navigate(`/lesson/${moduleId}/${lessonId}/${nextMicroLesson.id}`)
       console.log('Lesson Completed!')
       return
     }
 
-    // const updatedProgress = {
-    //   currentModuleId: moduleId,
-    //   currentLessonId: lessonId,
-    //   currentMicroLessonId: nextMicroLesson.id,
-    // }
+    //Last microLesson of current lesson
+    const lessonIndex = currentModule.lessons.findIndex(
+      (currentLesson) => currentLesson.id === lessonId,
+    )
 
-    // setProgress({
-    //   ...progress,
-    //   currentMicroLessonId: nextMicroLesson.id,
-    // })
+    const nextLesson = currentModule.lessons[lessonIndex + 1]
 
-    // setProgress(updatedProgress)
+    //Next lesson exists
+    if (nextLesson) {
+      navigate(`/lesson/${moduleId}/${nextLesson.id}/${nextLesson.microLessons[0].id}`)
+      return
+    }
 
-    //Path to update progress in backend, currently commented out
+    //Finished module
 
-    // await fetch('/api/progress', {
-    //   method: 'PATCH',
-    //   body: JSON.stringify(updatedProgress),
-    // })
-
-    navigate(`/learn/${moduleId}/${lessonId}/${nextMicroLesson.id}`)
+    console.log('Module Completed!')
+    navigate('/learn')
   }
+  // const updatedProgress = {
+  //   currentModuleId: moduleId,
+  //   currentLessonId: lessonId,
+  //   currentMicroLessonId: nextMicroLesson.id,
+  // }
+
+  // setProgress({
+  //   ...progress,
+  //   currentMicroLessonId: nextMicroLesson.id,
+  // })
+
+  // setProgress(updatedProgress)
+
+  //Path to update progress in backend, currently commented out
+
+  // await fetch('/api/progress', {
+  //   method: 'PATCH',
+  //   body: JSON.stringify(updatedProgress),
+  // })
 
   return <LessonCard lesson={lesson} microLesson={microLesson} onNext={handleNext} />
 }
