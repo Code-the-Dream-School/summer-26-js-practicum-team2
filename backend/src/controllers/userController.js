@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
 const { sendVerificationEmail } = require("../utils/sendEmail");
-//User is capitalized because it represents a model which is a collection of items forthe database
+//User is capitalized because it represents a model which is a collection of items for the database
 const User = require("../models/user.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { registerSchema, loginSchema } = require("../validation/userValidation");
@@ -22,7 +22,8 @@ const getCookieOptions = (req, maxAge) => ({
   maxAge,
 });
 
-//function register registers a new user document in MongoDB user story 2.1.6
+//function register a new user document in MongoDB user story 2.1.6
+// POST /api/v1/users/register
 
 const register = async (req, res, next) => {
   try {
@@ -64,6 +65,8 @@ const register = async (req, res, next) => {
       email_verified_at: null,
       verification_token: verificationToken,
       verification_token_expires_at: tokenExpiresAt,
+      token_version: 0,
+      is_deleted: false,
     });
     const verifyUrl = `${CLIENT_URL}/verify?token=${verificationToken}`;
     let emailSent = true;
@@ -135,6 +138,7 @@ const register = async (req, res, next) => {
 };
 //user story 2.1.8 - Login
 
+//POST /api/v1/users/login
 const login = async (req, res, next) => {
   try {
     const { error, value } = loginSchema.validate(req.body, {
@@ -150,11 +154,11 @@ const login = async (req, res, next) => {
     const { email, password, remember } = value;
     // Look up in mongo database
     const user = await User.findOne({ email });
-    if (!user) {
+    if (!user || user.is_deleted) {
       req.app.emit?.("login_failed", {
         email,
         ip: req.ip,
-        reason: "user_not_found",
+        reason: user?.is_deleted ? "account_deleted" : "user_not_found",
       });
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -189,7 +193,7 @@ const login = async (req, res, next) => {
     //Sign JWT Token
     const csrfToken = crypto.randomUUID();
     const token = jwt.sign(
-      { id: user._id, role: user.role, csrfToken },
+      { id: user._id, role: user.role, token_version: user.token_version ?? 0, csrfToken },
       JWT_SECRET,
       { expiresIn: tokenExpiry },
     );
@@ -217,7 +221,9 @@ const login = async (req, res, next) => {
 };
 
 // user story 2.1 -Post logout
-//L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
+//clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
+
+// POST /api/v1/users/logout
 
 const logout = async (req, res) => {
   const cookieOptions = {
@@ -252,10 +258,10 @@ const verifyEmail = async (req, res, next) => {
       verification_token: token,
       verification_token_expires_at: { $gt: new Date() },
     });
-    if (!user) {
+    if (!user || user.is_deleted) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ message: " invalid or expired verification token." });
+        .json({ message: "Invalid or expired verification token." });
     }
 
     //Email is verified and clear token
@@ -267,7 +273,7 @@ const verifyEmail = async (req, res, next) => {
     const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
     const csrfToken = crypto.randomUUID();
     const sessionToken = jwt.sign(
-      { id: user._id, role: user.role, csrfToken },
+      { id: user._id, role: user.role, token_version: user.token_version ?? 0, csrfToken },
       JWT_SECRET,
       { expiresIn: "14d" },
     );
@@ -298,6 +304,8 @@ const verifyEmail = async (req, res, next) => {
     return next(err);
   }
 };
+
+// POST /api/v1/users/forgot-password
 const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -307,7 +315,7 @@ const forgotPassword = async (req, res, next) => {
         .json({ message: "Please provide an email address." });
     }
     const user = await User.findOne({ email });
-    if (!user) {
+    if (!user || user.is_deleted) {
       return res.status(StatusCodes.OK).json({
         message:
           "If an account with the email exists, a password reset link will be provided to that email.",
@@ -373,7 +381,8 @@ const forgotPassword = async (req, res, next) => {
   }
 };
 
-//RESET Password
+//RESET Password 
+//POST /api/v1/users/reset-password
 
 const resetPassword = async (req, res, next) => {
   try {
@@ -388,7 +397,7 @@ const resetPassword = async (req, res, next) => {
       password_reset_expires_at: { $gt: new Date() },
     });
 
-    if (!user) {
+    if (!user || user.is_deleted) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message:
           "Expired password reset token or invalid password reset token.",
@@ -398,12 +407,14 @@ const resetPassword = async (req, res, next) => {
     user.password_hash = await hashPassword(newPassword);
     user.password_reset_token = undefined;
     user.password_reset_expires_at = undefined;
+
+    user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
     const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
     const csrfToken = crypto.randomUUID();
     const sessionToken = jwt.sign(
-      { id: user._id, role: user.role, csrfToken },
+      { id: user._id, role: user.role, token_version: user.token_version, csrfToken },
       JWT_SECRET,
       { expiresIn: "14d" },
     );

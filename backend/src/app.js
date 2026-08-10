@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const helloRoutes = require("./routes/hello.routes");
 
 const userRoutes = require("./routes/userRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const errorHandlerMiddleware = require("./middleware/errorHandlerMiddleware");
 const app = express();
@@ -56,6 +57,7 @@ app.use(limiter);
 // Routes
 app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 
 // Root route
