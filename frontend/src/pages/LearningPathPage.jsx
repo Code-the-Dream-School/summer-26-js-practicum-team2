@@ -65,7 +65,7 @@ function LearningPathPage() {
 
   return (
     <Card>
-      <h2 className="text-center mb-6 text-lg font-semibold text-slate-900">
+      <h2 className="text-h2 text-heading text-center mb-6 text-lg font-semibold text-slate-900">
         {currentModule.title}
       </h2>
 
