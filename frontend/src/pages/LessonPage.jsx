@@ -125,7 +125,15 @@ function LessonPage() {
   //   body: JSON.stringify(updatedProgress),
   // })
 
-  return <LessonCard lesson={lesson} microLesson={microLesson} onNext={handleNext} />
+  return (
+    <LessonCard
+      key={microLesson.id}
+      lesson={lesson}
+      microLesson={microLesson}
+      module={currentModule}
+      onNext={handleNext}
+    />
+  )
 }
 
 export default LessonPage
