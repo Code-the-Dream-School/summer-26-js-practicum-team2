@@ -22,14 +22,18 @@ function CharacterIntro({ content }) {
   //   }
 
   return (
-    <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
-      <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-600">
+    <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm items-center text-center md:text-left">
+      <div className="mb-5 text-sm font-semibold uppercase tracking-wide text-blue-600">
         Character Introduction
       </div>
 
       <div className="flex flex-col items-center gap-4">
-        {imageSrc}
-        <h2 className="text-2xl text-slate-900">{content.text}</h2>
+        <img
+          src={imageSrc}
+          alt="Character"
+          className="mx-5 h-auto object-contain inline-block w-3/4 items-center md:w-1/4"
+        />
+        <h2 className="text-lg md: text-xl text-slate-900">{content.text}</h2>
       </div>
     </div>
   )
