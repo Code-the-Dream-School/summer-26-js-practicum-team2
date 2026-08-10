@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import LessonRenderer from './LessonRenderer'
 import Button from '../ui/Button'
+import Card from '../ui/Card'
 
-function LessonCard({ lesson, microLesson, onNext }) {
+function LessonCard({ module, lesson, microLesson, onNext }) {
   //Content index state
   const [contentIndex, setContentIndex] = useState(0)
 
@@ -41,12 +42,16 @@ function LessonCard({ lesson, microLesson, onNext }) {
     setContentIndex((prev) => prev - 1)
   }
 
+  console.log(contentIndex)
+  console.log(content.length)
+  console.log(currentContent)
+
   return (
-    <>
+    <Card>
       <h1>{lesson.title}</h1>
       <h2>{microLesson.title}</h2>
 
-      <LessonRenderer content={currentContent} />
+      <LessonRenderer content={currentContent} module={module} />
 
       <div className="mt-6 flex justify-between">
         <Button variant="secondary" onClick={handlePreviousContent}>
@@ -57,7 +62,7 @@ function LessonCard({ lesson, microLesson, onNext }) {
           {contentIndex === content.length - 1 ? 'Next Lesson' : 'Continue'}
         </Button>
       </div>
-    </>
+    </Card>
   )
 }
 
