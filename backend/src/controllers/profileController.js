@@ -23,7 +23,7 @@ const getProfile = async (req, res, next) => {
       email: user.email,
       avatar_initial: getFirstInitial(user.name, user.email),
       current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
-      badges: progress?.badges || [],
+      badges: progress?.earned_badges || [],
     });
   } catch (error) {
     return next(error);
