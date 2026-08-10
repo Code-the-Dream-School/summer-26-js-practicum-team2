@@ -48,8 +48,10 @@ function LessonCard({ module, lesson, microLesson, onNext }) {
 
   return (
     <Card>
-      <h1>{lesson.title}</h1>
-      <h2>{microLesson.title}</h2>
+      <h1 className="mb-6 text-lg flex flex-col items-center">{lesson.title}</h1>
+      <h2 className="text-center mb-12 text-lg font-semibold text-slate-900">
+        {microLesson.title}
+      </h2>
 
       <LessonRenderer content={currentContent} module={module} />
 
