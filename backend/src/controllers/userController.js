@@ -6,23 +6,18 @@ const { sendVerificationEmail } = require("../utils/sendEmail");
 const User = require("../models/user.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { registerSchema, loginSchema } = require("../validation/userValidation");
+const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
+
 // Client URL for email verification links
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 // Determine if the environment is development or production
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
-const COOKIE_SAME_SITE =
-  process.env.COOKIE_SAME_SITE ||
-  (process.env.NODE_ENV === "production" ? "none" : "lax");
-const COOKIE_SECURE =
-  process.env.COOKIE_SECURE != null
-    ? process.env.COOKIE_SECURE === "true"
-    : process.env.NODE_ENV === "production";
 
 //we want  sameSite cookies to be lax as per userStory 2.1
 const getCookieOptions = (req, maxAge) => ({
   httpOnly: true,
-  secure: COOKIE_SAME_SITE.toLowerCase() === "none" ? true : COOKIE_SECURE,
-  sameSite: COOKIE_SAME_SITE.toLowerCase(),
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
   path: "/",
   maxAge,
 });
@@ -71,21 +66,50 @@ const register = async (req, res, next) => {
       verification_token_expires_at: tokenExpiresAt,
     });
     const verifyUrl = `${CLIENT_URL}/verify?token=${verificationToken}`;
+    let emailSent = true;
 
     // Send verification email to the user
-    await sendVerificationEmail(
-      newUser.email,
-      "Verify your email address",
-      `Hello ${newUser.name || ""},\n\nPlease verify your account by clicking this link: ${verifyUrl}`,
-      `<p>Hello ${newUser.name || "User"},</p>
+    try {
+      await sendVerificationEmail(
+        newUser.email,
+        "Verify your email address",
+        `Hello ${newUser.name || ""},\n\nPlease verify your account by clicking this link: ${verifyUrl}`,
+        `<p>Hello ${newUser.name || "User"},</p>
     <p>Please Verify your account by clicking the link below:</p>
     <p><a href="${verifyUrl}">${verifyUrl}</a></p>
     <p>This link expires in 24 hours.</p>`,
-    );
+      );
+    } catch (error) {
+      if (IS_DEV_ENV && EMAIL_FAIL_OPEN) {
+        emailSent = false;
+
+        console.warn(
+          "Verification email could not be sent:",
+          error.code,
+          error.message,
+        );
+      } else {
+        try {
+          await User.findByIdAndDelete(newUser._id);
+        } catch (rollbackError) {
+          console.error(
+            "Could not remove user after email failed:",
+            rollbackError.message,
+          );
+        }
+
+        return res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+          message:
+            "Registration is temporarily unavailable because verification email could not be sent. Please try again shortly.",
+        });
+      }
+    }
 
     // Return a success response with the new user's details (excluding sensitive information)
     return res.status(StatusCodes.CREATED).json({
-      message: "Registration successful. Please check for verification email.",
+      message: emailSent
+        ? "Registration successful. Please check for verification email."
+        : "Registration successful. Verification email could not be sent. Use the dev verification link below.",
       user: {
         id: newUser._id,
         name: newUser.name,
@@ -124,7 +148,7 @@ const login = async (req, res, next) => {
     }
     //Joi gives the sanitized input and the value is the output
     const { email, password, remember } = value;
-    // LOok up in mongo database
+    // Look up in mongo database
     const user = await User.findOne({ email });
     if (!user) {
       req.app.emit?.("login_failed", {
@@ -166,7 +190,7 @@ const login = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const token = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: tokenExpiry },
     );
     // HttpOnly session cookies
@@ -196,9 +220,23 @@ const login = async (req, res, next) => {
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
 const logout = async (req, res) => {
-  const { maxAge, ...cookieOptions } = getCookieOptions(req);
+  const cookieOptions = {
+    path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  };
+
+  const hasSessionCookie = Boolean(req.cookies?.session_token);
   res.clearCookie("session_token", cookieOptions);
-  return res.status(StatusCodes.NO_CONTENT).send();
+
+  if (!hasSessionCookie) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "No user is authenticated.",
+    });
+  }
+
+  return res.status(StatusCodes.OK).json({ message: "Logout successful." });
 };
 
 // GET/ Verify -email
@@ -230,7 +268,7 @@ const verifyEmail = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const sessionToken = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "14d" },
     );
 
@@ -284,18 +322,43 @@ const forgotPassword = async (req, res, next) => {
 
     const resetUrl = `${CLIENT_URL}/reset-password?token=${resetToken}`;
 
-    await sendVerificationEmail(
-      user.email,
-      "Password Reset Request",
-      `You requested a password reset. Please click this link: ${resetUrl}`,
-      `<p>Hello ${user.name || "User"}, </p>
+    // Send password reset email to the user
+    let emailSent = true;
+    try {
+      await sendVerificationEmail(
+        user.email,
+        "Password Reset Request",
+        `You requested a password reset. Please click this link: ${resetUrl}`,
+        `<p>Hello ${user.name || "User"}, </p>
           <p>Here's your link to reset a new password:</p>
-          <p><a href= "${resetUrl}" > ${resetUrl}</a></p>
+          <p><a href="${resetUrl}">${resetUrl}</a></p>
           <p>Reset link will expire in 1 hour.</p>`,
-    );
+      );
+    } catch (error) {
+      // If email sending fails, handle it based on the environment and EMAIL_FAIL_OPEN setting
+      if (IS_DEV_ENV && EMAIL_FAIL_OPEN) {
+        emailSent = false;
+        console.warn(
+          "Password reset email could not be sent:",
+          error.code,
+          error.message,
+        );
+      } else {
+        user.password_reset_token = undefined;
+        user.password_reset_expires_at = undefined;
+
+        await user.save();
+
+        return res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+          message:
+            "Password reset is temporarily unavailable because email could not be sent. Please try again shortly.",
+        });
+      }
+    }
     return res.status(StatusCodes.OK).json({
-      message:
-        "If an account with the email exists, a password reset link will be provided to that email.",
+      message: emailSent
+        ? "If an account with the email exists, a password reset link will be provided to that email."
+        : "Password reset email could not be sent. Use the dev reset link below.",
       ...(IS_DEV_ENV
         ? {
             devPasswordReset: {
@@ -341,7 +404,7 @@ const resetPassword = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const sessionToken = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "14d" },
     );
 
