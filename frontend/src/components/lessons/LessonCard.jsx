@@ -1,7 +1,7 @@
 // import { Link } from 'react-router'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import LessonRenderer from './LessonRenderer'
+import LessonRenderer from './LessonRenderer/LessonRenderer'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 
