@@ -8,6 +8,8 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   LESSONS: '/lessons',
   QUIZ: '/quizzes/:lessonId',
+  LEARN: '/learn',
+  LESSON: '/lesson/:moduleId/:lessonId/:microLessonId',
   PROFILE: '/profile',
   PRIVACY: '/privacy',
   TERMS: '/terms',

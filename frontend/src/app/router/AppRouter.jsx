@@ -13,6 +13,8 @@ import RegisterPage from '../../pages/RegisterPage.jsx'
 import PasswordResetPage from '../../pages/PasswordResetPage.jsx'
 import VerifyEmailPage from '../../pages/VerifyEmailPage.jsx'
 import { ROUTES } from './routes.js'
+import LearningPathPage from '../../pages/LearningPathPage.jsx'
+import LessonPage from '../../pages/LessonPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: ROUTES.LEARN,
+        element: <LearningPathPage />,
+      },
+      {
+        path: ROUTES.LESSON,
+        element: <LessonPage />,
       },
       {
         path: ROUTES.DASHBOARD,

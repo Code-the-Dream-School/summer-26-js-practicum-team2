@@ -1,5 +1,5 @@
 {
-  "id": "budgeting-and-cash-flow-basics",
+  "id": "cashFlow",
   "title": "Budgeting and Cash Flow Basics",
   "tags": ["budget", "cashflow", "income", "expenses"],
   "metadata": {
@@ -143,7 +143,7 @@
       "microLessons": [
         {
           "id": "1.1.1",
-          "title": "Abigail introduction",
+          "title": "Meet Abigail!",
           "microLessonContent": [
             {
               "type": "characterIntro",
@@ -493,10 +493,6 @@
               "text": "When Abigail looks at her latest paystub, she sees that she made a total of $3,500 for the past 2 weeks. However, she only receives $2,700 in her bank account. Why is that?"
             },
             {
-              "type": "callout",
-              "text": ""
-            },
-            {
               "type": "paragraph",
               "text": "The total amount that Abigail sees on her paycheck of $3,500 is called her gross pay."
             },
@@ -510,7 +506,7 @@
             },
             {
               "type": "paragraph",
-              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'.Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or retirement plans."
+              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'. Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or retirement plans."
             },
             {
               "type": "formula",
@@ -674,7 +670,7 @@
         },
         {
           "id": "1.3.2",
-          "title": "Categorize Abigail's and Ramona's Expenses",
+          "title": "Categorizing Expenses",
           "microLessonContent": [
             {
               "type": "paragraph",
