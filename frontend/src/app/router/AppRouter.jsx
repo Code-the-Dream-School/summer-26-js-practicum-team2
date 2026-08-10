@@ -8,7 +8,7 @@ import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import PrivacyPage from '../../pages/PrivacyPage.jsx'
 import TermsPage from '../../pages/TermsPage.jsx'
-import QuizPage from '../../pages/QuizPage.jsx'
+import LearnPage from '../../pages/LearnPage.jsx'
 import RegisterPage from '../../pages/RegisterPage.jsx'
 import PasswordResetPage from '../../pages/PasswordResetPage.jsx'
 import VerifyEmailPage from '../../pages/VerifyEmailPage.jsx'
@@ -32,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.LESSON,
         element: <LessonPage />,
+      },
+      {
+        path: ROUTES.LEARN_LESSON,
+        element: <LearnPage />,
       },
       {
         path: ROUTES.DASHBOARD,
@@ -67,7 +71,7 @@ const router = createBrowserRouter([
       },
       {
         path: ROUTES.QUIZ,
-        element: <QuizPage />,
+        element: <LearnPage />,
       },
       {
         path: '*',
