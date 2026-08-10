@@ -19,7 +19,7 @@ function LessonRenderer({ content, module }) {
       return <Paragraph content={content} />
 
     case 'characterIntro':
-      return <CharacterIntro content={content} />
+      return <CharacterIntro content={content} module={module} />
 
     case 'formula':
       return <Formula content={content} />
