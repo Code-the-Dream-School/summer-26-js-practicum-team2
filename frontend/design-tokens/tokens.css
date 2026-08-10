@@ -1,0 +1,81 @@
+:root {
+  /* ─── Color · semantic tokens ────────────────────────────────── */
+  --color-primary: #18816a; 
+  --color-primary-hover: #105647; 
+  --color-primary-alt: #41e3c0; 
+  --color-accent: #54dec0; 
+  --color-success: #18816a;
+  --color-warning: #ffddd8; 
+  --color-danger: #ffddd8; /* This color is not specified in the style guide */
+
+  --color-text-primary: #061e19; 
+  --color-text-heading: #105647; 
+  --color-text-on-primary: #f2fcfa; 
+
+  --color-surface-app: #f2fcfa; 
+  --color-surface-raised: #eafbf7; 
+  --color-surface-inset: #d4f7ef; 
+  --color-surface-input: #ffffff; 
+
+  --color-focus-ring: #105647; 
+
+  /* ─── Color · neutral scale ───────────────────────────── */
+  --color-neutral-50: #f4faf8;
+  --color-neutral-100: #e3ece9;
+  --color-neutral-200: #cedcd8;
+  --color-neutral-300: #b4c7c2;
+  --color-neutral-400: #91a9a3;
+  --color-neutral-500: #6a847e;
+  --color-neutral-600: #4e6660;
+  --color-neutral-700: #263e39;
+  --color-neutral-800: #061e19;
+
+  /* ─── Typography · families ──────────────────────────────────── */
+  --font-heading: Poppins, sans-serif; /*  */
+  --font-body: Inter, sans-serif; /*  */
+  --font-mono:
+    ui-monospace, "SF Mono", Menlo, monospace; 
+
+  /* ─── Typography · sizes ──────────────────────────────── */
+  /* rem values are conventional modular-scale proposals.             */
+  --font-size-h1: 2.25rem;
+  --font-size-h2: 1.875rem;
+  --font-size-h3: 1.5rem;
+  --font-size-h4: 1.25rem;
+  --font-size-body: 1rem;
+  --font-size-small: 0.875rem;
+  --font-size-caption: 0.75rem;
+
+  /* ─── Typography · line heights ───────────────────────── */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose: 1.75;
+
+  /* ─── Typography · weights ────────────────────────────── */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ─── Spacing · 4px scale ─────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Radius ─────────────────────────────────────────────────── */
+  --radius-sm: 4px; 
+  --radius-md: 8px; 
+  --radius-lg: 12px; 
+  --radius-pill: 9999px; 
+
+  /* ─── Elevation (shadow) ──────────────────────────────── */
+  /* Generic slate shadow   */
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow-md: 0 4px 8px rgba(17, 24, 39, 0.08);
+  --shadow-lg: 0 12px 24px rgba(17, 24, 39, 0.12);
+}
