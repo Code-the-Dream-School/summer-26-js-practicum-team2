@@ -10,12 +10,14 @@
     {
       "characterId": "abigail",
       "name": "Abigail",
-      "description": "Abigail is a single mom with 14 year old twins who works as a Registered Nurse."
+      "description": "Abigail is a single mom with 14 year old twins who works as a Registered Nurse.",
+      "imagePath": "./frontend/src/assets/images/abigail.svg"
     },
     {
       "characterId": "ramona",
       "name": "Ramona",
-      "description": "Ramona is an 18 year old Freshman college student who works part-time on campus."
+      "description": "Ramona is an 18 year old Freshman college student who works part-time on campus.",
+      "imagePath": "./frontend/src/assets/images/ramona.svg"
     }
   ],
 
@@ -269,8 +271,8 @@
               "text": "Money In (Income) - Money Out (Expenses) = Cash Flow"
             },
             {
-              "type": "example",
-              "text": "As a Registered Nurse (RN), Abigail earns $7,500 per month grossly and receives a monthly child support payment of $1230. Her take home net pay in addition to child support is $7080 per month. Her total monthly expenses are $2,154.\n\n$7,080(Income) - $2,154 (Expenses) = $4,926 (Net Cash Flow)\nSo Abigail's total cash flow each month is about $4,926."
+              "type": "paragraph",
+              "text": "As a Registered Nurse (RN), Abigail earns $7,500 per month. Her total monthly expenses are $2,154.\n\n$7,500 (Income) - $2,154 (Expenses) = $5,346 (Net Cash Flow)\nSo Abigail's total cash flow each month is about $5,346."
             },
             {
               "type": "knowledgeCheck",
