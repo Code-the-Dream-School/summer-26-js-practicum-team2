@@ -753,7 +753,7 @@
             },
             {
               "type": "paragraph",
-              "text": "These expenses are the same amount each month and don't change.\n\nShe also notices that some expenses change from month to month:"
+              "text": "These expenses are the same amount each month and don't change."
             },
             {
               "type": "paragraph",
@@ -777,7 +777,7 @@
             },
             {
               "type": "paragraph",
-              "text": "Expenses that stay the same every month are called fixed expenses. Expenses that change from month to month are variable expenses."
+              "text": "Expenses that stay the same every month are called fixed expenses.\n\n\nExpenses that change from month to month are variable expenses."
             },
             {
               "type": "knowledgeCheck",
@@ -1280,7 +1280,7 @@
               "text": "She also notices that she's not using the rock climbing membership as much as she thought she would, so she decides to cancel her monthly fee for now."
             },
             {
-              "type": "paragraph",
+              "type": "callout",
               "text": "Tip: Review your budget monthly."
             },
             {
