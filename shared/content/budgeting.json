@@ -147,6 +147,7 @@
           "microLessonContent": [
             {
               "type": "characterIntro",
+              "characterId": "abigail",
               "text": "Meet Abigail! Abigail is a single mom with twin 14-year-olds."
             },
             {
@@ -244,6 +245,7 @@
           "microLessonContent": [
             {
               "type": "characterIntro",
+              "characterId": "ramona",
               "text": "Meet Ramona! She is an 18-year-old college Freshman."
             },
             {
