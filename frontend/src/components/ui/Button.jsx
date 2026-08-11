@@ -5,6 +5,7 @@ export default function Button({
   disabled = false,
   type = 'button',
   className = '',
+  as: Component = 'button',
   ...props
 }) {
   const isDisabled = disabled || loading
@@ -15,9 +16,9 @@ export default function Button({
       'border border-neutral-300 bg-surface-app text-heading shadow-sm hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
     ghost:
       'border border-transparent bg-transparent text-primary shadow-none hover:bg-surface-inset focus:border-primary focus:ring-primary/20',
-    quiz: 'border border-primary bg-primary text-on-primary shadow-[0_8px_16px_rgba(16,86,71,0.2)] hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
+    quiz: 'border border-primary bg-primary text-on-primary shadow-[var(--shadow-quiz)] hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
     quizSecondary:
-      'border border-neutral-300 bg-white text-heading shadow-[0_6px_12px_rgba(6,30,25,0.08)] hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
+      'border border-neutral-300 bg-surface-input text-heading shadow-[var(--shadow-quiz-secondary)] hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
     circleCompleted:
       'border-[4px] border-circle-border bg-circle-completed text-circle-text shadow-[var(--shadow-circle-completed)] hover:bg-circle-hover-completed focus:border-circle-border focus:ring-circle-border/20',
     circleCurrent:
@@ -32,18 +33,25 @@ export default function Button({
   const baseClass =
     'inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold leading-none transition-all duration-200 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50'
 
+  const resolvedClassName =
+    variant === 'circleCompleted' || variant === 'circleCurrent' || variant === 'circleDisabled'
+      ? `${circleClass} ${styles[variant]} ${className}`.trim()
+      : `${baseClass} ${styles[variant] || styles.primary} ${className}`.trim()
+
+  const sharedProps = {
+    className: resolvedClassName,
+    'aria-busy': loading || undefined,
+  }
+
+  if (Component === 'button') {
+    sharedProps.type = type
+    sharedProps.disabled = isDisabled
+  } else {
+    sharedProps['aria-disabled'] = isDisabled || undefined
+  }
+
   return (
-    <button
-      type={type}
-      disabled={isDisabled}
-      aria-busy={loading || undefined}
-      className={
-        variant === 'circleCompleted' || variant === 'circleCurrent' || variant === 'circleDisabled'
-          ? `${circleClass} ${styles[variant]} ${className}`.trim()
-          : `${baseClass} ${styles[variant] || styles.primary} ${className}`.trim()
-      }
-      {...props}
-    >
+    <Component {...sharedProps} {...props}>
       {loading && (
         <span
           aria-hidden="true"
@@ -51,6 +59,6 @@ export default function Button({
         />
       )}
       <span>{loading ? 'Loading...' : children}</span>
-    </button>
+    </Component>
   )
 }
