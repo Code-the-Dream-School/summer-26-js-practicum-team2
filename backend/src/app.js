@@ -65,7 +65,8 @@ app.use(errorHandlerMiddleware);
 // Routes
 app.use('/api/hello', helloRoutes);
 app.use("/api/v1/users", userRoutes);
-
+app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/quizzes", quizRoutes);
 // Root route
 app.get("/", (req, res) => {
   res.redirect(process.env.CLIENT_URL);
