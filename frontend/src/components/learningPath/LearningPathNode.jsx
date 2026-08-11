@@ -4,15 +4,19 @@ import { forwardRef } from 'react'
 import Button from '../ui/Button'
 
 const LearningPathNode = forwardRef(({ node, status }, ref) => {
-  let variant = 'disabled'
+  let variant
   const navigate = useNavigate()
 
   if (status === 'current') {
-    variant = 'primary'
+    variant = 'circleCurrent'
   }
 
   if (status === 'completed') {
-    variant = 'secondary'
+    variant = 'circleCompleted'
+  }
+
+  if(status === 'locked') {
+    variant = 'circleDisabled'
   }
 
   return (
@@ -25,7 +29,6 @@ const LearningPathNode = forwardRef(({ node, status }, ref) => {
       </h3>
       <Button
         variant={variant}
-        size="circle"
         disabled={status === 'locked'}
         onClick={() => {
           if (status !== 'locked') {
