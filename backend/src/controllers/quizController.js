@@ -162,7 +162,7 @@ exports.startQuiz = async (req, res, next) => {
   }
 };
 // Route: POST /api/v1/quizzes/:id/submit
-//Function: Submit quiz responses gased on courseId, grades answers, logs the number of quiz attempts, updates lesson pogress.
+//Function: Submit quiz responses based on courseId, grades answers, logs the number of quiz attempts, updates lesson progress.
 
 exports.submitQuiz = async (req, res, next) => {
   try {
@@ -275,7 +275,7 @@ exports.submitQuiz = async (req, res, next) => {
           $addToSet: {
             completed_micro_lessons: microLessonId,
           },
-          // used by nextaction in dashboard to point Resume Course button to  user's latest lesson
+          // used by next action in dashboard to point Resume Course button to  user's latest lesson
           $set: {
             current_micro_lesson_id: microLessonId,
           },
