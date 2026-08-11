@@ -9,7 +9,6 @@ export const ROUTES = {
   LESSONS: '/lessons',
   LEARN: '/learn',
   LEARN_LESSON: '/learn/:moduleId/:lessonId',
-  LESSON: '/lesson/:moduleId/:lessonId/:microLessonId',
   PROFILE: '/profile',
   PRIVACY: '/privacy',
   TERMS: '/terms',

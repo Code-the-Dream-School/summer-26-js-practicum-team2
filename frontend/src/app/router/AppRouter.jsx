@@ -14,7 +14,6 @@ import PasswordResetPage from '../../pages/PasswordResetPage.jsx'
 import VerifyEmailPage from '../../pages/VerifyEmailPage.jsx'
 import { ROUTES } from './routes.js'
 import LearningPathPage from '../../pages/LearningPathPage.jsx'
-import LessonPage from '../../pages/LessonPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -30,20 +29,12 @@ const router = createBrowserRouter([
         element: <LearningPathPage />,
       },
       {
-        path: ROUTES.LESSON,
-        element: <LessonPage />,
-      },
-      {
         path: ROUTES.LEARN_LESSON,
         element: <LearnPage />,
       },
       {
         path: ROUTES.DASHBOARD,
         element: <Dashboard />,
-      },
-      {
-        path: ROUTES.LESSON,
-        element: <LessonPage />,
       },
       {
         path: ROUTES.REGISTER,
