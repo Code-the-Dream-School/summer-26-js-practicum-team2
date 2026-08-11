@@ -33,7 +33,7 @@
         {
           "id": "paycheck",
           "name": "Registered Nurse Paycheck",
-          "amount": 5800
+          "amount": 5850
         },
         {
           "id": "childSupport",
@@ -92,11 +92,11 @@
       },
 
       "summary": {
-        "totalIncome": 7030,
+        "totalIncome": 7080,
         "totalFixedExpenses": 1625,
         "totalVariableExpenses": 529,
         "totalExpenses": 2154,
-        "netCashFlow": 4876
+        "netCashFlow": 4926
       }
     }
   ],
@@ -187,7 +187,6 @@
             },
             {
               "type": "knowledgeCheck",
-              "text": "Budgets involve two main categories: income and expenses.",
               "id": "1.1.2-q2",
               "questionType": "multipleChoice",
               "question": "What is the purpose of a budget?",
@@ -207,7 +206,7 @@
               "type": "knowledgeCheck",
               "id": "1.1.2-q3",
               "questionType": "trueFalse",
-              "question": " True or False? You should create a budget to help you track where your money is going.",
+              "question": "True or False? You should create a budget to help you track where your money is going.",
               "answerChoices": [
                 {
                   "key": "a",
