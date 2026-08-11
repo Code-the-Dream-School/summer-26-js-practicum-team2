@@ -18,6 +18,17 @@
   --shadow-circle-current: 0 12px 20px var(--color-circle-shadow);
   --shadow-quiz: 0 8px 16px rgba(16, 86, 71, 0.2);
   --shadow-quiz-secondary: 0 6px 12px rgba(6, 30, 25, 0.08);
+  --color-learning-path-surface: #e8f7f2;
+  --color-learning-path-text: #195d50;
+  --color-learning-path-heading: #1a6b58;
+  --color-learning-path-divider: #8aa39a;
+  --color-learning-path-muted: #45665d;
+  --color-learning-path-line: #263e39;
+  --color-learning-path-footer-border: #81cfc0;
+  --color-learning-path-footer-surface: #9ee6d7;
+  --color-learning-path-button: #1c896f;
+  --color-learning-path-button-hover: #18755f;
+  --shadow-learning-path-button: 0 6px 14px rgba(18, 57, 49, 0.24);
   --color-shadow: rgba(0, 0, 0, 0.16);
 
   /* Status colors */
