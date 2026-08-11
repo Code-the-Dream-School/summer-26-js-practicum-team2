@@ -16,6 +16,8 @@
   --color-circle-shadow: rgba(0, 0, 0, 0.16);
   --shadow-circle-completed: 0 10px 18px var(--color-circle-shadow-completed);
   --shadow-circle-current: 0 12px 20px var(--color-circle-shadow);
+  --shadow-quiz: 0 8px 16px rgba(16, 86, 71, 0.2);
+  --shadow-quiz-secondary: 0 6px 12px rgba(6, 30, 25, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.16);
 
   /* Status colors */
