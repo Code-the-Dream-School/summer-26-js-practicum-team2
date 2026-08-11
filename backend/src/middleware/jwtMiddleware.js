@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
-
+const User = require("../models/user.js");
 const send401 = (res) => {
   return res
     .status(StatusCodes.UNAUTHORIZED)
@@ -25,23 +25,39 @@ module.exports = (req, res, next) => {
     return send401(res);
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
       return send401(res);
     }
+    try {
+      const user = await User.findById(decoded.id);
+      if (!user || user.is_deleted) {
+        return send401(res);
+      }
+      const tokenVersionInJwt = decoded.token_version ?? 0;
+      if (user.token_version !== tokenVersionInJwt) {
+        return send401(res);
+      }
+      req.user = {
+        id: user._id,
+        role: user.role,
+      };
+      //req.user = { id: decoded.id, role: decoded.role };
 
-    req.user = { id: decoded.id, role: decoded.role };
-
-    if (process.env.NODE_ENV === "production") {
-      if (["POST", "PATCH", "PUT", "DELETE", "CONNECT"].includes(req.method)) {
-        // for these operations we have to check for cross site request forgery
-        const csrfHeader = req.get("X-CSRF-TOKEN") || req.get("x-csrf-token");
-        if (!csrfHeader || csrfHeader !== decoded.csrfToken) {
-          return send401(res);
+      if (process.env.NODE_ENV === "production") {
+        if (
+          ["POST", "PATCH", "PUT", "DELETE", "CONNECT"].includes(req.method)
+        ) {
+          // for these operations we have to check for cross site request forgery
+          const csrfHeader = req.get("X-CSRF-TOKEN") || req.get("x-csrf-token");
+          if (!csrfHeader || csrfHeader !== decoded.csrfToken) {
+            return send401(res);
+          }
         }
       }
+      return next();
+    } catch (error) {
+      return next(error);
     }
-
-    return next();
   });
 };

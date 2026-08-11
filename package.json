@@ -25,10 +25,12 @@
   "main": "README.md",
   "scripts": {
     "setup": "npm i && cd backend && npm i && cd ../frontend && npm i",
-    "dev": "dotenv -e .env -- concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\""
+    "predev": "npx kill-port 8080 5173",
+    "dev": "dotenv -e .env -- concurrently --kill-others --no-handle-signal \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\""
   },
   "devDependencies": {
     "concurrently": "^10.0.4",
-    "dotenv-cli": "^11.0.0"
+    "dotenv-cli": "^11.0.0",
+    "kill-port": "^2.0.1"
   }
 }
