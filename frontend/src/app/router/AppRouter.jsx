@@ -29,6 +29,10 @@ const router = createBrowserRouter([
         element: <LearningPathPage />,
       },
       {
+        path: ROUTES.LESSON,
+        element: <LessonPage />,
+      },
+      {
         path: ROUTES.DASHBOARD,
         element: <Dashboard />,
       },
