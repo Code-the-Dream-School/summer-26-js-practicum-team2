@@ -274,12 +274,9 @@ function DevComponentsPage() {
             title="No lessons in progress"
             message="Choose a lesson to start building your financial skills."
             action={
-              <a
-                href="/lessons"
-                className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 font-semibold text-on-primary hover:bg-primary-hover"
-              >
+              <Button as="a" href="/lessons" variant="primary" className="px-4 py-2">
                 Browse lessons
-              </a>
+              </Button>
             }
           />
 

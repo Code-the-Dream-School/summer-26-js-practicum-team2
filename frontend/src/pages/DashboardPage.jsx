@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import DashboardHero from '../components/dashboard/DashboardHero.jsx'
 import RecentActivityCard from '../components/dashboard/RecentActivityCard.jsx'
 import UnitProgressRow from '../components/dashboard/UnitProgressRow.jsx'
+import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import Skeleton from '../components/ui/Skeleton.jsx'
@@ -37,12 +38,9 @@ function Dashboard() {
         title="Sign in to view your dashboard"
         message="Track your progress, streaks, and next lesson after you sign in."
         action={
-          <Link
-            to={ROUTES.LOGIN}
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
-          >
+          <Button as={Link} to={ROUTES.LOGIN} variant="primary" className="px-5 py-2.5">
             Go to sign in
-          </Link>
+          </Button>
         }
       />
     )
@@ -59,12 +57,9 @@ function Dashboard() {
         title="We could not load your dashboard"
         message={error}
         action={
-          <Link
-            to={ROUTES.HOME}
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
-          >
+          <Button as={Link} to={ROUTES.HOME} variant="primary" className="px-5 py-2.5">
             Back to home
-          </Link>
+          </Button>
         }
       />
     )
@@ -85,12 +80,14 @@ function Dashboard() {
         </p>
         <h2 className="font-heading text-h4 font-bold text-heading">{nextAction?.title}</h2>
         <p className="text-neutral-600">{nextAction?.description}</p>
-        <Link
+        <Button
+          as={Link}
           to={nextAction?.href || '/lessons'}
-          className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+          variant="primary"
+          className="px-5 py-2.5"
         >
           {nextAction?.ctaLabel || 'Continue learning'}
-        </Link>
+        </Button>
       </Card>
 
       {hasNoProgress ? (
@@ -99,12 +96,14 @@ function Dashboard() {
           title="Welcome to your progress dashboard"
           message="Ready to start? Begin with Budgeting Basics"
           action={
-            <Link
+            <Button
+              as={Link}
               to={nextAction?.href || '/lessons/budgeting-basics-1'}
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
+              variant="primary"
+              className="px-5 py-2.5"
             >
               Begin with Budgeting Basics
-            </Link>
+            </Button>
           }
         />
       ) : (

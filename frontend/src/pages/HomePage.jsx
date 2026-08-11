@@ -3,6 +3,8 @@ import dabbingBeaverImg from '../assets/dabbingBeaver.svg'
 import abigailImg from '../assets/abigail.svg'
 import ramonaImg from '../assets/ramona.svg'
 import { ROUTES } from '../app/router/routes.js'
+import Button from '../components/ui/Button.jsx'
+import Card from '../components/ui/Card.jsx'
 import useAuth from '../hooks/useAuth.js'
 
 function HomePage() {
@@ -32,19 +34,18 @@ function HomePage() {
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link
+            <Button
+              as={Link}
               to="/register"
               id="primary-cta"
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-6 py-2.5 font-semibold text-on-primary hover:bg-primary-hover transition-colors"
+              variant="primary"
+              className="px-6 py-2.5"
             >
               Start learning
-            </Link>
-            <Link
-              to="/lesson-preview"
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-neutral-300 bg-surface-input px-6 py-2.5 font-semibold text-foreground hover:bg-surface-raised transition-colors"
-            >
+            </Button>
+            <Button as={Link} to="/lesson-preview" variant="secondary" className="px-6 py-2.5">
               See a sample lesson
-            </Link>
+            </Button>
           </div>
         </div>
 
@@ -78,33 +79,33 @@ function HomePage() {
           </h2>
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <article className="flex flex-col items-center text-center p-6 bg-surface-raised rounded-xl shadow-sm border border-neutral-200">
-            <div className="text-3xl mb-4" aria-hidden="true">
+          <Card className="flex flex-col items-center text-center p-6">
+            <div className="mb-4 text-3xl" aria-hidden="true">
               ⚡
             </div>
-            <h3 className="text-xl font-semibold text-heading mb-2">No Jargon</h3>
-            <p className="text-foreground leading-normal">
+            <h3 className="mb-2 text-xl font-semibold text-heading">No Jargon</h3>
+            <p className="leading-normal text-foreground">
               Learn budgeting basics without the finance jargon.
             </p>
-          </article>
-          <article className="flex flex-col items-center text-center p-6 bg-surface-raised rounded-xl shadow-sm border border-neutral-200">
-            <div className="text-3xl mb-4" aria-hidden="true">
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <div className="mb-4 text-3xl" aria-hidden="true">
               📱
             </div>
-            <h3 className="text-xl font-semibold text-heading mb-2">Gamified Progress</h3>
-            <p className="text-foreground leading-normal">
+            <h3 className="mb-2 text-xl font-semibold text-heading">Gamified Progress</h3>
+            <p className="leading-normal text-foreground">
               Track streaks and earn badges as you progress.
             </p>
-          </article>
-          <article className="flex flex-col items-center text-center p-6 bg-surface-raised rounded-xl shadow-sm border border-neutral-200">
-            <div className="text-3xl mb-4" aria-hidden="true">
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <div className="mb-4 text-3xl" aria-hidden="true">
               🔒
             </div>
-            <h3 className="text-xl font-semibold text-heading mb-2">100% Free</h3>
-            <p className="text-foreground leading-normal">
+            <h3 className="mb-2 text-xl font-semibold text-heading">100% Free</h3>
+            <p className="leading-normal text-foreground">
               Free forever — no bank account required.
             </p>
-          </article>
+          </Card>
         </div>
       </section>
 
@@ -120,33 +121,33 @@ function HomePage() {
           </h2>
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div className="flex flex-col items-center text-center p-6 bg-surface-input rounded-xl shadow-sm border border-neutral-200 relative">
-            <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">
+          <Card className="relative flex flex-col items-center text-center p-6">
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
               1
             </span>
-            <h3 className="text-xl font-semibold text-heading mb-2 mt-2">Pick a Topic</h3>
-            <p className="text-foreground leading-normal">
+            <h3 className="mb-2 mt-2 text-xl font-semibold text-heading">Pick a Topic</h3>
+            <p className="leading-normal text-foreground">
               Choose from modules covering Credit Cards, Emergency Funds, or Student Loans.
             </p>
-          </div>
-          <div className="flex flex-col items-center text-center p-6 bg-surface-input rounded-xl shadow-sm border border-neutral-200 relative">
-            <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">
+          </Card>
+          <Card className="relative flex flex-col items-center text-center p-6">
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
               2
             </span>
-            <h3 className="text-xl font-semibold text-heading mb-2 mt-2">5-Min Daily Lesson</h3>
-            <p className="text-foreground leading-normal">
+            <h3 className="mb-2 mt-2 text-xl font-semibold text-heading">5-Min Daily Lesson</h3>
+            <p className="leading-normal text-foreground">
               Read interactive, simplified concepts designed to fit straight into a busy schedule.
             </p>
-          </div>
-          <div className="flex flex-col items-center text-center p-6 bg-surface-input rounded-xl shadow-sm border border-neutral-200 relative">
-            <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-on-primary text-sm">
+          </Card>
+          <Card className="relative flex flex-col items-center text-center p-6">
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
               3
             </span>
-            <h3 className="text-xl font-semibold text-heading mb-2 mt-2">Test Your Knowledge</h3>
-            <p className="text-foreground leading-normal">
+            <h3 className="mb-2 mt-2 text-xl font-semibold text-heading">Test Your Knowledge</h3>
+            <p className="leading-normal text-foreground">
               Complete quick summary checkpoints to solidify your learning and lock in streaks.
             </p>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -164,28 +165,28 @@ function HomePage() {
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">
-            <div className="p-6 bg-surface-raised rounded-lg border border-neutral-200">
-              <h4 className="text-lg font-semibold text-heading mb-2">1. Is it free?</h4>
-              <p className="text-foreground leading-normal">
+            <Card className="p-6">
+              <h4 className="mb-2 text-lg font-semibold text-heading">1. Is it free?</h4>
+              <p className="leading-normal text-foreground">
                 Yes — every lesson, quiz, and badge is free. There's no paid tier and no ads. We
                 built this so anyone starting out can learn money basics without a paywall.
               </p>
-            </div>
-            <div className="p-6 bg-surface-raised rounded-lg border border-neutral-200">
-              <h4 className="text-lg font-semibold text-heading mb-2">2. How long does it take?</h4>
-              <p className="text-foreground leading-normal">
+            </Card>
+            <Card className="p-6">
+              <h4 className="mb-2 text-lg font-semibold text-heading">2. How long does it take?</h4>
+              <p className="leading-normal text-foreground">
                 Most lessons take three to five minutes, and a full topic runs about a week at one
                 lesson a day. You can go faster or slower — your progress saves automatically.
               </p>
-            </div>
-            <div className="p-6 bg-surface-raised rounded-lg border border-neutral-200">
-              <h4 className="text-lg font-semibold text-heading mb-2">3. Who is it for?</h4>
-              <p className="text-foreground leading-normal">
+            </Card>
+            <Card className="p-6">
+              <h4 className="mb-2 text-lg font-semibold text-heading">3. Who is it for?</h4>
+              <p className="leading-normal text-foreground">
                 It's designed for first-time earners: students opening their first checking account
                 and recent grads getting their first paycheck. No prior finance knowledge is
                 assumed.
               </p>
-            </div>
+            </Card>
           </div>
         </div>
       </section>
