@@ -332,11 +332,8 @@
           "title": "Sources of Income",
           "microLessonContent": [
             {
-              "type": "paragraph",
-              "text": "There are many different sources of income.Some common sources of income include:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "There are many different sources of income. Some common sources of income include:",
               "items": [
                 "Paychecks from a job",
 
@@ -680,11 +677,12 @@
             },
             {
               "type": "paragraph",
-              "text": "Abigail lives in an apartment complex that has a gym and pool that's included in the price of rent. Her other expenses include: "
+              "text": "Abigail lives in an apartment complex that has a gym and pool that's included in the price of rent."
             },
 
             {
               "type": "unorderedList",
+              "intro": "Abigail's other expenses include:",
               "items": [
                 "Rent",
                 "Groceries",
@@ -695,10 +693,11 @@
             },
             {
               "type": "paragraph",
-              "text": "Ramona lives on campus. Her room and board is covered by her student loans. She has access to a free gym on campus. Ramona's additional expenses include:"
+              "text": "Ramona lives on campus. Her room and board is covered by her student loans. She has access to a free gym on campus."
             },
             {
               "type": "unorderedList",
+              "intro": "Ramona's additional expenses include:",
               "items": [
                 "Groceries",
                 "Bowling league Fees",
@@ -744,11 +743,8 @@
               "budgetId": "abigail-basic-expenses"
             },
             {
-              "type": "paragraph",
-              "text": "Abigail notices that some expenses stay the same every month:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "Abigail notices that some expenses stay the same every month:",
               "items": ["Rent", "Car Payment"]
             },
             {
@@ -756,11 +752,8 @@
               "text": "These expenses are the same amount each month and don't change."
             },
             {
-              "type": "paragraph",
-              "text": "She also notices that some expenses change from month to month:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "Abigail also notices that some expenses change from month to month:",
               "items": ["Groceries", "Gasoline", "Electricity"]
             },
             {
@@ -1163,11 +1156,8 @@
               "text": "Now that Abigail has her budget, the next step is to track her spending over the next 2 months to see if her budget is accurate and learn about her spending habits."
             },
             {
-              "type": "paragraph",
-              "text": "There's several different ways that Abigail can track her spending including:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "There's several different ways that Abigail can track her spending including:",
               "items": ["Pen and Paper", "Spreadsheets", "An App"]
             },
             {
@@ -1179,7 +1169,12 @@
               "text": "Using the app, Abigail is able to categorize each of her purchases and can see where each cent is going."
             },
             {
-              "type": "paragraph",
+              "type": "unorderedList",
+              "intro": "Abigail's categories include things like:",
+              "items": ["Groceries", "Gasoline", "Rock Climbing Membership"]
+            },
+            {
+              "type": "callout",
               "text": "The key to expense tracking is consistency and choosing a tracking method that works best for you."
             },
             {
