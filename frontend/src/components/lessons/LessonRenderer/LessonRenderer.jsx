@@ -1,9 +1,7 @@
 import Paragraph from './Paragraph'
-import CharacterIntro from './CharacterIntro'
 import Formula from './Formula'
 import Callout from './Callout'
 import UnorderedList from './UnorderedList'
-import KnowledgeCheck from './KnowledgeCheck'
 import Table from './Table'
 import BudgetSummary from './BudgetSummary'
 
@@ -19,7 +17,7 @@ function LessonRenderer({ content, module }) {
       return <Paragraph content={content} />
 
     case 'characterIntro':
-      return <CharacterIntro content={content} module={module} />
+      return <p className="text-lg font-semibold leading-relaxed text-slate-800">{content.text}</p>
 
     case 'formula':
       return <Formula content={content} />
@@ -29,13 +27,6 @@ function LessonRenderer({ content, module }) {
 
     case 'unorderedList':
       return <UnorderedList content={content} />
-
-    case 'knowledgeCheck':
-      return (
-        <div>
-          <KnowledgeCheck content={content} />
-        </div>
-      )
 
     case 'table': {
       return <Table content={content} module={module} />
