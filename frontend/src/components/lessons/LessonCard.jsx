@@ -1,10 +1,15 @@
 // import { Link } from 'react-router'
 import { useState } from 'react'
-import LessonRenderer from './LessonRenderer'
+import { useNavigate } from 'react-router'
+import LessonRenderer from './LessonRenderer/LessonRenderer'
+import Button from '../ui/Button'
+import Card from '../ui/Card'
 
-function LessonCard({ lesson, microLesson, onNext }) {
+function LessonCard({ module, lesson, microLesson, onNext }) {
   //Content index state
   const [contentIndex, setContentIndex] = useState(0)
+
+  const navigate = useNavigate()
 
   const content = microLesson.microLessonContent
 
@@ -26,17 +31,42 @@ function LessonCard({ lesson, microLesson, onNext }) {
     setContentIndex((prev) => prev + 1)
   }
 
+  //Helper function for back button
+  //Helper function for back button
+  function handlePreviousContent() {
+    if (contentIndex === 0) {
+      navigate('/learn')
+      return
+    }
+
+    setContentIndex((prev) => prev - 1)
+  }
+
+  console.log(contentIndex)
+  console.log(content.length)
+  console.log(currentContent)
+
   return (
-    <>
-      <h1>{lesson.title}</h1>
-      <h2>{microLesson.title}</h2>
+    <Card>
+      <h1 className="text-h1 font-bold mb-6 text-lg text-heading flex flex-col items-center text-center">
+        {lesson.title}
+      </h1>
+      <h2 className="text-center text-h2 mb-12 text-lg font-semibold text-slate-900">
+        {microLesson.title}
+      </h2>
 
-      <LessonRenderer content={currentContent} />
+      <LessonRenderer content={currentContent} module={module} />
 
-      <button onClick={handleNextContent}>
-        {contentIndex === content.length - 1 ? 'Next Lesson' : 'Continue'}
-      </button>
-    </>
+      <div className="mt-6 flex justify-between">
+        <Button variant="secondary" onClick={handlePreviousContent}>
+          {contentIndex === 0 ? 'Learning Path' : 'Back'}
+        </Button>
+
+        <Button variant="primary" onClick={handleNextContent}>
+          {contentIndex === content.length - 1 ? 'Next Lesson' : 'Continue'}
+        </Button>
+      </div>
+    </Card>
   )
 }
 

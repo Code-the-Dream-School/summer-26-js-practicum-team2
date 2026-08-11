@@ -1,7 +1,6 @@
 export default function Button({
   children,
   variant = 'primary',
-  size = 'md',
   loading = false,
   disabled = false,
   type = 'button',
@@ -19,23 +18,30 @@ export default function Button({
     quiz: 'border border-primary bg-primary text-on-primary shadow-[0_8px_16px_rgba(16,86,71,0.2)] hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
     quizSecondary:
       'border border-neutral-300 bg-white text-heading shadow-[0_6px_12px_rgba(6,30,25,0.08)] hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
+    circleCompleted:
+      'border border-neutral-300 bg-surface-app text-heading shadow-sm hover:bg-surface-raised focus:border-primary focus:ring-primary/20',
+    circleCurrent:
+      'border border-primary bg-primary text-on-primary shadow-sm hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
+    circleDisabled:
+      'border border-primary bg-primary text-on-primary shadow-sm hover:bg-primary-hover focus:border-primary focus:ring-primary/20',
   }
 
-  const sizeClasses = {
-    md: 'min-h-10 px-3.5 py-2',
-
-    circle: 'h-25 w-25 p-0 rounded-full flex items-center justify-center',
-  }
+  const circleClass =
+    'border h-25 w-25 p-0 rounded-full flex items-center justify-center disabled:opacity-50'
 
   const baseClass =
-    'inline-flex items-center justify-center gap-2 text-sm font-semibold leading-none transition-all duration-200 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50'
+    'inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold leading-none transition-all duration-200 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
     <button
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      className={`${baseClass} ${sizeClasses[size]} ${styles[variant] || styles.primary} ${className}`.trim()}
+      className={
+        variant === 'circleCompleted' || variant === 'circleCurrent' || variant === 'circleDisabled'
+          ? `${circleClass} ${styles[variant]}`
+          : `${baseClass} ${styles[variant] || styles.primary} ${className}`.trim()
+      }
       {...props}
     >
       {loading && (

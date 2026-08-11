@@ -42,6 +42,10 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
+        path: ROUTES.LESSON,
+        element: <LessonPage />,
+      },
+      {
         path: ROUTES.REGISTER,
         element: <RegisterPage />,
       },
