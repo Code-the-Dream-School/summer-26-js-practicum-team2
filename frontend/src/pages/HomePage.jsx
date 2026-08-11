@@ -1,19 +1,12 @@
-import { Link, Navigate } from 'react-router'
+import { Link } from 'react-router'
 import dabbingBeaverImg from '../assets/dabbingBeaver.svg'
 import abigailImg from '../assets/abigail.svg'
 import ramonaImg from '../assets/ramona.svg'
 import { ROUTES } from '../app/router/routes.js'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
-import useAuth from '../hooks/useAuth.js'
 
 function HomePage() {
-  const { isAuthenticated } = useAuth()
-
-  if (isAuthenticated) {
-    return <Navigate to={ROUTES.DASHBOARD} replace />
-  }
-
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* COMPONENT: Hero Section */}
@@ -36,14 +29,14 @@ function HomePage() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button
               as={Link}
-              to="/register"
+              to={ROUTES.LEARN}
               id="primary-cta"
               variant="primary"
               className="px-6 py-2.5"
             >
               Start learning
             </Button>
-            <Button as={Link} to="/lesson-preview" variant="secondary" className="px-6 py-2.5">
+            <Button as={Link} to={ROUTES.SAMPLE_LESSON} className="px-6 py-2.5">
               See a sample lesson
             </Button>
           </div>
