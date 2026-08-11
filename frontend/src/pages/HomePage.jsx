@@ -23,7 +23,7 @@ function HomePage() {
   return (
     <>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* COMPONENT: Hero Section */}
+   
         <section
           className="flex flex-col items-center justify-between py-12 md:py-3 lg:flex-row"
           aria-label="Introduction"
@@ -101,7 +101,7 @@ function HomePage() {
           </div>
         </section>
 
-        {/* REQUIRED CHECKLIST COMPONENT: How-It-Works Section */}
+       
         <section
           id="how-it-works"
           className="py-12 md:py-20 border-t border-neutral-200"
@@ -143,7 +143,6 @@ function HomePage() {
           </div>
         </section>
 
-        {/* COMPONENT: FAQ Section */}
         <section
           id="faq"
           className="py-12 md:py-20 border-t border-neutral-200"

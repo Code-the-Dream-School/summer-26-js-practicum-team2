@@ -11,6 +11,7 @@ import TermsPage from '../../pages/TermsPage.jsx'
 import RegisterPage from '../../pages/RegisterPage.jsx'
 import PasswordResetPage from '../../pages/PasswordResetPage.jsx'
 import VerifyEmailPage from '../../pages/VerifyEmailPage.jsx'
+import ProfilePage from '../../pages/ProfilePage.jsx'
 import { ROUTES } from './routes.js'
 
 const router = createBrowserRouter([
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.DASHBOARD,
         element: <Dashboard />,
+      },
+      {
+        path: ROUTES.PROFILE,
+        element: <ProfilePage />,
       },
       {
         path: ROUTES.REGISTER,
