@@ -12,10 +12,10 @@ export default function Card({
 }) {
   const variantClasses = {
     default: 'border-neutral-200 bg-surface-raised shadow-sm',
-    quiz: 'border-neutral-200 bg-[#e8faf5] shadow-md',
-    choice: 'border-neutral-200 bg-white shadow-sm',
-    success: 'border-success bg-[#ddf5e9] shadow-sm',
-    danger: 'border-danger bg-[#ffe0df] shadow-sm',
+    quiz: 'border-neutral-200 bg-surface-inset shadow-md',
+    choice: 'border-neutral-200 bg-surface-input shadow-sm',
+    success: 'border-success bg-surface-inset shadow-sm',
+    danger: 'border-danger bg-warning shadow-sm',
   }
 
   let stateClasses = variantClasses[variant] || variantClasses.default
