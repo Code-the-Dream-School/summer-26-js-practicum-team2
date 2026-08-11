@@ -79,6 +79,7 @@ function normalizeLearnData({ moduleData, lessonData }) {
   return {
     id: lessonData.id,
     moduleId: moduleData?.id,
+    module: moduleData,
     moduleTitle: moduleData?.title,
     title: lessonData.title,
     learningGoal: lessonData.learningGoal,
@@ -125,24 +126,31 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   const [phase, setPhase] = useState(() => getStartingPhase(lessonSteps, questions))
   // Initialize state variables for the current lesson index, question index, selected choice IDs, answers, and review answer.
   const [lessonIndex, setLessonIndex] = useState(0)
+  const [lessonContentIndex, setLessonContentIndex] = useState(0)
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedChoiceIds, setSelectedChoiceIds] = useState([])
   const [answers, setAnswers] = useState([])
   const [reviewAnswer, setReviewAnswer] = useState(null)
   // Get the current lesson and question based on the current indices.
   const currentLesson = lessonSteps[lessonIndex]
+  const currentLessonContent = currentLesson?.content ?? []
+  const lessonContentCount = currentLessonContent.length
+  const currentContentItem = currentLessonContent[lessonContentIndex]
   const currentQuestion = questions[questionIndex]
   // Determine if there are any quiz questions available.
   const hasQuiz = questions.length > 0
   // Get the character ID for the current lesson, if available.
   const currentCharacterId = currentLesson?.characterId
   // Set the current character image and alt text based on the character ID. If no character ID is available, use the default guide image and alt text.
-  let currentCharacterImage = guideImage
+  let currentCharacterVariant = 'beaver'
+  let currentCharacterImage = characterImages.beaver ?? guideImage
   let currentCharacterAlt = 'Sprout lesson guide'
 
   if (currentCharacterId) {
-    // If a character ID is available, get the corresponding character image from the characterImages object.
-    currentCharacterImage = characterImages[currentCharacterId]
+    // If a character ID is available, use it as the character variant and resolve a matching image.
+    currentCharacterVariant = currentCharacterId
+    currentCharacterImage =
+      characterImages[currentCharacterId] ?? characterImages.beaver ?? guideImage
     // Set the alt text for the character image based on the character ID, capitalizing the first letter of the ID.
     currentCharacterAlt = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1)
   }
@@ -154,24 +162,37 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   const questionPosition = currentLessonQuestions.findIndex(
     (question) => question.id === currentQuestion?.id,
   )
-  // Calculate the total number of steps in the learning flow, including lesson steps and quiz questions.
-  const totalSteps = lessonSteps.length + questions.length
+  // Calculate the total number of lesson content steps by summing the maximum of each lesson's content length or 1 (to account for lessons with no content).
+  const totalLessonContentSteps = lessonSteps.reduce(
+    (total, lesson) => total + Math.max(lesson.content?.length ?? 0, 1),
+    0,
+  )
+
+  // Calculate the total number of steps in the learning flow, including lesson chunks and quiz questions.
+  const totalSteps = totalLessonContentSteps + questions.length
   // Calculate the number of completed steps before the current lesson, including both lesson steps and quiz questions.
   let completedStepsBeforeLesson = 0
   // Iterate through the lesson steps before the current lesson and count the number of completed steps, including both lesson steps and quiz questions.
   lessonSteps.slice(0, lessonIndex).forEach((lesson) => {
+    const lessonContentSteps = Math.max(lesson.content?.length ?? 0, 1)
     const lessonQuestionCount = questions.filter(
       (question) => question.lessonStepId === lesson.id,
     ).length
-    // Add the lesson step itself and the number of quiz questions associated with that lesson to the completed steps count.
-    completedStepsBeforeLesson += 1 + lessonQuestionCount
+    // Add the lesson chunks and the number of quiz questions associated with that lesson to the completed steps count.
+    completedStepsBeforeLesson += lessonContentSteps + lessonQuestionCount
   })
   // Calculate the current step in the learning flow based on the phase, completed steps before the lesson, and the position of the current question.
-  let currentStep = completedStepsBeforeLesson
+  const currentLessonContentSteps = Math.max(lessonContentCount, 1)
+  let currentStep =
+    completedStepsBeforeLesson + Math.min(lessonContentIndex, currentLessonContentSteps - 1)
 
   if (phase === 'quiz') {
-    // If the current phase is "quiz," increment the current step by 1 for the current lesson and add the position of the current question within the lesson. If the answer is being reviewed, add an additional step for the review.
-    currentStep += 1 + Math.max(questionPosition, 0) + (reviewAnswer ? 1 : 0)
+    // If the current phase is "quiz," include all lesson chunks in this step, then add the current question position.
+    currentStep =
+      completedStepsBeforeLesson +
+      currentLessonContentSteps +
+      Math.max(questionPosition, 0) +
+      (reviewAnswer ? 1 : 0)
   }
 
   if (phase === 'result') {
@@ -192,6 +213,7 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   function resetLearnFlow() {
     setPhase(getStartingPhase(lessonSteps, questions))
     setLessonIndex(0)
+    setLessonContentIndex(0)
     setQuestionIndex(0)
     setSelectedChoiceIds([])
     setAnswers([])
@@ -199,6 +221,11 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   }
   // Function to navigate to the next lesson step or quiz question, updating the relevant state variables based on the current phase and position within the learning flow.
   function goToNextLesson() {
+    if (lessonContentIndex < lessonContentCount - 1) {
+      setLessonContentIndex((currentIndex) => currentIndex + 1)
+      return
+    }
+
     if (currentLessonQuestions.length > 0) {
       // If there are quiz questions associated with the current lesson, navigate to the first question of the lesson and reset the selected choices and review answer.
       const firstQuestion = currentLessonQuestions[0]
@@ -216,6 +243,8 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
     if (lessonIndex < lessonSteps.length - 1) {
       // If there are more lesson steps available, navigate to the next lesson step and reset the selected choices and review answer.
       setLessonIndex((currentIndex) => currentIndex + 1)
+      // Reset the lesson content index to 0 for the new lesson step.
+      setLessonContentIndex(0)
       return
     }
     // If there are no more lesson steps and no quiz questions, switch to the "result" phase to indicate that the learning flow is complete.
@@ -223,8 +252,20 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   }
 
   function goToPreviousLesson() {
-    // If the current lesson index is greater than 0, navigate to the previous lesson step and reset the selected choices and review answer.
-    setLessonIndex((currentIndex) => Math.max(currentIndex - 1, 0))
+    if (lessonContentIndex > 0) {
+      // If there are previous content chunks available in the current lesson, navigate to the previous content chunk by decrementing the lesson content index.
+      setLessonContentIndex((currentIndex) => currentIndex - 1)
+      return
+    }
+
+    if (lessonIndex > 0) {
+      // If there are previous lesson steps available, navigate to the previous lesson step and set the lesson content index to the last content chunk of that lesson.
+      const previousLesson = lessonSteps[lessonIndex - 1]
+      const previousLessonContentCount = previousLesson?.content?.length ?? 0
+
+      setLessonIndex((currentIndex) => currentIndex - 1)
+      setLessonContentIndex(Math.max(previousLessonContentCount - 1, 0))
+    }
   }
 
   function checkAnswer() {
@@ -297,6 +338,7 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
     if (lessonIndex < lessonSteps.length - 1) {
       // If there are more lesson steps available, navigate to the next lesson step, resetting the selected choices and review answer, and switch to the "lesson" phase.
       setLessonIndex((currentIndex) => currentIndex + 1)
+      setLessonContentIndex(0)
       setSelectedChoiceIds([])
       setReviewAnswer(null)
       setPhase('lesson')
@@ -309,6 +351,15 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   // Determine if the current question is the last question in the current lesson step.
   const isLastQuestion =
     lessonIndex === lessonSteps.length - 1 && questionPosition === currentLessonQuestions.length - 1
+
+  const isLastContentChunk = lessonContentIndex === lessonContentCount - 1
+  // Determine the appropriate bubble text to display based on the current position in the learning flow, including whether the user is at the last content chunk or has quiz questions available.
+  const lessonBubbleText =
+    isLastContentChunk && currentLessonQuestions.length > 0
+      ? 'Ready for a quick check?'
+      : isLastContentChunk
+        ? 'Nice work. Ready for the next step?'
+        : "Let's keep going."
 
   if (phase === 'result') {
     // If the current phase is "result," render the result section, displaying the quiz results and providing options to try again or continue.
@@ -356,7 +407,7 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
       </section>
     )
   }
-    // If the current phase is not "result," render the learning flow section, displaying the lesson content or quiz questions based on the current phase, along with navigation buttons to move between lessons and questions.
+  // If the current phase is not "result," render the learning flow section, displaying the lesson content or quiz questions based on the current phase, along with navigation buttons to move between lessons and questions.
   return (
     <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
       <Card variant="quiz" className="px-7 pb-8 pt-5 sm:px-10 sm:pb-10 sm:pt-6">
@@ -383,33 +434,33 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
             </p>
           )}
         </div>
-          {/* // Render the lesson content or quiz questions based on the current phase, along with navigation buttons to move between lessons and questions. */}
+        {/* Render the lesson content or quiz questions based on the current phase, along with navigation buttons to move between lessons and questions. */}
         {phase === 'lesson' ? (
           <>
             <LessonComponent
               title={currentLesson?.title}
-              eyebrow={`Lesson ${lessonIndex + 1} of ${lessonSteps.length}`}
-              content={currentLesson?.content}
+              eyebrow={`Lesson ${lessonIndex + 1} of ${lessonSteps.length} • Step ${Math.min(lessonContentIndex + 1, currentLessonContentSteps)} of ${currentLessonContentSteps}`}
+              content={currentContentItem ? [currentContentItem] : []}
+              module={learnData.module}
+              characterVariant={currentCharacterVariant}
               characterImage={currentCharacterImage}
               characterAlt={currentCharacterAlt}
-              bubbleText={
-                lessonIndex === lessonSteps.length - 1 && hasQuiz
-                  ? 'Ready for a quick check?'
-                  : 'One bite at a time!'
-              }
+              bubbleText={lessonBubbleText}
             />
 
             <div className="mt-8 flex flex-wrap justify-between gap-4 border-t border-primary/10 pt-6">
               <Button
                 variant="quizSecondary"
-                disabled={lessonIndex === 0}
+                disabled={lessonIndex === 0 && lessonContentIndex === 0}
                 onClick={goToPreviousLesson}
               >
                 Previous
               </Button>
 
               <Button variant="quiz" className="min-w-36" onClick={goToNextLesson}>
-                {currentLessonQuestions.length > 0 ? 'Quick Check' : 'Next'}
+                {isLastContentChunk && currentLessonQuestions.length > 0
+                  ? 'Quick Check'
+                  : 'Continue'}
               </Button>
             </div>
           </>
@@ -492,9 +543,10 @@ function LearnPage({
   }
 
   const characterImages = {
-    abigailImg,
-    ramonaImg,
-    dabbingBeaverImg,
+    abigail: abigailImg,
+    ramona: ramonaImg,
+    beaver: dabbingBeaverImg,
+    guide: guideImage,
     ...providedCharacterImages,
   }
 
