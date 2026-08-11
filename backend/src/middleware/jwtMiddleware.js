@@ -2,23 +2,18 @@ const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 const { User } = require("../models/user.js");
 const send401 = (res) => {
-  return res
-    .status(StatusCodes.UNAUTHORIZED)
-    .json({ message: "No user is authenticated." });
+  return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
 };
 
 module.exports = (req, res, next) => {
-  const isLogoutRoute =
-    req.path === "/logout" || req.originalUrl?.endsWith("/logout");
+  const isLogoutRoute = req.path === "/logout" || req.originalUrl?.endsWith("/logout");
   if (isLogoutRoute) {
     return next();
   }
   // Check for token in cookies or Authorization header
   const cookieToken = req?.cookies?.session_token;
   const authHeader = req.get("Authorization") || req.get("authorization");
-  const headerToken = authHeader?.startsWith("Bearer ")
-    ? authHeader.slice(7)
-    : null;
+  const headerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
   const token = cookieToken || headerToken;
 
   if (!token) {
@@ -45,9 +40,7 @@ module.exports = (req, res, next) => {
       //req.user = { id: decoded.id, role: decoded.role };
 
       if (process.env.NODE_ENV === "production") {
-        if (
-          ["POST", "PATCH", "PUT", "DELETE", "CONNECT"].includes(req.method)
-        ) {
+        if (["POST", "PATCH", "PUT", "DELETE", "CONNECT"].includes(req.method)) {
           // for these operations we have to check for cross site request forgery
           const csrfHeader = req.get("X-CSRF-TOKEN") || req.get("x-csrf-token");
           if (!csrfHeader || csrfHeader !== decoded.csrfToken) {

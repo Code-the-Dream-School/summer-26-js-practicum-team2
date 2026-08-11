@@ -2,7 +2,11 @@ const { User, ArchivedUser } = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
-const { updateProfileSchema, changePasswordSchema, deletAccountSchema } = require("../validation/profileValidation");
+const {
+  updateProfileSchema,
+  changePasswordSchema,
+  deletAccountSchema,
+} = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -56,9 +60,7 @@ const uploadAvatar = async (req, res, next) => {
     await user.save();
 
     return res.status(StatusCodes.OK).json({
-      message: user.avatar_url
-        ? "Avatar uploaded."
-        : "Avatar set to default initial.",
+      message: user.avatar_url ? "Avatar uploaded." : "Avatar set to default initial.",
       avatar_url: user.avatar_url,
       avatar_initial: getFirstInitial(user.name, user.email),
     });
@@ -71,7 +73,7 @@ const uploadAvatar = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { error, value } = updateProfileSchema.validate(req.body, {
-      abortEarly:false,
+      abortEarly: false,
     });
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -133,9 +135,7 @@ const updateProfile = async (req, res, next) => {
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res
-        .status(StatusCodes.CONFLICT)
-        .json({ message: "Email is not able to be used. " });
+      return res.status(StatusCodes.CONFLICT).json({ message: "Email is not able to be used. " });
     }
     return next(error);
   }
@@ -200,22 +200,22 @@ const changePassword = async (req, res, next) => {
   try {
     //Validate password input using changePasswordSchema
 
-    const  {error, value} = changePasswordSchema.validate(req.body, {
+    const { error, value } = changePasswordSchema.validate(req.body, {
       abortEarly: false,
     });
-    if(error){
+    if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Error with validation",
-        errors: error.details.map((detail) => detail.message), 
+        errors: error.details.map((detail) => detail.message),
       });
     }
     //const { currentPassword, newPassword } = req.body;
     //if (!currentPassword || !newPassword) {
-      //return res
-       // .status(StatusCodes.BAD_REQUEST)
-       // .json({ message: "Both the current and new passwords are needed." });
+    //return res
+    // .status(StatusCodes.BAD_REQUEST)
+    // .json({ message: "Both the current and new passwords are needed." });
     //}
-    const { currentPassword, newPassword} = value;
+    const { currentPassword, newPassword } = value;
     const user = await User.findById(req.user.id).select("+password_hash");
     if (!user || user.is_deleted) {
       return res
@@ -259,20 +259,18 @@ const deleteAccount = async (req, res, next) => {
       },
     );
     if (!user || user.is_deleted) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "User not found." });
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
-    if (user.email.toLocaleLowerCase() !== value.email.toLowerCase()){
-      return res.status(StatusCodes.BAD_REQUEST).json ({
+    if (user.email.toLocaleLowerCase() !== value.email.toLowerCase()) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Email does not match account email on record. Please try again.",
       });
     }
     user.is_deleted = true;
     user.delete_at = new Date();
-    user.token_version = (user.token_version || 0) +1;
+    user.token_version = (user.token_version || 0) + 1;
     await user.save();
-    
+
     await ArchivedUser.create({
       original_user_id: user._id,
       name: user.name,

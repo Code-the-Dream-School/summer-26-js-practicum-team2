@@ -14,16 +14,17 @@ const updateProfileSchema = Joi.object({
   goals: Joi.string().trim().max(500).allow("").optional().messages({
     "string.max": "Goals must be within 500 characters.",
   }),
-theme: Joi.string().valid("Light","Dark").optional().messages({
-  "any.only": "Theme must be either Light or Dark.",
-}),
-notifications: Joi.boolean().optional().messages({
-  "boolean.base": "Notifications setting must be true or false.",
-}),
-}).min(1) // request body must have at least one field to update
-.messages({
-  "object.min": "Please provide at least one field to update.", 
-});
+  theme: Joi.string().valid("Light", "Dark").optional().messages({
+    "any.only": "Theme must be either Light or Dark.",
+  }),
+  notifications: Joi.boolean().optional().messages({
+    "boolean.base": "Notifications setting must be true or false.",
+  }),
+})
+  .min(1) // request body must have at least one field to update
+  .messages({
+    "object.min": "Please provide at least one field to update.",
+  });
 
 const changePasswordSchema = Joi.object({
   currentPassword: Joi.string().required().messages({
@@ -47,9 +48,9 @@ const changePasswordSchema = Joi.object({
 const deleteAccountSchema = Joi.object({
   email: Joi.string().trim().lowercase().email().required().messages({
     "string.empty": "Please enter your email if you want to delete your account.",
-    "string.email": "Please provide email that is valid.", 
+    "string.email": "Please provide email that is valid.",
     "any.required": "You need to provide a valid email in order to delete your account.",
   }),
 });
 
-module.exports = {updateProfileSchema, changePasswordSchema, deleteAccountSchema };
+module.exports = { updateProfileSchema, changePasswordSchema, deleteAccountSchema };
