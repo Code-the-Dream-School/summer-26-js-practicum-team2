@@ -53,6 +53,21 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // additional updates for profile and user account features
+    // revoke old JWT session and occurs with a change in passwords
+    token_version: {
+      type: Number,
+      default: 0,
+    },
+    // Soft-deleted accounts
+    is_deleted: {
+      type: Boolean,
+      default: false,
+    },
+    deleted_at: {
+      type: Date,
+      default: null, // Tracks when deletion occurs
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
