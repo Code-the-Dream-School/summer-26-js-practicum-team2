@@ -26,6 +26,7 @@ const LearningPathNode = forwardRef(
         {/*  Display a button that represents the node in the learning path */}
         <Button
           variant={variant}
+          disabled={status === 'locked'}
           title={tooltipText || `${node.microLessonId}: ${node.microLessonTitle}`}
           aria-label={`${node.microLessonId}: ${node.microLessonTitle}`}
           onClick={() => onSelect?.(node)}
