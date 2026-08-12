@@ -7,11 +7,15 @@ const QuizAttempt = require("../models/QuizAttempt");
 const contentModules = {
   cashFlow: require("../../../shared/content/budgeting.json"),
 };
+// Cache keys are normalized as strings to avoid ObjectId/string mismatches.
 const moduleIds = Object.keys(contentModules);
+// Set a short-lived in-memory cache for dashboard responses to reduce database load on repeat requests.
 const DASHBOARD_CACHE_TTL_MS = 30 * 1000;
+// In-memory dashboard cache
 const dashboardCache = new Map();
 
 function invalidateDashboardCache(userId) {
+  // Cache keys are normalized as strings to avoid ObjectId/string mismatches.
   dashboardCache.delete(String(userId));
 }
 
@@ -67,6 +71,7 @@ function buildLessonAction(moduleId, lesson, hasStarted) {
 }
 
 function getNextAction(progressByModule, units) {
+  // First priority: resume the user's explicitly saved in-progress lesson.
   for (const moduleId of moduleIds) {
     const progressRecord = progressByModule.get(moduleId);
     const completedSet = new Set(progressRecord?.completed_lessons || []);
@@ -77,6 +82,7 @@ function getNextAction(progressByModule, units) {
     }
   }
 
+  // Fallback: pick the first incomplete lesson across modules.
   for (const moduleId of moduleIds) {
     const progressRecord = progressByModule.get(moduleId);
     const completedSet = new Set(progressRecord?.completed_lessons || []);
@@ -89,6 +95,7 @@ function getNextAction(progressByModule, units) {
       return buildLessonAction(
         moduleId,
         lesson,
+        // Treat as "started" if any lessons were completed or a progress doc exists.
         unit?.completedLessons > 0 || Boolean(progressRecord),
       );
     }
@@ -160,6 +167,7 @@ async function reconcileProgressFromPassedAttempts(userId) {
 
   const passedMicrosByModule = new Map();
   for (const attempt of passedAttempts) {
+    // Group passed micro-lesson quizzes by module for batch progress reconciliation.
     const microLessonIds = passedMicrosByModule.get(attempt.module_id) || [];
     microLessonIds.push(attempt.micro_lesson_id);
     passedMicrosByModule.set(attempt.module_id, microLessonIds);
@@ -169,6 +177,7 @@ async function reconcileProgressFromPassedAttempts(userId) {
     [...passedMicrosByModule].map(async ([moduleId, microLessonIds]) => {
       const completedLessons = getModuleLessons(moduleId)
         .filter((lesson) =>
+          // A lesson is complete once all of its knowledge-check micros are passed.
           lesson.microLessons
             ?.filter((micro) =>
               micro.microLessonContent?.some(
@@ -209,7 +218,8 @@ async function getRecentActivity(userId) {
       attempt.micro_lesson_id,
     );
     const label = attempt.passed
-      ? `Passed quiz: ${microLesson?.title || attempt.micro_lesson_id} (${attempt.score}%)`
+      ? // Prefer content title; fall back to stored ID when content lookup fails.
+        `Passed quiz: ${microLesson?.title || attempt.micro_lesson_id} (${attempt.score}%)`
       : `Attempted quiz: ${microLesson?.title || attempt.micro_lesson_id} (${attempt.score}%)`;
 
     return {
@@ -225,6 +235,7 @@ exports.getDashboard = async (req, res, next) => {
     const userId = String(req.user.id);
     const cachedDashboard = dashboardCache.get(userId);
 
+    // Serve from short-lived in-memory cache for repeat dashboard loads.
     if (cachedDashboard && cachedDashboard.expiresAt > Date.now()) {
       return res
         .set("Cache-Control", "private, max-age=30")
@@ -268,6 +279,7 @@ exports.getDashboard = async (req, res, next) => {
         generatedAt: new Date().toISOString(),
       },
     };
+    // Cache the fully assembled response payload for this user.
     dashboardCache.set(userId, {
       payload,
       expiresAt: Date.now() + DASHBOARD_CACHE_TTL_MS,
