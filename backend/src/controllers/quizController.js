@@ -31,11 +31,11 @@ const { STATUS_CODES } = require("http");
 
 //Contnent registery mapping manifest module IDs to JSON content files
 const moduleList = {
-  cashFlow: require("../../shared/content/budgeting.json"),
-  //savings: require("../../shared/content/savings.json"),
-  //credit: require("../../shared/content/credit.json"),
-  //debt: require("../../shared/content/debt.json"),
-  //investing: require("../../shared/content/investing.json"),
+  cashFlow: require("../../../shared/content/budgeting.json"),
+  //savings: require("../../../shared/content/savings.json"),
+  //credit: require("../../../shared/content/credit.json"),
+  //debt: require("../../../shared/content/debt.json"),
+  //investing: require("../../../shared/content/investing.json"),
 };
 const getModuleContent = (moduleId) => {
   const targetModule = moduleId || "cashFlow";

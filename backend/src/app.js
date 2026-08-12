@@ -8,6 +8,7 @@ const helloRoutes = require("./routes/hello.routes");
 
 const userRoutes = require("./routes/userRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 const errorHandlerMiddleware = require("./middleware/errorHandlerMiddleware");
 const app = express();
 
