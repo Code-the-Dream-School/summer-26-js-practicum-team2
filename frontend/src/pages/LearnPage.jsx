@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useParams, useSearchParams, Navigate } from 'react-router'
+import useAuth from '../hooks/useAuth.js'
+import { ROUTES } from '../app/router/routes.js'
 import { modules } from '../../../shared/content/index.js'
 import LessonComponent from '../components/learn/LessonComponent.jsx'
 import QuizComponent from '../components/learn/QuizComponent.jsx'
@@ -114,6 +116,15 @@ function getStartingPhase(lessonSteps, questions) {
   }
   // If there are neither lesson steps nor questions, start with the "result" phase.
   return 'result'
+}
+
+// Selects a random lesson from the available lessons in the module for the sample preview.
+function selectRandomLesson(lessonSteps) {
+  if (!lessonSteps || lessonSteps.length === 0) {
+    return null
+  }
+  const randomIndex = Math.floor(Math.random() * lessonSteps.length)
+  return lessonSteps[randomIndex]
 }
 
 // The LearnFlow component manages the learning flow, including lesson steps, quiz questions, and the result phase.
@@ -514,7 +525,11 @@ function LearnPage({
   characterImages: providedCharacterImages,
   guideImage = dabbingBeaverImg,
 }) {
+  const { isAuthenticated } = useAuth()
+
   const { moduleId, lessonId } = useParams()
+  const [searchParams] = useSearchParams()
+  const isSamplePreview = searchParams.get('sample') === 'true'
 
   const learnData = useMemo(() => {
     const defaultLesson = getDefaultLesson({
@@ -550,6 +565,27 @@ function LearnPage({
     ...providedCharacterImages,
   }
 
+  if (!isAuthenticated) {
+    // If the user isn't authenticated, but the page has a sample query parameter, allow them to view the sample lesson without authentication.
+    if (isSamplePreview) {
+      const randomLesson = selectRandomLesson(learnData.lessonSteps)
+      return (
+        <>
+          <p className="mx-auto mb-4 max-w-5xl rounded-xl border border-primary/20 bg-danger/5 px-4 py-3 text-sm font-medium text-primary sm:px-6">
+            This is a sample of a lesson.
+          </p>
+          <LearnFlow
+            key={`${learnData.moduleId}:${learnData.id}`}
+            learnData={randomLesson ? { ...learnData, lessonSteps: [randomLesson] } : learnData}
+            characterImages={characterImages}
+            guideImage={guideImage}
+          />
+        </>
+      )
+    }
+    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the dashboard.
+    return <Navigate to={ROUTES.LOGIN} replace />
+  }
   return (
     <LearnFlow
       key={`${learnData.moduleId}:${learnData.id}`}
