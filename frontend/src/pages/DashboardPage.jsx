@@ -58,6 +58,11 @@ function Dashboard() {
 
   const { hero, nextAction, units = [], recentActivity = [] } = dashboard || {}
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0)
+  // Calculate the total number of learning activities by summing up the totalMicroLessons or totalLessons for each unit. This gives a comprehensive view of the user's overall progress across all units.
+  const totalLearningActivities = units.reduce(
+    (sum, unit) => sum + (unit.totalMicroLessons || unit.totalLessons),
+    0,
+  )
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0)
   const hasNoProgress = completedLessons === 0
 
@@ -89,7 +94,7 @@ function Dashboard() {
           action={
             <Button
               as={Link}
-              to={nextAction?.href || '/lessons/budgeting-basics-1'}
+              to={nextAction?.href || '/learn/cashFlow/1.1'}
               variant="primary"
               className="px-5 py-2.5"
             >
@@ -102,7 +107,8 @@ function Dashboard() {
           <header className="space-y-1">
             <h2 className="font-heading text-h4 font-bold text-heading">Unit progress</h2>
             <p className="text-small text-neutral-600">
-              {completedLessons} of {totalLessons} lessons completed
+              {completedLessons} of {totalLessons} lesson units completed ({totalLearningActivities}{' '}
+              learning activities total)
             </p>
           </header>
 
