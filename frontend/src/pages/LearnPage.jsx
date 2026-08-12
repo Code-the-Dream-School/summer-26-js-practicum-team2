@@ -488,6 +488,9 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
               onChange={setSelectedChoiceIds}
               rightAnswerIcon={rightAnswerIcon}
               wrongAnswerIcon={wrongAnswerIcon}
+              characterVariant={currentCharacterVariant}
+              characterImage={currentCharacterImage}
+              characterAlt={currentCharacterAlt}
             />
 
             <div className="mt-8 flex flex-wrap justify-between gap-4 border-t border-primary/10 pt-6">

@@ -1,4 +1,5 @@
 import Card from '../ui/Card.jsx'
+import LessonGuideCharacter from './LessonGuideCharacter.jsx'
 
 // QuizComponent renders a quiz question with multiple choice answers.
 function QuizComponent({
@@ -10,6 +11,9 @@ function QuizComponent({
   onChange,
   rightAnswerIcon,
   wrongAnswerIcon,
+  characterVariant = 'beaver',
+  characterImage,
+  characterAlt = 'Lesson guide',
 }) {
   // Determine if the question allows multiple selections based on its type.
   const allowsMultiple = question?.type === 'multiSelect'
@@ -53,7 +57,7 @@ function QuizComponent({
           // Determine the variant of the card based on whether the answer is being reviewed and if the choice is selected.
           const variant =
             reviewAnswer && isSelected ? (reviewAnswer.isCorrect ? 'success' : 'danger') : 'choice'
-            // Determine the icon to display based on whether the answer is being reviewed and if the choice is selected.
+          // Determine the icon to display based on whether the answer is being reviewed and if the choice is selected.
           const selectedIcon = reviewAnswer
             ? isSelected && reviewAnswer.isCorrect
               ? rightAnswerIcon
@@ -97,14 +101,26 @@ function QuizComponent({
           )
         })}
       </div>
-        {/* Render the review answer section if available. */}
+      {/* Render the review answer section if available. */}
       {reviewAnswer ? (
-        <div className="space-y-3">
-          <p className="font-semibold text-heading">
-            {reviewAnswer.isCorrect ? 'Correct!' : 'Try again!'}
-          </p>
-          <p className="text-foreground">Explanation: {reviewAnswer.explanation}</p>
-        </div>
+        // Render the LessonGuideCharacter component to provide feedback on the answer.
+        <LessonGuideCharacter
+          variant={characterVariant}
+          imageSrc={characterImage}
+          imageAlt={characterAlt}
+          bubbleText={
+            reviewAnswer.isCorrect
+              ? 'Nice work! You got it.'
+              : 'Almost there — let us take another look.'
+          }
+        >
+          <div className="space-y-3">
+            <p className="font-semibold text-heading">
+              {reviewAnswer.isCorrect ? 'Correct!' : 'Try again!'}
+            </p>
+            <p className="text-foreground">Explanation: {reviewAnswer.explanation}</p>
+          </div>
+        </LessonGuideCharacter>
       ) : null}
     </div>
   )
