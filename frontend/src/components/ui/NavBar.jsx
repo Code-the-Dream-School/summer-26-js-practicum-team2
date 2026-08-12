@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import logo from '../../assets/logo.svg'
+import Button from './Button.jsx'
 
-const primaryLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
-]
+const primaryLinks = [{ label: 'Home', href: '/' }]
 
 export default function NavBar({
   signedIn = false,
@@ -19,16 +17,15 @@ export default function NavBar({
   const [isOpen, setIsOpen] = useState(false)
 
   const authLinks = signedIn
-    ? [
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Profile', href: '/profile' },
-      ]
+    ? [{ label: 'Dashboard', href: '/dashboard' }]
     : [
         { label: 'Login', href: '/login' },
         { label: 'Signup', href: '/register' },
       ]
 
-  const mobileLinks = [...primaryLinks, ...authLinks]
+  const combinedLinks = [...primaryLinks, ...authLinks]
+
+  const mobileLinks = [...combinedLinks, { label: 'Profile', href: '/profile' }]
 
   return (
     <nav
@@ -41,7 +38,7 @@ export default function NavBar({
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
-          {primaryLinks.map((link) => (
+          {combinedLinks.map((link) => (
             <li key={link.label}>
               {link.href.startsWith('http') ? (
                 <a
@@ -66,20 +63,14 @@ export default function NavBar({
           {!signedIn ? (
             <>
               <li>
-                <Link
-                  to="/login"
-                  className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset"
-                >
+                <Button as={Link} to="/login" variant="secondary">
                   Login
-                </Link>
+                </Button>
               </li>
               <li>
-                <Link
-                  to="/register"
-                  className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
-                >
+                <Button as={Link} to="/register" variant="primary">
                   Signup
-                </Link>
+                </Button>
               </li>
             </>
           ) : (
@@ -94,28 +85,38 @@ export default function NavBar({
                 </div>
               </li>
               <li>
-                <button
+                <Button
                   type="button"
                   onClick={onLogout}
                   disabled={isSigningOut}
-                  className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="ghost"
+                  className="px-3 py-2"
                 >
                   {isSigningOut ? 'Signing out...' : 'Logout'}
-                </button>
+                </Button>
               </li>
             </>
           )}
         </ul>
 
-        <button
+        <Button
           type="button"
           aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
           onClick={() => setIsOpen((value) => !value)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-surface-raised text-2xl text-heading shadow-sm md:hidden"
+          variant="secondary"
+          className="h-11 w-11 rounded-lg p-0 text-2xl md:hidden"
         >
-          {isOpen ? 'x' : '='}
-        </button>
+          {isOpen ? (
+            'x'
+          ) : (
+            <span aria-hidden="true" className="flex flex-col gap-1">
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+            </span>
+          )}
+        </Button>
       </div>
 
       {isOpen ? (
@@ -146,17 +147,18 @@ export default function NavBar({
             ))}
             {signedIn ? (
               <li>
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setIsOpen(false)
                     onLogout?.()
                   }}
                   disabled={isSigningOut}
-                  className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-heading transition-colors hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="ghost"
+                  className="w-full justify-start px-3 py-2"
                 >
                   {isSigningOut ? 'Signing out...' : 'Logout'}
-                </button>
+                </Button>
               </li>
             ) : null}
           </ul>
