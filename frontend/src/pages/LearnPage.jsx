@@ -34,6 +34,7 @@ function normalizeQuestion(question, index) {
   // Return a normalized question object with a unique ID, type, prompt, choices, correct choice IDs, and an explanation.
   return {
     id: question.id ?? `question-${index + 1}`,
+    characterId: question.characterId ?? null,
     type: question.questionType === 'multiSelect' ? 'multiSelect' : 'singleChoice',
     prompt: question.question ?? question.prompt,
     choices: answerChoices.map((choice) => ({
@@ -150,8 +151,13 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   const currentQuestion = questions[questionIndex]
   // Determine if there are any quiz questions available.
   const hasQuiz = questions.length > 0
-  // Prefer characterId on the current content chunk, then fall back to the lesson default.
-  const currentCharacterId = currentContentItem?.characterId ?? currentLesson?.characterId
+  // Prefer a question-level character override during quiz mode, then the current content chunk, then the lesson default.
+  const currentCharacterId =
+    phase === 'quiz'
+      ? (currentQuestion?.characterId ??
+        currentContentItem?.characterId ??
+        currentLesson?.characterId)
+      : (currentContentItem?.characterId ?? currentLesson?.characterId)
   // Set the current character image and alt text based on the character ID. If no character ID is available, use the default guide image and alt text.
   let currentCharacterVariant = 'beaver'
   let currentCharacterImage = characterImages.beaver ?? guideImage
