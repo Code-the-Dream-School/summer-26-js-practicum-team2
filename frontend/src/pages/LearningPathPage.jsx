@@ -96,10 +96,14 @@ function LearningPathPage() {
     -1,
   )
 
-  const currentIndex = Math.min(
-    Math.max(savedIndex, lastCompletedIndex + 1),
-    learningPath.length - 1,
-  )
+  // The last step being complete means there is nothing left to unlock in this module.
+  const isModuleComplete =
+    learningPath.length > 0 &&
+    (Boolean(progress?.isModuleCompleted) || lastCompletedIndex === learningPath.length - 1)
+
+  const currentIndex = isModuleComplete
+    ? -1
+    : Math.min(Math.max(savedIndex, lastCompletedIndex + 1), learningPath.length - 1)
 
   const currentNode = currentIndex >= 0 ? learningPath[currentIndex] : null
 
@@ -245,7 +249,9 @@ function LearningPathPage() {
         </div>
 
         <p className="mt-3 text-center text-sm leading-6 text-learning-path-muted">
-          Tap a step to jump straight into the lesson.
+          {isModuleComplete
+            ? 'You are all caught up. Revisit any step to review it.'
+            : 'Tap a step to jump straight into the lesson.'}
         </p>
 
         <div
@@ -306,7 +312,11 @@ function LearningPathPage() {
           {learningPath.map((node, index) => {
             let status = 'locked'
 
-            if (completedMicroLessons.has(node.microLessonId) || index < currentIndex) {
+            if (
+              isModuleComplete ||
+              completedMicroLessons.has(node.microLessonId) ||
+              index < currentIndex
+            ) {
               status = 'completed'
             }
 
@@ -364,24 +374,30 @@ function LearningPathPage() {
 
       <footer className="sticky bottom-0 mt-6 border-t border-learning-path-footer-border bg-learning-path-footer-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-[22rem] justify-end sm:max-w-[24rem] md:max-w-4xl lg:max-w-6xl">
-          <Button
-            type="button"
-            variant="primary"
-            className="rounded-lg border-0 bg-learning-path-button px-8 py-3 text-lg font-semibold text-on-primary shadow-[var(--shadow-learning-path-button)] hover:bg-learning-path-button-hover"
-            title={
-              currentNode
-                ? `Continue to ${currentNode.microLessonTitle}`
-                : 'Continue to the current lesson'
-            }
-            aria-label={
-              currentNode
-                ? `Continue to ${currentNode.microLessonTitle}`
-                : 'Continue to the current lesson'
-            }
-            onClick={() => openLesson(currentNode)}
-          >
-            Next
-          </Button>
+          {isModuleComplete ? (
+            <p className="text-lg font-semibold text-learning-path-heading">
+              Module complete. You are all caught up!
+            </p>
+          ) : (
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg border-0 bg-learning-path-button px-8 py-3 text-lg font-semibold text-on-primary shadow-[var(--shadow-learning-path-button)] hover:bg-learning-path-button-hover"
+              title={
+                currentNode
+                  ? `Continue to ${currentNode.microLessonTitle}`
+                  : 'Continue to the current lesson'
+              }
+              aria-label={
+                currentNode
+                  ? `Continue to ${currentNode.microLessonTitle}`
+                  : 'Continue to the current lesson'
+              }
+              onClick={() => openLesson(currentNode)}
+            >
+              Next
+            </Button>
+          )}
         </div>
       </footer>
     </div>
