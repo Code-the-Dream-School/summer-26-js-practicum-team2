@@ -32,6 +32,11 @@ const userProgressSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    completed_micro_lessons: [
+      {
+        type: String,
+      },
+    ],
     is_module_completed: {
       type: Boolean,
       default: false,
