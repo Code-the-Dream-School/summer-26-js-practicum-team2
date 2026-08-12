@@ -1,11 +1,10 @@
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
-import LoginPage from '../../pages/LoginPage.jsx'
 import MainLayout from '../../components/layout/MainLayout.jsx'
+import LoginPage from '../../pages/LoginPage.jsx'
 import Dashboard from '../../pages/DashboardPage.jsx'
 import HomePage from '../../pages/HomePage.jsx'
 import NotFoundPage from '../../pages/NotFoundPage.jsx'
-import DevComponentsPage from '../../pages/DevComponentsPage.jsx'
 import PrivacyPage from '../../pages/PrivacyPage.jsx'
 import TermsPage from '../../pages/TermsPage.jsx'
 import LearnPage from '../../pages/LearnPage.jsx'
@@ -51,10 +50,6 @@ const router = createBrowserRouter([
       {
         path: ROUTES.PASSWORD_RESET,
         element: <PasswordResetPage />,
-      },
-      {
-        path: ROUTES.DEV_COMPONENTS,
-        element: <DevComponentsPage />,
       },
       {
         path: ROUTES.PRIVACY,
