@@ -55,13 +55,13 @@ function normalizeLearnData({ moduleData, lessonData }) {
   // Map over the micro-lessons to create lesson steps, extracting relevant information such as the title, character ID, and content.
   const lessonSteps = microLessons.map((microLesson) => {
     const content = microLesson.microLessonContent ?? []
-    // Find the character introduction content item, if it exists, to extract the character ID.
-    const characterIntro = content.find((item) => item.type === 'characterIntro')
+    // Allow any content item to set the character, not only characterIntro items.
+    const firstCharacterContent = content.find((item) => item.characterId)
     // Return a normalized lesson step object with the micro-lesson ID, title, character ID, and filtered content (excluding knowledge check items).
     return {
       id: microLesson.id,
       title: microLesson.title,
-      characterId: characterIntro?.characterId,
+      characterId: firstCharacterContent?.characterId,
       content: normalizeContent(content.filter((item) => item.type !== 'knowledgeCheck')),
     }
   })
@@ -150,8 +150,8 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
   const currentQuestion = questions[questionIndex]
   // Determine if there are any quiz questions available.
   const hasQuiz = questions.length > 0
-  // Get the character ID for the current lesson, if available.
-  const currentCharacterId = currentLesson?.characterId
+  // Prefer characterId on the current content chunk, then fall back to the lesson default.
+  const currentCharacterId = currentContentItem?.characterId ?? currentLesson?.characterId
   // Set the current character image and alt text based on the character ID. If no character ID is available, use the default guide image and alt text.
   let currentCharacterVariant = 'beaver'
   let currentCharacterImage = characterImages.beaver ?? guideImage
@@ -298,6 +298,7 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
     })
 
     setAnswers((currentAnswers) => [
+      // Update the answers state by filtering out any existing answer for the current question and adding the new answer with the selected choices.
       ...currentAnswers.filter((answer) => answer.questionId !== currentQuestion.id),
       {
         questionId: currentQuestion.id,
@@ -306,6 +307,7 @@ function LearnFlow({ learnData, characterImages, guideImage }) {
     ])
 
     setReviewAnswer({
+      // Set the review answer state to indicate whether the answer is correct and provide an explanation for the current question.
       isCorrect: scoredAnswer.passed,
       explanation: currentQuestion.explanation,
     })

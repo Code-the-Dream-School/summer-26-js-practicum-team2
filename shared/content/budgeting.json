@@ -167,6 +167,7 @@
           "title": "What is a Budget?",
           "microLessonContent": [
             {
+              "characterId": "abigail",
               "type": "paragraph",
               "text": "Juggling everything going on in her life, Abigail feels like she isn't in control of her money."
             },
@@ -183,6 +184,7 @@
               "text": "A budget is simply a plan for your money. It's a tool you can use to help make financial decisions."
             },
             {
+   
               "type": "paragraph",
               "text": "Budgets involve two main categories: income and expenses."
             },
