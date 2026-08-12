@@ -3,10 +3,7 @@ import { Link } from 'react-router'
 import logo from '../../assets/logo.svg'
 import Button from './Button.jsx'
 
-const primaryLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
-]
+const primaryLinks = [{ label: 'Home', href: '/' }]
 
 export default function NavBar({
   signedIn = false,
@@ -20,16 +17,15 @@ export default function NavBar({
   const [isOpen, setIsOpen] = useState(false)
 
   const authLinks = signedIn
-    ? [
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Profile', href: '/profile' },
-      ]
+    ? [{ label: 'Dashboard', href: '/dashboard' }]
     : [
         { label: 'Login', href: '/login' },
         { label: 'Signup', href: '/register' },
       ]
 
-  const mobileLinks = [...primaryLinks, ...authLinks]
+  const combinedLinks = [...primaryLinks, ...authLinks]
+
+  const mobileLinks = [...combinedLinks, { label: 'Profile', href: '/profile' }]
 
   return (
     <nav
@@ -42,7 +38,7 @@ export default function NavBar({
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
-          {primaryLinks.map((link) => (
+          {combinedLinks.map((link) => (
             <li key={link.label}>
               {link.href.startsWith('http') ? (
                 <a
@@ -111,7 +107,15 @@ export default function NavBar({
           variant="secondary"
           className="h-11 w-11 rounded-lg p-0 text-2xl md:hidden"
         >
-          {isOpen ? 'x' : '='}
+          {isOpen ? (
+            'x'
+          ) : (
+            <span aria-hidden="true" className="flex flex-col gap-1">
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+            </span>
+          )}
         </Button>
       </div>
 
