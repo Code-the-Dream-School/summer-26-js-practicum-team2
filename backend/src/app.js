@@ -8,6 +8,8 @@ const helloRoutes = require("./routes/hello.routes");
 
 const userRoutes = require("./routes/userRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const quizRoutes = require("./routes/quizRoutes");
+const lessonRoutes = require("./routes/lessonRoutes");
 const errorHandlerMiddleware = require("./middleware/errorHandlerMiddleware");
 const app = express();
 
@@ -58,9 +60,10 @@ app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/quizzes", quizRoutes);
-// Root route
+app.use("/api/v1/lessons", lessonRoutes);
+// Root route redirects user to the client
 app.get("/", (req, res) => {
-  res.send("Backend API is running");
+  res.redirect(process.env.CLIENT_URL);
 });
 app.use(errorHandlerMiddleware);
 

@@ -3,6 +3,8 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')
 const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`
+const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`
+const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`
 
 // Helper function to make API requests to the backend.
 async function apiRequest(path, options = {}) {
@@ -84,4 +86,52 @@ export const trackDashboardEvent = ({ type, csrfToken, ...payload }) =>
       ...payload,
     },
     basePath: DASHBOARD_BASE_PATH,
+  })
+
+export const getLesson = (moduleId, lessonId) =>
+  apiRequest(`/${encodeURIComponent(moduleId)}/${encodeURIComponent(lessonId)}`, {
+    method: 'GET',
+    basePath: LESSONS_BASE_PATH,
+  })
+
+export const getLessonProgress = (moduleId) =>
+  apiRequest(`/progress?moduleId=${encodeURIComponent(moduleId)}`, {
+    method: 'GET',
+    basePath: LESSONS_BASE_PATH,
+  })
+
+export const updateLessonProgress = ({ moduleId, lessonId, microLessonId, csrfToken }) =>
+  apiRequest('/progress', {
+    method: 'PATCH',
+    csrfToken,
+    body: { moduleId, lessonId, microLessonId },
+    basePath: LESSONS_BASE_PATH,
+  })
+
+export const getQuizProgress = () =>
+  apiRequest('/progress', {
+    method: 'GET',
+    basePath: QUIZZES_BASE_PATH,
+  })
+
+export const getQuizAttempts = () =>
+  apiRequest('/attempts', {
+    method: 'GET',
+    basePath: QUIZZES_BASE_PATH,
+  })
+
+export const startQuiz = ({ moduleId, microLessonId, csrfToken }) =>
+  apiRequest('/start', {
+    method: 'POST',
+    csrfToken,
+    body: { moduleId, microLessonId },
+    basePath: QUIZZES_BASE_PATH,
+  })
+
+export const submitQuiz = (microLessonId, { attemptId, moduleId, answers, csrfToken }) =>
+  apiRequest(`/${encodeURIComponent(microLessonId)}/submit`, {
+    method: 'POST',
+    csrfToken,
+    body: { attemptId, moduleId, answers },
+    basePath: QUIZZES_BASE_PATH,
   })

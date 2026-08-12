@@ -20,7 +20,7 @@ function LessonComponent({
         {eyebrow ? (
           <p className="text-small font-semibold uppercase tracking-wide text-primary">{eyebrow}</p>
         ) : null}
-        <h2 className="font-heading text-h3 font-bold text-heading">{title}</h2>
+        {title ? <h2 className="font-heading text-h3 font-bold text-heading">{title}</h2> : null}
       </div>
 
       <LessonGuideCharacter
