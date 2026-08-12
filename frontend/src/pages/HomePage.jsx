@@ -1,12 +1,15 @@
 import { Link } from 'react-router'
+import useAuth from '../hooks/useAuth.js'
+import { ROUTES } from '../app/router/routes.js'
 import dabbingBeaverImg from '../assets/dabbingBeaver.svg'
 import abigailImg from '../assets/abigail.svg'
 import ramonaImg from '../assets/ramona.svg'
-import { ROUTES } from '../app/router/routes.js'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 
 function HomePage() {
+  const { isAuthenticated } = useAuth()
+
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* COMPONENT: Hero Section */}
@@ -29,14 +32,21 @@ function HomePage() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button
               as={Link}
-              to={ROUTES.LEARN}
+              to={isAuthenticated ? ROUTES.LEARN : ROUTES.REGISTER}
               id="primary-cta"
               variant="primary"
               className="px-6 py-2.5"
             >
               Start learning
             </Button>
-            <Button as={Link} to={ROUTES.SAMPLE_LESSON} className="px-6 py-2.5">
+            <Button
+              as={Link}
+              to={{
+                pathname: ROUTES.SAMPLE_LESSON,
+                search: '?sample=true',
+              }}
+              className="px-6 py-2.5"
+            >
               See a sample lesson
             </Button>
           </div>
