@@ -19,7 +19,7 @@ const fallbackHero = {
   },
   primaryAction: {
     label: 'Start Budgeting Basics',
-    href: '/lessons/budgeting-basics-1',
+    href: '/learn/cashFlow/1.1',
   },
 }
 
@@ -44,7 +44,7 @@ export default function DashboardHero({ hero }) {
     : 1
   const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? 'Goal met' : 'In progress'
   const ctaLabel = resolvedHero?.primaryAction?.label || 'Continue learning'
-  const ctaHref = resolvedHero?.primaryAction?.href || '/lessons'
+  const ctaHref = resolvedHero?.primaryAction?.href || '/learn'
 
   return (
     <section className="rounded-2xl border border-neutral-200 bg-surface-raised p-5 text-foreground shadow-sm sm:p-6">

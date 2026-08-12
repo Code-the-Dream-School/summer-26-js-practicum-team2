@@ -24,6 +24,7 @@ quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
 
 const QuizAttempt = require("../models/QuizAttempt");
 const UserProgress = require("../models/UserProgress");
+const { invalidateDashboardCache } = require("./dashboardController");
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
@@ -32,10 +33,10 @@ const { STATUS_CODES } = require("http");
 //Contnent registery mapping manifest module IDs to JSON content files
 const moduleList = {
   cashFlow: require("../../../shared/content/budgeting.json"),
-  //savings: require("../../../shared/content/savings.json"),
-  //credit: require("../../../shared/content/credit.json"),
-  //debt: require("../../../shared/content/debt.json"),
-  //investing: require("../../../shared/content/investing.json"),
+  //savings: require("../../shared/content/savings.json"),
+  //credit: require("../../shared/content/credit.json"),
+  //debt: require("../../shared/content/debt.json"),
+  //investing: require("../../shared/content/investing.json"),
 };
 const getModuleContent = (moduleId) => {
   const targetModule = moduleId || "cashFlow";
@@ -80,9 +81,16 @@ const getQuestionsFromLesson = (moduleId, microLessonId) => {
 const getMicroLessonIdsForLesson = (moduleId, lessonId) => {
   const moduleData = getModuleContent(moduleId);
   const lesson = (moduleData.lessons || []).find((l) => l.id === lessonId);
-
+  // if lesson not found or has no micro lessons, return empty array
   if (!lesson || !lesson.microLessons) return [];
-  return lesson.microLessons.map((micro) => micro.id);
+  // returns an array of micro lesson IDs
+  return lesson.microLessons
+    .filter((micro) =>
+      micro.microLessonContent?.some(
+        (contentItem) => contentItem.type === "knowledgeCheck",
+      ),
+    )
+    .map((micro) => micro.id);
 };
 
 //GET /api/v1/quizzes/progress
@@ -302,6 +310,8 @@ exports.submitQuiz = async (req, res, next) => {
         );
       }
     }
+    // Invalidate dashboard cache after quiz submission to ensure the next fetch gets updated progress
+    invalidateDashboardCache(userId);
     return res.status(StatusCodes.OK).json({
       score: attempt.score,
       passed: attempt.passed,

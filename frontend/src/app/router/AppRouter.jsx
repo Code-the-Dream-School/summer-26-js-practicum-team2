@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
+import { ROUTES } from './routes.js'
 import MainLayout from '../../components/layout/MainLayout.jsx'
 import LoginPage from '../../pages/LoginPage.jsx'
 import Dashboard from '../../pages/DashboardPage.jsx'
@@ -11,7 +12,6 @@ import LearnPage from '../../pages/LearnPage.jsx'
 import RegisterPage from '../../pages/RegisterPage.jsx'
 import PasswordResetPage from '../../pages/PasswordResetPage.jsx'
 import VerifyEmailPage from '../../pages/VerifyEmailPage.jsx'
-import { ROUTES } from './routes.js'
 import LearningPathPage from '../../pages/LearningPathPage.jsx'
 
 const router = createBrowserRouter([
