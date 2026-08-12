@@ -3,7 +3,10 @@ import { Link } from 'react-router'
 import logo from '../../assets/logo.svg'
 import Button from './Button.jsx'
 
-const primaryLinks = [{ label: 'Home', href: '/' }]
+const primaryLinks = [
+  { label: 'Home', href: '/' },
+  { label: 'Learn', href: '/learn' },
+]
 
 export default function NavBar({
   signedIn = false,
@@ -78,12 +81,13 @@ export default function NavBar({
               <li>
                 <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
-                    {avatarLabel}
+                    <Link to="/profile">{avatarLabel}</Link>
                   </span>
                   <span className="text-sm font-semibold text-heading">{xp} XP</span>
                   <span className="text-sm text-neutral-600">{streak} day streak</span>
                 </div>
               </li>
+
               <li>
                 <Button
                   type="button"
