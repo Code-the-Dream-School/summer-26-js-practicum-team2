@@ -121,6 +121,10 @@ function LoginPage() {
       </header>
 
       <form
+        method="post"
+        action={ROUTES.LOGIN}
+        autoComplete="on"
+        noValidate
         onSubmit={handleSubmit}
         className="rounded-2xl border border-neutral-200 bg-surface-raised p-6 shadow-sm"
       >
@@ -135,6 +139,10 @@ function LoginPage() {
             error={fieldErrors.email}
             placeholder="you@example.com"
             disabled={isSubmitting}
+            autoComplete="username"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
             required
           />
           <Input
@@ -147,6 +155,7 @@ function LoginPage() {
             error={fieldErrors.password}
             placeholder="Your password"
             disabled={isSubmitting}
+            autoComplete="current-password"
             required
           />
         </div>
