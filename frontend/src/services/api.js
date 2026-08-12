@@ -75,8 +75,12 @@ export const getDashboard = () =>
     basePath: DASHBOARD_BASE_PATH,
   })
 
-export const trackDashboardEvent = ({ type, csrfToken, ...payload }) =>
-  apiRequest('/events', {
+export const notifyDashboardProgressChanged = () => {
+  window.dispatchEvent(new Event('sprout:progress-updated'))
+}
+
+export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
+  const response = await apiRequest('/events', {
     method: 'POST',
     csrfToken,
     body: {
@@ -85,3 +89,7 @@ export const trackDashboardEvent = ({ type, csrfToken, ...payload }) =>
     },
     basePath: DASHBOARD_BASE_PATH,
   })
+
+  notifyDashboardProgressChanged()
+  return response
+}
