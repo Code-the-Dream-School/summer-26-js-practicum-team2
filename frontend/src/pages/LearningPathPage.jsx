@@ -2,14 +2,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate, Navigate } from 'react-router'
 import { ROUTES } from '../app/router/routes.js'
 import useAuth from '../hooks/useAuth.js'
-import cashFlow from '../../../shared/content/budgeting.json'
+import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from '../hooks/useLessonContent.js'
+import { getLesson, getLessonProgress } from '../services/api.js'
 import LearningPathNode from '../components/learningPath/LearningPathNode'
 import Button from '../components/ui/Button'
 import Skeleton from '../components/ui/Skeleton'
-
-// We do not know the progress API endpoint yet.
-// Add it here when the backend route is ready.
-const PROGRESS_API_URL = null
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -27,58 +24,51 @@ function LearningPathPage() {
 
   const { isAuthenticated } = useAuth()
 
-  if (!isAuthenticated) {
-    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the Learning Page.
-    return <Navigate to={ROUTES.LOGIN} replace />
-  }
-
-  // Mock Progress
-  // This can be used until the backend progress endpoint is ready.
-  const mockProgress = {
-    currentModule: 'cashFlow',
-    currentLessonId: '1.2',
-    currentMicroLessonId: '1.2.3',
-  }
-
-  // Setting state for user progress
-  // For getting progress from backend
-  const [progress, setProgress] = useState(mockProgress)
+  const [progress, setProgress] = useState(null)
+  const [currentModule, setCurrentModule] = useState(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    // We do not know the API endpoint yet, so use mock progress for now.
-    if (!PROGRESS_API_URL) {
-      return
+    if (!isAuthenticated) {
+      return undefined
     }
 
-    fetch(PROGRESS_API_URL)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Could not load user progress')
+    let isActive = true
+
+    async function loadLearningPath() {
+      try {
+        // The saved progress tells us which module and lesson to load the content for.
+        const progressPayload = await getLessonProgress(DEFAULT_MODULE_ID)
+        const lessonPayload = await getLesson(
+          progressPayload.currentModule || DEFAULT_MODULE_ID,
+          progressPayload.currentLessonId || DEFAULT_LESSON_ID,
+        )
+
+        if (!isActive) {
+          return
         }
 
-        return response.json()
-      })
-      .then((data) => {
-        setProgress(data)
-      })
-      .catch((error) => {
-        console.error('Error loading progress:', error)
+        setProgress(progressPayload)
+        setCurrentModule(lessonPayload.moduleData)
+      } catch (requestError) {
+        if (!isActive) {
+          return
+        }
 
-        // Keep using mock progress if the request fails.
-        setProgress(mockProgress)
-      })
-  }, [])
+        setError(requestError.message || 'We could not load your learning path right now.')
+      }
+    }
 
-  // Use progress to determine which module to load
+    loadLearningPath()
 
-  // const currentModule = modules[progress.currentModule]
+    return () => {
+      isActive = false
+    }
+  }, [isAuthenticated])
 
-  // For now, we only have the Cash Flow module.
-  const currentModule = cashFlow
-
-  // Build path from current module
-  const learningPath = currentModule.lessons.flatMap((lesson) =>
-    lesson.microLessons.map((microLesson) => ({
+  // Build path from the module content returned by the API
+  const learningPath = (currentModule?.lessons ?? []).flatMap((lesson) =>
+    (lesson.microLessons ?? []).map((microLesson) => ({
       moduleId: currentModule.id,
 
       lessonId: lesson.id,
@@ -93,8 +83,22 @@ function LearningPathPage() {
     })),
   )
 
-  const currentIndex = learningPath.findIndex(
-    (node) => node.microLessonId === progress.currentMicroLessonId,
+  const completedMicroLessons = new Set(progress?.completedMicroLessons ?? [])
+
+  const savedIndex = learningPath.findIndex(
+    (node) => node.microLessonId === progress?.currentMicroLessonId,
+  )
+
+  // Micro-lessons without a quiz are never marked complete, so unlock the step right after the furthest completed one.
+  const lastCompletedIndex = learningPath.reduce(
+    (furthestIndex, node, index) =>
+      completedMicroLessons.has(node.microLessonId) ? index : furthestIndex,
+    -1,
+  )
+
+  const currentIndex = Math.min(
+    Math.max(savedIndex, lastCompletedIndex + 1),
+    learningPath.length - 1,
   )
 
   const currentNode = currentIndex >= 0 ? learningPath[currentIndex] : null
@@ -200,7 +204,20 @@ function LearningPathPage() {
     navigate(`/learn/${node.moduleId}/${node.lessonId}`)
   }
 
-  if (!progress) {
+  if (!isAuthenticated) {
+    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the Learning Page.
+    return <Navigate to={ROUTES.LOGIN} replace />
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16 text-center">
+        <p className="text-sm font-medium text-danger">{error}</p>
+      </div>
+    )
+  }
+
+  if (!progress || !currentModule) {
     return <Skeleton />
   }
 
@@ -289,7 +306,7 @@ function LearningPathPage() {
           {learningPath.map((node, index) => {
             let status = 'locked'
 
-            if (index < currentIndex) {
+            if (completedMicroLessons.has(node.microLessonId) || index < currentIndex) {
               status = 'completed'
             }
 
