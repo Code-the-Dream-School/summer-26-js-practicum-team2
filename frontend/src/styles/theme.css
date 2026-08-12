@@ -29,6 +29,10 @@
   --color-learning-path-button: #1c896f;
   --color-learning-path-button-hover: #18755f;
   --shadow-learning-path-button: 0 6px 14px rgba(18, 57, 49, 0.24);
+  --color-learning-path-callout-surface: #eafaf4;
+  --color-learning-path-callout-border: #a9e0cd;
+  --color-learning-path-callout-text: #14493d;
+  --shadow-learning-path-callout: 0 10px 20px rgba(20, 73, 61, 0.18);
   --color-shadow: rgba(0, 0, 0, 0.16);
 
   /* Status colors */
@@ -111,4 +115,19 @@
   --shadow-lg: 0 12px 24px rgb(17 24 39 / 12%);
 
   /* Default tailwind spacing can be used they are the same we dont need to add enything specific */
+}
+
+@keyframes callout-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-callout-pop {
+  animation: callout-pop 0.28s ease-out;
 }

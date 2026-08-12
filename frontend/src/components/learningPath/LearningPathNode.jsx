@@ -15,14 +15,20 @@ const LearningPathNode = forwardRef(
 
     return (
       <div ref={ref} style={style} className="absolute flex flex-col items-center">
-        {/* Callout message for the current node, displayed if showCallout is true */}
-        {/* Will prove useful during onboarding phase */}
+        {/* Callout message for the current node, shown only during onboarding for the very first step */}
         {showCallout ? (
-          <div className="absolute left-[-8.9rem] top-[4.35rem] w-[7.8rem] rounded-sm bg-[#dff0dc] px-2 py-1 text-[0.68rem] leading-4 text-[#263e39] shadow-[0_1px_1px_rgba(0,0,0,0.06)]">
-            This is where you will begin but move on as you complete the lesson!
-            <span className="absolute -right-2 top-[-0.05rem] h-px w-6 rotate-[34deg] bg-[#263e39]" />
+          <div
+            role="status"
+            className="animate-callout-pop absolute left-[-9.5rem] top-1/2 w-[8.2rem] -translate-y-1/2 rounded-xl border border-learning-path-callout-border bg-learning-path-callout-surface px-3 py-2 text-[0.7rem] font-medium leading-4 text-learning-path-callout-text shadow-[var(--shadow-learning-path-callout)]"
+          >
+            <span aria-hidden="true" className="mr-1">
+              👋
+            </span>
+            Start here, then move on as you complete each lesson!
+            <span className="absolute right-[-0.35rem] top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 border-r border-t border-learning-path-callout-border bg-learning-path-callout-surface" />
           </div>
         ) : null}
+
         {/*  Display a button that represents the node in the learning path */}
         <Button
           variant={variant}
