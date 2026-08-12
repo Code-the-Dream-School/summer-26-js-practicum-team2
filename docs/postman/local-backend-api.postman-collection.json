@@ -137,6 +137,10 @@
                   "  pm.expect(responseJson.user).to.be.an('object');",
                   "  pm.expect(responseJson.user.email).to.eql(pm.collectionVariables.get('testUserEmail'));",
                   "});",
+                  "if (responseJson?.user?.email) {",
+                  "  pm.collectionVariables.set('testUserEmail', responseJson.user.email);",
+                  "  pm.variables.set('testUserEmail', responseJson.user.email);",
+                  "}",
                   "const devVerification = responseJson?.devVerification || {};",
                   "const setVariable = (name, value) => {",
                   "  if (value === undefined || value === null || value === '') return;",
@@ -241,6 +245,22 @@
         {
           "name": "Login",
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const email = pm.collectionVariables.get('testUserEmail') || pm.variables.get('testUserEmail') || '';",
+                  "const password = pm.collectionVariables.get('testUserPassword') || pm.variables.get('testUserPassword') || '';",
+                  "if (!email) {",
+                  "  throw new Error('testUserEmail is empty. Run Register first.');",
+                  "}",
+                  "pm.variables.set('testUserEmail', email);",
+                  "pm.variables.set('testUserPassword', password);",
+                  "console.log('Using login email:', email);"
+                ],
+                "type": "text/javascript"
+              }
+            },
             {
               "listen": "test",
               "script": {
@@ -537,6 +557,295 @@
               "raw": "{{baseUrl}}/api/v1/users/reset-password",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "reset-password"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /dashboard returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Dashboard response includes expected sections', function () {",
+                  "  pm.expect(responseJson.hero).to.be.an('object');",
+                  "  pm.expect(responseJson.nextAction).to.be.an('object');",
+                  "  pm.expect(responseJson.units).to.be.an('array');",
+                  "  pm.expect(responseJson.recentActivity).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dashboard"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Track Dashboard Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /dashboard/events returns 202', function () {",
+                  "  pm.response.to.have.status(202);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Dashboard event confirms processing', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Dashboard event processed.');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"lesson_complete\",\n  \"lessonSlug\": \"cash-flow\",\n  \"lessonTitle\": \"What is Cash Flow and a Budget?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dashboard/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dashboard", "events"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "Get User Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /quizzes/progress returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Progress response is an object', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "progress"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz Attempts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /quizzes/attempts returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Attempts response is an array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/attempts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "attempts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /quizzes/start returns 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "let responseJson = pm.response.json();",
+                  "pm.test('Start quiz returns an attempt ID', function () {",
+                  "  pm.expect(responseJson.attemptId).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.collectionVariables.set('quizAttemptId', responseJson.attemptId);",
+                  "pm.variables.set('quizAttemptId', responseJson.attemptId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"moduleId\": \"cashFlow\",\n  \"microLessonId\": \"1.1.2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "start"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /quizzes/:id/submit returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = pm.response.json();",
+                  "pm.test('Quiz submission returns score and pass status', function () {",
+                  "  pm.expect(responseJson.score).to.be.a('number');",
+                  "  pm.expect(responseJson.passed).to.be.a('boolean');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"attemptId\": \"{{quizAttemptId}}\",\n  \"moduleId\": \"cashFlow\",\n  \"answers\": {\n    \"1.1.2-q2\": \"d\",\n    \"1.1.2-q3\": \"a\",\n    \"1.1.2-q4\": \"a\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/1.1.2/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "1.1.2", "submit"]
             }
           },
           "response": []
