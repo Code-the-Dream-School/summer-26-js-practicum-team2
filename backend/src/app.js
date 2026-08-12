@@ -61,9 +61,9 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/quizzes", quizRoutes);
 app.use("/api/v1/lessons", lessonRoutes);
-// Root route
+// Root route redirects user to the client
 app.get("/", (req, res) => {
-  res.send("Backend API is running");
+  res.redirect(process.env.CLIENT_URL);
 });
 app.use(errorHandlerMiddleware);
 
