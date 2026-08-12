@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, Navigate } from 'react-router'
+import { ROUTES } from '../app/router/routes.js'
+import useAuth from '../hooks/useAuth.js'
 import cashFlow from '../../../shared/content/budgeting.json'
 import LearningPathNode from '../components/learningPath/LearningPathNode'
 import Button from '../components/ui/Button'
@@ -22,6 +24,13 @@ function getMicroLessonPreview(content = []) {
 
 function LearningPathPage() {
   const navigate = useNavigate()
+
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the dashboard.
+    return <Navigate to={ROUTES.LOGIN} replace />
+  }
 
   // Mock Progress
   // This can be used until the backend progress endpoint is ready.

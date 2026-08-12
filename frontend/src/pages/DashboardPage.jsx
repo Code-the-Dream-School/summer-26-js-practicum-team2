@@ -1,4 +1,5 @@
-import { Link } from 'react-router'
+import { Link, Navigate } from 'react-router'
+import useAuth from '../hooks/useAuth.js'
 import DashboardHero from '../components/dashboard/DashboardHero.jsx'
 import RecentActivityCard from '../components/dashboard/RecentActivityCard.jsx'
 import UnitProgressRow from '../components/dashboard/UnitProgressRow.jsx'
@@ -7,7 +8,7 @@ import Card from '../components/ui/Card.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import Skeleton from '../components/ui/Skeleton.jsx'
 import { ROUTES } from '../app/router/routes.js'
-import useAuth from '../hooks/useAuth.js'
+
 import useDashboardData from '../hooks/useDashboardData.js'
 
 function DashboardSkeleton() {
@@ -32,18 +33,8 @@ function Dashboard() {
   })
 
   if (!isAuthenticated) {
-    return (
-      <EmptyState
-        icon="🔐"
-        title="Sign in to view your dashboard"
-        message="Track your progress, streaks, and next lesson after you sign in."
-        action={
-          <Button as={Link} to={ROUTES.LOGIN} variant="primary" className="px-5 py-2.5">
-            Go to sign in
-          </Button>
-        }
-      />
-    )
+    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the dashboard.
+    return <Navigate to={ROUTES.LOGIN} replace />
   }
 
   if (isLoading && !dashboard) {
