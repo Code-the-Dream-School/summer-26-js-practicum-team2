@@ -28,7 +28,7 @@ function LearningPathPage() {
   const { isAuthenticated } = useAuth()
 
   if (!isAuthenticated) {
-    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the dashboard.
+    // If the user is not authenticated, redirect them to the login page. This ensures that only authenticated users can access the Learning Page.
     return <Navigate to={ROUTES.LOGIN} replace />
   }
 
