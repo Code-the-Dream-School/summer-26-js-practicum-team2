@@ -6,18 +6,17 @@ const {
   startQuiz,
   submitQuiz,
 } = require("../controllers/quiz.controller");
-const jwtMiddleware = require("../middleware/jsonWebToken");
 
 //GET user progress from modules or specific module
-router.get("/progress", jwtMiddleware, getUserProgress);
+router.get("/progress", getUserProgress);
 
 //GET attempt hx for administrative analytics or user review
-router.get("/attempts", jwtMiddleware, getUserAttempts);
+router.get("/attempts", getUserAttempts);
 
 //start a new knowledge check
-router.post("/start", jwtMiddleware, startQuiz);
+router.post("/start", startQuiz);
 
 //Submit quiz and get score
-router.post("/:id/submit", jwtMiddleware, submitQuiz);
+router.post("/:id/submit", submitQuiz);
 
 module.exports = router;

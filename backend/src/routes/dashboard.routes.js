@@ -1,5 +1,4 @@
 const express = require("express");
-const jwtMiddleware = require("../middleware/jsonWebToken");
 const {
   getDashboard,
   trackDashboardEvent,
@@ -7,7 +6,7 @@ const {
 
 const router = express.Router();
 
-router.get("/", jwtMiddleware, getDashboard);
-router.post("/events", jwtMiddleware, trackDashboardEvent);
+router.get("/", getDashboard);
+router.post("/events", trackDashboardEvent);
 
 module.exports = router;

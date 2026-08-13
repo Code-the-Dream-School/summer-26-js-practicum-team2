@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 const {
   register,
   login,
@@ -8,7 +8,7 @@ const {
   forgotPassword,
   resetPassword,
 } = require("../controllers/user.controller");
-const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
+const router = express.Router();
 
 // POST /api/v1/users/register
 router.post("/register", registerLimiter, register);
@@ -18,9 +18,6 @@ router.get("/verify", verifyEmail);
 router.post("/login", loginLimiter, login);
 // POST /api/v1/users/logout
 router.post("/logout", logout);
-
-//forgot password and reset password
-
 // POST /api/v1/users/forgot-password
 router.post("/forgot-password", forgotPassword);
 // POST /api/v1/users/reset-password
