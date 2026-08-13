@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add content utility functions for managing modules and lessons
+- Add lesson routes and controller for lesson management
 
 ### Changed
 
