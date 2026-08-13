@@ -1,12 +1,13 @@
 const { StatusCodes } = require("http-status-codes");
 const rateLimiter = require("express-rate-limit"); //defend against dOS and brute-force
+const { ipKeyGenerator } = require("express-rate-limit");
 
 // user story 2.1 10 sign up rate limiter: 5 per IP per 10 minutes
 const registerLimiter = rateLimiter({
   windowMs: 10 * 60 * 1000, // 10 minutes
   limit: 5,
   standardHeaders: true, //return rate limit info in Ratelimit headers
-  legacyHeaders: false, 
+  legacyHeaders: false,
   message: {
     message:
       "Too many registering attempts from this IP, please retry after 10 minutes.",
@@ -17,9 +18,11 @@ const registerLimiter = rateLimiter({
 const loginLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 5,
-  skipSuccessfulRequests: true, 
+  skipSuccessfulRequests: true,
   keyGenerator: (req) => {
-    return req.body?.email ? req.body.email.toLowerCase() : req.ip;
+    return req.body?.email
+      ? req.body.email.toLowerCase()
+      : ipKeyGenerator(req.ip);
   },
   standardHeaders: true, //return rate limit info in Ratelimit headers
   legacyHeaders: false, //disable X-Rate limit

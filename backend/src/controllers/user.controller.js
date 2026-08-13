@@ -9,6 +9,8 @@ const {
   registerSchema,
   loginSchema,
 } = require("../validation/userValidation.js");
+const JWT_SECRET =
+  process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 
@@ -17,6 +19,7 @@ const getCookieOptions = (req, maxAge) => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === "production", // only when HTTPS is available
   sameSite: "lax",
+  path: "/",
   maxAge,
 });
 
@@ -151,7 +154,7 @@ const login = async (req, res, next) => {
     const csrfToken = crypto.randomUUID();
     const token = jwt.sign(
       { id: user._id, role: user.role, csrfToken },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: tokenExpiry },
     );
     // HttpOnly session cookies
@@ -182,8 +185,16 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res) => {
   const { maxAge, ...cookieOptions } = getCookieOptions(req);
+  const hasSessionCookie = Boolean(req.cookies?.session_token);
   res.clearCookie("session_token", cookieOptions);
-  return res.status(StatusCodes.NO_CONTENT).send();
+
+  if (!hasSessionCookie) {
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: "No user is authenticated." });
+  }
+
+  return res.status(StatusCodes.OK).json({ message: "Logout successful." });
 };
 
 // GET/ Verify -email
@@ -211,9 +222,36 @@ const verifyEmail = async (req, res, next) => {
     user.verification_token_expires_at = undefined;
     await user.save();
 
-    return res
-      .status(StatusCodes.OK)
-      .json({ message: "Verified email. Continue Login" });
+    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+    const csrfToken = crypto.randomUUID();
+    const sessionToken = jwt.sign(
+      { id: user._id, role: user.role, csrfToken },
+      JWT_SECRET,
+      { expiresIn: "14d" },
+    );
+
+    res.cookie(
+      "session_token",
+      sessionToken,
+      getCookieOptions(req, FOURTEEN_DAYS),
+    );
+
+    req.app.emit?.("login_success", {
+      userId: user._id,
+      email: user.email,
+      ip: req.ip,
+    });
+
+    return res.status(StatusCodes.OK).json({
+      message: "Email verified successfully. You are now signed in.",
+      csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
     return next(err);
   }
@@ -290,9 +328,30 @@ const resetPassword = async (req, res, next) => {
     user.password_reset_expires_at = undefined;
     await user.save();
 
-    return res
-      .status(StatusCodes.OK)
-      .json({ message: "Password is reset. Log in with your new password." });
+    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+    const csrfToken = crypto.randomUUID();
+    const sessionToken = jwt.sign(
+      { id: user._id, role: user.role, csrfToken },
+      JWT_SECRET,
+      { expiresIn: "14d" },
+    );
+
+    res.cookie(
+      "session_token",
+      sessionToken,
+      getCookieOptions(req, FOURTEEN_DAYS),
+    );
+
+    return res.status(StatusCodes.OK).json({
+      message: "Password reset successful. You are now signed in.",
+      csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
     return next(err);
   }
