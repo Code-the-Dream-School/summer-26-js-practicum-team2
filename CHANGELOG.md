@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.0.4]
+
+### Added
+- Cherry-picks commits from feature branches to keep contributions from team to this point
+
+### Changed
+
+- Temporarily removes features breaking code without supporting dependent files
+
 ## [0.0.3]
 
 ### Added

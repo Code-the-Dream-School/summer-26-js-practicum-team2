@@ -63,12 +63,13 @@ app.use(limiter);
 app.use(errorHandlerMiddleware);
 
 // Routes
-app.use('/api/hello', helloRoutes);
-app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/dashboard", dashboardRoutes);
-app.use("/api/v1/quizzes", quizRoutes);
+app.use("/api/hello", helloRoutes);
+// TEMP disabled: app.use("/api/v1/users", userRoutes);
+// TEMP disabled: app.use("/api/v1/dashboard", dashboardRoutes);
+// TEMP disabled: app.use("/api/v1/quizzes", quizRoutes);
 // Root route
 app.get("/", (req, res) => {
+  // Redirect to the frontend application
   res.redirect(process.env.CLIENT_URL);
 });
 app.use(errorHandlerMiddleware);
