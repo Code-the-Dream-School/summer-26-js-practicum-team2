@@ -22,8 +22,8 @@ quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
   );
 });
 
-const QuizAttempt = require("../models/QuizAttempt");
-const UserProgress = require("../models/UserProgress");
+const QuizAttempt = require("../models/QuizAttempt.model");
+const UserProgress = require("../models/UserProgress.model");
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
