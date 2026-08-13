@@ -1,27 +1,43 @@
-const nodemailer = require("nodemailer");
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const BREVO_URL =
+  process.env.BREVO_API_URL || "https://api.brevo.com/v3/smtp/email";
+
 const sendVerificationEmail = async (to, subject, text, html) => {
-  try {
-    const mailChoices = {
-      from: process.env.FROM_EMAIL,
-      to,
-      subject,
-      text,
-      html,
-    };
-    //Send eamil with transporter
-    const info = await transporter.sendMail(mailChoices);
-    return info;
-  } catch (err) {
-    console.error("FAILED TO SEND EMAIL:", err);
-    throw err;
+  const apiKey = process.env.BREVO_API_KEY;
+  const fromEmail = process.env.FROM_EMAIL || "sprout@example.com";
+  const fromName = process.env.FROM_NAME || "Sprout";
+
+  if (!apiKey) {
+    if (process.env.NODE_ENV !== "test") {
+      console.log(`[email:dev] ${subject} -> ${to}\n${text}`);
+    }
+    return { skipped: true };
   }
+
+  const response = await fetch(BREVO_URL, {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+      accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: { email: fromEmail, name: fromName },
+      to: [{ email: to }],
+      subject,
+      textContent: text,
+      htmlContent: html,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    const error = new Error(
+      `Brevo request failed (${response.status}): ${body}`,
+    );
+    error.code = response.status;
+    throw error;
+  }
+
+  return response.json();
 };
 module.exports = { sendVerificationEmail };
