@@ -10,6 +10,7 @@ const errorHandlerMiddleware = require("./middleware/errorHandler");
 
 // Route imports
 const helloRoutes = require("./routes/hello.routes");
+const userRoutes = require("./routes/user.routes");
 
 // Create Express app
 const app = express();
@@ -64,7 +65,7 @@ app.use(errorHandlerMiddleware);
 
 // Routes
 app.use("/api/hello", helloRoutes);
-// TEMP disabled: app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/users", userRoutes);
 // TEMP disabled: app.use("/api/v1/dashboard", dashboardRoutes);
 // TEMP disabled: app.use("/api/v1/quizzes", quizRoutes);
 // Root route
