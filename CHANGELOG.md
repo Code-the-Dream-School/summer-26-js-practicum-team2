@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.0.6]
+
+### Changed
+
+-  Trimmed manifest.json to the one module that actually ships lessons
+
+---
+
 ## [0.0.5]
 
 ### Added
