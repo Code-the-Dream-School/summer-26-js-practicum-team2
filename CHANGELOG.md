@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Session cookies are now scoped to the application root so that authenticated users can access all rotected routes
 - Users sign in automatically after email verification and password reset, which returns a CSRF token
 - Logging out successfully returns a message indicating, and if a user is not logged in, returns a message stating a user is not logged in
+- Upgraded the backend test runner to Jest 30
+- Approved required install scripts for `mongodb-memory-server` and Jest's `unrs-resolver` dependency
 
 ### Added
 
@@ -27,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Implement an IPv6-safe login limiter fallback to satisfy tests
+- Replaced deprecated transitive `glob` and `test-exclude` versions with maintained releases
 
 ---
 
