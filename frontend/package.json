@@ -1,7 +1,6 @@
 {
   "name": "sprout-frontend",
   "version": "0.0.0",
-<<<<<<< HEAD
   "description": "This is the frontend code for a financial literacy app created for Code the Dream's Summer Practicum 2026",
   "keywords": [
     "frontend",
@@ -26,8 +25,6 @@
   },
   "license": "ISC",
   "author": "kwishart24,berenicerojas,BytesOfStrength,mnichols08",
-  "type": "module"
-=======
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -59,5 +56,4 @@
     "prettier": "3.9.6",
     "vite": "^8.1.5"
   }
->>>>>>> 4aa40eb (Created a top level Frontend architecture)
 }
