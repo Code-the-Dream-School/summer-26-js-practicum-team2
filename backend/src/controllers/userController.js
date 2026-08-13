@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
 const { sendVerificationEmail } = require("../utils/sendEmail");
 //User is capitalized because it represents a model which is a collection of items for the database
-const User = require("../models/user.js");
+const { User, ArchivedUser } = require("../models/user.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { registerSchema, loginSchema } = require("../validation/userValidation");
 const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
@@ -136,8 +136,46 @@ const register = async (req, res, next) => {
     return next(err);
   }
 };
-//user story 2.1.8 - Login
+//POST reaactivate route /api/v1/users/reactivate
+const reactivate = async( req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(StatusCodes.BAD_REQUEST).json({message: "Email and password are needed."});
+    }
+    const user = await User.findOne({email});
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({message: "Email or password is incorrect."});
+    }
+    const isMatch = await comparePassword(password, user.password_hash);
+    if(!isMatch){
+      return res.status(StatusCodes.UNAUTHORIZED).json({message: "Email or password is incorrect."});
+    }
+    if (!user.is_deleted) {
+      return res.status(StatusCodes.BAD_REQUEST).json({message: "Account is active."});
+    }
+    //check if request is made within 30 day period to reactivate deleted account
+    const monthExpired = 30 * 24 * 3600 * 1000;
+    const timeSinceDeletedAcct = user.deleted_at ? Date.now() - new Date(user.deleted_at).getTime() : 0;
+    if (timeSinceDeletedAcct > monthExpired) {
+      return res.status(StatusCodes.GONE).json({message: "Reactivation period has closed." });
+    }
+    //Restore user state of not deleted account
+    user.is_deleted = false;
+    user.deleted_at = null;
+    user.token_version = (user.token_version || 0) + 1;
+    await user.save90;
 
+    //remove ArchivedUser information 
+    if(ArchivedUser) {
+      await ArchivedUser.deleteOne({original_user_id: user._id });
+    }
+    return res.status(StatusCodes.OK).json({message: "Account is reactivated. Please log in."});
+  }catch (error) {
+    return next(error);
+  }
+}
+//user story 2.1.8 - Login
 //POST /api/v1/users/login
 const login = async (req, res, next) => {
   try {
@@ -160,6 +198,7 @@ const login = async (req, res, next) => {
         ip: req.ip,
         reason: user?.is_deleted ? "account_deleted" : "user_not_found",
       });
+      
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "Invalid email or password." });
@@ -442,6 +481,7 @@ const resetPassword = async (req, res, next) => {
 
 module.exports = {
   register,
+  reactivate,
   login,
   logout,
   verifyEmail,

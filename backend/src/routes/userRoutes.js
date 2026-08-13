@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   register,
   login,
+  reactivate,
   logout,
   verifyEmail,
   forgotPassword,
@@ -15,6 +16,8 @@ const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 router.post("/register", registerLimiter, register);
 // GET/ verify ? token = (new endpoint for email verification link clicks)
 router.get("/verify", verifyEmail);
+// POST /api/v1/users/reactivate
+router.post("/reactivate", reactivate);
 // POST /api/v1/users/login
 router.post("/login", loginLimiter, login);
 // POST /api/v1/users/logout
