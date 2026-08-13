@@ -1,6 +1,6 @@
 {
   "name": "sprout",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "Sprout — a financial literacy learning app built for Code the Dream Summer 2026 Practicum. Full-stack Node + React MVP.",
   "type": "commonjs",
