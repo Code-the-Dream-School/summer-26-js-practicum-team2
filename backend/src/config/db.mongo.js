@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const mongoUri =
   process.env.MONGO_URI ||
-  "mongodb://localhost:27017/summer-26-js-practicum-team2";
+  "mongodb://127.0.0.1:27017/summer-26-js-practicum-team2";
 
 const connectMongo = async () => {
   try {

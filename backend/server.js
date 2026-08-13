@@ -22,6 +22,7 @@ const startServer = async () => {
     console.error("Failed to connect to MongoDB:", err.message);
     process.exit(1);
   });
+
   app.listen(PORT, () => {
     console.log(`Sprout API listening on http://localhost:${PORT}`);
   });
