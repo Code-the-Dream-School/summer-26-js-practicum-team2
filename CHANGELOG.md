@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased]
+## [0.0.3]
 
 ### Added
 
 - Install dependencies and write scripts for backend
 - Configure Express App with middleware and a simple hello route
+- Add server and MongoDB connection setup
 
 ---
 
