@@ -5,8 +5,8 @@ const {
   getUserAttempts,
   startQuiz,
   submitQuiz,
-} = require("../controllers/quizController");
-const jwtMiddleware = require("../middleware/jwtMiddleware");
+} = require("../controllers/quiz.controller");
+const jwtMiddleware = require("../middleware/jsonWebToken");
 
 //GET user progress from modules or specific module
 router.get("/progress", jwtMiddleware, getUserProgress);

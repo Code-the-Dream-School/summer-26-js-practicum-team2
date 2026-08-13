@@ -7,8 +7,8 @@ const {
   verifyEmail,
   forgotPassword,
   resetPassword,
-} = require("../controllers/userController");
-const jwtMiddleware = require("../middleware/jwtMiddleware");
+} = require("../controllers/user.controller");
+const jwtMiddleware = require("../middleware/jsonWebToken");
 const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 
 // POST /api/v1/users/register

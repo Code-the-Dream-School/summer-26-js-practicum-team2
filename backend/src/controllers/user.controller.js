@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
-const { sendVerificationEmail } = require("../utils/sendEmail");
+const { sendVerificationEmail } = require("../utils/sendEmail.js");
 //User is capitalized because it represents a model which is a collection of items forthe database
-const User = require("../models/user.js");
+const User = require("../models/User.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
-const { registerSchema, loginSchema } = require("../validation/userValidation");
+const { registerSchema, loginSchema } = require("../validation/userValidation.js");
 
 //we want  sameSite cookies to be lax as per userStory 2.1
 const getCookieOptions = (req, maxAge) => ({

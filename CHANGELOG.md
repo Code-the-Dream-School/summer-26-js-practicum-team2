@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.0.5]
+
+### Added
+
+- Add completed_micro_lessons to UserProgress Schema
+
+### Changed
+- Rename controllers, routes, and model files for consistency
+
+---
+
 ## [0.0.4]
 
 ### Added
@@ -17,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Temporarily removes features breaking code without supporting dependent files
+
+---
 
 ## [0.0.3]
 
