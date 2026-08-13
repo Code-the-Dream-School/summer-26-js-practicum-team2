@@ -1,0 +1,26 @@
+{
+  "name": "sprout-backend",
+  "version": "0.0.0",
+  "description": "This is the backend code for a financial literacy app created for Code the Dream's Summer Practicum 2026",
+  "keywords": [
+    "backend",
+    "mongodb",
+    "cloud",
+    "financial-literacy",
+    "collab",
+    "team",
+    "group"
+  ],
+  "homepage": "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2#readme",
+  "bugs": {
+    "url": "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2.git"
+  },
+  "license": "ISC",
+  "author": "kwishart24,berenicerojas,BytesOfStrength,mnichols08",
+  "main": "server.js",
+  "type": "commonjs"
+}
