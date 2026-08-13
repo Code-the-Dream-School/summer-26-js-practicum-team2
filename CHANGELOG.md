@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.1.1]
+
+### Added
+
+- Added JSON 404 responses for unknown API routes
+- Added error-handler middleware test coverage
+
+### Changed
+
+- Moved error handling middleware to run after all routes
+
+---
+
 ## [0.1.0]
 
 ### Changed
