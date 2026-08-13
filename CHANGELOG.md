@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased]
+## [0.1.0]
 
 ### Changed
 
@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Session cookies are now scoped to the application root so that authenticated users can access all rotected routes
 - Users sign in automatically after email verification and password reset, which returns a CSRF token
 - Logging out successfully returns a message indicating, and if a user is not logged in, returns a message stating a user is not logged in
+
+### Added
+
+- Added a `npm test` command for the backend using Jest and Supertest
+- Added isolated in-memory MongoDB setup and cleanup for backend integration tests
+- Added integration coverage for registration, login, logout, password-reset sessions, and protected lesson retrieval
 
 ### Fixed
 
