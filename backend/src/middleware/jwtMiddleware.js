@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
-const User = require("../models/user.js");
+const { User } = require("../models/user.js");
 const send401 = (res) => {
   return res
     .status(StatusCodes.UNAUTHORIZED)

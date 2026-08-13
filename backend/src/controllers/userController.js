@@ -164,7 +164,7 @@ const reactivate = async( req, res, next) => {
     user.is_deleted = false;
     user.deleted_at = null;
     user.token_version = (user.token_version || 0) + 1;
-    await user.save90;
+    await user.save();
 
     //remove ArchivedUser information 
     if(ArchivedUser) {
