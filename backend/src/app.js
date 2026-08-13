@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 
 // Middleware imports
 const errorHandlerMiddleware = require("./middleware/errorHandler");
+const notFoundMiddleware = require("./middleware/notFound");
 
 // Route imports
 const helloRoutes = require("./routes/hello.routes");
@@ -56,7 +57,7 @@ const corsOptions = {
 // Configure Morgan based on environment
 const morganConfig = process.env.NODE_ENV === "production" ? "combined" : "dev";
 
-// Middleware
+// Top-level middleware
 app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -64,7 +65,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan(morganConfig));
 app.use(limiter);
-app.use(errorHandlerMiddleware);
 
 // Routes
 app.use("/api/hello", helloRoutes);
@@ -77,6 +77,10 @@ app.get("/", (req, res) => {
   // Redirect to the frontend application
   res.redirect(process.env.CLIENT_URL);
 });
+
+// Error Handling Middleware
+app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
+
 
 module.exports = app;
