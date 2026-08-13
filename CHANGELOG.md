@@ -9,12 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.1.3]
+
+### Added
+
+- Added Postman collection and environment files for local backend API testing
+
+---
+
 ## [0.1.2]
 
 ### Added
 
 - Added test coverage for registration rate limiting, and public registration access
 - Added authentication boundary coverage for protected route groups
+- Add Postman collection and environment files for local backend API testing
 
 ### Changed
 
