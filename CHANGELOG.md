@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added dashboard cache invalidation on quiz submission
 - Added shared learning-path helpers
+- Added dashboard assembly for hero copy, next action, unit progress, recent activity, and passed-attempt reconciliation
+- Added POST /api/v1/dashboard/events; unknown event types are accepted and ignored
+- Enabled /api/v1/dashboard and /api/v1/quizzes routes
 
 ### Fixed
 
