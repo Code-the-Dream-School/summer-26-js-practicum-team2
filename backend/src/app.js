@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 
 // Middleware imports
+const jwtMiddleware = require("./middleware/jsonWebToken");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const notFoundMiddleware = require("./middleware/notFound");
 
@@ -69,9 +70,9 @@ app.use(limiter);
 // Routes
 app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/lessons", lessonRoutes);
-app.use("/api/v1/dashboard", dashboardRoutes);
-app.use("/api/v1/quizzes", quizRoutes);
+app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
+app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
+app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application

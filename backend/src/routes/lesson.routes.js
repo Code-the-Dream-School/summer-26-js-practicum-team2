@@ -1,5 +1,4 @@
 const express = require("express");
-const jwtMiddleware = require("../middleware/jsonWebToken");
 const {
   getLesson,
   getLessonProgress,
@@ -9,13 +8,13 @@ const {
 const router = express.Router();
 
 // GET /api/v1/lessons/progress?moduleId=...
-router.get("/progress", jwtMiddleware, getLessonProgress);
+router.get("/progress", getLessonProgress);
 
 // PATCH /api/v1/lessons/progress
-router.patch("/progress", jwtMiddleware, updateLessonProgress);
+router.patch("/progress", updateLessonProgress);
 
 // Declared last so "/progress" is not swallowed by the :moduleId param.
 // GET /api/v1/lessons/:moduleId/:lessonId
-router.get("/:moduleId/:lessonId", jwtMiddleware, getLesson);
+router.get("/:moduleId/:lessonId", getLesson);
 
 module.exports = router;
