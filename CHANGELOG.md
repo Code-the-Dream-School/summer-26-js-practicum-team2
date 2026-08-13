@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.1.2]
+
+### Added
+
+- Added test coverage for registration rate limiting, and public registration access
+- Added authentication boundary coverage for protected route groups
+
+### Changed
+
+- Moved JWT authentication from individual endpoints to the lesson, dashboard, and quiz route groups
+
+---
+
 ## [0.1.1]
 
 ### Added
