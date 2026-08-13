@@ -16,7 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add completed_micro_lessons to UserProgress Schema
 
 ### Changed
+
 - Rename controllers, routes, and model files for consistency
+- Replaced SMTP with Brevo and a development logging fallback
 
 ---
 
