@@ -12,6 +12,8 @@ const errorHandlerMiddleware = require("./middleware/errorHandler");
 const helloRoutes = require("./routes/hello.routes");
 const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
+const dashboardRoutes = require("./routes/dashboard.routes");
+const quizRoutes = require("./routes/quiz.routes");
 
 // Create Express app
 const app = express();
@@ -68,8 +70,8 @@ app.use(errorHandlerMiddleware);
 app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", lessonRoutes);
-// TEMP disabled: app.use("/api/v1/dashboard", dashboardRoutes);
-// TEMP disabled: app.use("/api/v1/quizzes", quizRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/quizzes", quizRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application
