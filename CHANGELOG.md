@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 -  Trimmed manifest.json to the one module that actually ships lessons
+- In shared/content/index.js, exports mudules map and utility functions
 
 ---
 
