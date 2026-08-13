@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Changed
+
+- Handle JWT secrets more efficiently and allow authenticated API requests using either a session cookie or Bearer token
+- Session cookies are now scoped to the application root so that authenticated users can access all rotected routes
+- Users sign in automatically after email verification and password reset, which returns a CSRF token
+- Logging out successfully returns a message indicating, and if a user is not logged in, returns a message stating a user is not logged in
+
+### Fixed
+
+- Implement an IPv6-safe login limiter fallback to satisfy tests
+
+---
+
 ## [0.0.7]
 
 ### Added
@@ -34,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--  Trimmed manifest.json to the one module that actually ships lessons
+- Trimmed manifest.json to the one module that actually ships lessons
 - In shared/content/index.js, exports mudules map and utility functions
 
 ---
@@ -59,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.4]
 
 ### Added
+
 - Cherry-picks commits from feature branches to keep contributions from team to this point
 
 ### Changed

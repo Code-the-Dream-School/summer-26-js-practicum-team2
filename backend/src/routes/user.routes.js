@@ -8,7 +8,6 @@ const {
   forgotPassword,
   resetPassword,
 } = require("../controllers/user.controller");
-const jwtMiddleware = require("../middleware/jsonWebToken");
 const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 
 // POST /api/v1/users/register
@@ -18,7 +17,7 @@ router.get("/verify", verifyEmail);
 // POST /api/v1/users/login
 router.post("/login", loginLimiter, login);
 // POST /api/v1/users/logout
-router.post("/logout", jwtMiddleware, logout);
+router.post("/logout", logout);
 
 //forgot password and reset password
 
