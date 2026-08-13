@@ -1,0 +1,23 @@
+{
+  "name": "sprout",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Sprout — a financial literacy learning app built for Code the Dream Summer 2026 Practicum. Full-stack Node + React MVP.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "setup": "npm i && npm --prefix backend i && npm --prefix frontend i",
+    "predev": "npx --yes kill-port 8080 5173",
+    "dev": "concurrently --kill-others --names \"backend,frontend\" --prefix-colors \"blue,magenta\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "lint": "npm --prefix frontend run lint",
+    "test": "npm --prefix backend test",
+    "start:backend": "npm --prefix backend start",
+    "build:frontend": "npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "kill-port": "^2.0.1"
+  }
+}
