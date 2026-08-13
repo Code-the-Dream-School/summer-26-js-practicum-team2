@@ -24,6 +24,7 @@ quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
 
 const QuizAttempt = require("../models/QuizAttempt.model");
 const UserProgress = require("../models/UserProgress.model");
+const { invalidateDashboardCache } = require("./dashboard.controller");
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
@@ -31,7 +32,7 @@ const { STATUS_CODES } = require("http");
 
 //Contnent registery mapping manifest module IDs to JSON content files
 const moduleList = {
-  cashFlow: require("../../shared/content/budgeting.json"),
+  cashFlow: require("../../../shared/content/budgeting.json"),
   //savings: require("../../shared/content/savings.json"),
   //credit: require("../../shared/content/credit.json"),
   //debt: require("../../shared/content/debt.json"),
@@ -302,6 +303,7 @@ exports.submitQuiz = async (req, res, next) => {
         );
       }
     }
+    invalidateDashboardCache(userId);
     return res.status(StatusCodes.OK).json({
       score: attempt.score,
       passed: attempt.passed,

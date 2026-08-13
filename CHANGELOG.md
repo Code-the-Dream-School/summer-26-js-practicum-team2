@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.0.7]
+
+### Added
+
+- Added dashboard cache invalidation on quiz submission
+
+### Fixed
+
+- Fix module path for budgeting content
+
+---
+
 ## [0.0.6]
 
 ### Added
