@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add completed_micro_lessons to UserProgress Schema
+- Added robust scrypt password hashing/comparison.
 
 ### Changed
 
