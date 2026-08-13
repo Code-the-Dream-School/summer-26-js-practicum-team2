@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
 const send401 = (res) => {
   return res
     .status(StatusCodes.UNAUTHORIZED)
@@ -12,19 +14,28 @@ module.exports = (req, res, next) => {
   if (!token) {
     return send401(res);
   }
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return send401(res);
-    }
-    req.user = { id: decoded.id, role: decoded.role };
-    // this is where the id is kept for subsequent use in access control.
-    if (["POST", "PATCH", "PUT", "DELETE", "CONNECT"].includes(req.method)) {
-      // for these operations we have to check for cross site request forgery
-      const csrfHeader = req.get("X-CSRF-TOKEN") || req.get("x-csrf-token");
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+      csrfToken: decoded.csrfToken,
+    };
+
+    if (
+      process.env.NODE_ENV === "production" &&
+      !SAFE_METHODS.has(req.method)
+    ) {
+      const csrfHeader = req.get("x-csrf-token");
       if (!csrfHeader || csrfHeader !== decoded.csrfToken) {
-        return send401(res);
+        return res
+          .status(StatusCodes.FORBIDDEN)
+          .json({ message: "Invalid CSRF token." });
       }
     }
+
     return next();
-  });
+  } catch {
+    return send401(res);
+  }
 };
