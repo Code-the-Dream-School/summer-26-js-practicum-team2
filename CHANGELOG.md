@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added logo, progress-bar, flower-progress, right, and wrong answer SVG images
 - Added useFieldA11y hook for accessible form field management
 - Added Footer and Header components with navigation links
+- Added mock implementations for HTMLDialogElement methods in setupTests
 
 ### Changed
 
