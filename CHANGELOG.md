@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added useLessonContent hook for lesson data fetching and state management
 
+### Changed
+
+- Moved lesson components into features and adds component suffix
+
 ---
 
 ## [0.2.5]
