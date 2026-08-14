@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Moved lesson components into features and adds component suffix
+- Refactored LearnPage to integrate lesson flow and progress tracking
 
 ### Fixed
 
