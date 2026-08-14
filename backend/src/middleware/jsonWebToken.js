@@ -17,6 +17,7 @@ module.exports = (req, res, next) => {
   const headerToken = authorization.startsWith("Bearer ")
     ? authorization.slice(7)
     : null;
+  const usedCookieAuth = Boolean(cookieToken);
   const token = cookieToken || headerToken;
   if (!token) {
     return send401(res);
@@ -29,10 +30,7 @@ module.exports = (req, res, next) => {
       csrfToken: decoded.csrfToken,
     };
 
-    if (
-      process.env.NODE_ENV === "production" &&
-      !SAFE_METHODS.has(req.method)
-    ) {
+    if (usedCookieAuth && !SAFE_METHODS.has(req.method)) {
       const csrfHeader = req.get("x-csrf-token");
       if (!csrfHeader || csrfHeader !== decoded.csrfToken) {
         return res

@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Postman collection and environment files for local backend API testing
 - Added instructions within `.env.example` to generate a proper JWT token for use in production
 
+### Changed
+
+- Refactor JWT middleware to simplify CSRF token validation logic
+
 ### Fixed
 
 - Prevent server from running in production without a JWT_SECRET
