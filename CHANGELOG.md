@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added QuizComponent for interactive quiz functionality
 - Added unit tests for quizReducer functionality
 - Added tests for QuizComponent functionality
+- Added tests for quiz scoring and normalization functions
 
 ---
 
