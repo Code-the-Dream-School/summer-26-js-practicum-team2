@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added auth reducer with action types and initial state
 - Added tests for authReducer functionality
 - Implement authentication context and provider
+- Update environment configuration and API paths
+- Add lesson and quiz endpoints
 
 ### Changed
 
-- Update environment configuration and API paths
 - Refactor useAuth hook to improve authentication state management and storage handling
 - Disable react-refresh rule for context files
 - Wrap AppRouter with AuthProvider for authentication context
