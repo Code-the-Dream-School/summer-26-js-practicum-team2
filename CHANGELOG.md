@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added useLessonContent hook for lesson data fetching and state management
 - Added normalization functions for lesson content and questions
+- Added lesson cash flow JSON fixture for budgeting module
+- Added tests for LessonRenderer component to verify content rendering and reference resolution
+- Added tests for useLessonContent hook to verify lesson loading and error handling
+- Added tests for normalizeLesson utility functions
 
 ### Changed
 
