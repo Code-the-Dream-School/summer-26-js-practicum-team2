@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor App component to set document title based on route
 - Refactor AppRouter to use Routes as taught in curriculum
 - Rename LessonPage to LearnPage
+- Refactor HomePage and LearningPathPage to use named exports
 
 ---
 

@@ -6,7 +6,7 @@ import LearningPathNode from "../components/learningPath/LearningPathNode";
 import Card from "../shared/Card/Card.component";
 // import LessonCard from '../components/layout/LessonCard'
 
-function LearningPathPage() {
+export default function LearningPathPage() {
   //Mock Progress
   const progress = {
     currentModule: "cashFlow",
@@ -147,4 +147,3 @@ function LearningPathPage() {
   );
 }
 
-export default LearningPathPage;
