@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Postman collection and environment files for local backend API testing
 - Added instructions within `.env.example` to generate a proper JWT token for use in production
-- Added ESLint and Prettier configuration for code formatting and linting backend code
+- Added ESLint and Prettier configuration for code formatting and linting
 
 ### Changed
 
