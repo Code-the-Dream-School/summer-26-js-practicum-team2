@@ -1,11 +1,11 @@
-import Paragraph from "./Paragraph";
-import CharacterIntro from "./CharacterIntro";
-import Formula from "./Formula";
-import Callout from "./Callout";
-import UnorderedList from "./UnorderedList";
-import KnowledgeCheck from "./KnowledgeCheck";
-import Table from "./Table";
-import BudgetSummary from "./BudgetSummary";
+import Paragraph from "./Paragraph/Paragraph.component";
+import CharacterIntro from "./CharacterIntro/CharacterIntro.component";
+import Formula from "./Formula/Formula.component";
+import Callout from "./Callout/Callout.component";
+import UnorderedList from "./UnorderedList/UnorderedList.component";
+import KnowledgeCheck from "./KnowledgeCheck/KnowledgeCheck.component";
+import Table from "./Table/Table.component";
+import BudgetSummary from "./BudgetSummary/BudgetSummary.component";
 
 function LessonRenderer({ content, module }) {
   if (!content) {
