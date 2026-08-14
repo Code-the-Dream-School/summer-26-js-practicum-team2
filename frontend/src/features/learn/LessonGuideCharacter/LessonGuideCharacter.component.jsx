@@ -1,27 +1,27 @@
-import abigailImg from '../../assets/abigail.webp'
-import dabbingBeaverImg from '../../assets/dabbingBeaver.svg'
-import ramonaImg from '../../assets/ramona.webp'
+import abigailImg from "../../assets/abigail.webp";
+import dabbingBeaverImg from "../../assets/dabbingBeaver.svg";
+import ramonaImg from "../../assets/ramona.webp";
 
 const GUIDE_VARIANTS = {
   beaver: {
     image: dabbingBeaverImg,
-    alt: 'Sprout lesson guide',
+    alt: "Sprout lesson guide",
   },
   abigail: {
     image: abigailImg,
-    alt: 'Abigail',
+    alt: "Abigail",
   },
   ramona: {
     image: ramonaImg,
-    alt: 'Ramona',
+    alt: "Ramona",
   },
-}
+};
 
-function LessonGuideCharacter({ variant = 'beaver', imageSrc, imageAlt, bubbleText, children }) {
+function LessonGuideCharacter({ variant = "beaver", imageSrc, imageAlt, bubbleText, children }) {
   // Determine the selected variant and resolve the image and alt text based on the provided props or defaults
-  const selectedVariant = GUIDE_VARIANTS[variant] ?? GUIDE_VARIANTS.beaver
-  const resolvedImage = imageSrc ?? selectedVariant.image
-  const resolvedAlt = imageAlt ?? selectedVariant.alt
+  const selectedVariant = GUIDE_VARIANTS[variant] ?? GUIDE_VARIANTS.beaver;
+  const resolvedImage = imageSrc ?? selectedVariant.image;
+  const resolvedAlt = imageAlt ?? selectedVariant.alt;
   // Render the lesson guide character with the provided bubble text and children content
   return (
     <div className="mx-auto max-w-xl">
@@ -36,7 +36,7 @@ function LessonGuideCharacter({ variant = 'beaver', imageSrc, imageAlt, bubbleTe
         {bubbleText ? (
           <p className="relative mb-4 font-heading text-lg font-bold text-primary">{bubbleText}</p>
         ) : null}
-    
+
         <div className="relative space-y-4">{children}</div>
       </div>
 
@@ -50,7 +50,7 @@ function LessonGuideCharacter({ variant = 'beaver', imageSrc, imageAlt, bubbleTe
         </div>
       ) : null}
     </div>
-  )
+  );
 }
 
-export default LessonGuideCharacter
+export default LessonGuideCharacter;
