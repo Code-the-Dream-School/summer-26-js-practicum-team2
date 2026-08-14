@@ -64,9 +64,7 @@ export default function RegisterPage() {
   return (
     <div className="mx-auto max-w-2xl py-8">
       <Card>
-        <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-          Create account
-        </p>
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary">Create account</p>
         <h1 className="mt-1 font-heading text-h2 font-bold text-heading">Join Sprout</h1>
         <p className="mt-2 text-small text-neutral-700">
           Create an account to save your progress and keep a record of your lessons.
@@ -126,9 +124,7 @@ export default function RegisterPage() {
               .
             </span>
           </label>
-          {errors.tos && (
-            <p className="text-sm font-medium text-danger">{errors.tos.message}</p>
-          )}
+          {errors.tos && <p className="text-sm font-medium text-danger">{errors.tos.message}</p>}
 
           {errors.root && (
             <p role="alert" className="text-sm font-medium text-danger">
