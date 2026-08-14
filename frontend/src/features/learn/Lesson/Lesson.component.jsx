@@ -1,18 +1,18 @@
-import LessonRenderer from '../lessons/LessonRenderer/LessonRenderer'
-import LessonGuideCharacter from './LessonGuideCharacter.component.jsx'
+import LessonRenderer from "../lessons/LessonRenderer/LessonRenderer";
+import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component.jsx";
 
 function LessonComponent({
   title,
   eyebrow,
   content = [],
   module,
-  characterVariant = 'beaver',
+  characterVariant = "beaver",
   characterImage,
-  characterAlt = 'Lesson guide',
+  characterAlt = "Lesson guide",
   bubbleText,
 }) {
   // Filter out knowledge check content items from the visible content
-  const visibleContent = content.filter((item) => item && item.type !== 'knowledgeCheck')
+  const visibleContent = content.filter((item) => item && item.type !== "knowledgeCheck");
   return (
     <div className="mt-8 space-y-8 text-center">
       <div className="space-y-2">
@@ -42,7 +42,7 @@ function LessonComponent({
         )}
       </LessonGuideCharacter>
     </div>
-  )
+  );
 }
 
-export default LessonComponent
+export default LessonComponent;
