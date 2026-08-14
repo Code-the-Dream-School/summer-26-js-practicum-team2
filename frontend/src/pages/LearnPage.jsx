@@ -10,7 +10,7 @@ import {
   normalizeLearnData,
   selectRandomLesson,
   titlesOverlap,
-} from "../utils/normalizeLesson.js";
+} from "../features/learn/normalizeLesson.js";
 import LessonComponent from "../features/learn/Lesson/Lesson.component.jsx";
 import Button from "../shared/Button/Button.component.jsx";
 import Card from "../shared/Card/Card.component.jsx";
