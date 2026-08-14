@@ -1,12 +1,16 @@
-import { AuthProvider } from "./context/AuthContext";
-import AppRouter from "./app/router/AppRouter";
+import { useEffect } from "react";
+import { useLocation } from "react-router";
+import AppRouter from "./app/router/AppRouter.jsx";
+import { getRouteTitle } from "./app/router/routes.js";
 
 function App() {
-  return (
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
-  );
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = getRouteTitle(pathname);
+  }, [pathname]);
+
+  return <AppRouter />;
 }
 
 export default App;
