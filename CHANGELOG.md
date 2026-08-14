@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added tests for QuizComponent functionality
 - Added tests for quiz scoring and normalization functions
 
+### Changed
+
+- Invalidated cached dashboard on quiz submission to ensure progress updates are reflected
+
 ---
 
 ## [0.2.6]
