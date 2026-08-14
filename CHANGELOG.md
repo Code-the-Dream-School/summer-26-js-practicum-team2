@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased]
+## [0.2.5]
 
 ### Added
 
@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added validation schemas for authentication and password management
 - Added placeholder identities for fun registration experience
 - Implemented password reset and email verification forms with error handling and user feedback
+- Added tests for Login and Register pages to validate user input and authentication flow
 
 ---
 
