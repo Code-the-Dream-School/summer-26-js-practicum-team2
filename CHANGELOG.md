@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Declared @hookform/resolvers as a dependency
 - Added validation schemas for authentication and password management
-- Add placeholder identities for fun registration experience
+- Added placeholder identities for fun registration experience
+- Implemented password reset and email verification forms with error handling and user feedback
 
 ---
 
