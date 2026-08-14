@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added RecentActivityCard component to display user activity feed
 - Added DashboardHero component for user dashboard display
 - Added useDashboardData hook for managing dashboard state and caching
+- Added dashboard fixture data for initial testing
 
 ### Changed
 
