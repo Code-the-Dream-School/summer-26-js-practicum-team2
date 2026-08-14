@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuthContext } from "../context/AuthContext.jsx";
 import { ROUTES, SAMPLE_LESSON_LINK } from "../app/router/routes.js";
 import Button from "../shared/Button/Button.component.jsx";
 import Card from "../shared/Card/Card.component.jsx";
@@ -8,7 +8,7 @@ import abigailImg from "../assets/abigail.svg";
 import ramonaImg from "../assets/ramona.svg";
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthContext();
 
   return (
     <>
