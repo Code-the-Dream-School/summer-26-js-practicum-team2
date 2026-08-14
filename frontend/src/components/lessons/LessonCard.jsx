@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import LessonRenderer from "./LessonRenderer/LessonRenderer";
-import Button from "../ui/Button";
-import Card from "../ui/Card";
+import Button from "../../shared/Button/Button.component";
+import Card from "../../shared/Card/Card.component";
 
 function LessonCard({ module, lesson, microLesson, onNext }) {
   //Content index state

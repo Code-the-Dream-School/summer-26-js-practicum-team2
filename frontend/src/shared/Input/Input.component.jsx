@@ -1,4 +1,4 @@
-import { useFieldA11y } from "../../../hooks/useFieldA1ly.js";
+import { useFieldA11y } from "../../hooks/useFieldA1ly.js";
 
 export default function Input({
   id,
@@ -10,8 +10,12 @@ export default function Input({
   type = "text",
   ...props
 }) {
-  const { fieldId, helperTextId, errorId, describedBy, stateClass } =
-    useFieldA11y({ id, helperText, error, disabled });
+  const { fieldId, helperTextId, errorId, describedBy, stateClass } = useFieldA11y({
+    id,
+    helperText,
+    error,
+    disabled,
+  });
 
   return (
     <div className="flex flex-col gap-2">
