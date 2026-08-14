@@ -1,4 +1,4 @@
-import flowerProgress from "../../assets/flower-progress.svg";
+import flowerProgress from "../../assets/flower-progress.webp";
 import progressBarFrame from "../../assets/progress-bar.svg";
 
 // Colors used by the standard progress bars
