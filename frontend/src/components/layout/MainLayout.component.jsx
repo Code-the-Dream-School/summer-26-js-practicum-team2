@@ -3,7 +3,7 @@ import { Outlet } from "react-router";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import Header from "./Header/Header.component.jsx";
 import Footer from "./Footer/Footer.component.jsx";
-import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.jsx";
+import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component.jsx";
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
