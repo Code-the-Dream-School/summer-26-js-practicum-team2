@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added LearningPathNode component for current, completed, and locked learning steps
 - Added LastLessonRedirect with API lookup and localStorage fallback behavior
 - Added tests for LastLessonRedirect component to verify redirect logic
+- Added tests for LearningPathNode component functionality and accessibility
 
 ### Changed
 
