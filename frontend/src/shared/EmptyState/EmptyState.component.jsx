@@ -1,4 +1,4 @@
-export default function EmptyState({ icon, title, message, action, className = '' }) {
+export default function EmptyState({ icon, title, message, action, className = "" }) {
   return (
     <section
       className={`flex flex-col items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-surface-raised px-6 py-12 text-center ${className}`}
@@ -19,5 +19,5 @@ export default function EmptyState({ icon, title, message, action, className = '
       {/* Optional action */}
       {action && <div className="mt-6">{action}</div>}
     </section>
-  )
+  );
 }
