@@ -17,10 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `test` and `test:watch` scripts to the frontend package
 - Added `frontend/src/styles/reset.css` with an accessibility-focused reset covering `:focus-visible`, `forced-colors`, and `prefers-reduced-motion`
 - Added `frontend/src/styles/theme.css` defining the Tailwind `@theme` design tokens for brand, status, surface, and learning-path colors
+- Added `VITE_API_PORT` documentation to `frontend/.env.example`
+
 
 ### Changed
 
 - Changed `frontend/src/index.css` to import the reset and theme stylesheets alongside Tailwind
+- Changed the frontend ESLint config to declare Vitest globals for test files and the setup file, keeping `npm run lint --max-warnings 0` passing
+
+### Fixed
+
+- Fixed the misspelled `frontend/.prettieringore`, which left `node_modules`, `dist`, `coverage`, and `package-lock.json` unignored by Prettier
 
 ---
 
