@@ -12,6 +12,8 @@ import {
   titlesOverlap,
 } from "../features/learn/normalizeLesson.js";
 import LessonComponent from "../features/learn/Lesson/Lesson.component.jsx";
+import QuizComponent from "../features/learn/Quiz/Quiz.component.jsx";
+import { useQuiz } from "../hooks/useQuiz.js";
 import Button from "../shared/Button/Button.component.jsx";
 import Card from "../shared/Card/Card.component.jsx";
 import ProgressBar from "../shared/ProgressBar/ProgressBar.component.jsx";
@@ -19,6 +21,8 @@ import Skeleton from "../shared/Skeleton/Skeleton.component.jsx";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
+import rightAnswerIcon from "../assets/right_answer.svg";
+import wrongAnswerIcon from "../assets/wrong_answer.svg";
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
@@ -53,13 +57,29 @@ function LearnFlow({
 
   const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
   const [chunkIndex, setChunkIndex] = useState(0);
+  const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);
+  // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
+  const [submissions, setSubmissions] = useState({});
 
   const currentStep = lessonSteps[stepIndex];
   const chunks = currentStep?.content ?? [];
   const currentChunk = chunks[chunkIndex];
   const currentMicroLessonId = currentStep?.id;
   const canSyncProgress = !isReadOnly && Boolean(csrfToken);
+
+  const currentStepQuestions = useMemo(
+    () => learnData.questions.filter((question) => question.lessonStepId === currentMicroLessonId),
+    [learnData.questions, currentMicroLessonId],
+  );
+
+  const quiz = useQuiz({
+    questions: currentStepQuestions,
+    moduleId: learnData.moduleId,
+    passThreshold: learnData.passThreshold,
+    csrfToken,
+    isReadOnly,
+  });
 
   useEffect(() => {
     if (!canSyncProgress || !currentMicroLessonId) return;
@@ -74,22 +94,29 @@ function LearnFlow({
     });
   }, [canSyncProgress, csrfToken, currentMicroLessonId, learnData.id, learnData.moduleId]);
 
-  const { totalChunks, completedChunks } = useMemo(() => {
+  const { totalUnits, completedUnits } = useMemo(() => {
+    const countQuestions = (stepId) =>
+      learnData.questions.filter((question) => question.lessonStepId === stepId).length;
+    const countUnits = (step) => countChunks(step) + countQuestions(step.id);
+
     return {
-      totalChunks: lessonSteps.reduce((total, step) => total + countChunks(step), 0),
-      completedChunks: lessonSteps
+      totalUnits: lessonSteps.reduce((total, step) => total + countUnits(step), 0),
+      completedUnits: lessonSteps
         .slice(0, stepIndex)
-        .reduce((total, step) => total + countChunks(step), 0),
+        .reduce((total, step) => total + countUnits(step), 0),
     };
-  }, [lessonSteps, stepIndex]);
+  }, [learnData.questions, lessonSteps, stepIndex]);
+
+  const currentUnit =
+    phase === "quiz"
+      ? completedUnits + (currentStep ? countChunks(currentStep) : 0) + quiz.questionIndex
+      : completedUnits + chunkIndex;
 
   const progressPercent =
-    totalChunks === 0
-      ? 0
-      : Math.round(((isComplete ? totalChunks : completedChunks + chunkIndex) / totalChunks) * 100);
+    totalUnits === 0 ? 0 : Math.round(((isComplete ? totalUnits : currentUnit) / totalUnits) * 100);
 
   const character = resolveCharacter(
-    currentChunk?.characterId ?? currentStep?.characterId,
+    quiz.currentQuestion?.characterId ?? currentChunk?.characterId ?? currentStep?.characterId,
     characterImages,
     guideImage,
   );
@@ -97,10 +124,35 @@ function LearnFlow({
   const isFirstChunk = stepIndex === 0 && chunkIndex === 0;
   const isLastChunkOfStep = chunkIndex >= chunks.length - 1;
   const isLastStep = stepIndex >= lessonSteps.length - 1;
+  const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
+
+  const gradedSubmissions = Object.values(submissions);
+  const gradedPercentage = gradedSubmissions.length
+    ? Math.round(
+        gradedSubmissions.reduce((total, submission) => total + (submission.score ?? 0), 0) /
+          gradedSubmissions.length,
+      )
+    : 0;
+  const gradedPassed =
+    gradedSubmissions.length > 0 && gradedSubmissions.every((submission) => submission.passed);
+  const hasQuiz = learnData.questions.length > 0;
+  // Only a passing lesson unlocks the next one.
+  const canContinue = !hasQuiz || gradedPassed;
 
   const continuePath = learnData.nextLessonId
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
+
+  function advanceStep() {
+    if (!isLastStep) {
+      setStepIndex((current) => current + 1);
+      setChunkIndex(0);
+      setPhase("lesson");
+      return;
+    }
+
+    setIsComplete(true);
+  }
 
   function goForward() {
     if (chunkIndex < chunks.length - 1) {
@@ -108,13 +160,29 @@ function LearnFlow({
       return;
     }
 
-    if (!isLastStep) {
-      setStepIndex((current) => current + 1);
-      setChunkIndex(0);
+    if (currentStepQuestions.length > 0) {
+      quiz.begin(currentMicroLessonId);
+      setPhase("quiz");
       return;
     }
 
-    setIsComplete(true);
+    advanceStep();
+  }
+
+  async function advanceQuiz() {
+    if (!isLastQuestion) {
+      quiz.goToNextQuestion();
+      return;
+    }
+
+    const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
+
+    if (submission) {
+      setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
+    }
+
+    quiz.reset();
+    advanceStep();
   }
 
   function goBack() {
@@ -144,18 +212,39 @@ function LearnFlow({
             imageClassName="mx-auto w-full max-w-md"
           />
 
-          <h1 className="font-heading text-h2 font-bold text-heading">Congratulations!</h1>
-          <p className="text-lg font-semibold text-heading">Lesson completed</p>
-          <p className="text-foreground">You reviewed every bite-sized lesson.</p>
+          <h1 className="font-heading text-h2 font-bold text-heading">
+            {hasQuiz && !gradedPassed ? "Nice try" : "Congratulations!"}
+          </h1>
+          <p className="text-lg font-semibold text-heading">
+            {hasQuiz && !gradedPassed ? "Keep practicing" : "Lesson completed"}
+          </p>
+
+          {hasQuiz ? (
+            <p className="text-foreground">
+              Score: {gradedPercentage}% — {gradedPassed ? "Pass" : "Fail"}
+            </p>
+          ) : (
+            <p className="text-foreground">You reviewed every bite-sized lesson.</p>
+          )}
+
+          {quiz.errorMessage ? (
+            <p role="alert" className="text-sm font-medium text-danger">
+              {quiz.errorMessage}
+            </p>
+          ) : null}
 
           <div className="flex flex-wrap justify-center gap-4 pt-2">
             {isReadOnly ? (
               <Button as={Link} to={ROUTES.REGISTER} variant="quiz">
                 Register to keep learning
               </Button>
-            ) : (
+            ) : canContinue ? (
               <Button as={Link} to={continuePath} variant="quiz">
                 Continue
+              </Button>
+            ) : (
+              <Button as={Link} to={ROUTES.LEARN} variant="quizSecondary">
+                Back to learning path
               </Button>
             )}
           </div>
@@ -191,31 +280,86 @@ function LearnFlow({
           ) : null}
         </div>
 
-        <LessonComponent
-          title={titlesOverlap(learnData.title, currentStep.title) ? null : currentStep.title}
-          eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
-          content={currentChunk ? [currentChunk] : []}
-          module={learnData.module}
-          characterVariant={character.variant}
-          characterImage={character.image}
-          characterAlt={character.alt}
-          bubbleText={
-            isLastChunkOfStep && isLastStep
-              ? "That's the whole lesson. Nice work!"
-              : isLastChunkOfStep
-                ? "Nice work. Ready for the next step?"
-                : "Let's keep going."
-          }
-        />
+        {phase === "quiz" ? (
+          <>
+            <QuizComponent
+              question={quiz.currentQuestion}
+              questionNumber={quiz.questionIndex + 1}
+              totalQuestions={currentStepQuestions.length}
+              selectedChoiceIds={quiz.selectedChoiceIds}
+              reviewAnswer={quiz.review}
+              onChange={(choiceIds) => quiz.selectChoice(quiz.currentQuestion.id, choiceIds)}
+              rightAnswerIcon={rightAnswerIcon}
+              wrongAnswerIcon={wrongAnswerIcon}
+              characterVariant={character.variant}
+              characterImage={character.image}
+              characterAlt={character.alt}
+            />
 
-        <div className="mt-8 flex flex-wrap justify-between gap-4 border-t border-primary/10 pt-6">
-          <Button variant="quizSecondary" disabled={isFirstChunk} onClick={goBack}>
-            Previous
-          </Button>
-          <Button variant="quiz" className="min-w-36" onClick={goForward}>
-            {isLastChunkOfStep && isLastStep ? "Finish lesson" : "Continue"}
-          </Button>
-        </div>
+            {quiz.errorMessage ? (
+              <p role="alert" className="mt-4 text-center text-sm font-medium text-danger">
+                {quiz.errorMessage}
+              </p>
+            ) : null}
+
+            {/* Quiz navigation is forward-only so an answer cannot be revised after review. */}
+            <div className="mt-8 flex flex-wrap justify-end gap-4 border-t border-primary/10 pt-6">
+              {quiz.review ? (
+                <Button
+                  variant="quiz"
+                  className="min-w-36"
+                  loading={quiz.status === "submitting"}
+                  onClick={advanceQuiz}
+                >
+                  {isLastQuestion && isLastStep ? "View results" : "Continue"}
+                </Button>
+              ) : (
+                <Button
+                  variant="quiz"
+                  className="min-w-40"
+                  disabled={quiz.selectedChoiceIds.length === 0}
+                  onClick={() => quiz.checkAnswer(quiz.currentQuestion, quiz.selectedChoiceIds)}
+                >
+                  Check answer
+                </Button>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <LessonComponent
+              title={titlesOverlap(learnData.title, currentStep.title) ? null : currentStep.title}
+              eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
+              content={currentChunk ? [currentChunk] : []}
+              module={learnData.module}
+              characterVariant={character.variant}
+              characterImage={character.image}
+              characterAlt={character.alt}
+              bubbleText={
+                isLastChunkOfStep && currentStepQuestions.length > 0
+                  ? "Ready for a quick check?"
+                  : isLastChunkOfStep && isLastStep
+                    ? "That's the whole lesson. Nice work!"
+                    : isLastChunkOfStep
+                      ? "Nice work. Ready for the next step?"
+                      : "Let's keep going."
+              }
+            />
+
+            <div className="mt-8 flex flex-wrap justify-between gap-4 border-t border-primary/10 pt-6">
+              <Button variant="quizSecondary" disabled={isFirstChunk} onClick={goBack}>
+                Previous
+              </Button>
+              <Button variant="quiz" className="min-w-36" onClick={goForward}>
+                {isLastChunkOfStep && currentStepQuestions.length > 0
+                  ? "Quick check"
+                  : isLastChunkOfStep && isLastStep
+                    ? "Finish lesson"
+                    : "Continue"}
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
     </section>
   );
@@ -261,7 +405,16 @@ export default function LearnPage() {
   if (!isAuthenticated) {
     if (isSamplePreview && learnData) {
       const randomStep = selectRandomLesson(learnData.lessonSteps);
-      const sampleLearnData = randomStep ? { ...learnData, lessonSteps: [randomStep] } : learnData;
+      // Keep only the questions for the previewed step so local scoring reflects a real attempt.
+      const sampleLearnData = randomStep
+        ? {
+            ...learnData,
+            lessonSteps: [randomStep],
+            questions: learnData.questions.filter(
+              (question) => question.lessonStepId === randomStep.id,
+            ),
+          }
+        : learnData;
 
       return (
         <>
