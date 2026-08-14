@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.9]
 
+### Added
+
+- Added progress-driven LearningPathPage with lesson and micro-lesson navigation states
+- Added LearningPathNode component for current, completed, and locked learning steps
+- Added LastLessonRedirect with API lookup and localStorage fallback behavior
+
 ### Changed
 
 - Refactor LearningPathPage component to show a callout message
@@ -25,13 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added RecentActivityCard component to display user activity feed
 - Added DashboardHero component for user dashboard display
 - Added useDashboardData hook for managing dashboard state and caching
-- Added dashboard fixture data for initial testing
-- Added tests for useDashboardData hook to validate caching and API interactions
+- Added dashboard fixture data and tests covering caching, cache expiration, progress invalidation, errors, and API interactions
 
 ### Changed
 
 - Refactor npm scripts for better organization of backend and frontend tests
-- Enhanced DashboardPage with loading and error states, and integrate DashboardHero, RecentActivityCard, and UnitProgressRow components
+- Enhanced DashboardPage with loading and error states, dashboard progress summaries, recent activity, and recommended next actions
+- Refactored learning-path and last-lesson pages to use the shared authentication context, API services, and feature-based component structure
 
 ---
 
