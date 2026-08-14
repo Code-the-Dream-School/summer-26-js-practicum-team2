@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactor JWT middleware to simplify CSRF token validation logic
 - Refactor authentication tests to use helper functions for user registration, verification, and login
+- Refactor lesson test helpers for improved readability and functionality
 
 ### Fixed
 
