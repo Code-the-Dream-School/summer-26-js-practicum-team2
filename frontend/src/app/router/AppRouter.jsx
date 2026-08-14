@@ -8,6 +8,7 @@ import LoginPage from "../../pages/LoginPage.jsx";
 import RegisterPage from "../../pages/RegisterPage.jsx";
 import VerifyEmailPage from "../../pages/VerifyEmailPage.jsx";
 import PasswordResetPage from "../../pages/PasswordResetPage.jsx";
+import ProfilePage from "../../pages/ProfilePage.jsx";
 import DashboardPage from "../../pages/DashboardPage.jsx";
 import LearningPathPage from "../../pages/LearningPathPage.jsx";
 import LearnPage from "../../pages/LearnPage.jsx";
@@ -27,7 +28,14 @@ export default function AppRouter() {
         <Route path={ROUTES.PASSWORD_RESET} element={<PasswordResetPage />} />
         <Route path={ROUTES.PRIVACY} element={<PrivacyPage />} />
         <Route path={ROUTES.TERMS} element={<TermsPage />} />
-
+        <Route
+          path={ROUTES.PROFILE}
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path={ROUTES.DASHBOARD}
           element={
