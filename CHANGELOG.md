@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `VITE_API_PORT` documentation to `frontend/.env.example`
 - Added a `/api` dev-server proxy to `frontend/vite.config.js`, targeting the port set by `VITE_API_PORT` (defaults to `8080`)
 - Added `frontend/public/_redirects` so client-side routes resolve correctly on Netlify
+- Added Vitest setup and initial test configuration
 
 ### Changed
 
