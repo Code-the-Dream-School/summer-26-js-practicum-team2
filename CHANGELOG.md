@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.2.2]
+
+### Added
+
+- Adds logo, progress-bar, flower-progress, right, and wrong answer SVG images
+
+### Changed
+
+- Rename every shared component to have a `.component.jsx` suffix
+
+### Removed
+
+- Removes unused SVG images
+
+---
+
 ## [0.2.1]
 
 ### Added
