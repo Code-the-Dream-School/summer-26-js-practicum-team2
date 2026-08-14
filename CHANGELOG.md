@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Disable react-refresh rule for context files
 - Wrap AppRouter with AuthProvider for authentication context
 
+### Removed
+
+- Removes setupTests test as it was a temporary proof of concept
+
 ---
 
 ## [0.2.0]
