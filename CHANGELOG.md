@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Moved lesson components into features and adds component suffix
 
+### Fixed
+
+- Fix script option in dev command to prevent concurrent failures
+
 ---
 
 ## [0.2.5]
