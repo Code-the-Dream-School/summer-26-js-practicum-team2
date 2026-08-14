@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 // import modules from '../content/index.js'
 import cashFlow from "../../../shared/content/budgeting.json";
 import LearningPathNode from "../components/learningPath/LearningPathNode";
-import Card from "../components/ui/Card";
+import Card from "../shared/Card/Card.component";
 // import LessonCard from '../components/layout/LessonCard'
 
 function LearningPathPage() {
