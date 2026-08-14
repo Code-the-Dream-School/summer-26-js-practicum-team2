@@ -10,7 +10,7 @@ import VerifyEmailPage from "../../pages/VerifyEmailPage.jsx";
 import PasswordResetPage from "../../pages/PasswordResetPage.jsx";
 import DashboardPage from "../../pages/DashboardPage.jsx";
 import LearningPathPage from "../../pages/LearningPathPage.jsx";
-import LessonPage from "../../pages/LearnPage.jsx";
+import LearnPage from "../../pages/LearnPage.jsx";
 import LastLessonRedirect from "../../pages/LastLessonRedirect.jsx";
 import PrivacyPage from "../../pages/PrivacyPage.jsx";
 import TermsPage from "../../pages/TermsPage.jsx";
@@ -54,7 +54,7 @@ export default function AppRouter() {
         />
 
         {/* Public so unauthenticated visitors can preview a sample lesson. */}
-        <Route path={ROUTES.LEARN_LESSON} element={<LessonPage />} />
+        <Route path={ROUTES.LEARN_LESSON} element={<LearnPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
