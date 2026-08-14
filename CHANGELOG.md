@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## 0.2.8
+
+### Changed
+
+- Refactor npm scripts for better organization of backend and frontend tests
+
+---
+
 ## [0.2.7]
 
 ### Added
