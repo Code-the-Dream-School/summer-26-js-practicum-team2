@@ -24,12 +24,10 @@ export default function ConsentBanner() {
     >
       <div className="mx-auto flex max-w-7xl flex-col gap-3 rounded-2xl border border-neutral-200 bg-surface-app p-4 md:flex-row md:items-center md:justify-between">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-heading">
-            Help us improve Sprout
-          </p>
+          <p className="text-sm font-semibold text-heading">Help us improve Sprout</p>
           <p className="mt-1 text-sm text-neutral-600">
-            We use optional analytics to understand how learners use the app.
-            You can accept or decline this at any time.
+            We use optional analytics to understand how learners use the app. You can accept or
+            decline this at any time.
           </p>
         </div>
 
