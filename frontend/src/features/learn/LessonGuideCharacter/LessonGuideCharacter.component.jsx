@@ -1,6 +1,6 @@
-import abigailImg from "../../assets/abigail.webp";
-import dabbingBeaverImg from "../../assets/dabbingBeaver.svg";
-import ramonaImg from "../../assets/ramona.webp";
+import abigailImg from "../../../assets/abigail.webp";
+import dabbingBeaverImg from "../../../assets/dabbingBeaver.svg";
+import ramonaImg from "../../../assets/ramona.webp";
 
 const GUIDE_VARIANTS = {
   beaver: {
