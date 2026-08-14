@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.2.0]
+
+### Added
+
+- Added Vitest, jsdom, and React Testing Library (`@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`) to the frontend as dev dependencies
+- Added `test` and `test:watch` scripts to the frontend package
+
+
+---
+
 ## [0.1.3]
 
 ### Added
