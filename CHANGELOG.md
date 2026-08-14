@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented quiz reducer with action handling and initial state setup
 - Added useQuiz hook for managing quiz state and interactions
 - Added QuizComponent for interactive quiz functionality
-- Add unit tests for quizReducer functionality
+- Added unit tests for quizReducer functionality
+- Added tests for QuizComponent functionality
 
 ---
 
