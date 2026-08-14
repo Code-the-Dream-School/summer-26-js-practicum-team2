@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added tests for LessonRenderer component to verify content rendering and reference resolution
 - Added tests for useLessonContent hook to verify lesson loading and error handling
 - Added tests for normalizeLesson utility functions
+- Enabled clearMocks option in Vitest configuration for better test isolation
 
 ### Changed
 

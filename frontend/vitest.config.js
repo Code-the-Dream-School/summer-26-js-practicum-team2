@@ -9,5 +9,7 @@ export default defineConfig({
     globals: true,
     setupFiles: "./src/setupTests.js",
     passWithNoTests: true,
+    // restoreAllMocks leaves vi.fn() call history intact, so clear it between tests.
+    clearMocks: true,
   },
 });
