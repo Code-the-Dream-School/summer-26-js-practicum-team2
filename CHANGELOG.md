@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor authentication tests to use helper functions for user registration, verification, and login
 - Refactor lesson test helpers for improved readability and functionality
 - Validate microLessonId in startQuiz and handle empty request body
+- Refactor error handler middleware to remove unused next parameter and improve error handling structure
 
 ### Fixed
 

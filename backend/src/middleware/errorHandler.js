@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 
-const errorHandlerMiddleware = (err, req, res, next) => {
+const errorHandlerMiddleware = (err, req, res) => {
   console.error(
     "Internal server error: ",
     err.constructor.name,
@@ -19,6 +19,22 @@ const errorHandlerMiddleware = (err, req, res, next) => {
       });
     }
   }
+  // Handle Mongoose CastError (invalid ObjectId)
+  if (err.name === "CastError") {
+    if (!res.headersSent) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: `Invalid value for ${err.path || "identifier"}.`,
+        field: err.path,
+      });
+    }
+  }
+  if (err.type === "entity.parse.failed") {
+    if (!res.headersSent) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Malformed JSON request body.",
+      });
+    }
+  }
   //if the email already exists in the database
   if (err.code && err.code === 11000) {
     const field = Object.keys(err.keyValue || {})[0];
@@ -28,7 +44,6 @@ const errorHandlerMiddleware = (err, req, res, next) => {
         .json({ message: `${field ? field : "Field"} already exists.` });
     }
   }
-
   if (!res.headersSent) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
