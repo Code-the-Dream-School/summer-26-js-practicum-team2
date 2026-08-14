@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor AppRouter to use Routes as taught in curriculum
 - Rename LessonPage to LearnPage
 - Refactor HomePage and LearningPathPage to use named exports
+- Refactor route definitions and titles in routes.js toi support handling titles
 
 ---
 
