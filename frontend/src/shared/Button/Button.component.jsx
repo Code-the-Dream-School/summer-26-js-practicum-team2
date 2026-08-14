@@ -40,9 +40,7 @@ export default function Button({
       disabled={isDisabled}
       aria-busy={loading || undefined}
       className={
-        variant === "circleCompleted" ||
-        variant === "circleCurrent" ||
-        variant === "circleDisabled"
+        variant === "circleCompleted" || variant === "circleCurrent" || variant === "circleDisabled"
           ? `${circleClass} ${styles[variant]} ${className}`.trim()
           : `${baseClass} ${styles[variant] || styles.primary} ${className}`.trim()
       }

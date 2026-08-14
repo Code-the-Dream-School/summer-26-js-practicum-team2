@@ -5,8 +5,7 @@ const stateClasses = {
     "border-neutral-200 bg-surface-input text-foreground placeholder:text-neutral-500 focus:border-primary focus:ring-primary/20",
   error:
     "border-danger bg-surface-input text-foreground placeholder:text-neutral-500 focus:border-danger focus:ring-danger/20",
-  disabled:
-    "border-neutral-200 bg-surface-raised text-neutral-500 placeholder:text-neutral-400",
+  disabled: "border-neutral-200 bg-surface-raised text-neutral-500 placeholder:text-neutral-400",
 };
 
 export function useFieldA11y({ id, helperText, error, disabled }) {
@@ -29,8 +28,7 @@ export function useFieldA11y({ id, helperText, error, disabled }) {
     helperTextId,
     errorId,
     // Screen readers use this space-separated list to read both messages.
-    describedBy:
-      [helperTextId, errorId].filter(Boolean).join(" ") || undefined,
+    describedBy: [helperTextId, errorId].filter(Boolean).join(" ") || undefined,
     stateClass: stateClasses[variant],
   };
 }

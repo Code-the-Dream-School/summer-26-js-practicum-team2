@@ -1,39 +1,39 @@
-import { useEffect } from 'react'
+import { useEffect } from "react";
 
 const variantClasses = {
-  default: 'border-neutral-300 bg-surface-input text-foreground',
-  success: 'border-primary bg-primary text-on-primary',
-  badge: 'border-primary-alt bg-surface-inset text-heading',
-}
+  default: "border-neutral-300 bg-surface-input text-foreground",
+  success: "border-primary bg-primary text-on-primary",
+  badge: "border-primary-alt bg-surface-inset text-heading",
+};
 
 export default function Toast({
   isOpen,
   message,
   onClose,
   duration = 5000,
-  variant = 'default',
+  variant = "default",
   action,
   showCloseButton = true,
-  className = '',
+  className = "",
 }) {
   // Automatically close the toast after the set duration
   useEffect(() => {
-    if (!isOpen || duration <= 0) return
+    if (!isOpen || duration <= 0) return;
 
     const timer = setTimeout(() => {
-      onClose()
-    }, duration)
+      onClose();
+    }, duration);
 
     return () => {
-      clearTimeout(timer)
-    }
-  }, [isOpen, duration, onClose])
+      clearTimeout(timer);
+    };
+  }, [isOpen, duration, onClose]);
 
   // Don't show anything if the toast is closed
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   // Determine the styles for the toast based on its variant
-  const styles = variantClasses[variant] || variantClasses.default
+  const styles = variantClasses[variant] || variantClasses.default;
 
   return (
     <div
@@ -64,5 +64,5 @@ export default function Toast({
         </button>
       )}
     </div>
-  )
+  );
 }

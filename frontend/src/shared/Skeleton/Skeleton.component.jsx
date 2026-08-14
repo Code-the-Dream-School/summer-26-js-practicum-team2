@@ -1,18 +1,18 @@
 const variants = {
-  line: 'h-4 rounded-pill',
-  rectangle: 'min-h-24 rounded-md',
-}
+  line: "h-4 rounded-pill",
+  rectangle: "min-h-24 rounded-md",
+};
 
 // Skeleton component for displaying loading placeholders with different variants
 export default function Skeleton({
-  variant = 'rectangle',
+  variant = "rectangle",
   width,
   height,
-  className = '',
+  className = "",
   style,
   ...props
 }) {
-  const styles = variants[variant] || variants.rectangle
+  const styles = variants[variant] || variants.rectangle;
 
   return (
     <div
@@ -25,13 +25,13 @@ export default function Skeleton({
         ...style,
       }}
     />
-  )
+  );
 }
 
 export function SkeletonLine(props) {
-  return <Skeleton variant="line" {...props} />
+  return <Skeleton variant="line" {...props} />;
 }
 
 export function SkeletonRectangle(props) {
-  return <Skeleton variant="rectangle" {...props} />
+  return <Skeleton variant="rectangle" {...props} />;
 }

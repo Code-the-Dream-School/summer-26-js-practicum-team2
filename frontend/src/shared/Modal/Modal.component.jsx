@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useId, useRef } from "react";
 
 export default function Modal({
   children,
@@ -9,78 +9,78 @@ export default function Modal({
   footer,
   closeOnBackdrop = true,
   showCloseButton = true,
-  className = '',
+  className = "",
 }) {
-  const dialogRef = useRef(null)
-  const previousFocusRef = useRef(null)
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
 
-  const titleId = useId()
-  const descriptionId = useId()
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
-    const dialog = dialogRef.current
+    const dialog = dialogRef.current;
 
-    if (!dialog) return
+    if (!dialog) return;
 
     if (isOpen && !dialog.open) {
-      previousFocusRef.current = document.activeElement
-      dialog.showModal()
+      previousFocusRef.current = document.activeElement;
+      dialog.showModal();
 
       const focusTarget = dialog.querySelector(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      )
+      );
       if (focusTarget instanceof HTMLElement) {
-        focusTarget.focus()
+        focusTarget.focus();
       }
     }
 
     if (!isOpen && dialog.open) {
-      dialog.close()
+      dialog.close();
 
       if (previousFocusRef.current instanceof HTMLElement) {
-        previousFocusRef.current.focus()
+        previousFocusRef.current.focus();
       }
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const handleCancel = (event) => {
-    event.preventDefault()
-    onClose()
-  }
+    event.preventDefault();
+    onClose();
+  };
 
   const handleBackdropClick = (event) => {
     if (closeOnBackdrop && event.target === event.currentTarget) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const handleKeyDown = (event) => {
-    if (event.key !== 'Tab') return
+    if (event.key !== "Tab") return;
 
-    const dialog = dialogRef.current
-    if (!dialog) return
+    const dialog = dialogRef.current;
+    if (!dialog) return;
 
     const focusableElements = Array.from(
       dialog.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ),
-    ).filter((element) => !element.hasAttribute('disabled'))
+    ).filter((element) => !element.hasAttribute("disabled"));
 
-    if (focusableElements.length === 0) return
+    if (focusableElements.length === 0) return;
 
-    const first = focusableElements[0]
-    const last = focusableElements[focusableElements.length - 1]
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
 
     if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault()
-      first.focus()
+      event.preventDefault();
+      first.focus();
     }
 
     if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault()
-      last.focus()
+      event.preventDefault();
+      last.focus();
     }
-  }
+  };
 
   return (
     <dialog
@@ -125,5 +125,5 @@ export default function Modal({
         </footer>
       )}
     </dialog>
-  )
+  );
 }
