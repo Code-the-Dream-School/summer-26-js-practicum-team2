@@ -8,8 +8,6 @@ import Table from "./Table";
 import BudgetSummary from "./BudgetSummary";
 
 function LessonRenderer({ content, module }) {
-  console.log("Renderer content:", content);
-
   if (!content) {
     return <div>No content found</div>;
   }
@@ -45,12 +43,6 @@ function LessonRenderer({ content, module }) {
       return <BudgetSummary content={content} module={module} />;
 
     default:
-      console.log(
-        "Unsupported content type:",
-
-        content,
-      );
-
       return null;
   }
 }
