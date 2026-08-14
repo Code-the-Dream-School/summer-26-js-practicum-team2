@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.2.3]
+
+### Changed
+
+- Refactor main entry point to use BrowserRouter
+
+---
+
 ## [0.2.2]
 
 ### Added
