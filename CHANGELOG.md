@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactor main entry point to use BrowserRouter
 - Refactor App component to set document title based on route
+- Refactor AppRouter to use Routes as taught in curriculum
 
 ---
 
