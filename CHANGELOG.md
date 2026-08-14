@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Refactored HomePage component to enhance layout and integrate authentication logic
+- Compress images by converting large SVGs into .webp images
 
 ---
 

@@ -1,5 +1,5 @@
-import abigailImage from "../../../assets/abigail.svg";
-import ramonaImage from "../../../assets/ramona.svg";
+import abigailImage from "../../../assets/abigail.webp";
+import ramonaImage from "../../../assets/ramona.webp";
 import dabbingBeaver from "../../../assets/dabbingBeaver.svg";
 
 function CharacterIntro({ content }) {

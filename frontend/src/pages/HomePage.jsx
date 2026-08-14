@@ -4,8 +4,8 @@ import { ROUTES, SAMPLE_LESSON_LINK } from "../app/router/routes.js";
 import Button from "../shared/Button/Button.component.jsx";
 import Card from "../shared/Card/Card.component.jsx";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
-import abigailImg from "../assets/abigail.svg";
-import ramonaImg from "../assets/ramona.svg";
+import abigailImg from "../assets/abigail.webp";
+import ramonaImg from "../assets/ramona.webp";
 
 export default function HomePage() {
   const { isAuthenticated } = useAuthContext();
