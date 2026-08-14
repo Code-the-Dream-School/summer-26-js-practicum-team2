@@ -29,7 +29,6 @@ const TITLES = {
 
 export function getRouteTitle(pathname) {
   return (
-    TITLES[pathname] ??
-    (pathname.startsWith("/learn/") ? "Lesson — Sprout" : "Not found — Sprout")
+    TITLES[pathname] ?? (pathname.startsWith("/learn/") ? "Lesson — Sprout" : "Not found — Sprout")
   );
 }
