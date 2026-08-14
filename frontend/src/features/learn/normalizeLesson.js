@@ -1,4 +1,4 @@
-import { modules } from "../../../shared/content/index.js";
+import { modules } from "../../../../shared/content/index.js";
 
 export function normalizeContent(content = []) {
   return content.map((item, index) => ({
