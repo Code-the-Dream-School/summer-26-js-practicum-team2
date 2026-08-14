@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Refactor npm scripts for better organization of backend and frontend tests
+- Enhanced DashboardPage with loading and error states, and integrate DashboardHero, RecentActivityCard, and UnitProgressRow components
 
 ---
 
