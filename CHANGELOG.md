@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added quiz scoring utility functions for normalizing choice IDs and scoring attempts
+
+---
+
 ## [0.2.6]
 
 ### Added
