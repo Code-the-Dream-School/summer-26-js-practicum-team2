@@ -11,7 +11,8 @@
     "setup": "npm i && npm --prefix backend i && npm --prefix frontend i",
     "predev": "npx --yes kill-port 8080 5173",
     "dev": "concurrently --kill-others-on-fail --names \"backend,frontend\" --prefix-colors \"blue,magenta\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
-    "lint": "npm --prefix frontend run lint",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "format": "npm --prefix backend run format && npm --prefix frontend run format",
     "test": "npm --prefix backend test",
     "start:backend": "npm --prefix backend start",
     "build:frontend": "npm --prefix frontend run build"
