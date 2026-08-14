@@ -1,4 +1,13 @@
 require("dotenv").config();
+// Ensure that JWT_SECRET is set in production
+if (
+  process.env.NODE_ENV === "production" &&
+  !process.env.JWT_SECRET
+) {
+  console.warn("JWT_SECRET must be set in production.");
+  console.log("Exiting the application due to missing JWT_SECRET.");
+  process.exit(1);
+}
 const { setServers } = require("node:dns/promises");
 const app = require("./src/app");
 const connectMongo = require("./src/config/db.mongo.js");
