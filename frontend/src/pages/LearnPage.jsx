@@ -10,8 +10,8 @@ import {
   normalizeLearnData,
   selectRandomLesson,
   titlesOverlap,
-} from "../features/lessons/normalizeLesson.js";
-import LessonComponent from "../features/learn/LessonComponent.component.jsx";
+} from "../utils/normalizeLesson.js";
+import LessonComponent from "../features/learn/Lesson/Lesson.component.jsx";
 import Button from "../shared/Button/Button.component.jsx";
 import Card from "../shared/Card/Card.component.jsx";
 import ProgressBar from "../shared/ProgressBar/ProgressBar.component.jsx";

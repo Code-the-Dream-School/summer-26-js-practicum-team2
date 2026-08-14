@@ -1,4 +1,4 @@
-import LessonRenderer from "../lessons/LessonRenderer/LessonRenderer";
+import LessonRenderer from "./LessonRenderer/LessonRenderer.component.jsx";
 import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component.jsx";
 
 function LessonComponent({
