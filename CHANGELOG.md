@@ -15,7 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Vitest, jsdom, and React Testing Library (`@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`) to the frontend as dev dependencies
 - Added `test` and `test:watch` scripts to the frontend package
+- Added `frontend/src/styles/reset.css` with an accessibility-focused reset covering `:focus-visible`, `forced-colors`, and `prefers-reduced-motion`
+- Added `frontend/src/styles/theme.css` defining the Tailwind `@theme` design tokens for brand, status, surface, and learning-path colors
 
+### Changed
+
+- Changed `frontend/src/index.css` to import the reset and theme stylesheets alongside Tailwind
 
 ---
 
