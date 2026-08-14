@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Rename every shared component to have a `.component.jsx` suffix
+- Refactor layout components: update MainLayout import path, enhance Header with logo and props, and streamline NavBar structure
 
 ### Removed
 
