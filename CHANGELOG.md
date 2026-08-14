@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Declared @hookform/resolvers as a dependency
+
+---
+
 ## [0.2.4]
 
 ### Added
