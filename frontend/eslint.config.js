@@ -57,6 +57,12 @@ export default defineConfig([
     },
   },
   {
+    files: ["src/context/*.jsx"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
     files: ["**/*.{test,spec}.{js,jsx}", "src/setupTests.js"],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node, ...vitestGlobals },
