@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import authReducer, { actions, initialState } from "../reducers/auth.reducer.js";
+import authReducer, { actions, initialState } from "../reducers/auth.reducer";
 import * as api from "../services/api.js";
 
 const STORAGE_KEY = "sprout.auth";

@@ -1,22 +1,15 @@
 import { Link } from "react-router";
+import Button from "../shared/Button/Button.component";
 
-function NotFoundPage() {
+export default function NotFoundPage() {
   return (
-    <section className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <p className="text-sm font-semibold text-emerald-700">404</p>
-
-      <h1 className="mt-2 text-3xl font-bold">Page not found</h1>
-
-      <p className="mt-4 text-slate-600">The page you are looking for does not exist.</p>
-
-      <Link
-        className="mt-6 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-        to="/"
-      >
-        Return home
-      </Link>
-    </section>
+    <div className="mx-auto flex max-w-md flex-col items-center gap-4 py-16 text-center">
+      <p className="text-6xl">🌱</p>
+      <h1 className="font-heading text-h1 font-bold text-heading">Nothing sprouted here</h1>
+      <p className="text-body text-neutral-600">The page you're looking for doesn't exist.</p>
+      <Button as={Link} to="/">
+        Take me home
+      </Button>
+    </div>
   );
 }
-
-export default NotFoundPage;
