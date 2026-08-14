@@ -23,7 +23,6 @@ const { invalidateDashboardCache } = require("./dashboard.controller");
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
-const { STATUS_CODES } = require("http");
 
 //Contnent registery mapping manifest module IDs to JSON content files
 const moduleList = {
@@ -113,7 +112,12 @@ exports.getUserAttempts = async (req, res, next) => {
 //Route: POST /api/v1/quizzes/start
 exports.startQuiz = async (req, res, next) => {
   try {
-    const { microLessonId, moduleId = "cashFlow" } = req.body;
+    const { microLessonId, moduleId = "cashFlow" } = req.body || {};
+    if (typeof microLessonId !== "string" || !microLessonId.trim()) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "microLessonId is required.",
+      });
+    }
     const userId = req.user.id;
     const lessonId = microLessonId.split(".").slice(0, 2).join(".");
 
@@ -159,13 +163,7 @@ exports.submitQuiz = async (req, res, next) => {
   try {
     let microLessonId = req.params.id;
     const userId = req.user.id; //due to middleware from jwt
-    const {
-      attemptId,
-      moduleId = "cashFlow",
-      started_at,
-      answers = {},
-      //questions = [],
-    } = req.body;
+    const { attemptId, moduleId = "cashFlow", answers = {} } = req.body || {};
 
     //Prevent double-submission of answers by comparing attempt to any prior existing attempt
     //if there is a double answer submission, there is a 409 CONFLICT
