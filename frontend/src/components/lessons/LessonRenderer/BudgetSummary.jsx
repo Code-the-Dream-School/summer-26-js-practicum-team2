@@ -1,8 +1,8 @@
 function BudgetSummary({ content, module }) {
-  const budget = module.budgets.find((budget) => budget.budgetId === content.budgetId)
+  const budget = module.budgets.find((budget) => budget.budgetId === content.budgetId);
 
   if (!budget) {
-    return <div>Budget not found</div>
+    return <div>Budget not found</div>;
   }
 
   return (
@@ -53,7 +53,7 @@ function BudgetSummary({ content, module }) {
         </section>
       )}
     </div>
-  )
+  );
 }
 
-export default BudgetSummary
+export default BudgetSummary;

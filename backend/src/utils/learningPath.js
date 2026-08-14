@@ -19,13 +19,11 @@ function pickCurrentNode(learningPath, progressRecord) {
     (node) => node.microLessonId === progressRecord?.current_micro_lesson_id,
   );
   const lastCompletedIndex = learningPath.reduce(
-    (furthest, node, index) =>
-      completed.has(node.microLessonId) ? index : furthest,
+    (furthest, node, index) => (completed.has(node.microLessonId) ? index : furthest),
     -1,
   );
   const isModuleComplete =
-    Boolean(progressRecord?.is_module_completed) ||
-    lastCompletedIndex === learningPath.length - 1;
+    Boolean(progressRecord?.is_module_completed) || lastCompletedIndex === learningPath.length - 1;
 
   if (isModuleComplete) {
     return { ...learningPath[learningPath.length - 1], isModuleComplete: true };

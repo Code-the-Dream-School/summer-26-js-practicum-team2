@@ -1,20 +1,20 @@
 function Table({ content, module }) {
-  const tableId = content.tableId || content.budgetId
+  const tableId = content.tableId || content.budgetId;
 
-  const table = module.tables.find((table) => table.tableId === tableId)
+  const table = module.tables.find((table) => table.tableId === tableId);
 
   if (!table) {
-    return <div>Table not found</div>
+    return <div>Table not found</div>;
   }
 
-  const budget = module.budgets[0]
+  const budget = module.budgets[0];
 
-  let rows = []
+  let rows = [];
 
   if (table.incomeRefs) {
     rows = table.incomeRefs
       .map((incomeRef) => budget.income.find((income) => income.id === incomeRef))
-      .filter(Boolean)
+      .filter(Boolean);
   }
 
   if (table.expenseRefs) {
@@ -23,11 +23,11 @@ function Table({ content, module }) {
       ...budget.fixedExpenses.wants,
       ...budget.variableExpenses.needs,
       ...budget.variableExpenses.wants,
-    ]
+    ];
 
     rows = table.expenseRefs
       .map((expenseRef) => allExpenses.find((expense) => expense.id === expenseRef))
-      .filter(Boolean)
+      .filter(Boolean);
   }
 
   return (
@@ -53,7 +53,7 @@ function Table({ content, module }) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
-export default Table
+export default Table;

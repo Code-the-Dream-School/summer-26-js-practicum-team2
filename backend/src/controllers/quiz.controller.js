@@ -5,21 +5,16 @@ const EventEmitter = require("events");
 const quizEvents = new EventEmitter();
 //Event listeners for Quiz Cycle
 
-quizEvents.on(
-  "quiz_submit",
-  ({ userId, microLessonId, score, attemptNumber }) => {
-    console.log(
-      `[Event: quiz_submit] User ${userId} submitted ${microLessonId} (Attempt #${attemptNumber}, Score: ${score}%)`,
-    );
-  },
-);
+quizEvents.on("quiz_submit", ({ userId, microLessonId, score, attemptNumber }) => {
+  console.log(
+    `[Event: quiz_submit] User ${userId} submitted ${microLessonId} (Attempt #${attemptNumber}, Score: ${score}%)`,
+  );
+});
 quizEvents.on("quiz_pass", ({ userId, microLessonId }) => {
   console.log(`[Event: quiz_pass] User ${userId} passed quiz ${microLessonId}`);
 });
 quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
-  console.log(
-    `[Event: quiz_fail] User ${userId} did not pass ${microLessonId}`,
-  );
+  console.log(`[Event: quiz_fail] User ${userId} did not pass ${microLessonId}`);
 });
 
 const QuizAttempt = require("../models/QuizAttempt.model");
@@ -66,9 +61,7 @@ const getQuestionsFromLesson = (moduleId, microLessonId) => {
   for (const lesson of moduleData.lessons || []) {
     for (const micro of lesson.microLessons || []) {
       if (micro.id === microLessonId) {
-        return (micro.microLessonContent || []).filter(
-          (item) => item.type === "knowledgeCheck",
-        );
+        return (micro.microLessonContent || []).filter((item) => item.type === "knowledgeCheck");
       }
     }
   }
@@ -129,10 +122,7 @@ exports.startQuiz = async (req, res, next) => {
       micro_lesson_id: microLessonId,
     }).sort({ createdAt: -1 });
 
-    if (
-      latestAttempt &&
-      Date.now() - new Date(latestAttempt.createdAt).getTime() < 5000
-    ) {
+    if (latestAttempt && Date.now() - new Date(latestAttempt.createdAt).getTime() < 5000) {
       return res.status(StatusCodes.CONFLICT).json({
         message: "Please wait 5 seconds before submitting an answer again.",
       });
@@ -220,9 +210,7 @@ exports.submitQuiz = async (req, res, next) => {
       const userChoices = Array.isArray(rawChoices) ? rawChoices : [rawChoices];
       const correctAnswers = q.correctResponse || q.correctChoiceIds || [];
 
-      const correctChoices = Array.isArray(correctAnswers)
-        ? correctAnswers
-        : [correctAnswers];
+      const correctChoices = Array.isArray(correctAnswers) ? correctAnswers : [correctAnswers];
 
       const isCorrect = arraysMatch(userChoices, correctChoices);
 
@@ -284,9 +272,7 @@ exports.submitQuiz = async (req, res, next) => {
         { upsert: true, new: true },
       );
       const allMicroLessonsIds = getMicroLessonIdsForLesson(moduleId, lessonId);
-      const userCompletedMicros = new Set(
-        updatedProgress.completed_micro_lessons || [],
-      );
+      const userCompletedMicros = new Set(updatedProgress.completed_micro_lessons || []);
       const isLessonFullyCompleted =
         allMicroLessonsIds.length > 0 &&
         allMicroLessonsIds.every((id) => userCompletedMicros.has(id));

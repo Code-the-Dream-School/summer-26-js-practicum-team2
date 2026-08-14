@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router'
-import Footer from '../ui/Footer'
+import { Outlet } from "react-router";
+import Footer from "../ui/Footer";
 
 function MainLayout() {
   return (
@@ -10,7 +10,7 @@ function MainLayout() {
 
       <Footer />
     </div>
-  )
+  );
 }
 
-export default MainLayout
+export default MainLayout;

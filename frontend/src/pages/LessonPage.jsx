@@ -1,12 +1,12 @@
 // import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router'
-import { modules } from '../../../shared/content/index.js'
+import { useParams, useNavigate } from "react-router";
+import { modules } from "../../../shared/content/index.js";
 // import budgeting from '../content/budgeting.json'
-import LessonCard from '../components/lessons/LessonCard'
+import LessonCard from "../components/lessons/LessonCard";
 
 function LessonPage() {
   //Get current module, lesson and micro-lesson from URL params
-  const { moduleId, lessonId, microLessonId } = useParams()
+  const { moduleId, lessonId, microLessonId } = useParams();
   //Set progress state, currently using fake data
   // const [progress, setProgress] = useState({
   //   currentModuleId: 'cashFlow',
@@ -21,14 +21,14 @@ function LessonPage() {
   //   currentMicroLessonId: microLessonId,
   // })
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // console.log(moduleId)
   // console.log(lessonId)
   // console.log(microLessonId)
 
-  console.log('moduleId from URL:', moduleId)
-  console.log('modules:', modules)
+  console.log("moduleId from URL:", moduleId);
+  console.log("modules:", modules);
 
   //useEffect to update progress state when URL params change
   // useEffect(() => {
@@ -39,18 +39,18 @@ function LessonPage() {
   //   })
   // }, [moduleId, lessonId, microLessonId])
 
-  const currentModule = modules[moduleId]
+  const currentModule = modules[moduleId];
 
   if (!currentModule) {
-    return <div>Module not found</div>
+    return <div>Module not found</div>;
   }
 
   // const lesson = budgeting.lessons.find((lesson) => lesson.id === progress.currentLessonId)
 
-  const lesson = currentModule.lessons.find((lesson) => lesson.id === lessonId)
+  const lesson = currentModule.lessons.find((lesson) => lesson.id === lessonId);
 
   if (!lesson) {
-    return <div>Lesson not found</div>
+    return <div>Lesson not found</div>;
   }
 
   // const microLesson = lesson.microLessons.find(
@@ -61,10 +61,10 @@ function LessonPage() {
   //   (microLesson) => microLesson.id === progress.microLessonId,
   // )
 
-  const microLesson = lesson.microLessons.find((microLesson) => microLesson.id === microLessonId)
+  const microLesson = lesson.microLessons.find((microLesson) => microLesson.id === microLessonId);
 
   if (!microLesson) {
-    return <div>Micro-lessons not found</div>
+    return <div>Micro-lessons not found</div>;
   }
 
   // const currentMicroLessonIndex = lesson.microLessons.findIndex(
@@ -73,37 +73,37 @@ function LessonPage() {
 
   const currentMicroLessonIndex = lesson.microLessons.findIndex(
     (microLesson) => microLesson.id === microLessonId,
-  )
+  );
 
   //Helper function for next button
   function handleNext() {
-    console.log('NEXT LESSON CLICKED')
-    const nextMicroLesson = lesson.microLessons[currentMicroLessonIndex + 1]
+    console.log("NEXT LESSON CLICKED");
+    const nextMicroLesson = lesson.microLessons[currentMicroLessonIndex + 1];
 
     //Still inside current lesson
     if (nextMicroLesson) {
-      navigate(`/lesson/${moduleId}/${lessonId}/${nextMicroLesson.id}`)
-      console.log('Lesson Completed!')
-      return
+      navigate(`/lesson/${moduleId}/${lessonId}/${nextMicroLesson.id}`);
+      console.log("Lesson Completed!");
+      return;
     }
 
     //Last microLesson of current lesson
     const lessonIndex = currentModule.lessons.findIndex(
       (currentLesson) => currentLesson.id === lessonId,
-    )
+    );
 
-    const nextLesson = currentModule.lessons[lessonIndex + 1]
+    const nextLesson = currentModule.lessons[lessonIndex + 1];
 
     //Next lesson exists
     if (nextLesson) {
-      navigate(`/lesson/${moduleId}/${nextLesson.id}/${nextLesson.microLessons[0].id}`)
-      return
+      navigate(`/lesson/${moduleId}/${nextLesson.id}/${nextLesson.microLessons[0].id}`);
+      return;
     }
 
     //Finished module
 
-    console.log('Module Completed!')
-    navigate('/learn')
+    console.log("Module Completed!");
+    navigate("/learn");
   }
   // const updatedProgress = {
   //   currentModuleId: moduleId,
@@ -133,7 +133,7 @@ function LessonPage() {
       module={currentModule}
       onNext={handleNext}
     />
-  )
+  );
 }
 
-export default LessonPage
+export default LessonPage;

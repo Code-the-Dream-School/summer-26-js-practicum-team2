@@ -1,16 +1,16 @@
-import { Link } from 'react-router'
+import { Link } from "react-router";
 
 const footerLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'Privacy Policy', to: '/privacy' },
-  { label: 'Terms', to: '/terms' },
+  { label: "Home", to: "/" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms", to: "/terms" },
   {
-    label: 'GitHub',
-    href: 'https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2',
+    label: "GitHub",
+    href: "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2",
   },
-  { label: 'Contact', href: '/contact' },
-  { label: 'Help', href: '/help' },
-]
+  { label: "Contact", href: "/contact" },
+  { label: "Help", href: "/help" },
+];
 
 function Footer() {
   return (
@@ -41,7 +41,7 @@ function Footer() {
         </p>
       </div>
     </footer>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

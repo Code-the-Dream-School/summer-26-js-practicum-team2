@@ -1,12 +1,12 @@
-export default function Card({ children, className = '', ...props }) {
+export default function Card({ children, className = "", ...props }) {
   return (
     <div
       {...props}
-      className={['rounded-2xl border border-slate-200 bg-white p-6 shadow-sm', className]
+      className={["rounded-2xl border border-slate-200 bg-white p-6 shadow-sm", className]
         .filter(Boolean)
-        .join(' ')}
+        .join(" ")}
     >
       {children}
     </div>
-  )
+  );
 }

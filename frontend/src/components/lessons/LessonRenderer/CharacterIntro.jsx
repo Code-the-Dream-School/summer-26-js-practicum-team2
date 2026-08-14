@@ -1,16 +1,16 @@
-import abigailImage from '../../../assets/abigail.svg'
-import ramonaImage from '../../../assets/ramona.svg'
-import dabbingBeaver from '../../../assets/dabbingBeaver.svg'
+import abigailImage from "../../../assets/abigail.svg";
+import ramonaImage from "../../../assets/ramona.svg";
+import dabbingBeaver from "../../../assets/dabbingBeaver.svg";
 
 function CharacterIntro({ content }) {
-  let imageSrc = dabbingBeaver
+  let imageSrc = dabbingBeaver;
 
-  if (content.text.includes('Abigail')) {
-    imageSrc = abigailImage
+  if (content.text.includes("Abigail")) {
+    imageSrc = abigailImage;
   }
 
-  if (content.text.includes('Ramona')) {
-    imageSrc = ramonaImage
+  if (content.text.includes("Ramona")) {
+    imageSrc = ramonaImage;
   }
 
   //   const character = module.characters.find(
@@ -36,7 +36,7 @@ function CharacterIntro({ content }) {
         <h2 className="text-lg md: text-xl text-slate-900">{content.text}</h2>
       </div>
     </div>
-  )
+  );
 }
 
-export default CharacterIntro
+export default CharacterIntro;
