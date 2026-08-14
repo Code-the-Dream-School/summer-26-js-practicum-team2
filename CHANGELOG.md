@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add auth reducer with action types and initial state
+- Add tests for authReducer functionality
 
 ### Changed
 
