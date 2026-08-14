@@ -20,7 +20,7 @@ export default function ConsentBanner() {
   return (
     <section
       aria-label="Analytics consent"
-      className="border-t border-neutral-200 bg-surface-raised/80 px-4 py-4 shadow-sm backdrop-blur sm:px-6 lg:px-8"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-surface-raised/80 px-4 py-4 shadow-lg backdrop-blur sm:px-6 lg:px-8"
     >
       <div className="mx-auto flex max-w-7xl flex-col gap-3 rounded-2xl border border-neutral-200 bg-surface-app p-4 md:flex-row md:items-center md:justify-between">
         <div className="max-w-2xl">
