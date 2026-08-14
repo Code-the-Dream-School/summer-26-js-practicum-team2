@@ -1,4 +1,5 @@
 const express = require("express");
+const jwtMiddleware = require("../middleware/jsonWebToken");
 const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 const {
   register,
@@ -17,7 +18,7 @@ router.get("/verify", verifyEmail);
 // POST /api/v1/users/login
 router.post("/login", loginLimiter, login);
 // POST /api/v1/users/logout
-router.post("/logout", logout);
+router.post("/logout", jwtMiddleware, logout);
 // POST /api/v1/users/forgot-password
 router.post("/forgot-password", forgotPassword);
 // POST /api/v1/users/reset-password

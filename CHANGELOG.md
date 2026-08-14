@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Prevent server from running in production without a JWT_SECRET
+- Enforce JWT authentication on logout to prevent CSRF-triggered logouts and session spoofing
 
 ---
 
