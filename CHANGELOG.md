@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added legal consent utility functions for tracking preferences
 - Added ConsentBanner component to handle user consent for analytics
+- Added Privacy and Terms pages with detailed content and improved layout
 
 ### Changed
 
