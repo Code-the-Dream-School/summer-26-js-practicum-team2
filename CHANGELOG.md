@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added DashboardHero component for user dashboard display
 - Added useDashboardData hook for managing dashboard state and caching
 - Added dashboard fixture data for initial testing
+- Added tests for useDashboardData hook to validate caching and API interactions
 
 ### Changed
 
