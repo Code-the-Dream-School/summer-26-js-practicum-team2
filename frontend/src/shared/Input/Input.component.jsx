@@ -1,4 +1,4 @@
-import { useFieldA11y } from "../../hooks/useFieldA1ly.js";
+import { useFieldA11y } from "../../hooks/useFieldAl1y.js";
 
 export default function Input({
   id,
