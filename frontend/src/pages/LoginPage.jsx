@@ -39,9 +39,7 @@ export default function LoginPage() {
     <div className="mx-auto max-w-md py-8">
       <Card>
         <h1 className="font-heading text-h2 font-bold text-heading">Login</h1>
-        <p className="mt-1 text-small text-neutral-600">
-          Log in to keep growing your streak.
-        </p>
+        <p className="mt-1 text-small text-neutral-600">Log in to keep growing your streak.</p>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-6 flex flex-col gap-4">
           <Input
@@ -80,7 +78,10 @@ export default function LoginPage() {
           <Link to={ROUTES.REGISTER} className="text-primary underline hover:text-primary-hover">
             Create an account
           </Link>
-          <Link to={ROUTES.PASSWORD_RESET} className="text-primary underline hover:text-primary-hover">
+          <Link
+            to={ROUTES.PASSWORD_RESET}
+            className="text-primary underline hover:text-primary-hover"
+          >
             Forgot password?
           </Link>
         </div>
