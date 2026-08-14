@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import Button from "../../shared/Button/Button.component";
+import Button from "../../../shared/Button/Button.component.jsx";
 
 const statusVariant = {
   current: "circleCurrent",
@@ -8,14 +8,10 @@ const statusVariant = {
 };
 
 const LearningPathNode = forwardRef(
-  // The LearningPathNode component represents a single node in the learning path. It displays a button with a step number and can show a callout message if specified.
   ({ node, status, stepNumber, style, showCallout = false, tooltipText, onSelect }, ref) => {
-    // Determine the button variant based on the node's status. If the status is not recognized, default to 'locked'.
     const variant = statusVariant[status] ?? statusVariant.locked;
-
     return (
       <div ref={ref} style={style} className="absolute flex flex-col items-center">
-        {/* Callout message for the current node, shown only during onboarding for the very first step */}
         {showCallout ? (
           <div
             role="status"
@@ -29,7 +25,6 @@ const LearningPathNode = forwardRef(
           </div>
         ) : null}
 
-        {/*  Display a button that represents the node in the learning path */}
         <Button
           variant={variant}
           disabled={status === "locked"}
