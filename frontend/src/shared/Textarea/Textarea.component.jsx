@@ -1,4 +1,4 @@
-import { useFieldA11y } from "../useFieldA11y.js";
+import { useFieldA11y } from "../../hooks/useFieldA11y";
 
 export default function Textarea({
   id,
@@ -9,8 +9,12 @@ export default function Textarea({
   className = "",
   ...props
 }) {
-  const { fieldId, helperTextId, errorId, describedBy, stateClass } =
-    useFieldA11y({ id, helperText, error, disabled });
+  const { fieldId, helperTextId, errorId, describedBy, stateClass } = useFieldA11y({
+    id,
+    helperText,
+    error,
+    disabled,
+  });
 
   return (
     <div className="flex flex-col gap-2">
