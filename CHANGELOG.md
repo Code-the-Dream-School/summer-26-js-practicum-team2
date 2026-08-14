@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update environment configuration and API paths
 - Refactor useAuth hook to improve authentication state management and storage handling
 - Disable react-refresh rule for context files
+- Wrap AppRouter with AuthProvider for authentication context
 
 ---
 
