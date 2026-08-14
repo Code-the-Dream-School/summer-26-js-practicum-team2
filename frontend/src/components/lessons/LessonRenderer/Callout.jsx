@@ -7,7 +7,7 @@ function Callout({ content }) {
 
       <p className="text-lg font-medium text-slate-800">{content.text}</p>
     </div>
-  )
+  );
 }
 
-export default Callout
+export default Callout;

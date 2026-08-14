@@ -69,16 +69,16 @@ function Hello() {
 ```js
 // services/helloApi.js
 export const getHello = async () => {
-  const res = await fetch('/api/hello')
-  return res.json()
-}
+  const res = await fetch("/api/hello");
+  return res.json();
+};
 ```
 
 ```jsx
 function Hello() {
   useEffect(() => {
-    getHello().then(setMessage)
-  }, [])
+    getHello().then(setMessage);
+  }, []);
 }
 ```
 
@@ -97,14 +97,14 @@ Avoid unnecessary state.
 ❌ Bad:
 
 ```jsx
-const [count, setCount] = useState(0)
-const doubled = count * 2
+const [count, setCount] = useState(0);
+const doubled = count * 2;
 ```
 
 ✅ Better:
 
 ```jsx
-const doubled = count * 2
+const doubled = count * 2;
 ```
 
 Derived values should not be state.
@@ -115,14 +115,14 @@ Only optimize **when necessary**, not everywhere.
 
 ```jsx
 const expensiveValue = useMemo(() => {
-  return heavyCalculation(data)
-}, [data])
+  return heavyCalculation(data);
+}, [data]);
 ```
 
 ```jsx
 const handleClick = useCallback(() => {
-  setCount((c) => c + 1)
-}, [])
+  setCount((c) => c + 1);
+}, []);
 ```
 
 These prevent unnecessary recalculations and re-renders.
@@ -138,8 +138,8 @@ These prevent unnecessary recalculations and re-renders.
 ✅ Better:
 
 ```jsx
-const onSave = useCallback(handleSave, [])
-;<Button onClick={onSave} />
+const onSave = useCallback(handleSave, []);
+<Button onClick={onSave} />;
 ```
 
 ## 🧯 Prevent Memory Leaks
@@ -155,11 +155,11 @@ Always clean up:
 ```jsx
 useEffect(() => {
   const id = setInterval(() => {
-    console.log('tick')
-  }, 1000)
+    console.log("tick");
+  }, 1000);
 
-  return () => clearInterval(id)
-}, [])
+  return () => clearInterval(id);
+}, []);
 ```
 
 Without cleanup, memory leaks occur.
@@ -168,15 +168,15 @@ Without cleanup, memory leaks occur.
 
 ```jsx
 useEffect(() => {
-  const controller = new AbortController()
+  const controller = new AbortController();
 
-  fetch('/api/data', { signal: controller.signal })
+  fetch("/api/data", { signal: controller.signal })
     .then((res) => res.json())
     .then(setData)
-    .catch(() => {})
+    .catch(() => {});
 
-  return () => controller.abort()
-}, [])
+  return () => controller.abort();
+}, []);
 ```
 
 Prevents state updates on unmounted components.
@@ -200,14 +200,14 @@ Avoid global state too early.
 
 ```jsx
 useEffect(() => {
-  setTotal(price * qty)
-}, [price, qty])
+  setTotal(price * qty);
+}, [price, qty]);
 ```
 
 ✅ Better:
 
 ```jsx
-const total = price * qty
+const total = price * qty;
 ```
 
 ## 🧪 Rendering & Lists
@@ -217,13 +217,13 @@ const total = price * qty
 ❌ Bad:
 
 ```jsx
-items.map((item, index) => <Item key={index} />)
+items.map((item, index) => <Item key={index} />);
 ```
 
 ✅ Good:
 
 ```jsx
-items.map((item) => <Item key={item.id} />)
+items.map((item) => <Item key={item.id} />);
 ```
 
 Stable keys prevent UI bugs and re-renders.
@@ -233,7 +233,7 @@ Stable keys prevent UI bugs and re-renders.
 ### 1️⃣1️⃣ Use Environment Variables
 
 ```js
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 ```
 
 Never hardcode production URLs.

@@ -5,12 +5,8 @@ const { sendVerificationEmail } = require("../utils/sendEmail.js");
 //User is capitalized because it represents a model which is a collection of items forthe database
 const User = require("../models/User.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
-const {
-  registerSchema,
-  loginSchema,
-} = require("../validation/userValidation.js");
-const JWT_SECRET =
-  process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
+const { registerSchema, loginSchema } = require("../validation/userValidation.js");
+const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 
@@ -45,9 +41,7 @@ const register = async (req, res, next) => {
     // using Mongoose  to figure out if the user already exists
     const previousUser = await User.findOne({ email });
     if (previousUser) {
-      return res
-        .status(StatusCodes.CONFLICT)
-        .json({ message: "Email already registered." });
+      return res.status(StatusCodes.CONFLICT).json({ message: "Email already registered." });
     }
     const password_hash = await hashPassword(password);
     const verificationToken = crypto.randomBytes(32).toString("hex");
@@ -89,9 +83,7 @@ const register = async (req, res, next) => {
         tos_agreement_at: newUser.tos_agreement_at,
         created_at: newUser.createdAt || newUser.created_at,
       },
-      ...(IS_DEV_ENV
-        ? { devVerification: { token: verificationToken, verifyUrl } }
-        : {}),
+      ...(IS_DEV_ENV ? { devVerification: { token: verificationToken, verifyUrl } } : {}),
     });
   } catch (err) {
     return next(err);
@@ -120,9 +112,7 @@ const login = async (req, res, next) => {
         ip: req.ip,
         reason: "user_not_found",
       });
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "Invalid email or password." });
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
     //compared hashed password
 
@@ -134,9 +124,7 @@ const login = async (req, res, next) => {
         ip: req.ip,
         reason: "invalid_password",
       });
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "Invalid email or password." });
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
 
     if (!user.email_verified_at) {
@@ -152,11 +140,9 @@ const login = async (req, res, next) => {
 
     //Sign JWT Token
     const csrfToken = crypto.randomUUID();
-    const token = jwt.sign(
-      { id: user._id, role: user.role, csrfToken },
-      JWT_SECRET,
-      { expiresIn: tokenExpiry },
-    );
+    const token = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
+      expiresIn: tokenExpiry,
+    });
     // HttpOnly session cookies
     res.cookie("session_token", token, getCookieOptions(req, maxAge));
     req.app.emit?.("login_success", {
@@ -189,9 +175,7 @@ const logout = async (req, res) => {
   res.clearCookie("session_token", cookieOptions);
 
   if (!hasSessionCookie) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: "No user is authenticated." });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
   }
 
   return res.status(StatusCodes.OK).json({ message: "Logout successful." });
@@ -224,17 +208,11 @@ const verifyEmail = async (req, res, next) => {
 
     const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
     const csrfToken = crypto.randomUUID();
-    const sessionToken = jwt.sign(
-      { id: user._id, role: user.role, csrfToken },
-      JWT_SECRET,
-      { expiresIn: "14d" },
-    );
+    const sessionToken = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
+      expiresIn: "14d",
+    });
 
-    res.cookie(
-      "session_token",
-      sessionToken,
-      getCookieOptions(req, FOURTEEN_DAYS),
-    );
+    res.cookie("session_token", sessionToken, getCookieOptions(req, FOURTEEN_DAYS));
 
     req.app.emit?.("login_success", {
       userId: user._id,
@@ -292,9 +270,7 @@ const forgotPassword = async (req, res, next) => {
     return res.status(StatusCodes.OK).json({
       message:
         "If an account with the email exists, a password reset link will be provided to that email.",
-      ...(IS_DEV_ENV
-        ? { devPasswordReset: { token: resetToken, resetUrl } }
-        : {}),
+      ...(IS_DEV_ENV ? { devPasswordReset: { token: resetToken, resetUrl } } : {}),
     });
   } catch (err) {
     return next(err);
@@ -318,8 +294,7 @@ const resetPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message:
-          "Expired password reset token or invalid password reset token.",
+        message: "Expired password reset token or invalid password reset token.",
       });
     }
 
@@ -330,17 +305,11 @@ const resetPassword = async (req, res, next) => {
 
     const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
     const csrfToken = crypto.randomUUID();
-    const sessionToken = jwt.sign(
-      { id: user._id, role: user.role, csrfToken },
-      JWT_SECRET,
-      { expiresIn: "14d" },
-    );
+    const sessionToken = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
+      expiresIn: "14d",
+    });
 
-    res.cookie(
-      "session_token",
-      sessionToken,
-      getCookieOptions(req, FOURTEEN_DAYS),
-    );
+    res.cookie("session_token", sessionToken, getCookieOptions(req, FOURTEEN_DAYS));
 
     return res.status(StatusCodes.OK).json({
       message: "Password reset successful. You are now signed in.",

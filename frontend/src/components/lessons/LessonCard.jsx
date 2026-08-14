@@ -1,19 +1,19 @@
 // import { Link } from 'react-router'
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
-import LessonRenderer from './LessonRenderer/LessonRenderer'
-import Button from '../ui/Button'
-import Card from '../ui/Card'
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import LessonRenderer from "./LessonRenderer/LessonRenderer";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
 
 function LessonCard({ module, lesson, microLesson, onNext }) {
   //Content index state
-  const [contentIndex, setContentIndex] = useState(0)
+  const [contentIndex, setContentIndex] = useState(0);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const content = microLesson.microLessonContent
+  const content = microLesson.microLessonContent;
 
-  const currentContent = content[contentIndex]
+  const currentContent = content[contentIndex];
 
   // const microLessonContent = microLesson.microLessonContent
 
@@ -21,30 +21,30 @@ function LessonCard({ module, lesson, microLesson, onNext }) {
 
   //Helper function for next button
   function handleNextContent() {
-    const isLastContent = contentIndex === content.length - 1
+    const isLastContent = contentIndex === content.length - 1;
 
     if (isLastContent) {
-      onNext()
-      return
+      onNext();
+      return;
     }
 
-    setContentIndex((prev) => prev + 1)
+    setContentIndex((prev) => prev + 1);
   }
 
   //Helper function for back button
   //Helper function for back button
   function handlePreviousContent() {
     if (contentIndex === 0) {
-      navigate('/learn')
-      return
+      navigate("/learn");
+      return;
     }
 
-    setContentIndex((prev) => prev - 1)
+    setContentIndex((prev) => prev - 1);
   }
 
-  console.log(contentIndex)
-  console.log(content.length)
-  console.log(currentContent)
+  console.log(contentIndex);
+  console.log(content.length);
+  console.log(currentContent);
 
   return (
     <Card>
@@ -59,15 +59,15 @@ function LessonCard({ module, lesson, microLesson, onNext }) {
 
       <div className="mt-6 flex justify-between">
         <Button variant="secondary" onClick={handlePreviousContent}>
-          {contentIndex === 0 ? 'Learning Path' : 'Back'}
+          {contentIndex === 0 ? "Learning Path" : "Back"}
         </Button>
 
         <Button variant="primary" onClick={handleNextContent}>
-          {contentIndex === content.length - 1 ? 'Next Lesson' : 'Continue'}
+          {contentIndex === content.length - 1 ? "Next Lesson" : "Continue"}
         </Button>
       </div>
     </Card>
-  )
+  );
 }
 
-export default LessonCard
+export default LessonCard;

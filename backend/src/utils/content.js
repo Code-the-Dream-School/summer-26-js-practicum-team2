@@ -47,9 +47,7 @@ const getLesson = (moduleId, lessonId) => {
   if (!moduleData) {
     return null;
   }
-  return (
-    (moduleData.lessons || []).find((lesson) => lesson.id === lessonId) || null
-  );
+  return (moduleData.lessons || []).find((lesson) => lesson.id === lessonId) || null;
 };
 
 const clearCache = () => {

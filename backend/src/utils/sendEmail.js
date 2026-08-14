@@ -1,5 +1,4 @@
-const BREVO_URL =
-  process.env.BREVO_API_URL || "https://api.brevo.com/v3/smtp/email";
+const BREVO_URL = process.env.BREVO_API_URL || "https://api.brevo.com/v3/smtp/email";
 
 const sendVerificationEmail = async (to, subject, text, html) => {
   const apiKey = process.env.BREVO_API_KEY;
@@ -31,9 +30,7 @@ const sendVerificationEmail = async (to, subject, text, html) => {
 
   if (!response.ok) {
     const body = await response.text();
-    const error = new Error(
-      `Brevo request failed (${response.status}): ${body}`,
-    );
+    const error = new Error(`Brevo request failed (${response.status}): ${body}`);
     error.code = response.status;
     throw error;
   }

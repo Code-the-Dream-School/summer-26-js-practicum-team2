@@ -27,10 +27,7 @@ const parseAllowedOrigins = () => {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-  const fallbackOrigins = [
-    process.env.CLIENT_URL,
-    "http://localhost:5173",
-  ].filter(Boolean);
+  const fallbackOrigins = [process.env.CLIENT_URL, "http://localhost:5173"].filter(Boolean);
 
   return [...new Set([...configuredOrigins, ...fallbackOrigins])];
 };
@@ -82,6 +79,5 @@ app.get("/", (req, res) => {
 // Error Handling Middleware
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
-
 
 module.exports = app;

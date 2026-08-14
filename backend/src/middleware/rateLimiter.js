@@ -9,8 +9,7 @@ const registerLimiter = rateLimiter({
   standardHeaders: true, //return rate limit info in Ratelimit headers
   legacyHeaders: false,
   message: {
-    message:
-      "Too many registering attempts from this IP, please retry after 10 minutes.",
+    message: "Too many registering attempts from this IP, please retry after 10 minutes.",
   },
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
 });
@@ -20,15 +19,12 @@ const loginLimiter = rateLimiter({
   limit: 5,
   skipSuccessfulRequests: true,
   keyGenerator: (req) => {
-    return req.body?.email
-      ? req.body.email.toLowerCase()
-      : ipKeyGenerator(req.ip);
+    return req.body?.email ? req.body.email.toLowerCase() : ipKeyGenerator(req.ip);
   },
   standardHeaders: true, //return rate limit info in Ratelimit headers
   legacyHeaders: false, //disable X-Rate limit
   message: {
-    message:
-      "Too many failed login attempts from this account. Please retry after 15 minutes.",
+    message: "Too many failed login attempts from this account. Please retry after 15 minutes.",
   },
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
 });

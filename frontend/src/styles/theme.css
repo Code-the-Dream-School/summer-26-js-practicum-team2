@@ -37,9 +37,9 @@
   --color-neutral-800: #061e19;
 
   /* Fonts */
-  --font-heading: 'Poppins', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-heading: "Poppins", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Fonts sizes */
   --text-h1: 2.25rem;

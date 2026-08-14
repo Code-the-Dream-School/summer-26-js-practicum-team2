@@ -25,15 +25,11 @@ const registerSchema = Joi.object({
         "Password must be at least 8 characters long and include upper and lower case letters, a number, and a special character.",
       "any.required": "Password is required.",
     }),
-  confirmPassword: Joi.string()
-    .trim()
-    .valid(Joi.ref("password"))
-    .required()
-    .messages({
-      "string.empty": "Please confirm password.",
-      "any.only": "Passwords do not match.",
-      "any.required": "Please confirm password.",
-    }),
+  confirmPassword: Joi.string().trim().valid(Joi.ref("password")).required().messages({
+    "string.empty": "Please confirm password.",
+    "any.only": "Passwords do not match.",
+    "any.required": "Please confirm password.",
+  }),
   tos: Joi.boolean().valid(true).required().messages({
     "any.only": "Please accept the terms of service.",
     "any.required": "Please accept the terms of service.",

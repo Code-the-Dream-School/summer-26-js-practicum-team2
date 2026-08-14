@@ -27,7 +27,7 @@ function UnorderedList({ content }) {
         ))}
       </ul>
     </div>
-  )
+  );
 }
 
-export default UnorderedList
+export default UnorderedList;

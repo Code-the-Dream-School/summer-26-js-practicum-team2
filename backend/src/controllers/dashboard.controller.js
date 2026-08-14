@@ -24,18 +24,14 @@ function findLesson(moduleId, lessonId) {
 }
 
 function findMicroLesson(moduleId, lessonId, microLessonId) {
-  return findLesson(moduleId, lessonId)?.microLessons?.find(
-    (micro) => micro.id === microLessonId,
-  );
+  return findLesson(moduleId, lessonId)?.microLessons?.find((micro) => micro.id === microLessonId);
 }
 
 function buildUnit(moduleId, progressRecord) {
   const content = contentModules[moduleId];
   const lessons = getModuleLessons(moduleId);
   const completedSet = new Set(progressRecord?.completed_lessons || []);
-  const completedLessons = lessons.filter((lesson) =>
-    completedSet.has(lesson.id),
-  ).length;
+  const completedLessons = lessons.filter((lesson) => completedSet.has(lesson.id)).length;
 
   return {
     id: moduleId,
@@ -46,9 +42,7 @@ function buildUnit(moduleId, progressRecord) {
       (total, lesson) => total + (lesson.microLessons?.length || 0),
       0,
     ),
-    progressPercent: lessons.length
-      ? Math.round((completedLessons / lessons.length) * 100)
-      : 0,
+    progressPercent: lessons.length ? Math.round((completedLessons / lessons.length) * 100) : 0,
   };
 }
 
@@ -65,17 +59,14 @@ function getNextAction(progressByModule, units) {
     if (!lesson) continue;
     const unit = units.find((item) => item.id === moduleId);
     const hasStarted =
-      unit?.completedLessons > 0 ||
-      (progressRecord?.completed_micro_lessons?.length || 0) > 0;
+      unit?.completedLessons > 0 || (progressRecord?.completed_micro_lessons?.length || 0) > 0;
 
     return {
       title: lesson.title,
       description: hasStarted
         ? "Pick up where you left off."
         : "Ready to start? Begin with this lesson.",
-      ctaLabel: hasStarted
-        ? `Continue ${lesson.title}`
-        : `Start ${lesson.title}`,
+      ctaLabel: hasStarted ? `Continue ${lesson.title}` : `Start ${lesson.title}`,
       href: `/learn/${moduleId}/${lesson.id}`,
     };
   }
@@ -90,10 +81,7 @@ function getNextAction(progressByModule, units) {
 
 function getHero(userName, units, nextAction) {
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
-  const completedLessons = units.reduce(
-    (sum, unit) => sum + unit.completedLessons,
-    0,
-  );
+  const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const isNewUser = completedLessons === 0;
   const isAllCaughtUp = totalLessons > 0 && completedLessons >= totalLessons;
   let state = "in_progress";
@@ -107,8 +95,7 @@ function getHero(userName, units, nextAction) {
   } else if (isAllCaughtUp) {
     state = "all_caught_up";
     greeting = `You're caught up, ${userName}`;
-    statusText =
-      "Great work finishing every lesson. A quick review can keep the habit warm.";
+    statusText = "Great work finishing every lesson. A quick review can keep the habit warm.";
   }
 
   return {
@@ -149,9 +136,7 @@ async function reconcileProgressFromPassedAttempts(userId) {
         .filter((lesson) =>
           lesson.microLessons
             ?.filter((micro) =>
-              micro.microLessonContent?.some(
-                (item) => item.type === "knowledgeCheck",
-              ),
+              micro.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
             )
             .every((micro) => microLessonIds.includes(micro.id)),
         )
@@ -207,9 +192,7 @@ exports.getDashboard = async (req, res, next) => {
 
     const user = await User.findById(userId).select("name");
     if (!user) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "User not found." });
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
 
     await reconcileProgressFromPassedAttempts(userId);
@@ -217,12 +200,8 @@ exports.getDashboard = async (req, res, next) => {
       user_id: userId,
       module_id: { $in: moduleIds },
     });
-    const progressByModule = new Map(
-      progressRecords.map((record) => [record.module_id, record]),
-    );
-    const units = moduleIds.map((moduleId) =>
-      buildUnit(moduleId, progressByModule.get(moduleId)),
-    );
+    const progressByModule = new Map(progressRecords.map((record) => [record.module_id, record]));
+    const units = moduleIds.map((moduleId) => buildUnit(moduleId, progressByModule.get(moduleId)));
     const nextAction = getNextAction(progressByModule, units);
     const payload = {
       hero: getHero(user.name || "Learner", units, nextAction),
@@ -238,10 +217,7 @@ exports.getDashboard = async (req, res, next) => {
       payload,
       expiresAt: Date.now() + DASHBOARD_CACHE_TTL_MS,
     });
-    return res
-      .set("Cache-Control", "private, max-age=30")
-      .status(StatusCodes.OK)
-      .json(payload);
+    return res.set("Cache-Control", "private, max-age=30").status(StatusCodes.OK).json(payload);
   } catch (error) {
     return next(error);
   }
@@ -253,9 +229,7 @@ exports.trackDashboardEvent = async (req, res, next) => {
     if (["lesson_complete", "quiz_submit"].includes(type)) {
       invalidateDashboardCache(req.user.id);
     }
-    return res
-      .status(StatusCodes.ACCEPTED)
-      .json({ message: "Dashboard event processed." });
+    return res.status(StatusCodes.ACCEPTED).json({ message: "Dashboard event processed." });
   } catch (error) {
     return next(error);
   }

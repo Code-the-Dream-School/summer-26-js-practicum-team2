@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import Button from '../../ui/Button'
+import { useState } from "react";
+import Button from "../../ui/Button";
 
 function KnowledgeCheck({ content }) {
-  const [selectedAnswer, setSelectedAnswer] = useState(null)
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
 
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(false);
 
-  const isCorrect = selectedAnswer === content.correctResponse
+  const isCorrect = selectedAnswer === content.correctResponse;
 
   return (
     <div className="space-y-4">
@@ -17,7 +17,7 @@ function KnowledgeCheck({ content }) {
           <button
             key={choice.key}
             className={`block w-full rounded-lg border p-3 text-left ${
-              selectedAnswer === choice.key ? 'border-primary bg-primary/10' : 'border-slate-300'
+              selectedAnswer === choice.key ? "border-primary bg-primary/10" : "border-slate-300"
             }`}
             onClick={() => setSelectedAnswer(choice.key)}
           >
@@ -32,15 +32,15 @@ function KnowledgeCheck({ content }) {
         </Button>
       ) : (
         <div className="space-y-2">
-          <p className={isCorrect ? 'text-green-600' : 'text-red-600'}>
-            {isCorrect ? '✅ Correct!' : '❌ Not quite.'}
+          <p className={isCorrect ? "text-green-600" : "text-red-600"}>
+            {isCorrect ? "✅ Correct!" : "❌ Not quite."}
           </p>
 
           <p>{content.explanation}</p>
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default KnowledgeCheck
+export default KnowledgeCheck;

@@ -1,18 +1,18 @@
 // import { useEffect, useState } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 // import modules from '../content/index.js'
-import cashFlow from '../../../shared/content/budgeting.json'
-import LearningPathNode from '../components/learningPath/LearningPathNode'
-import Card from '../components/ui/Card'
+import cashFlow from "../../../shared/content/budgeting.json";
+import LearningPathNode from "../components/learningPath/LearningPathNode";
+import Card from "../components/ui/Card";
 // import LessonCard from '../components/layout/LessonCard'
 
 function LearningPathPage() {
   //Mock Progress
   const progress = {
-    currentModule: 'cashFlow',
-    currentLessonId: '1.2',
-    currentMicroLessonId: '1.2.3',
-  }
+    currentModule: "cashFlow",
+    currentLessonId: "1.2",
+    currentMicroLessonId: "1.2.3",
+  };
 
   //Setting state for user progress
   //For getting progress from backend
@@ -29,7 +29,7 @@ function LearningPathPage() {
 
   //const currentModule = modules[progress.currentModuleId]
 
-  const currentModule = cashFlow
+  const currentModule = cashFlow;
 
   //Build path from current module
   const learningPath = currentModule.lessons.flatMap((lesson) =>
@@ -43,24 +43,24 @@ function LearningPathPage() {
 
       microLessonTitle: microLesson.title,
     })),
-  )
+  );
 
   const currentIndex = learningPath.findIndex(
     (node) => node.microLessonId === progress.currentMicroLessonId,
-  )
+  );
 
   //For scrolling to the current microLesson node in the learning path
-  const currentNodeRef = useRef(null)
+  const currentNodeRef = useRef(null);
 
   useEffect(() => {
     currentNodeRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  }, [])
+      behavior: "smooth",
+      block: "start",
+    });
+  }, []);
 
   if (!progress) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -105,17 +105,17 @@ function LearningPathPage() {
 
               microLessonId: microLesson.id,
               microLessonTitle: microLesson.title,
-            }
+            };
 
             const nodeIndex = learningPath.findIndex(
               (pathNode) => pathNode.microLessonId === microLesson.id,
-            )
+            );
 
-            let status = 'locked'
+            let status = "locked";
 
-            if (nodeIndex < currentIndex) status = 'completed'
+            if (nodeIndex < currentIndex) status = "completed";
 
-            if (nodeIndex === currentIndex) status = 'current'
+            if (nodeIndex === currentIndex) status = "current";
 
             return (
               <LearningPathNode
@@ -124,7 +124,7 @@ function LearningPathPage() {
                 status={status}
                 ref={nodeIndex === currentIndex ? currentNodeRef : null}
               />
-            )
+            );
           })}
         </div>
       ))}
@@ -144,7 +144,7 @@ function LearningPathPage() {
         <div key={module.id}>{module.title}</div>
       ))} */}
     </Card>
-  )
+  );
 }
 
-export default LearningPathPage
+export default LearningPathPage;
