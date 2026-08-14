@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixes script option in dev command to prevent concurrent failures
+- Added SAMPLE_LESSON_LINK to routes and update tests for public access to fix failing test in AppRouter.test
 
 ---
 
