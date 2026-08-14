@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added useFieldA11y hook for accessible form field management
 - Added Footer and Header components with navigation links
 - Added mock implementations for HTMLDialogElement methods in setupTests
+- Added tests for Button, Card, EmptyState, Input, and Modal components
 
 ### Changed
 
