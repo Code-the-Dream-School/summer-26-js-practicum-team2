@@ -6,8 +6,20 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import { defineConfig, globalIgnores } from "eslint/config";
 
+const vitestGlobals = {
+  describe: "readonly",
+  it: "readonly",
+  test: "readonly",
+  expect: "readonly",
+  vi: "readonly",
+  beforeAll: "readonly",
+  afterAll: "readonly",
+  beforeEach: "readonly",
+  afterEach: "readonly",
+};
+
 export default defineConfig([
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "coverage"]),
 
   {
     files: ["**/*.{js,jsx}"],
@@ -44,6 +56,11 @@ export default defineConfig([
       ],
     },
   },
-
+  {
+    files: ["**/*.{test,spec}.{js,jsx}", "src/setupTests.js"],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node, ...vitestGlobals },
+    },
+  },
   eslintConfigPrettier,
 ]);
