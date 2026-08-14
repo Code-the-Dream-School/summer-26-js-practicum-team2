@@ -146,10 +146,15 @@ export const startQuiz = ({ moduleId, microLessonId, csrfToken }) =>
     basePath: QUIZZES_BASE_PATH,
   });
 
-export const submitQuiz = (microLessonId, { attemptId, moduleId, answers, csrfToken }) =>
-  apiRequest(`/${encodeURIComponent(microLessonId)}/submit`, {
+// Submitting a quiz changes lesson progress, so the cached dashboard is invalidated alongside it.
+export const submitQuiz = async (microLessonId, { attemptId, moduleId, answers, csrfToken }) => {
+  const response = await apiRequest(`/${encodeURIComponent(microLessonId)}/submit`, {
     method: "POST",
     csrfToken,
     body: { attemptId, moduleId, answers },
     basePath: QUIZZES_BASE_PATH,
   });
+
+  notifyDashboardProgressChanged();
+  return response;
+};
