@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added quiz scoring utility functions for normalizing choice IDs and scoring attempts
+- Implemented quiz reducer with action handling and initial state setup
 
 ---
 
