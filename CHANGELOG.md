@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add UnitProgressRow component for displaying lesson progress
+- Added UnitProgressRow component for displaying lesson progress
+- Added RecentActivityCard component to display user activity feed
 
 ### Changed
 
