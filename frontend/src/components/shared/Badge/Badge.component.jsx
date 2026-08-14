@@ -1,4 +1,4 @@
-import Card from './Card.component.jsx'
+import Card from '../Card/Card.component.jsx'
 
 const toneClasses = {
   default: {
