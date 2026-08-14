@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.2.9]
+
+### Changed
+
+- Refactor LearningPathPage component to show a callout message
+
+---
+
 ## [0.2.8]
 
 ### Added
