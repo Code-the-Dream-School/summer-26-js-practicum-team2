@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added useLessonContent hook for lesson data fetching and state management
+- Added normalization functions for lesson content and questions
 
 ### Changed
 
@@ -21,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix script option in dev command to prevent concurrent failures
+- Fixes script option in dev command to prevent concurrent failures
 
 ---
 
