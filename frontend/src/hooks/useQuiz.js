@@ -76,15 +76,13 @@ export function useQuiz({
       });
 
       if (isReadOnly || !csrfToken) {
-        dispatch({
-          type: actions.submitSuccess,
-          result: {
-            score: localResult.percentage,
-            passed: localResult.passed,
-            missed: localResult.missed,
-          },
-        });
-        return;
+        const offlineResult = {
+          score: localResult.percentage,
+          passed: localResult.passed,
+          missed: localResult.missed,
+        };
+        dispatch({ type: actions.submitSuccess, result: offlineResult });
+        return offlineResult;
       }
 
       dispatch({ type: actions.submitStart });
@@ -102,8 +100,10 @@ export function useQuiz({
           csrfToken,
         });
         dispatch({ type: actions.submitSuccess, result: submission });
+        return submission;
       } catch (error) {
         dispatch({ type: actions.submitFailure, errorMessage: error.message });
+        return null;
       }
     },
     [csrfToken, isReadOnly, moduleId, passThreshold, quizState.answers, quizState.attemptId],
