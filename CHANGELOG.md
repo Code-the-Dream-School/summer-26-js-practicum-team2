@@ -9,22 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.2.4]
+
+### Added
+
+- Added legal consent utility functions for tracking preferences
+
+---
+
 ## [0.2.3]
 
 ### Added
 
 - Added initial page components for Dashboard, Last Lesson Redirect, Login, Password Reset, Privacy, Register, Terms, and Verify Email
-- Add ProtectedRoute component for authentication handling
-- Add tests for AppRouter to validate routing behavior and authentication handling
+- Added ProtectedRoute component for authentication handling
+- Added tests for AppRouter to validate routing behavior and authentication handling
 
 ### Changed
 
-- Refactor main entry point to use BrowserRouter
-- Refactor App component to set document title based on route
-- Refactor AppRouter to use Routes as taught in curriculum
-- Rename LessonPage to LearnPage
-- Refactor HomePage and LearningPathPage to use named exports
-- Refactor route definitions and titles in routes.js toi support handling titles
+- Refactored main entry point to use BrowserRouter
+- Refactored App component to set document title based on route
+- Refactored AppRouter to use Routes as taught in curriculum
+- Renamed LessonPage to LearnPage
+- Refactored HomePage and LearningPathPage to use named exports
+- Refactored route definitions and titles in routes.js to support handling titles
 
 ---
 
@@ -40,12 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename every shared component to have a `.component.jsx` suffix
-- Refactor layout components: update MainLayout import path, enhance Header with logo and props, and streamline NavBar structure
+- Renamed every shared component to have a `.component.jsx` suffix
+- Refactored layout components: updated MainLayout import path, enhanced Header with logo and props, and streamlined NavBar structure
 
 ### Removed
 
-- Removes unused SVG images
+- Removed unused SVG images
 
 ---
 
@@ -55,19 +63,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added auth reducer with action types and initial state
 - Added tests for authReducer functionality
-- Implement authentication context and provider
-- Update environment configuration and API paths
-- Add lesson and quiz endpoints
+- Implemented authentication context and provider
+- Updated environment configuration and API paths
+- Added lesson and quiz endpoints
 
 ### Changed
 
-- Refactor useAuth hook to improve authentication state management and storage handling
-- Disable react-refresh rule for context files
-- Wrap AppRouter with AuthProvider for authentication context
+- Refactored useAuth hook to improve authentication state management and storage handling
+- Disabled react-refresh rule for context files
+- Wrapped AppRouter with AuthProvider for authentication context
 
 ### Removed
 
-- Removes setupTests test as it was a temporary proof of concept
+- Removed setupTests test as it was a temporary proof of concept
 
 ---
 
@@ -106,11 +114,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Refactor JWT middleware to simplify CSRF token validation logic
-- Refactor authentication tests to use helper functions for user registration, verification, and login
-- Refactor lesson test helpers for improved readability and functionality
-- Validate microLessonId in startQuiz and handle empty request body
-- Refactor error handler middleware to remove unused next parameter and improve error handling structure
+- Refactored JWT middleware to simplify CSRF token validation logic
+- Refactored authentication tests to use helper functions for user registration, verification, and login
+- Refactored lesson test helpers for improved readability and functionality
+- Validated microLessonId in startQuiz and handled empty request body
+- Refactored error handler middleware to remove unused next parameter and improved error handling structure
 
 ### Fixed
 
@@ -150,10 +158,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Handle JWT secrets more efficiently and allow authenticated API requests using either a session cookie or Bearer token
-- Session cookies are now scoped to the application root so that authenticated users can access all rotected routes
-- Users sign in automatically after email verification and password reset, which returns a CSRF token
-- Logging out successfully returns a message indicating, and if a user is not logged in, returns a message stating a user is not logged in
+- Handled JWT secrets more efficiently and allowed authenticated API requests using either a session cookie or Bearer token
+- Scoped session cookies to the application root so that authenticated users could access all protected routes
+- Signed users in automatically after email verification and password reset, which returned a CSRF token
+- Returned a success message when logging out and a message stating that a user was not logged in when applicable
 - Upgraded the backend test runner to Jest 30
 - Approved required install scripts for `mongodb-memory-server` and Jest's `unrs-resolver` dependency
 
@@ -165,7 +173,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Implement an IPv6-safe login limiter fallback to satisfy tests
+- Implemented an IPv6-safe login limiter fallback to satisfy tests
 - Replaced deprecated transitive `glob` and `test-exclude` versions with maintained releases
 
 ---
@@ -182,7 +190,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix module path for budgeting content
+- Fixed module path for budgeting content
 
 ---
 
@@ -190,13 +198,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add content utility functions for managing modules and lessons
-- Add lesson routes and controller for lesson management
+- Added content utility functions for managing modules and lessons
+- Added lesson routes and controller for lesson management
 
 ### Changed
 
 - Trimmed manifest.json to the one module that actually ships lessons
-- In shared/content/index.js, exports mudules map and utility functions
+- In shared/content/index.js, exported modules map and utility functions
 
 ---
 
@@ -211,7 +219,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename controllers, routes, and model files for consistency
+- Renamed controllers, routes, and model files for consistency
 - Replaced SMTP with Brevo and a development logging fallback
 - Enabled /api/v1/users
 
@@ -225,7 +233,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Temporarily removes features breaking code without supporting dependent files
+- Temporarily removed features breaking code without supporting dependent files
 
 ---
 
@@ -233,10 +241,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Install dependencies and write scripts for backend
-- Configure Express App with middleware and a simple hello route
-- Add server and MongoDB connection setup
-- Initialize environment example files
+- Installed dependencies and wrote scripts for backend
+- Configured Express App with middleware and a simple hello route
+- Added server and MongoDB connection setup
+- Initialized environment example files
 
 ---
 
@@ -244,11 +252,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initalize new project scaffolding to run project from root folder
+- Initialized new project scaffolding to run project from root folder
 
 ### Removed
 
-- Removes initial project scaffolding
+- Removed initial project scaffolding
 
 ---
 
