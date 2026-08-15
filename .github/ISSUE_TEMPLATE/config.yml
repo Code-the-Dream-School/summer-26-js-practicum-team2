@@ -1,1 +1,8 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/code-the-dream-school/summer-26-js-practicum-team2/security/advisories/new
+    about: Use a private GitHub Security Advisory for sensitive reports.
+  - name: Security policy
+    url: https://github.com/code-the-dream-school/summer-26-js-practicum-team2/blob/docs/.github/SECURITY.md
+    about: Review supported versions and response timeline.
