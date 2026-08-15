@@ -65,6 +65,11 @@ app.use("/api/v1/quizzes", quizRoutes);
 app.get("/", (req, res) => {
   res.send("Backend API is running");
 });
+app.use((req,res,next) =>{
+  const error = new Error( `Route not found`);
+  error.status = 404;
+  next(error);
+});
 app.use(errorHandlerMiddleware);
 
 module.exports = app;

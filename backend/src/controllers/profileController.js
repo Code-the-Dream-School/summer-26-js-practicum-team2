@@ -2,6 +2,7 @@ const { User, ArchivedUser } = require("../models/user");
 const UserProgress = require("../models/UserProgress");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
+const { updateProfileSchema, changePasswordSchema } = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -23,12 +24,20 @@ const getProfile = async (req, res, next) => {
       updated_at: -1,
     });
     return res.status(StatusCodes.OK).json({
-      name: user.name,
-      email: user.email,
-      avatar_url: user.avatar_url || null, // this is so front end will use first initial of user
-      avatar_initial: getFirstInitial(user.name, user.email),
-      current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
-      badges: progress?.earned_badges || [],
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        goals: user.goals ?? "",
+        theme: user.theme ?? "Light",
+        notifications: user.notifications ?? true,
+        xp: user.xp ?? 0,
+        streak: user.streak ?? 0,
+        avatar_url: user.avatar_url || null,
+        avatar_initial: getFirstInitial(user.name, user.email),
+        current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
+        badges: progress?.earned_badges || [],
+      },
     });
   } catch (error) {
     return next(error);
@@ -47,8 +56,11 @@ const uploadAvatar = async (req, res, next) => {
     const uploadedUrl = req.file?.path || req.body?.avatar_url || null;
     user.avatar_url = uploadedUrl;
     await user.save();
+
     return res.status(StatusCodes.OK).json({
-      message: user.avatar_url ? "Avatar uploaded." : "Avatar set to default initial.",
+      message: user.avatar_url
+        ? "Avatar uploaded."
+        : "Avatar set to default initial.",
       avatar_url: user.avatar_url,
       avatar_initial: getFirstInitial(user.name, user.email),
     });
@@ -56,10 +68,100 @@ const uploadAvatar = async (req, res, next) => {
     return next(error);
   }
 };
+
 //PATCH /api/v1/profile
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, email } = req.body;
+    const { error, value } = updateProfileSchema.validate(req.body, {
+      abortEarly:false,
+    });
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Validation error",
+        error: error.details.map((detail) => detail.message),
+      });
+    }
+    const { name, email, goals, theme, notifications } = value;
+    const user = await User.findById(req.user.id);
+
+    if (!user || user.is_deleted) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: " User not found or user deleted account. " });
+    }
+    let hasUpdates = false;
+    if (name !== undefined) {
+      user.name = name;
+      hasUpdates = true;
+    }
+    if (goals !== undefined) {
+      user.goals = goals;
+      hasUpdates = true;
+    }
+    if (theme !== undefined) {
+      user.theme = theme;
+      hasUpdates = true;
+    }
+    if (notifications !== undefined) {
+      user.notifications = notifications;
+      hasUpdates = true;
+    }
+    // Email changed
+    if (email !== undefined && email !== user.email) {
+      user.email = email;
+      user.email_verified_at = null;
+      hasUpdates = true;
+    }
+    if (!hasUpdates) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No items requested to be updated." });
+    }
+    await user.save();
+    return res.status(StatusCodes.OK).json({
+      message: "You have successfully updated your profile.",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        goals: user.goals,
+        theme: user.theme,
+        notifications: user.notifications,
+        xp: user.xp ?? 0,
+        streak: user.streak ?? 0,
+        avatar_url: user.avatar_url || null,
+        avatar_initial: getFirstInitial(user.name, user.email),
+      },
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "Email is not able to be used. " });
+    }
+    return next(error);
+  }
+};
+/* const user = await User.findById(req.user.id);
+  if (!user || user.is_deleted) {
+    return res.status(StatusCodes.NOT_FOUND).json({message: " User not found. "});
+  } 
+  if (name !== undefined) user.name = name;
+  if (goals != undefined) user.goals = goals;
+  if (theme !== undefined) user.theme = theme;
+  if (notifications !== undefined) user.notifications = notifications;
+
+
+  await user.save();
+  return res.status(StatusCodes.OK).json({
+    message: "Profile updated with succeess.",
+   
+  });
+} catch (error) {
+  return next (error);
+}
+  try { 
+    const { name, email, goals, theme, notifications } = req.body;
     const updates = {};
     if (name !== undefined) updates.name = name;
     if (email !== undefined) {
@@ -98,16 +200,28 @@ const updateProfile = async (req, res, next) => {
     }
     return next(error);
   }
-};
+}; REMOVED Aug 13*/
 //POST /api/v1/profile/password (uS 2.4.7)
 const changePassword = async (req, res, next) => {
   try {
-    const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Both the current and new passwords are needed." });
+    //Validate password input using changePasswordSchema
+
+    const  {error, value} = changePasswordSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if(error){
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Error with validation",
+        errors: error.details.map((detail) => detail.message), 
+      });
     }
+    //const { currentPassword, newPassword } = req.body;
+    //if (!currentPassword || !newPassword) {
+      //return res
+       // .status(StatusCodes.BAD_REQUEST)
+       // .json({ message: "Both the current and new passwords are needed." });
+    //}
+    const { currentPassword, newPassword} = value;
     const user = await User.findById(req.user.id).select("+password_hash");
     if (!user || user.is_deleted) {
       return res
@@ -130,7 +244,8 @@ const changePassword = async (req, res, next) => {
     return next(error);
   }
 };
-//DELETE /api/v1/profile
+
+//DELETE /api/v1/profile for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(

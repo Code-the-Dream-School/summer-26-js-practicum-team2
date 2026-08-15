@@ -59,6 +59,33 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    //profile
+    avatar_url: {
+      type: String,
+      default: null,
+    },
+    goals: {
+      type: String,
+      default: "",
+    },
+    theme: {
+      type: String,
+      enum: ["Light", "Dark"],
+      default: "Light",
+    },
+    notifications: {
+      type: Boolean,
+      default: true,
+    },
+    //Achievements
+    xp: {
+      type: Number,
+      default: 0,
+    },
+    streak: {
+      type: Number,
+      default: 0,
+    },
     // Soft-deleted accounts
     is_deleted: {
       type: Boolean,
@@ -97,4 +124,4 @@ const archivedUserSchema = new mongoose.Schema(
 const User = mongoose.model("User", userSchema);
 const ArchivedUser = mongoose.model("ArchivedUser", archivedUserSchema);
 
-module.exports = {User, ArchivedUser};
+module.exports = { User, ArchivedUser };
