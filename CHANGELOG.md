@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactor LearningPathPage component to show a callout message
 
+### Fixed
+
+- Switched script runner from concurrently to npm-run-all to prevent multiple "ghost" servers from running.
+
 ---
 
 ## [0.2.8]
