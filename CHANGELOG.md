@@ -14,10 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Implemented soft deletion, reactivation, and avatar upload updates
+- Integrated Joi validation for profile route
 
 ### Changed
 
 - Migrated limiter function is backend/src/app to an exported apiRateLimiter middleware function
+- Refactored User model with frontend fields
 
 ---
 
