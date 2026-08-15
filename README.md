@@ -19,6 +19,7 @@ feel in control of their money — without a lecture.
 - [Contributing Guidelines](.github/CONTRIBUTING.md)
 - [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 - [Security Policy](.github/SECURITY.md)
+- [Support](SUPPORT.md)
 
 ## 🧠 Problem Statement
 
