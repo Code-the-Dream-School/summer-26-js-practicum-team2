@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        shell: bash
+        run: |
+          if [ -f package.json ]; then
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
+          else
+            npm ci --prefix frontend
+          fi
+
+      - name: Run frontend lint checks
+        shell: bash
+        run: |
+          has_script() {
+            node -e "const fs=require('fs'); const script=process.argv[1]; if (!fs.existsSync('package.json')) process.exit(1); const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); process.exit(pkg.scripts && pkg.scripts[script] ? 0 : 1);" "$1"
+          }
+
+          if has_script lint; then
+            npm run lint
+          else
+            npm --prefix frontend run lint
+          fi
+
+      - name: Run frontend test checks
+        shell: bash
+        run: |
+          has_script() {
+            node -e "const fs=require('fs'); const script=process.argv[1]; if (!fs.existsSync('package.json')) process.exit(1); const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); process.exit(pkg.scripts && pkg.scripts[script] ? 0 : 1);" "$1"
+          }
+
+          if has_script test:frontend; then
+            npm run test:frontend
+          else
+            npm --prefix frontend run --if-present test
+          fi
+
+      - name: Run frontend build checks
+        shell: bash
+        run: |
+          has_script() {
+            node -e "const fs=require('fs'); const script=process.argv[1]; if (!fs.existsSync('package.json')) process.exit(1); const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); process.exit(pkg.scripts && pkg.scripts[script] ? 0 : 1);" "$1"
+          }
+
+          if has_script build:frontend; then
+            npm run build:frontend
+          else
+            npm --prefix frontend run build
+          fi
+
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            backend/package-lock.json
+
+      - name: Install backend dependencies
+        shell: bash
+        run: |
+          if [ -f package.json ]; then
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
+          else
+            npm ci --prefix backend
+          fi
+
+      - name: Run backend lint checks
+        shell: bash
+        run: |
+          has_script() {
+            node -e "const fs=require('fs'); const script=process.argv[1]; if (!fs.existsSync('package.json')) process.exit(1); const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); process.exit(pkg.scripts && pkg.scripts[script] ? 0 : 1);" "$1"
+          }
+
+          if has_script lint; then
+            npm run lint
+          else
+            npm --prefix backend run --if-present lint
+          fi
+
+      - name: Run backend test checks
+        shell: bash
+        run: |
+          has_script() {
+            node -e "const fs=require('fs'); const script=process.argv[1]; if (!fs.existsSync('package.json')) process.exit(1); const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); process.exit(pkg.scripts && pkg.scripts[script] ? 0 : 1);" "$1"
+          }
+
+          if has_script test:backend; then
+            npm run test:backend
+          else
+            npm --prefix backend run --if-present test
+          fi
+
+      - name: Run backend syntax checks
+        run: |
+          node --check backend/server.js
+          node --check backend/src/app.js
