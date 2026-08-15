@@ -113,69 +113,7 @@ project-root/
 
 ## ⚙️ Setup & Installation
 
-### Prerequisites
-
-- Node.js (v24+ required)
-- npm
-- MongoDB
-
-### Node Version Management (Recommended)
-
-This repo includes a `.nvmrc` file set to Node `24`.
-
-- Windows: use `fnm` (recommended)
-- macOS/Linux: use `nvm`
-
-#### Windows (`fnm`) auto-switch setup
-
-1. Install `fnm`.
-2. Add this to your PowerShell profile so Node auto-switches on folder change:
-
-```powershell
-fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
-```
-
-3. In the project root, run:
-
-```powershell
-fnm install
-fnm use
-```
-
-#### macOS/Linux (`nvm`) setup
-
-In the project root, run:
-
-```bash
-nvm install
-nvm use
-```
-
-For auto-switch on directory change, add this to `~/.zshrc` or `~/.bashrc`:
-
-```bash
-autoload -U add-zsh-hook
-load-nvmrc() {
-  local nvmrc_path
-  nvmrc_path="$(nvm_find_nvmrc)"
-  if [ -n "$nvmrc_path" ]; then
-    nvm use
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
-```
-
-#### `nvm-for-windows` note
-
-`nvm-for-windows` does not support automatic `.nvmrc` switching.
-If you use it, run this manually in the project root:
-
-```powershell
-nvm use 24
-```
-
-### Quick Start (Recommended)
+### Quick Start
 
 ```bash
 npm run setup
@@ -185,132 +123,11 @@ npm run dev
 - Frontend runs on: http://localhost:5173
 - Backend runs on: http://localhost:8080
 
-### Run A Single App
+For full setup, scripts, testing, and API details, see:
 
-```bash
-npm run development:frontend
-npm run development:backend
-```
-
-Run backend in non-watch mode:
-
-```bash
-npm run start:backend
-```
-
-### Environment Setup
-
-Copy the backend env template and fill in values:
-
-```bash
-copy backend\.env.example backend\.env
-```
-
-Mac/Linux:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-## 🧪 Available Scripts
-
-### Root (run from project root)
-
-```bash
-npm run setup
-npm run predev
-npm run dev
-npm run lint
-npm run format
-npm run test
-npm run test:backend
-npm run test:frontend
-npm run start:backend
-npm run build:frontend
-```
-
-### Frontend (run from frontend)
-
-```bash
-npm run dev
-npm run build
-npm run preview
-npm run lint
-npm run lint:fix
-npm run format
-npm run format:check
-npm run test
-npm run test:watch
-```
-
-### Backend (run from backend)
-
-```bash
-npm run dev
-npm run start
-npm run test
-npm run lint
-npm run lint:fix
-npm run format
-npm run format:check
-```
-
-## 🧪 Postman Backend Testing
-
-Use the included Postman files to speed up backend testing across local and cloud environments:
-
-- Collection: docs/postman/local-backend-api.postman-collection.json
-- Environment (local): docs/postman/local-backend-api.postman_environment.json
-- Environment (remote development): docs/postman/remote-dev-backend-api.postman_environment.json
-- Environment (remote production): docs/postman/remote-backend-api.postman_environment.json
-
-### Import And Run
-
-1. Import the collection and all environment files into Postman.
-2. Select one environment based on where you want to test:
-
-- Local Backend API (`http://localhost:8080`)
-- Remote Development Backend API (`https://sprout-backend-dev.onrender.com/`)
-- Remote Production Backend API (`https://sprout-backend-x46w.onrender.com/`)
-
-3. If testing local, start the backend first (`npm run dev` from root or backend).
-4. Run in this order for end-to-end auth coverage: Register, Verify Email, Login.
-5. Then run Dashboard, Quizzes, and Lessons requests.
-
-Collection tests and scripts automatically capture and reuse these values:
-
-- `verificationToken`
-- `csrfToken`
-- `sessionCookie`
-- `resetToken`
-- `quizAttemptId`
-
-## 🔐 API Overview
-
-### Routes Covered By Postman Collection
-
-```text
-GET    /api/hello
-
-POST   /api/v1/users/register
-GET    /api/v1/users/verify?token=...
-POST   /api/v1/users/login
-POST   /api/v1/users/logout
-POST   /api/v1/users/forgot-password
-POST   /api/v1/users/reset-password
-
-GET    /api/v1/dashboard
-POST   /api/v1/dashboard/events
-
-GET    /api/v1/quizzes/progress
-GET    /api/v1/quizzes/attempts
-POST   /api/v1/quizzes/start
-POST   /api/v1/quizzes/1.1.2/submit
-
-GET    /api/v1/lessons/cashFlow/1.1
-GET    /api/v1/lessons/progress?moduleId=cashFlow
-PATCH  /api/v1/lessons/progress
-```
+- [Development Setup](docs/development-setup.md)
+- [Postman Backend Testing](docs/testing-postman.md)
+- [API Overview](docs/api-overview.md)
 
 ## 🤝 Team & Collaboration
 
@@ -360,10 +177,10 @@ PATCH  /api/v1/lessons/progress
 
 ## 🙌 Acknowledgments
 
-- Mentors
-- Instructors
-- Open-source libraries and tools
+- Code the Dream mentors and practicum staff for guidance and review support
+- The Sprout contributor team for collaborative design, implementation, and testing
+- The maintainers of key open-source tools used in this project, including React, Vite, Express, MongoDB, Jest, Vitest, and Postman
 
 ## 📄 License
 
-This project is for educational purposes only.
+This project uses the license in the root [LICENSE](LICENSE) file.
