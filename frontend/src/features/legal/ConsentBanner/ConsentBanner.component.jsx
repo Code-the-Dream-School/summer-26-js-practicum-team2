@@ -1,9 +1,6 @@
 import { useState } from "react";
 import Button from "../../../shared/Button/Button.component";
-import {
-  getConsentPreference,
-  setConsentPreference,
-} from "../../../utils/legalConsent";
+import { getConsentPreference, setConsentPreference } from "../../../utils/legalConsent";
 
 export default function ConsentBanner() {
   // Read the saved preference once so the banner stays hidden after a choice.

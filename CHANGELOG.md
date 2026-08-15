@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Migrated layout into a new folder within `src/shared` called `MainLayout`
 - Refactored imports to remove file extensions for consistency
+- Established `src/styles/theme.css` as the authoritative frontend design-token source.
 
 ### Fixed
 
