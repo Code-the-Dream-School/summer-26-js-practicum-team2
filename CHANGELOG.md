@@ -11,11 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added repository community-standard files: `SUPPORT.md`, `.editorconfig`, `.gitattributes`, and `.nvmrc`
+- Added GitHub governance and automation files: `.github/CODEOWNERS`, `.github/SECURITY.md`, `.github/dependabot.yml`, and `.github/workflows/ci.yml`
+- Added issue templates for bug reports, feature requests, and security vulnerabilities with issue-chooser contact links
+- Added docs index and split guides under `docs/` for setup, API overview, Postman testing, workflow, and roadmap
+- Added Postman environment files for remote development and remote production backend testing
+
 ### Changed
 
 - Migrated layout into a new folder within `src/shared` called `MainLayout`
 - Refactored imports to remove file extensions for consistency
 - Established `src/styles/theme.css` as the authoritative frontend design-token source.
+- Refactored root `README.md` into a concise landing page that links to detailed docs as the primary source of truth
+- Updated contributor guidance and PR template expectations to align with issue-based, `hotfix/`, and `refactor/` workflows
 
 ### Fixed
 
