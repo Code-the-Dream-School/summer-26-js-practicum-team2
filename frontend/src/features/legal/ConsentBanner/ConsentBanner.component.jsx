@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Button from "../../../shared/Button/Button.component.jsx";
+import Button from "../../../shared/Button/Button.component";
 import {
   getConsentPreference,
   setConsentPreference,
-} from "../../../../../redo/frontend/src/utils/legalConsent.js";
+} from "../../../utils/legalConsent";
 
 export default function ConsentBanner() {
   // Read the saved preference once so the banner stays hidden after a choice.

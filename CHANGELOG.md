@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Migrated layout into a new folder within `src/shared` called `MainLayout`
 
+### Fixed
+
+- Resolved a typo within the ConsentBanner component
+
 ---
 
 ## [0.2.9]
