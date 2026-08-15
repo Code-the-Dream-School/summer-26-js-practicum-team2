@@ -30,9 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added progress-driven LearningPathPage with lesson and micro-lesson navigation states
 - Added LearningPathNode component for current, completed, and locked learning steps
 - Added LastLessonRedirect with API lookup and localStorage fallback behavior
-- Added tests for LastLessonRedirect component to verify redirect logic
-- Added tests for LearningPathNode component functionality and accessibility
-- Added tests for LearningPathPage to validate progress loading and navigation
 
 ### Changed
 
@@ -52,7 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added RecentActivityCard component to display user activity feed
 - Added DashboardHero component for user dashboard display
 - Added useDashboardData hook for managing dashboard state and caching
-- Added dashboard fixture data and tests covering caching, cache expiration, progress invalidation, errors, and API interactions
 
 ### Changed
 
@@ -70,9 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented quiz reducer with action handling and initial state setup
 - Added useQuiz hook for managing quiz state and interactions
 - Added QuizComponent for interactive quiz functionality
-- Added unit tests for quizReducer functionality
-- Added tests for QuizComponent functionality
-- Added tests for quiz scoring and normalization functions
 
 ### Changed
 
@@ -87,10 +80,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added useLessonContent hook for lesson data fetching and state management
 - Added normalization functions for lesson content and questions
 - Added lesson cash flow JSON fixture for budgeting module
-- Added tests for LessonRenderer component to verify content rendering and reference resolution
-- Added tests for useLessonContent hook to verify lesson loading and error handling
-- Added tests for normalizeLesson utility functions
-- Enabled clearMocks option in Vitest configuration for better test isolation
 
 ### Changed
 
@@ -100,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixes script option in dev command to prevent concurrent failures
-- Added SAMPLE_LESSON_LINK to routes and update tests for public access to fix failing test in AppRouter.test
+- Added SAMPLE_LESSON_LINK to routes
 
 ---
 
@@ -112,7 +101,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added validation schemas for authentication and password management
 - Added placeholder identities for fun registration experience
 - Implemented password reset and email verification forms with error handling and user feedback
-- Added tests for Login and Register pages to validate user input and authentication flow
 
 ---
 
@@ -123,9 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added legal consent utility functions for tracking preferences
 - Added ConsentBanner component to handle user consent for analytics
 - Added Privacy and Terms pages with detailed content and improved layout
-- Added unit tests for legal consent functionality
 - Added Profile page shell and created routes to reach it
-- Add tests for ProtectedRoute component and enhance AppRouter tests
 
 ### Changed
 
@@ -140,7 +126,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added initial page components for Dashboard, Last Lesson Redirect, Login, Password Reset, Privacy, Register, Terms, and Verify Email
 - Added ProtectedRoute component for authentication handling
-- Added tests for AppRouter to validate routing behavior and authentication handling
 
 ### Changed
 
@@ -160,8 +145,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added logo, progress-bar, flower-progress, right, and wrong answer SVG images
 - Added useFieldA11y hook for accessible form field management
 - Added Footer and Header components with navigation links
-- Added mock implementations for HTMLDialogElement methods in setupTests
-- Added tests for Button, Card, EmptyState, Input, and Modal components
 
 ### Changed
 
@@ -179,7 +162,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added auth reducer with action types and initial state
-- Added tests for authReducer functionality
 - Implemented authentication context and provider
 - Updated environment configuration and API paths
 - Added lesson and quiz endpoints
@@ -192,27 +174,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Removed setupTests test as it was a temporary proof of concept
-
 ---
 
 ## [0.2.0]
 
 ### Added
 
-- Added Vitest, jsdom, and React Testing Library (`@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`) to the frontend as dev dependencies
-- Added `test` and `test:watch` scripts to the frontend package
 - Added `frontend/src/styles/reset.css` with an accessibility-focused reset covering `:focus-visible`, `forced-colors`, and `prefers-reduced-motion`
 - Added `frontend/src/styles/theme.css` defining the Tailwind `@theme` design tokens for brand, status, surface, and learning-path colors
 - Added `VITE_API_PORT` documentation to `frontend/.env.example`
 - Added a `/api` dev-server proxy to `frontend/vite.config.js`, targeting the port set by `VITE_API_PORT` (defaults to `8080`)
 - Added `frontend/public/_redirects` so client-side routes resolve correctly on Netlify
-- Added Vitest setup and initial test configuration
 
 ### Changed
 
 - Changed `frontend/src/index.css` to import the reset and theme stylesheets alongside Tailwind
-- Changed the frontend ESLint config to declare Vitest globals for test files and the setup file, keeping `npm run lint --max-warnings 0` passing
 
 ### Fixed
 
@@ -227,13 +203,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Postman collection and environment files for local backend API testing
 - Added instructions within `.env.example` to generate a proper JWT token for use in production
 - Added ESLint and Prettier configuration for code formatting and linting
-- Added tests for error handler middleware to validate responses for Mongoose ID errors and malformed JSON
 
 ### Changed
 
 - Refactored JWT middleware to simplify CSRF token validation logic
-- Refactored authentication tests to use helper functions for user registration, verification, and login
-- Refactored lesson test helpers for improved readability and functionality
 - Validated microLessonId in startQuiz and handled empty request body
 - Refactored error handler middleware to remove unused next parameter and improved error handling structure
 
@@ -248,8 +221,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added test coverage for registration rate limiting, and public registration access
-- Added authentication boundary coverage for protected route groups
 - Add Postman collection and environment files for local backend API testing
 
 ### Changed
@@ -263,7 +234,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added JSON 404 responses for unknown API routes
-- Added error-handler middleware test coverage
 
 ### Changed
 
@@ -279,18 +249,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scoped session cookies to the application root so that authenticated users could access all protected routes
 - Signed users in automatically after email verification and password reset, which returned a CSRF token
 - Returned a success message when logging out and a message stating that a user was not logged in when applicable
-- Upgraded the backend test runner to Jest 30
 - Approved required install scripts for `mongodb-memory-server` and Jest's `unrs-resolver` dependency
 
 ### Added
 
-- Added a `npm test` command for the backend using Jest and Supertest
-- Added isolated in-memory MongoDB setup and cleanup for backend integration tests
-- Added integration coverage for registration, login, logout, password-reset sessions, and protected lesson retrieval
-
 ### Fixed
 
-- Implemented an IPv6-safe login limiter fallback to satisfy tests
 - Replaced deprecated transitive `glob` and `test-exclude` versions with maintained releases
 
 ---
