@@ -45,6 +45,7 @@ first-paycheck recent grad.
 - Form validation and error handling
 - RESTful API integration
 
+<!--
 ## 📸 Screenshots
 
 <!-- Add screenshots or GIFs of key features here. -->
@@ -80,37 +81,20 @@ first-paycheck recent grad.
 ## 📁 Project Structure
 
 ```text
-project-root/
-├── frontend/
-│   ├── src/
-│   │   ├── app/            # Application-level configuration
-│   │   │   └── router/     # Routes and navigation configuration
-│   │   ├── context/        # Auth context, provider, and hook guard
-│   │   ├── reducers/       # Shared state reducers
-│   │   ├── hooks/          # Shared custom React hooks
-│   │   ├── services/       # API requests and external services
-│   │   ├── features/       # Domain feature modules (auth, dashboard, learn, lessons, legal)
-│   │   ├── shared/         # Reusable UI elements (Button, Card, Input, Layouts, etc.)
-│   │   ├── pages/          # Route-level view components
-│   │   ├── utils/          # Shared helper functions
-│   │   ├── test/
-│   │   │   └── fixtures/   # Mock data for tests
-│   │   ├── App.jsx         # Main application component
-│   │   ├── main.jsx        # Application entry point
-│   │   ├── index.css       # Global styles
-│   │   ├── reset.css       # CSS reset/base styles
-│   │   └── setupTests.js   # Frontend test setup
-│
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   └── config/
-│   ├── server.js
-│   └── package.json
-│
-└── README.md
+summer-26-js-practicum-team2/
+├── .github/              # GitHub configuration and community policies
+├── backend/              # Node.js/Express API
+├── docs/                 # Documentation and Postman resources
+├── frontend/             # React application
+├── shared/               # Content shared across applications
+├── package.json          # Root scripts and project metadata
+├── CHANGELOG.md          # Record of project changes
+├── CONTRIBUTORS.md       # Project contributors
+└── README.md             # Project overview and setup instructions
 ```
+
+See the [full project structure](docs/project-structure.md) for the detailed
+folder and file breakdown.
 
 ## ⚙️ Setup & Installation
 

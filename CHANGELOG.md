@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Established `src/styles/theme.css` as the authoritative frontend design-token source.
 - Refactored root `README.md` into a concise landing page that links to detailed docs as the primary source of truth
 - Updated contributor guidance and PR template expectations to align with issue-based, `hotfix/`, and `refactor/` workflows
+- Updated project structure diagram and provide a link to more detailed ones in project-structure.md
 
 ### Fixed
 
