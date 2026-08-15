@@ -9,10 +9,16 @@ feel in control of their money — without a lecture.
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https:/sprout-ctd.netlify.app/
+- **Frontend Live Site:** https://sprout-ctd.netlify.app/
 - **Frontend Repo:** /frontend
 - **Backend Live Site:** https://sprout-backend-x46w.onrender.com
 - **Backend Repo:** /backend
+
+## 🤝 Community Standards
+
+- [Contributing Guidelines](.github/CONTRIBUTING.md)
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+- [Security Policy](.github/SECURITY.md)
 
 ## 🧠 Problem Statement
 
@@ -210,6 +216,7 @@ The first script is:
 ```bash
 npm run setup
 ```
+
 ````
 
 This script installs the root development dependencies, then installs the dependencies for both the `backend` and `frontend` folders.
@@ -294,3 +301,4 @@ DELETE /api/items/:id
 ## 📄 License
 
 This project is for educational purposes only.
+````
