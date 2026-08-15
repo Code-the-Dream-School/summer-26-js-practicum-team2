@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { ROUTES } from "../app/router/routes.js";
+import { useAuthContext } from "../context/AuthContext";
+import { ROUTES } from "../app/router/routes";
 import Card from "../shared/Card/Card.component";
 import Spinner from "../shared/Spinner/Spinner.component";
 

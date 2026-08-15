@@ -1,11 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from "../hooks/useLessonContent.js";
-import { getLesson, getLessonProgress } from "../services/api.js";
-import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component.jsx";
-import Button from "../shared/Button/Button.component.jsx";
-import Skeleton from "../shared/Skeleton/Skeleton.component.jsx";
+import { useAuthContext } from "../context/AuthContext";
+import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from "../hooks/useLessonContent";
+import { getLesson, getLessonProgress } from "../services/api";
+import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
+import Button from "../shared/Button/Button.component";
+import Skeleton from "../shared/Skeleton/Skeleton.component";
 
 function getMicroLessonPreview(content = []) {
   return content

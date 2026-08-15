@@ -1,6 +1,6 @@
 import { useId } from "react";
-import Card from "../../../shared/Card/Card.component.jsx";
-import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component.jsx";
+import Card from "../../../shared/Card/Card.component";
+import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component";
 
 function QuizComponent({
   question,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getDashboard } from "../services/api.js";
+import { getDashboard } from "../services/api";
 
 // Sets default cache Time to Live to 30 seconds.
 const DASHBOARD_CACHE_TTL_MS = 30 * 1000;

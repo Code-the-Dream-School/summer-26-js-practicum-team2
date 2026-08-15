@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Migrated layout into a new folder within `src/shared` called `MainLayout`
+- Refactored imports to remove file extensions for consistency
 
 ### Fixed
 

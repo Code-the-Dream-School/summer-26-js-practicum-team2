@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getLesson } from "../services/api.js";
+import { getLesson } from "../services/api";
 
 export const DEFAULT_MODULE_ID = "cashFlow";
 export const DEFAULT_LESSON_ID = "1.1";

@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import Badge from "../../../shared/Badge/Badge.component.jsx";
-import Button from "../../../shared/Button/Button.component.jsx";
-import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component.jsx";
+import Badge from "../../../shared/Badge/Badge.component";
+import Button from "../../../shared/Button/Button.component";
+import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
 
 const fallbackHero = {
   state: "new_user",

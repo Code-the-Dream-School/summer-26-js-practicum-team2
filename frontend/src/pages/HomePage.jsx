@@ -1,8 +1,8 @@
 import { Link } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { ROUTES, SAMPLE_LESSON_LINK } from "../app/router/routes.js";
-import Button from "../shared/Button/Button.component.jsx";
-import Card from "../shared/Card/Card.component.jsx";
+import { useAuthContext } from "../context/AuthContext";
+import { ROUTES, SAMPLE_LESSON_LINK } from "../app/router/routes";
+import Button from "../shared/Button/Button.component";
+import Card from "../shared/Card/Card.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";

@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import Button from "../../../shared/Button/Button.component.jsx";
+import Button from "../../../shared/Button/Button.component";
 
 const statusVariant = {
   current: "circleCurrent",

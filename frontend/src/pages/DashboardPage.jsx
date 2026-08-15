@@ -1,15 +1,15 @@
 import { Link } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import DashboardHero from "../features/dashboard/DashboardHero/DashboardHero.component.jsx";
-import RecentActivityCard from "../features/dashboard/RecentActivityCard/RecentActivityCard.component.jsx";
-import UnitProgressRow from "../features/dashboard/UnitProgressRow/UnitProgressRow.component.jsx";
-import Button from "../shared/Button/Button.component.jsx";
-import Card from "../shared/Card/Card.component.jsx";
-import EmptyState from "../shared/EmptyState/EmptyState.component.jsx";
-import Skeleton from "../shared/Skeleton/Skeleton.component.jsx";
-import { ROUTES } from "../app/router/routes.js";
+import { useAuthContext } from "../context/AuthContext";
+import DashboardHero from "../features/dashboard/DashboardHero/DashboardHero.component";
+import RecentActivityCard from "../features/dashboard/RecentActivityCard/RecentActivityCard.component";
+import UnitProgressRow from "../features/dashboard/UnitProgressRow/UnitProgressRow.component";
+import Button from "../shared/Button/Button.component";
+import Card from "../shared/Card/Card.component";
+import EmptyState from "../shared/EmptyState/EmptyState.component";
+import Skeleton from "../shared/Skeleton/Skeleton.component";
+import { ROUTES } from "../app/router/routes";
 
-import useDashboardData from "../hooks/useDashboardData.js";
+import useDashboardData from "../hooks/useDashboardData";
 
 function DashboardSkeleton() {
   return (

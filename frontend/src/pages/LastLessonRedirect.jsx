@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
-import { getLastLesson } from "../services/api.js";
-import { ROUTES } from "../app/router/routes.js";
-import Skeleton from "../shared/Skeleton/Skeleton.component.jsx";
+import { getLastLesson } from "../services/api";
+import { ROUTES } from "../app/router/routes";
+import Skeleton from "../shared/Skeleton/Skeleton.component";
 
 const STORAGE_KEY = "lastLessonPath";
 

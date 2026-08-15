@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { ROUTES } from "../app/router/routes.js";
-import { confirmResetSchema, requestResetSchema } from "../features/auth/schemas.js";
-import Card from "../shared/Card/Card.component.jsx";
-import Input from "../shared/Input/Input.component.jsx";
-import Button from "../shared/Button/Button.component.jsx";
+import { useAuthContext } from "../context/AuthContext";
+import { ROUTES } from "../app/router/routes";
+import { confirmResetSchema, requestResetSchema } from "../features/auth/schemas";
+import Card from "../shared/Card/Card.component";
+import Input from "../shared/Input/Input.component";
+import Button from "../shared/Button/Button.component";
 
 function RequestResetForm() {
   const { requestPasswordReset } = useAuthContext();

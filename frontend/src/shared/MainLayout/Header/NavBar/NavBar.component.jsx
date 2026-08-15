@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router";
-import Button from "../../../Button/Button.component.jsx";
+import Button from "../../../Button/Button.component";
 
 const primaryNavLinks = [{ label: "Home", href: "/" }];
 

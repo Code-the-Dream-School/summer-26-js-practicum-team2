@@ -1,5 +1,5 @@
-import Card from "../../../shared/Card/Card.component.jsx";
-import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component.jsx";
+import Card from "../../../shared/Card/Card.component";
+import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
 
 export default function UnitProgressRow({ unit }) {
   return (

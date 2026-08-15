@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router";
-import AppRouter from "./app/router/AppRouter.jsx";
-import { getRouteTitle } from "./app/router/routes.js";
+import AppRouter from "./app/router/AppRouter";
+import { getRouteTitle } from "./app/router/routes";
 
 function App() {
   const { pathname } = useLocation();

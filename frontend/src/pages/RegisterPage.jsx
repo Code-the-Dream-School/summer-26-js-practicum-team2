@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { ROUTES } from "../app/router/routes.js";
-import { registerSchema } from "../features/auth/schemas.js";
-import { pickPlaceholderIdentity } from "../features/auth/placeholderIdentities.js";
-import Card from "../shared/Card/Card.component.jsx";
-import Input from "../shared/Input/Input.component.jsx";
-import Button from "../shared/Button/Button.component.jsx";
+import { useAuthContext } from "../context/AuthContext";
+import { ROUTES } from "../app/router/routes";
+import { registerSchema } from "../features/auth/schemas";
+import { pickPlaceholderIdentity } from "../features/auth/placeholderIdentities";
+import Card from "../shared/Card/Card.component";
+import Input from "../shared/Input/Input.component";
+import Button from "../shared/Button/Button.component";
 
 export default function RegisterPage() {
   const { register: registerUser } = useAuthContext();

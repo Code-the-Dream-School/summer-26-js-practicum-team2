@@ -1,21 +1,21 @@
 import { Route, Routes } from "react-router";
-import { ROUTES } from "./routes.js";
-import MainLayout from "../../components/layout/MainLayout.component.jsx";
-import ProtectedRoute from "./ProtectedRoute.jsx";
+import { ROUTES } from "./routes";
+import MainLayout from "../../shared/MainLayout/MainLayout.component";
+import ProtectedRoute from "./ProtectedRoute";
 
-import HomePage from "../../pages/HomePage.jsx";
-import LoginPage from "../../pages/LoginPage.jsx";
-import RegisterPage from "../../pages/RegisterPage.jsx";
-import VerifyEmailPage from "../../pages/VerifyEmailPage.jsx";
-import PasswordResetPage from "../../pages/PasswordResetPage.jsx";
-import ProfilePage from "../../pages/ProfilePage.jsx";
-import DashboardPage from "../../pages/DashboardPage.jsx";
-import LearningPathPage from "../../pages/LearningPathPage.jsx";
-import LearnPage from "../../pages/LearnPage.jsx";
-import LastLessonRedirect from "../../pages/LastLessonRedirect.jsx";
-import PrivacyPage from "../../pages/PrivacyPage.jsx";
-import TermsPage from "../../pages/TermsPage.jsx";
-import NotFoundPage from "../../pages/NotFoundPage.jsx";
+import HomePage from "../../pages/HomePage";
+import LoginPage from "../../pages/LoginPage";
+import RegisterPage from "../../pages/RegisterPage";
+import VerifyEmailPage from "../../pages/VerifyEmailPage";
+import PasswordResetPage from "../../pages/PasswordResetPage";
+import ProfilePage from "../../pages/ProfilePage";
+import DashboardPage from "../../pages/DashboardPage";
+import LearningPathPage from "../../pages/LearningPathPage";
+import LearnPage from "../../pages/LearnPage";
+import LastLessonRedirect from "../../pages/LastLessonRedirect";
+import PrivacyPage from "../../pages/PrivacyPage";
+import TermsPage from "../../pages/TermsPage";
+import NotFoundPage from "../../pages/NotFoundPage";
 
 export default function AppRouter() {
   return (

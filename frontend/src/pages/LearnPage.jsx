@@ -1,23 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-router";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import useLessonContent from "../hooks/useLessonContent.js";
-import { ROUTES } from "../app/router/routes.js";
-import { updateLessonProgress } from "../services/api.js";
+import { useAuthContext } from "../context/AuthContext";
+import useLessonContent from "../hooks/useLessonContent";
+import { ROUTES } from "../app/router/routes";
+import { updateLessonProgress } from "../services/api";
 import {
   getResumeIndex,
   getSampleLesson,
   normalizeLearnData,
   selectRandomLesson,
   titlesOverlap,
-} from "../features/learn/normalizeLesson.js";
-import LessonComponent from "../features/learn/Lesson/Lesson.component.jsx";
-import QuizComponent from "../features/learn/Quiz/Quiz.component.jsx";
-import { useQuiz } from "../hooks/useQuiz.js";
-import Button from "../shared/Button/Button.component.jsx";
-import Card from "../shared/Card/Card.component.jsx";
-import ProgressBar from "../shared/ProgressBar/ProgressBar.component.jsx";
-import Skeleton from "../shared/Skeleton/Skeleton.component.jsx";
+} from "../features/learn/normalizeLesson";
+import LessonComponent from "../features/learn/Lesson/Lesson.component";
+import QuizComponent from "../features/learn/Quiz/Quiz.component";
+import { useQuiz } from "../hooks/useQuiz";
+import Button from "../shared/Button/Button.component";
+import Card from "../shared/Card/Card.component";
+import ProgressBar from "../shared/ProgressBar/ProgressBar.component";
+import Skeleton from "../shared/Skeleton/Skeleton.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";

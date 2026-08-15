@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router";
-import { useAuthContext } from "../../context/AuthContext.jsx";
-import Spinner from "../../shared/Spinner/Spinner.component.jsx";
-import { ROUTES } from "./routes.js";
+import { useAuthContext } from "../../context/AuthContext";
+import Spinner from "../../shared/Spinner/Spinner.component";
+import { ROUTES } from "./routes";
 
 export default function ProtectedRoute({ children }) {
   const { isAuthenticated, isHydrating } = useAuthContext();

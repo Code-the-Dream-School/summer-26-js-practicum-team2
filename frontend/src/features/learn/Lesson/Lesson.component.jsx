@@ -1,5 +1,5 @@
-import LessonRenderer from "./LessonRenderer/LessonRenderer.component.jsx";
-import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component.jsx";
+import LessonRenderer from "./LessonRenderer/LessonRenderer.component";
+import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component";
 
 function LessonComponent({
   title,

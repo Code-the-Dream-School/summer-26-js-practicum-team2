@@ -1,4 +1,4 @@
-import Card from "../shared/Card/Card.component.jsx";
+import Card from "../shared/Card/Card.component";
 
 export default function PrivacyPage() {
   return (

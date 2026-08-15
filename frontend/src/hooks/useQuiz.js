@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useReducer } from "react";
-import quizReducer, { actions, initialState } from "../reducers/quiz.reducer.js";
-import { startQuiz, submitQuiz } from "../services/api.js";
-import { scoreQuizAttempt } from "../utils/quizScoring.js";
+import quizReducer, { actions, initialState } from "../reducers/quiz.reducer";
+import { startQuiz, submitQuiz } from "../services/api";
+import { scoreQuizAttempt } from "../utils/quizScoring";
 
 export function useQuiz({
   questions = [],
