@@ -529,7 +529,25 @@
                   "  pm.expect(responseJson.user.email).to.eql(pm.collectionVariables.get('testUserEmail'));",
                   "});",
                   "pm.collectionVariables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
-                  "pm.variables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));"
+                  "pm.variables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
+                  "if (responseJson && responseJson.csrfToken) {",
+                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.variables.set('csrfToken', responseJson.csrfToken);",
+                  "}",
+                  "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
+                  "if (setCookieHeaders.length) {",
+                  "  const cookiePairs = setCookieHeaders",
+                  "    .map((header) => header.value || '')",
+                  "    .flatMap((value) => value.split(',').map((part) => part.trim()).filter(Boolean))",
+                  "    .filter((part) => part.includes('='))",
+                  "    .map((part) => part.split(';')[0].trim())",
+                  "    .filter(Boolean);",
+                  "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
+                  "  if (sessionCookie) {",
+                  "    pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "    pm.variables.set('sessionCookie', sessionCookie);",
+                  "  }",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
