@@ -1,26 +1,40 @@
-# Project Name
+# Sprout
 
-Short, clear description of what this application does and who it’s for.  
-(1–2 sentences max.)
+**Plant your money. Watch it grow.**
 
-**Example:**  
-A full-stack web application with a React frontend and a Node/Express backend that allows users to create, manage, and track data stored in a database.
+Sprout is a friendly, gamified money-basics app for college freshmen and
+recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
+and a per-lesson plant-growth reward loop help first-paycheck learners
+feel in control of their money — without a lecture.
 
 ## 🚀 Live Demo
 
-- **Frontend Live Site:** https://your-frontend-url.com
-- **Frontend Repo:** /frontend
-- **Backend Repo:** /backend
+- **Frontend Live Site:** https://sprout-ctd.netlify.app/
+- **Frontend Repo:** https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/tree/main/frontend
+- **Backend Live Site:** https://sprout-backend-x46w.onrender.com
+- **Backend Repo:** https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/tree/main/backend
+
+## 🤝 Community Standards
+
+- [Contributing Guidelines](.github/CONTRIBUTING.md)
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+- [Security Policy](.github/SECURITY.md)
+- [Support](SUPPORT.md)
 
 ## 🧠 Problem Statement
 
-What problem does this project solve?
+Most young adults handle their first checking account, paycheck, and rent
+payment with no formal money education. Existing personal-finance apps
+either lecture, push wealth-management products, or assume the user already
+speaks fluent finance — none of which fits a college freshman or a
+first-paycheck recent grad.
 
-- Who is this application for?
-- What pain point does it address?
-- Why does this solution matter?
-
-Focus on the **user problem**, not the technology.
+- **Who is this for?** Single moms (Persona A, "Working Single Mom of Two") and Freshman in College (Persona B, "College Freshman").
+- **Pain point:** They want to feel smarter about money but don't want a
+  lecture, an advisor pitch, or a 30-minute reading assignment. They want a way to learn in between classes or shifts
+- **Why this matters:** Small, confident money habits formed early
+  compound. Sprout keeps the learning loop short (3–5 min per lesson) and
+  makes the reward visible via the plant-growth mechanic.
 
 ## 🎯 Features
 
@@ -33,7 +47,7 @@ Focus on the **user problem**, not the technology.
 
 ## 📸 Screenshots
 
-Add screenshots or GIFs of key features here.
+<!-- Add screenshots or GIFs of key features here. -->
 
 ## 🛠 Tech Stack
 
@@ -43,23 +57,24 @@ Add screenshots or GIFs of key features here.
 - JavaScript (ES6+)
 - HTML5
 - CSS3 / Tailwind
-- Vite or Create React App
+- Vite
+- Vitest + Testing Library
 
 ### Backend
 
 - Node.js
 - Express.js
 - REST API
+- Jest + Supertest
 
 ### Database
 
-- MongoDB (Mongoose) **or**
-- PostgreSQL (Prisma / Knex / Sequelize)
+- MongoDB (Mongoose)
 
 ### Tooling
 
 - Git & GitHub
-- dotenv (environment variables)
+- dotenv
 - ESLint / Prettier
 
 ## 📁 Project Structure
@@ -68,41 +83,29 @@ Add screenshots or GIFs of key features here.
 project-root/
 ├── frontend/
 │   ├── src/
-|   |   ├── app             # Application-level configuration
-│   │   │
-│   │   │    └── router/    # Routes and navigation configuration
-│   │   │
-│   │   ├── assets/         # Images, icons, and other static assets
-│   │   │
-│   │   ├── components/     # Reusable React components
-│   │   │   ├── layout/     # Shared page layout components
-│   │   │   └── ui/         # Reusable UI components
-│   │   │
-│   │   ├── context/        # Global React contexts
-│   │   │
+│   │   ├── app/            # Application-level configuration
+│   │   │   └── router/     # Routes and navigation configuration
+│   │   ├── context/        # Auth context, provider, and hook guard
+│   │   ├── reducers/       # Shared state reducers
 │   │   ├── hooks/          # Shared custom React hooks
-│   │   │
-│   │   ├── pages/          # Route-level page components
-│   │   │
 │   │   ├── services/       # API requests and external services
-│   │   │
-│   │   ├── styles/         # Shared styles and Tailwind customization()
-│   │   │
+│   │   ├── features/       # Domain feature modules (auth, dashboard, learn, lessons, legal)
+│   │   ├── shared/         # Reusable UI elements (Button, Card, Input, Layouts, etc.)
+│   │   ├── pages/          # Route-level view components
 │   │   ├── utils/          # Shared helper functions
-│   │   │
+│   │   ├── test/
+│   │   │   └── fixtures/   # Mock data for tests
 │   │   ├── App.jsx         # Main application component
-│   │   │
-│   │   ├── index.css       # Global styles and Tailwind import
-│   │   │
-│   │   └── main.jsx        # Application entry point
+│   │   ├── main.jsx        # Application entry point
+│   │   ├── index.css       # Global styles
+│   │   ├── reset.css       # CSS reset/base styles
+│   │   └── setupTests.js   # Frontend test setup
 │
 ├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── middleware/
-│   ├── config/
-│   ├── app.js
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   └── config/
 │   ├── server.js
 │   └── package.json
 │
@@ -111,119 +114,31 @@ project-root/
 
 ## ⚙️ Setup & Installation
 
-### Prerequisites
-
-- Node.js (v24+ recommended)
-- npm
-- MongoDB
-
-### Backend Setup
+### Quick Start
 
 ```bash
-cd backend
-npm install
+npm run setup
 npm run dev
 ```
 
-Create a `.env` file inside the `backend` folder:
+- Frontend runs on: http://localhost:5173
+- Backend runs on: http://localhost:8080
 
-```env
-PORT=5000
-DATABASE_URL=your_database_url
-JWT_SECRET=your_secret_key
-```
+For full setup, scripts, testing, and API details, see:
 
-Backend runs on:  
-http://localhost:8080
-
-### Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend runs on:  
-http://localhost:5173
-
-## 🧪 Available Scripts
-
-### Frontend
-
-Run commands from the `frontend` directory.
-
-```bash
-npm run dev # start the development server
-npm run build # create the production build
-npm run preview # preview the production build
-npm run lint # check code with ESLint
-npm run lint:fix # fix supported ESLint issues
-npm run format # format files with Prettier
-npm run format:check # check formatting without changing files
-```
-
-### Backend
-
-```bash
-npm run dev
-npm start
-```
-
-## 🔐 API Overview
-
-### Example Endpoints
-
-```text
-POST   /api/auth/register
-POST   /api/auth/login
-GET    /api/items
-POST   /api/items
-PUT    /api/items/:id
-DELETE /api/items/:id
-```
-
-## 🤝 Team & Collaboration
-
-### Team Members
-
-- Name — Role
-- Name — Role
-- Name — Role
-
-### Workflow
-
-- GitHub Issues for task tracking
-- Feature branches for development
-- Pull Requests required for all merges
-- Code reviews before merging to `main`
-
-## 🧩 Development Process
-
-- Agile / sprint-based workflow
-- Backend API built before frontend integration
-- MVP defined early
-- Incremental feature development
-
-## 📌 Known Issues / Limitations
-
-- Limited role-based access control
-- No automated tests yet
-- Performance optimizations pending
-
-## 🛣 Future Improvements
-
-- Add automated testing (Jest, Supertest)
-- Improve security and validation
-- Add caching and performance improvements
-- Dockerize the application
+- [Documentation Index](docs/README.md)
+- [Development Setup](docs/development-setup.md)
+- [Postman Backend Testing](docs/testing-postman.md)
+- [API Overview](docs/api-overview.md)
+- [Team and Collaboration Workflow](docs/contributing-workflow.md)
+- [Roadmap and Known Limitations](docs/roadmap.md)
 
 ## 🙌 Acknowledgments
 
-- Mentors
-- Instructors
-- Open-source libraries and tools
+- Code the Dream mentors and practicum staff for guidance and review support
+- The Sprout contributor team for collaborative design, implementation, and testing
+- The maintainers of key open-source tools used in this project, including React, Vite, Express, MongoDB, Jest, Vitest, and Postman
 
 ## 📄 License
 
-This project is for educational purposes only.
+This project uses the license in the root [LICENSE](LICENSE) file.

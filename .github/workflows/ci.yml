@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Run frontend lint checks
+        run: npm --prefix frontend run lint
+
+      - name: Run frontend test checks
+        run: npm --prefix frontend run test
+
+      - name: Run frontend build checks
+        run: npm --prefix frontend run build
+
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
+      - name: Run backend lint checks
+        run: npm --prefix backend run lint
+
+      - name: Run backend test checks
+        run: npm --prefix backend run test
+
+      - name: Run backend syntax checks
+        run: |
+          node --check backend/server.js
+          node --check backend/src/app.js
