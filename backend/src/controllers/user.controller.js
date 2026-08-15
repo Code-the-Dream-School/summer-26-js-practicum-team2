@@ -170,7 +170,7 @@ const login = async (req, res, next) => {
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
 const logout = async (req, res) => {
-  const { maxAge, ...cookieOptions } = getCookieOptions(req);
+  const { ...cookieOptions } = getCookieOptions(req);
   const hasSessionCookie = Boolean(req.cookies?.session_token);
   res.clearCookie("session_token", cookieOptions);
 

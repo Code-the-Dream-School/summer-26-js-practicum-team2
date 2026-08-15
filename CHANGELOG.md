@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Resolved a typo within the ConsentBanner component
+- Fixes a linting error by removing unused maxAge variable from logout in backend user.controller
 
 ---
 
