@@ -10,9 +10,9 @@ feel in control of their money — without a lecture.
 ## 🚀 Live Demo
 
 - **Frontend Live Site:** https://sprout-ctd.netlify.app/
-- **Frontend Repo:** /frontend
+- **Frontend Repo:** https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/tree/main/frontend
 - **Backend Live Site:** https://sprout-backend-x46w.onrender.com
-- **Backend Repo:** /backend
+- **Backend Repo:** https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/tree/main/backend
 
 ## 🤝 Community Standards
 
@@ -56,13 +56,15 @@ first-paycheck recent grad.
 - JavaScript (ES6+)
 - HTML5
 - CSS3 / Tailwind
-- Vite or Create React App
+- Vite
+- Vitest + Testing Library
 
 ### Backend
 
 - Node.js
 - Express.js
 - REST API
+- Jest + Supertest
 
 ### Database
 
@@ -71,7 +73,7 @@ first-paycheck recent grad.
 ### Tooling
 
 - Git & GitHub
-- dotenv (environment variables)
+- dotenv
 - ESLint / Prettier
 
 ## 📁 Project Structure
@@ -80,41 +82,29 @@ first-paycheck recent grad.
 project-root/
 ├── frontend/
 │   ├── src/
-|   |   ├── app             # Application-level configuration
-│   │   │
-│   │   │    └── router/    # Routes and navigation configuration
-│   │   │
-│   │   ├── assets/         # Images, icons, and other static assets
-│   │   │
-│   │   ├── components/     # Reusable React components
-│   │   │   ├── layout/     # Shared page layout components
-│   │   │   └── ui/         # Reusable UI components
-│   │   │
-│   │   ├── context/        # Global React contexts
-│   │   │
+│   │   ├── app/            # Application-level configuration
+│   │   │   └── router/     # Routes and navigation configuration
+│   │   ├── context/        # Auth context, provider, and hook guard
+│   │   ├── reducers/       # Shared state reducers
 │   │   ├── hooks/          # Shared custom React hooks
-│   │   │
-│   │   ├── pages/          # Route-level page components
-│   │   │
 │   │   ├── services/       # API requests and external services
-│   │   │
-│   │   ├── styles/         # Shared styles and Tailwind customization()
-│   │   │
+│   │   ├── features/       # Domain feature modules (auth, dashboard, learn, lessons, legal)
+│   │   ├── shared/         # Reusable UI elements (Button, Card, Input, Layouts, etc.)
+│   │   ├── pages/          # Route-level view components
 │   │   ├── utils/          # Shared helper functions
-│   │   │
+│   │   ├── test/
+│   │   │   └── fixtures/   # Mock data for tests
 │   │   ├── App.jsx         # Main application component
-│   │   │
-│   │   ├── index.css       # Global styles and Tailwind import
-│   │   │
-│   │   └── main.jsx        # Application entry point
+│   │   ├── main.jsx        # Application entry point
+│   │   ├── index.css       # Global styles
+│   │   ├── reset.css       # CSS reset/base styles
+│   │   └── setupTests.js   # Frontend test setup
 │
 ├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── middleware/
-│   ├── config/
-│   ├── app.js
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   └── config/
 │   ├── server.js
 │   └── package.json
 │
@@ -125,125 +115,201 @@ project-root/
 
 ### Prerequisites
 
-- Node.js (v24+ recommended)
+- Node.js (v24+ required)
 - npm
 - MongoDB
 
-### Backend Setup
+### Node Version Management (Recommended)
+
+This repo includes a `.nvmrc` file set to Node `24`.
+
+- Windows: use `fnm` (recommended)
+- macOS/Linux: use `nvm`
+
+#### Windows (`fnm`) auto-switch setup
+
+1. Install `fnm`.
+2. Add this to your PowerShell profile so Node auto-switches on folder change:
+
+```powershell
+fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+```
+
+3. In the project root, run:
+
+```powershell
+fnm install
+fnm use
+```
+
+#### macOS/Linux (`nvm`) setup
+
+In the project root, run:
 
 ```bash
-cd backend
-npm install
-npm run dev
+nvm install
+nvm use
 ```
 
-Create a `.env` file inside the `backend` folder:
-
-```env
-# Local MongoDB
-MONGO_URI=mongodb://localhost:27017/summer-26-js-practicum-team2
-# Cloud MongoDB (uncomment and replace <username> and <password> with your credentials)
-#MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/summer-26-js-practicum-team2?retryWrites=true&w=majority
-
-# SMTP configuration for sending emails
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_app_password_or_smtp_password
-FROM_EMAIL=your_email@gmail.com
-# Optional: keep auth flows working in local dev when SMTP is unavailable.
-# In production keep this false so mail failures surface immediately.
-EMAIL_FAIL_OPEN=true
-
-# Auth & Frontend URLs
-JWT_SECRET=your_super_secret_jwt_key_here
-CLIENT_URL=http://localhost:5173
-
-# Comma-separated frontend origins allowed to call this API (for CORS credentials)
-# Example: CORS_ORIGINS=https://development--sprout-ctd.netlify.app,https://sprout-ctd.netlify.app,http://localhost:5173
-CORS_ORIGINS=https://development--sprout-ctd.netlify.app,https://sprout-ctd.netlify.app,http://localhost:5173
-
-# Cookie settings for cross-site deployments (Netlify + Render)
-# For production cross-site auth: COOKIE_SAME_SITE=none and COOKIE_SECURE=true
-COOKIE_SAME_SITE=lax
-COOKIE_SECURE=false
-```
-
-Backend runs on:  
-http://localhost:8080
-
-### Frontend Setup
+For auto-switch on directory change, add this to `~/.zshrc` or `~/.bashrc`:
 
 ```bash
-cd frontend
-npm install
-npm run dev
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local nvmrc_path
+  nvmrc_path="$(nvm_find_nvmrc)"
+  if [ -n "$nvmrc_path" ]; then
+    nvm use
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
 ```
 
-Frontend runs on:  
-http://localhost:5173
+#### `nvm-for-windows` note
 
-## 🧪 Available Scripts
+`nvm-for-windows` does not support automatic `.nvmrc` switching.
+If you use it, run this manually in the project root:
 
-### Frontend
-
-Run commands from the `frontend` directory.
-
-```bash
-npm run dev # start the development server
-npm run build # create the production build
-npm run preview # preview the production build
-npm run lint # check code with ESLint
-npm run lint:fix # fix supported ESLint issues
-npm run format # format files with Prettier
-npm run format:check # check formatting without changing files
+```powershell
+nvm use 24
 ```
 
-### Backend
-
-```bash
-npm run dev
-```
-
-### Running Frontend & Backend Concurrently
-
-The root folder includes two development dependencies: **Concurrently** and **dotenv-cli**.
-
-It also includes two scripts.
-
-The first script is:
+### Quick Start (Recommended)
 
 ```bash
 npm run setup
-```
-
-````
-
-This script installs the root development dependencies, then installs the dependencies for both the `backend` and `frontend` folders.
-
-The second script is:
-
-```bash
 npm run dev
 ```
 
-This script uses **dotenv-cli** to load environment variables from the root `.env` file. If a port is defined there, it can be passed to the backend and frontend as needed.
+- Frontend runs on: http://localhost:5173
+- Backend runs on: http://localhost:8080
 
-It also uses **Concurrently** to start both the frontend and backend development servers at the same time from a single terminal.
+### Run A Single App
 
+```bash
+npm run development:frontend
+npm run development:backend
 ```
+
+Run backend in non-watch mode:
+
+```bash
+npm run start:backend
+```
+
+### Environment Setup
+
+Copy the backend env template and fill in values:
+
+```bash
+copy backend\.env.example backend\.env
+```
+
+Mac/Linux:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+## 🧪 Available Scripts
+
+### Root (run from project root)
+
+```bash
+npm run setup
+npm run predev
+npm run dev
+npm run lint
+npm run format
+npm run test
+npm run test:backend
+npm run test:frontend
+npm run start:backend
+npm run build:frontend
+```
+
+### Frontend (run from frontend)
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
+npm run lint:fix
+npm run format
+npm run format:check
+npm run test
+npm run test:watch
+```
+
+### Backend (run from backend)
+
+```bash
+npm run dev
+npm run start
+npm run test
+npm run lint
+npm run lint:fix
+npm run format
+npm run format:check
+```
+
+## 🧪 Postman Backend Testing
+
+Use the included Postman files to speed up backend testing across local and cloud environments:
+
+- Collection: docs/postman/local-backend-api.postman-collection.json
+- Environment (local): docs/postman/local-backend-api.postman_environment.json
+- Environment (remote development): docs/postman/remote-dev-backend-api.postman_environment.json
+- Environment (remote production): docs/postman/remote-backend-api.postman_environment.json
+
+### Import And Run
+
+1. Import the collection and all environment files into Postman.
+2. Select one environment based on where you want to test:
+
+- Local Backend API (`http://localhost:8080`)
+- Remote Development Backend API (`https://sprout-backend-dev.onrender.com/`)
+- Remote Production Backend API (`https://sprout-backend-x46w.onrender.com/`)
+
+3. If testing local, start the backend first (`npm run dev` from root or backend).
+4. Run in this order for end-to-end auth coverage: Register, Verify Email, Login.
+5. Then run Dashboard, Quizzes, and Lessons requests.
+
+Collection tests and scripts automatically capture and reuse these values:
+
+- `verificationToken`
+- `csrfToken`
+- `sessionCookie`
+- `resetToken`
+- `quizAttemptId`
 
 ## 🔐 API Overview
 
-### Example Endpoints
+### Routes Covered By Postman Collection
 
 ```text
-POST   /api/auth/register
-POST   /api/auth/login
-GET    /api/items
-POST   /api/items
-PUT    /api/items/:id
-DELETE /api/items/:id
+GET    /api/hello
+
+POST   /api/v1/users/register
+GET    /api/v1/users/verify?token=...
+POST   /api/v1/users/login
+POST   /api/v1/users/logout
+POST   /api/v1/users/forgot-password
+POST   /api/v1/users/reset-password
+
+GET    /api/v1/dashboard
+POST   /api/v1/dashboard/events
+
+GET    /api/v1/quizzes/progress
+GET    /api/v1/quizzes/attempts
+POST   /api/v1/quizzes/start
+POST   /api/v1/quizzes/1.1.2/submit
+
+GET    /api/v1/lessons/cashFlow/1.1
+GET    /api/v1/lessons/progress?moduleId=cashFlow
+PATCH  /api/v1/lessons/progress
 ```
 
 ## 🤝 Team & Collaboration
@@ -301,4 +367,3 @@ DELETE /api/items/:id
 ## 📄 License
 
 This project is for educational purposes only.
-````
