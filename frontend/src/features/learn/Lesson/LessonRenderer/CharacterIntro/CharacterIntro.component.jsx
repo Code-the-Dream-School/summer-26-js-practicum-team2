@@ -33,7 +33,7 @@ function CharacterIntro({ content }) {
           alt="Character"
           className="mx-5 h-auto object-contain inline-block w-3/4 items-center md:w-1/4"
         />
-        <h2 className="text-lg md: text-xl text-slate-900">{content.text}</h2>
+        <h2 className="text-lg md:text-xl text-slate-900">{content.text}</h2>
       </div>
     </div>
   );
