@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added function to generate random encouraging phrases and words for quiz feedback
 - Add ExpandableWhy component for quiz explanation display when the explanation is greater than 30 words
+- Added a step-by-step quiz review flow after lesson completion.
+- Preserved submitted quiz answers for later review.
+- Added read-only answer feedback with correct and incorrect choice indicators.
+- Added Previous, Next, and Back to Results navigation during quiz review.
+
+### Changed
+
+- Split Learn Page into multiple smaller components to reduce it's size
 
 ---
 
