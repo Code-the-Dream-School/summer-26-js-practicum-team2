@@ -31,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Resolved a typo within the ConsentBanner component
-- Fixes a linting error by removing unused maxAge variable from logout in backend user.controller
+- Fixed a linting error by removing unused maxAge variable from logout in backend user.controller
+- Added optional chaining to content in BudgetSummary component to prevent undefined if json is missing content
 
 ---
 

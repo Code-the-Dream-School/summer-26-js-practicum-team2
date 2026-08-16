@@ -9,7 +9,7 @@ function BudgetSummary({ content, module }) {
     <div className="space-y-6 rounded-xl border p-6">
       <h2 className="text-2xl font-bold">{budget.title}</h2>
 
-      {content.show.income && (
+      {content.show?.income && (
         <section>
           <h3 className="mb-2 font-semibold">Income</h3>
 
@@ -23,7 +23,7 @@ function BudgetSummary({ content, module }) {
         </section>
       )}
 
-      {content.show.totals && (
+      {content.show?.totals && (
         <section>
           <h3 className="mb-2 font-semibold">Totals</h3>
 
@@ -41,7 +41,7 @@ function BudgetSummary({ content, module }) {
         </section>
       )}
 
-      {content.show.cashFlow && (
+      {content.show?.cashFlow && (
         <section>
           <div className="rounded-lg bg-emerald-50 p-4">
             <div className="font-semibold">Cash Flow</div>
