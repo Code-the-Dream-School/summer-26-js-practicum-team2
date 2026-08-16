@@ -5,6 +5,7 @@ import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
 import { updateLessonProgress } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
+import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 
 import QuizComponent from "../Quiz/Quiz.component";
 import QuizReview from "../Quiz/QuizReview/QuizReview.component";
@@ -55,6 +56,7 @@ export default function LearnFlow({
   const [submissions, setSubmissions] = useState({});
   const [completedAttempts, setCompletedAttempts] = useState([]);
   const [isReviewing, setIsReviewing] = useState(false);
+  const [feedbackMode, setFeedbackMode] = useState(() => getQuizFeedbackPreference());
 
   const currentStep = lessonSteps[stepIndex];
   const chunks = currentStep?.content ?? [];
@@ -87,6 +89,14 @@ export default function LearnFlow({
       // A dropped position update should never interrupt the lesson.
     });
   }, [canSyncProgress, csrfToken, currentMicroLessonId, learnData.id, learnData.moduleId]);
+
+  useEffect(() => {
+    function handleStorageChange() {
+      setFeedbackMode(getQuizFeedbackPreference());
+    }
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const { totalUnits, completedUnits } = useMemo(() => {
     const countQuestions = (stepId) =>
@@ -155,6 +165,7 @@ export default function LearnFlow({
     }
 
     if (currentStepQuestions.length > 0) {
+      setFeedbackMode(getQuizFeedbackPreference());
       quiz.begin(currentMicroLessonId);
       setPhase("quiz");
       return;
@@ -295,7 +306,7 @@ export default function LearnFlow({
             </p>
           ) : null}
         </div>
-
+        <div className="mb-2 flex justify-end"></div>
         {phase === "quiz" ? (
           <>
             <QuizComponent
@@ -320,7 +331,7 @@ export default function LearnFlow({
 
             {/* Quiz navigation is forward-only so an answer cannot be revised after review. */}
             <div className="mt-8 flex flex-wrap justify-end gap-4 border-t border-primary/10 pt-6">
-              {quiz.review ? (
+              {feedbackMode === "immediate" && quiz.review ? (
                 <Button
                   variant="quiz"
                   className="min-w-36"
@@ -329,7 +340,7 @@ export default function LearnFlow({
                 >
                   {isLastQuestion && isLastStep ? "View results" : "Continue"}
                 </Button>
-              ) : (
+              ) : feedbackMode === "immediate" ? (
                 <Button
                   variant="quiz"
                   className="min-w-40"
@@ -337,6 +348,16 @@ export default function LearnFlow({
                   onClick={() => quiz.checkAnswer(quiz.currentQuestion, quiz.selectedChoiceIds)}
                 >
                   Check answer
+                </Button>
+              ) : (
+                <Button
+                  variant="quiz"
+                  className="min-w-40"
+                  loading={quiz.status === "submitting"}
+                  disabled={quiz.selectedChoiceIds.length === 0}
+                  onClick={advanceQuiz}
+                >
+                  {isLastQuestion && isLastStep ? "View results" : "Continue"}
                 </Button>
               )}
             </div>

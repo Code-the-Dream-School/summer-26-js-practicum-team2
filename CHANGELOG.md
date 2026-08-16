@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added read-only answer feedback with correct and incorrect choice indicators.
 - Added Previous, Next, and Back to Results navigation during quiz review.
 - Added a quiz feedback preference (instant vs. at-the-end) with a toggle on the Profile page.
+- Wired the quiz feedback preference into the lesson flow so it controls whether answers are revealed per question or only after quiz submission.
 
 ### Changed
 
