@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
   console.log("Exiting the application due to missing JWT_SECRET.");
   process.exit(1);
 }
-const { setServers } = require("node:dns/promises");
+const { setServers } = require("node:dns");
 const app = require("./src/app");
 const connectMongo = require("./src/config/db.mongo.js");
 
@@ -15,7 +15,8 @@ const PORT = process.env.PORT || 8080;
 // This is a workaround to set the DNS server to Cloudflare's public DNS
 const setDNS = async (dns = "1.1.1.1") => {
   try {
-    setServers([dns]);
+    // Only enabled if the NODE_ENV is not set to "production" to avoid potential issues in production environments.
+    process.env.NODE_ENV !== "production" && setServers([dns]);
   } catch (err) {
     console.error("Failed to set DNS servers:", err.message);
     process.exit(1);

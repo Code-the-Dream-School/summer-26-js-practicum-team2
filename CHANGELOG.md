@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a linting error by removing unused maxAge variable from logout in backend user.controller
 - Added optional chaining to content in BudgetSummary component to prevent undefined if json is missing content
 - Fixed login rate limiter IP key generation
+- In backend/server.js, conditionally sets DNS override only outside of production to prevent the app from crashing in some environments
 
 
 ---
