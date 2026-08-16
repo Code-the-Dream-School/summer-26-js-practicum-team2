@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Split Learn Page into multiple smaller components to reduce it's size
+- Extracted the lesson/quiz flow out of LearnPage into a new LearnFlow component, reducing LearnPage's size.
 
 ---
 
