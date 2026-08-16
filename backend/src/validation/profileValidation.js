@@ -43,4 +43,13 @@ const changePasswordSchema = Joi.object({
       "any.required": "New Password is required.",
     }),
 });
-module.exports = {updateProfileSchema, changePasswordSchema };
+
+const deleteAccountSchema = Joi.object({
+  email: Joi.string().trim().lowercase().email().required().messages({
+    "string.empty": "Please enter your email if you want to delete your account.",
+    "string.email": "Please provide email that is valid.", 
+    "any.required": "You need to provide a valid email in order to delete your account.",
+  }),
+});
+
+module.exports = {updateProfileSchema, changePasswordSchema, deleteAccountSchema };
