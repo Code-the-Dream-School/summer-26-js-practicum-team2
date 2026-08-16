@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Preserved submitted quiz answers for later review.
 - Added read-only answer feedback with correct and incorrect choice indicators.
 - Added Previous, Next, and Back to Results navigation during quiz review.
+- Added a quiz feedback preference (instant vs. at-the-end) with a toggle on the Profile page.
 
 ### Changed
 
