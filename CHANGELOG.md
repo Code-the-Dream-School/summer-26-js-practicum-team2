@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added optional chaining to content in BudgetSummary component to prevent undefined if json is missing content
 - Fixed login rate limiter IP key generation
 - In backend/server.js, conditionally sets DNS override only outside of production to prevent the app from crashing in some environments
-
+- Allowed Vite to access shared lesson content by updating the vite.config.js file
 
 ---
 
