@@ -36,8 +36,8 @@ export default function Button({
 
   return (
     <Component
-      type={type}
-      disabled={isDisabled}
+      type={Component === "button" ? type : undefined}
+      disabled={Component === "button" ? isDisabled : undefined}
       aria-busy={loading || undefined}
       className={
         variant === "circleCompleted" || variant === "circleCurrent" || variant === "circleDisabled"
