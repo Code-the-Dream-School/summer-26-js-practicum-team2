@@ -2,7 +2,7 @@ const { User, ArchivedUser } = require("../models/user");
 const UserProgress = require("../models/UserProgress");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
-const { updateProfileSchema, changePasswordSchema } = require("../validation/profileValidation");
+const { updateProfileSchema, changePasswordSchema, deletAccountSchema } = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -248,6 +248,12 @@ const changePassword = async (req, res, next) => {
 //DELETE /api/v1/profile for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
+    const { error, value } = deletAccountSchema.validate(req.body);
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: error.details[0].message,
+      });
+    }
     const user = await User.findByIdAndUpdate(
       req.user.id,
       {
@@ -258,11 +264,21 @@ const deleteAccount = async (req, res, next) => {
         new: true,
       },
     );
-    if (!user) {
+    if (!user || user.is_deleted) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "User not found." });
     }
+    if (user.email.toLocaleLowerCase() !== value.email.toLowerCase()){
+      return res.status(StatusCodes.BAD_REQUEST).json ({
+        message: "Email does not match account email on record. Please try again.",
+      });
+    }
+    user.is_deleted = true;
+    user.delete_at = new Date();
+    user.token_version = (user.token_version || 0) +1;
+    await user.save();
+    
     await ArchivedUser.create({
       original_user_id: user._id,
       name: user.name,
