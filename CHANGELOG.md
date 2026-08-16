@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined 
 - Fixed Tailwind breakpoint class typo in CharacterIntro component
 - Fixed typo with duplicate JWT_SECRET is backend/.env.example
+- Improved lesson table rendering by safely handling missing module, table, and budget data, and by selecting the correct budget when a `budgetId` is provided instead of always defaulting to the first budget.
 
 ---
 

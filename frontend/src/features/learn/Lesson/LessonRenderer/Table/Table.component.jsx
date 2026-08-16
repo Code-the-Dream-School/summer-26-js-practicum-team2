@@ -1,14 +1,24 @@
 function Table({ content, module }) {
-  const tableId = content.tableId || content.budgetId;
-
-  const table = module.tables.find((table) => table.tableId === tableId);
+  // Check if the module is available
+  if (!module) return <div>Module not found</div>;
+  // Check if the content is available
+  const tableId = content?.tableId || content.budgetId;
+  // If tableId is not provided, default to the first table in the module
+  const table = module.tables?.find((table) => table.tableId === tableId);
 
   if (!table) {
     return <div>Table not found</div>;
   }
+  // Find the budget associated with the table
+  const budgetId = content.budgetId;
+  // If budgetId is not provided, default to the first budget in the module
+  const budget = budgetId
+    ? module.budgets?.find((b) => b.budgetId === budgetId)
+    : module.budgets?.[0];
 
-  const budget = module.budgets[0];
-
+  if (!budget) {
+    return <div>Budget not found</div>;
+  }
   let rows = [];
 
   if (table.incomeRefs) {
