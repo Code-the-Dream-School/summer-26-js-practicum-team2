@@ -1,6 +1,7 @@
 import { useId } from "react";
 import Card from "../../../shared/Card/Card.component";
 import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component";
+import { getEncouragingPhrase, getEncouragingWord } from "./encouragingCopy";
 
 function QuizComponent({
   question,
@@ -100,15 +101,11 @@ function QuizComponent({
           variant={characterVariant}
           imageSrc={characterImage}
           imageAlt={characterAlt}
-          bubbleText={
-            reviewAnswer.isCorrect
-              ? "Nice work! You got it."
-              : "Almost there — let us take another look."
-          }
+          bubbleText={getEncouragingPhrase(reviewAnswer.isCorrect)}
         >
           <div className="space-y-3">
             <p className="font-semibold text-heading">
-              {reviewAnswer.isCorrect ? "Correct!" : "Try again!"}
+              {getEncouragingWord(reviewAnswer.isCorrect)}
             </p>
             <p className="text-foreground">Explanation: {reviewAnswer.explanation}</p>
           </div>

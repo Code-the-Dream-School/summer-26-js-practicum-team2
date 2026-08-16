@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added function to generate random encouraging phrases and words for quiz feedback
+
+---
+
 ## [0.3.0] - 2026-08-16
 
 ### Added
