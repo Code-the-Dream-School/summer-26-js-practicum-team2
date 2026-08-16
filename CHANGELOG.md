@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allowed Vite to access shared lesson content by updating the vite.config.js file
 - Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined 
 - Fixed Tailwind breakpoint class typo in CharacterIntro component
+- Fixed typo with duplicate JWT_SECRET is backend/.env.example
 
 ---
 
