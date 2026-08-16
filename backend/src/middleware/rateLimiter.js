@@ -18,9 +18,8 @@ const loginLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 5,
   skipSuccessfulRequests: true,
-  keyGenerator: (req) => {
-    return req.body?.email ? req.body.email.toLowerCase() : ipKeyGenerator(req.ip);
-  },
+  keyGenerator: (req, res) =>
+    req.body?.email ? req.body.email.toLowerCase() : ipKeyGenerator(req, res),
   standardHeaders: true, //return rate limit info in Ratelimit headers
   legacyHeaders: false, //disable X-Rate limit
   message: {
