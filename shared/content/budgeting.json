@@ -149,6 +149,7 @@
           "microLessonContent": [
             {
               "type": "characterIntro",
+              "characterId": "abigail",
               "text": "Meet Abigail! Abigail is a single mom with twin 14-year-olds."
             },
             {
@@ -166,6 +167,7 @@
           "title": "What is a Budget?",
           "microLessonContent": [
             {
+              "characterId": "abigail",
               "type": "paragraph",
               "text": "Juggling everything going on in her life, Abigail feels like she isn't in control of her money."
             },
@@ -182,6 +184,7 @@
               "text": "A budget is simply a plan for your money. It's a tool you can use to help make financial decisions."
             },
             {
+   
               "type": "paragraph",
               "text": "Budgets involve two main categories: income and expenses."
             },
@@ -246,6 +249,7 @@
           "microLessonContent": [
             {
               "type": "characterIntro",
+              "characterId": "ramona",
               "text": "Meet Ramona! She is an 18-year-old college Freshman."
             },
             {
