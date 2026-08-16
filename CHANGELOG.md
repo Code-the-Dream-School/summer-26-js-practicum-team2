@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added function to generate random encouraging phrases and words for quiz feedback
+- Add ExpandableWhy component for quiz explanation display when the explanation is greater than 30 words
 
 ---
 

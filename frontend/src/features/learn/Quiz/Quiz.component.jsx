@@ -1,6 +1,7 @@
 import { useId } from "react";
 import Card from "../../../shared/Card/Card.component";
 import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component";
+import ExpandableWhy from "./ExpandableWhy/ExpandableWhy.component";
 import { getEncouragingPhrase, getEncouragingWord } from "./encouragingCopy";
 
 function QuizComponent({
@@ -107,7 +108,7 @@ function QuizComponent({
             <p className="font-semibold text-heading">
               {getEncouragingWord(reviewAnswer.isCorrect)}
             </p>
-            <p className="text-foreground">Explanation: {reviewAnswer.explanation}</p>
+            <ExpandableWhy explanation={reviewAnswer.explanation} />
           </div>
         </LessonGuideCharacter>
       ) : null}
