@@ -1,0 +1,49 @@
+name: Lesson Accuracy Automated Review
+
+on:
+  pull_request:
+    branches:
+      - development
+      - docs
+    paths:
+      - shared/content/**
+  workflow_dispatch:
+
+jobs:
+  content-accuracy:
+    name: Lesson accuracy metadata check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify accuracy_reviewed_by and accuracy_reviewed_at fields in lesson JSON files
+        run: |
+          set -euo pipefail
+
+          missing=0
+
+          while IFS= read -r -d '' file; do
+            while IFS= read -r lesson; do
+              lesson_id=$(jq -r '.id // "<unknown>"' <<<"$lesson")
+              lesson_title=$(jq -r '.title // "<untitled>"' <<<"$lesson")
+
+              if ! jq -e '
+                (.accuracy_reviewed_by | type == "string") and
+                (.accuracy_reviewed_by | length > 0) and
+                (.accuracy_reviewed_at | type == "string") and
+                (.accuracy_reviewed_at | length > 0)
+              ' <<<"$lesson" >/dev/null; then
+                echo "Missing accuracy review metadata: $file :: lesson $lesson_id - $lesson_title"
+                missing=1
+              fi
+            done < <(jq -c '.lessons[]?' "$file")
+          done < <(find shared/content -type f -name '*.json' -print0)
+
+          if [ "$missing" -eq 1 ]; then
+            echo "One or more lesson files are missing required accuracy metadata fields."
+            exit 1
+          fi
+
+          echo "All lesson accuracy metadata fields are present and non-empty."
