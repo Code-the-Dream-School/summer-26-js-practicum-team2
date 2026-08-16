@@ -22,12 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a quiz feedback preference (instant vs. at-the-end) with a toggle on the Profile page.
 - Wired the quiz feedback preference into the lesson flow so it controls whether answers are revealed per question or only after quiz submission.
 - Added character introductions for Abigail and Ramona in budgeting lessons
+- Added additional randomized phrases and words for quiz completion, and catching up on lessons
 
 ### Changed
 
 - Extracted the lesson/quiz flow out of LearnPage into a new LearnFlow component, reducing LearnPage's size.
 - Refactored CharacterIntro component to only render text
 - Refactored Table component for better accessibility and prevent crashes with optional chaining
+- Changed the review quiz to only show explanations, not the encouraging text that shows up while taking a quiz
 
 ---
 

@@ -6,6 +6,11 @@ import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalize
 import { updateLessonProgress } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
+import {
+  getQuizCompletionPhrase,
+  getQuizCompletionWord,
+  getAllCaughtUpPhrase,
+} from "../Quiz/encouragingCopy";
 
 import QuizComponent from "../Quiz/Quiz.component";
 import QuizReview from "../Quiz/QuizReview/QuizReview.component";
@@ -234,10 +239,10 @@ export default function LearnFlow({
           />
 
           <h1 className="font-heading text-h2 font-bold text-heading">
-            {hasQuiz && !gradedPassed ? "Nice try" : "Congratulations!"}
+            {hasQuiz && !gradedPassed && getQuizCompletionWord(gradedPassed)}
           </h1>
           <p className="text-lg font-semibold text-heading">
-            {hasQuiz && !gradedPassed ? "Keep practicing" : "Lesson completed"}
+            {hasQuiz && !gradedPassed && getQuizCompletionPhrase(gradedPassed)}
           </p>
 
           {hasQuiz ? (
@@ -245,7 +250,7 @@ export default function LearnFlow({
               Score: {gradedPercentage}% — {gradedPassed ? "Pass" : "Fail"}
             </p>
           ) : (
-            <p className="text-foreground">You reviewed every bite-sized lesson.</p>
+            <p className="text-foreground">{getAllCaughtUpPhrase()}</p>
           )}
 
           {quiz.errorMessage ? (

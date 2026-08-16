@@ -58,6 +58,7 @@ export default function QuizReview({ attempts, onDone, rightAnswerIcon, wrongAns
           onChange={() => {}}
           rightAnswerIcon={rightAnswerIcon}
           wrongAnswerIcon={wrongAnswerIcon}
+          reviewMode={true}
         />
 
         <div className="mt-8 flex justify-between gap-4 border-t border-primary/10 pt-6">

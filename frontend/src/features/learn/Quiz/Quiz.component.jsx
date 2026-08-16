@@ -16,6 +16,7 @@ function QuizComponent({
   characterVariant = "beaver",
   characterImage,
   characterAlt = "Lesson guide",
+  reviewMode = false,
 }) {
   const allowsMultiple = question?.type === "multiSelect";
   const promptId = useId();
@@ -102,7 +103,17 @@ function QuizComponent({
           );
         })}
       </div>
-      {reviewAnswer ? (
+      {reviewAnswer && reviewMode ? (
+        <LessonGuideCharacter
+          variant={characterVariant}
+          imageSrc={characterImage}
+          imageAlt={characterAlt}
+        >
+          <div className="space-y-3">
+            <ExpandableWhy explanation={reviewAnswer.explanation} />
+          </div>
+        </LessonGuideCharacter>
+      ) : reviewAnswer ? (
         <LessonGuideCharacter
           variant={characterVariant}
           imageSrc={characterImage}
@@ -111,7 +122,7 @@ function QuizComponent({
         >
           <div className="space-y-3">
             <p className="font-semibold text-heading">
-              {getEncouragingWord(reviewAnswer.isCorrect)}
+              {getEncouragingWord(reviewAnswer.isCorrect)}!
             </p>
             <ExpandableWhy explanation={reviewAnswer.explanation} />
           </div>
