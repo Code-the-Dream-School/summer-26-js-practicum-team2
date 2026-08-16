@@ -21,6 +21,12 @@
 
 <!-- Add screenshots or a short screen recording for visual changes. -->
 
+## Required Content Sign-off (if modifying lesson or quiz content)
+
+- [ ] Reviewed for factual accuracy by @.. (tag reviewer if possible)
+- [ ] Content lessons reviewed against the accuracy checklist
+- Content PRs will not be approved without this sign-off.
+
 ## Quick Checklist
 
 - [ ] Scope is focused and PR is reviewable
