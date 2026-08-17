@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored Table component for better accessibility and prevent crashes with optional chaining
 - Changed the review quiz to only show explanations, not the encouraging text that shows up while taking a quiz
 
+### Fixed
+
+- Resolved a Mongoose deprecation warning by replacing the obsolete `new: true` option with `returnDocument: "after"` in the lesson progress and quiz submission controllers.
+
 ---
 
 ## [0.3.0] - 2026-08-16
