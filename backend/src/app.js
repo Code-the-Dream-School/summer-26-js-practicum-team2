@@ -15,6 +15,7 @@ const helloRoutes = require("./routes/hello.routes");
 const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
+const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
 
 // Create Express app

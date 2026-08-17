@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Implemented soft deletion, reactivation, and avatar upload updates
+
 ### Changed
 
 - Migrated limiter function is backend/src/app to an exported apiRateLimiter middleware function
