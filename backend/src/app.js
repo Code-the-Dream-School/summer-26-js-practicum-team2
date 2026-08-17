@@ -63,6 +63,7 @@ app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
+app.use("/api/v1/profile", jwtMiddleware, profileRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
 // Root route
 app.get("/", (req, res) => {
