@@ -5,7 +5,7 @@ const { comparePassword, hashPassword } = require("../utils/password");
 const {
   updateProfileSchema,
   changePasswordSchema,
-  deletAccountSchema,
+  deleteAccountSchema,
 } = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
@@ -242,22 +242,13 @@ const changePassword = async (req, res, next) => {
 //DELETE /api/v1/profile for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
-    const { error, value } = deletAccountSchema.validate(req.body);
+    const { error, value } = deleteAccountSchema.validate(req.body);
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: error.details[0].message,
       });
     }
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        $set: { is_deleted: true, deleted_at: new Date() },
-        $inc: { token_version: 1 },
-      },
-      {
-        new: true,
-      },
-    );
+    const user = await User.findById(req.user.id);
     if (!user || user.is_deleted) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
@@ -267,7 +258,7 @@ const deleteAccount = async (req, res, next) => {
       });
     }
     user.is_deleted = true;
-    user.delete_at = new Date();
+    user.deleted_at = new Date();
     user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
