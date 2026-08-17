@@ -25,6 +25,8 @@ Use the included Postman files to speed up backend testing across local and clou
 5. Dashboard, Quizzes, Lessons, and Profile requests then reuse the captured session and
    CSRF token. The final account lifecycle requests change the password, soft-delete the
    test account, and reactivate it.
+4. Run in this order for end-to-end auth coverage: Register, Verify Email, Login.
+5. Then run Dashboard, Quizzes, and Lessons requests.
 
 Collection tests and scripts automatically capture and reuse these values:
 

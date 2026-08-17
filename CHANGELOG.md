@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added issue templates for bug reports, feature requests, and security vulnerabilities with issue-chooser contact links
 - Added docs index and split guides under `docs/` for setup, API overview, Postman testing, workflow, and roadmap
 - Added Postman environment files for remote development and remote production backend testing
+- Added GitHub workflows for syncing `docs` with `development` and also `development` with `docs`
 
 ### Changed
 
