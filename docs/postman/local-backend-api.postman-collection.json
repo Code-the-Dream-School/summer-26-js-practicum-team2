@@ -55,6 +55,11 @@
       "key": "newTestUserPassword",
       "value": "N3wP@ssword!",
       "type": "string"
+    },
+    {
+      "key": "finalTestUserPassword",
+      "value": "F1nalP@ssword!",
+      "type": "string"
     }
   ],
   "item": [
@@ -219,6 +224,19 @@
                   "});",
                   "pm.test('Verify email response includes csrf token', function () {",
                   "  pm.expect(responseJson.csrfToken).to.be.a('string').and.not.empty;",
+                  "});",
+                  "if (responseJson.csrfToken) {",
+                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.variables.set('csrfToken', responseJson.csrfToken);",
+                  "}",
+                  "const sessionToken = pm.cookies.get('session_token');",
+                  "if (sessionToken) {",
+                  "  const sessionCookie = `session_token=${sessionToken}`;",
+                  "  pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "  pm.variables.set('sessionCookie', sessionCookie);",
+                  "}",
+                  "pm.test('Verify email establishes a session', function () {",
+                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1007,6 +1025,390 @@
               "raw": "{{baseUrl}}/api/v1/lessons/progress",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "lessons", "progress"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile and Account Lifecycle",
+      "item": [
+        {
+          "name": "Get Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /profile returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Profile response includes the registered user', function () {",
+                  "  pm.expect(responseJson.user).to.be.an('object');",
+                  "  pm.expect(responseJson.user.email).to.eql(pm.collectionVariables.get('testUserEmail'));",
+                  "  pm.expect(responseJson.user).to.have.property('avatar_initial');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('PATCH /profile returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Profile update returns submitted values', function () {",
+                  "  pm.expect(responseJson.message).to.eql('You have successfully updated your profile.');",
+                  "  pm.expect(responseJson.user.goals).to.eql('Build a reliable monthly budget');",
+                  "  pm.expect(responseJson.user.theme).to.eql('Dark');",
+                  "  pm.expect(responseJson.user.notifications).to.eql(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goals\": \"Build a reliable monthly budget\",\n  \"theme\": \"Dark\",\n  \"notifications\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set Profile Avatar URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /profile/avatar returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Avatar response includes the submitted URL', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Avatar uploaded.');",
+                  "  pm.expect(responseJson.avatar_url).to.eql('https://example.com/test-avatar.png');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"avatar_url\": \"https://example.com/test-avatar.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "avatar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /profile/password returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Change password confirms success', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Password changed successfully.');",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "  const finalPassword = pm.collectionVariables.get('finalTestUserPassword');",
+                  "  pm.collectionVariables.set('testUserPassword', finalPassword);",
+                  "  pm.variables.set('testUserPassword', finalPassword);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{testUserPassword}}\",\n  \"newPassword\": \"{{finalTestUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login With Changed Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login with changed password returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "if (responseJson.csrfToken) {",
+                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.variables.set('csrfToken', responseJson.csrfToken);",
+                  "}",
+                  "const sessionToken = pm.cookies.get('session_token');",
+                  "if (sessionToken) {",
+                  "  const sessionCookie = `session_token=${sessionToken}`;",
+                  "  pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "  pm.variables.set('sessionCookie', sessionCookie);",
+                  "}",
+                  "pm.test('Changed-password login refreshes auth state', function () {",
+                  "  pm.expect(pm.collectionVariables.get('csrfToken')).to.be.a('string').and.not.empty;",
+                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testUserEmail}}\",\n  \"password\": \"{{testUserPassword}}\",\n  \"remember\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('DELETE /profile returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Delete account confirms soft deletion', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Account has been deleted successfully.');",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('sessionCookie', '');",
+                  "  pm.variables.set('sessionCookie', '');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testUserEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivate Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /users/reactivate returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Reactivation confirms the account is active', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Account is reactivated. Please log in.');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testUserEmail}}\",\n  \"password\": \"{{testUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/reactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "reactivate"]
             }
           },
           "response": []
