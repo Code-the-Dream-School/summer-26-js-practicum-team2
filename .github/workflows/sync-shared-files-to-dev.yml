@@ -1,0 +1,105 @@
+name: Sync shared files to development
+
+on:
+  push:
+    branches:
+      - docs
+    paths:
+      - .github/**
+      - docs/**
+      - .editorconfig
+      - .env.example
+      - .gitattributes
+      - .gitignore
+      - .nvmrc
+      - CHANGELOG.md
+      - CONTRIBUTORS.md
+      - LICENSE
+      - README.md
+      - SUPPORT.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-shared-files-to-development
+  cancel-in-progress: true
+
+env:
+  SYNC_PATHS: >-
+    .github
+    docs
+    .editorconfig
+    .env.example
+    .gitattributes
+    .gitignore
+    .nvmrc
+    CHANGELOG.md
+    CONTRIBUTORS.md
+    LICENSE
+    README.md
+    SUPPORT.md
+
+jobs:
+  sync-shared-files:
+    name: Create development sync PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "mnichols08"
+          git config user.email "33106391+mnichols08@users.noreply.github.com"
+
+      - name: Prepare development branch changes
+        id: prepare
+        run: |
+          git fetch origin docs development
+          git switch development
+
+          read -r -a PATHS <<< "$SYNC_PATHS"
+          for path in "${PATHS[@]}"; do
+            if git cat-file -e "${{ github.sha }}:$path" 2>/dev/null; then
+              git restore --source "${{ github.sha }}" -- "$path"
+            fi
+          done
+
+          if git diff --quiet -- "${PATHS[@]}"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit sync change on PR branch
+        if: steps.prepare.outputs.changed == 'true'
+        run: |
+          read -r -a PATHS <<< "$SYNC_PATHS"
+          git switch -C chore/sync-shared-files-from-docs
+          git add -- "${PATHS[@]}"
+          git commit -m "Sync shared files from docs"
+          git push --force-with-lease origin chore/sync-shared-files-from-docs
+
+      - name: Create or update PR to development
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE="Sync shared files from docs"
+          PR_BODY="Automated sync of shared files from docs."
+          PR_BODY+=$'\n\n'
+          PR_BODY+="Source commit: ${GITHUB_SHA}"
+
+          PR_NUMBER=$(gh pr list --repo "$GITHUB_REPOSITORY" --base development --head chore/sync-shared-files-from-docs --json number --jq '.[0].number // ""')
+
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --title "$PR_TITLE" --body "$PR_BODY" --add-label documentation --add-label changelog
+          else
+            gh pr create --repo "$GITHUB_REPOSITORY" --base development --head chore/sync-shared-files-from-docs --title "$PR_TITLE" --body "$PR_BODY" --label documentation --label changelog
+          fi
