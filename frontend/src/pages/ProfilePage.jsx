@@ -14,7 +14,6 @@ export default function ProfilePage() {
   const [theme, setTheme] = useState('Light')
   const [notifications, setNotifications] = useState(true)
 
-
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [deleteEmailInput, setDeleteEmailInput] = useState('')
