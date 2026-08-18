@@ -68,6 +68,8 @@ function LearnFlow({
   const currentMicroLessonId = currentStep?.id;
   const canSyncProgress = !isReadOnly && Boolean(csrfToken);
 
+  const isAtLessonStart = stepIndex === 0 && chunkIndex === 0 && phase === "lesson";
+
   const currentStepQuestions = useMemo(
     () => learnData.questions.filter((question) => question.lessonStepId === currentMicroLessonId),
     [learnData.questions, currentMicroLessonId],
@@ -198,6 +200,25 @@ function LearnFlow({
     }
   }
 
+  function handleStartOver() {
+    setStepIndex(0);
+    setChunkIndex(0);
+    setPhase("lesson");
+  }
+
+  // ******************* ADD BACKEND HERE *************
+
+  // async function handleStartOver() {
+  //   await updateLessonProgress({
+  //     moduleId: learnData.moduleId,
+  //     lessonId: learnData.id,
+  //     microLessonId: lessonSteps[0]?.id,
+  //     sectionIndex: 0,
+  //     scrollPercent: 0,
+  //     csrfToken,
+  //   });
+  // }
+
   if (isComplete) {
     return (
       <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
@@ -327,6 +348,19 @@ function LearnFlow({
           </>
         ) : (
           <>
+            {/* This is for the resume banner button */}
+            {savedProgress && !isAtLessonStart && (
+              <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm font-medium">
+                    Welcome Back! Resuming "{currentStep.title}"
+                  </p>
+                  <Button variant="quizSecondary" onClick={handleStartOver}>
+                    Start Over
+                  </Button>
+                </div>
+              </Card>
+            )}
             <LessonComponent
               title={titlesOverlap(learnData.title, currentStep.title) ? null : currentStep.title}
               eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
