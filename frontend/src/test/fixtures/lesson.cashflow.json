@@ -1,0 +1,149 @@
+{
+  "moduleData": {
+    "id": "cashFlow",
+    "title": "Budgeting and Cash Flow Basics",
+    "characters": [
+      { "characterId": "abigail", "name": "Abigail" },
+      { "characterId": "ramona", "name": "Ramona" }
+    ],
+    "budgets": [
+      {
+        "budgetId": "abigail-complete-budget",
+        "characterRef": "abigail",
+        "type": "budget-summary",
+        "title": "Abigail's Budget",
+        "showTotals": true,
+        "income": [
+          { "id": "paycheck", "name": "Registered Nurse Paycheck", "amount": 5850 },
+          { "id": "childSupport", "name": "Child Support", "amount": 1230 }
+        ],
+        "fixedExpenses": {
+          "needs": [
+            { "id": "rent", "name": "Rent", "amount": 1200 },
+            { "id": "carPayment", "name": "Car Payment", "amount": 300 }
+          ],
+          "wants": [{ "id": "rockClimbing", "name": "Rock Climbing Membership", "amount": 80 }]
+        },
+        "variableExpenses": {
+          "needs": [{ "id": "groceries", "name": "Groceries", "amount": 420 }],
+          "wants": []
+        },
+        "summary": {
+          "totalIncome": 7080,
+          "totalFixedExpenses": 1580,
+          "totalVariableExpenses": 420,
+          "totalExpenses": 2000,
+          "netCashFlow": 5080
+        }
+      }
+    ],
+    "tables": [
+      {
+        "tableId": "abigail-income",
+        "title": "Income Sources",
+        "headers": ["Income Source", "Monthly Net Pay"],
+        "incomeRefs": ["paycheck", "childSupport"]
+      }
+    ],
+    "lessons": [
+      { "id": "1.1", "title": "What is Cash Flow and a Budget?" },
+      { "id": "1.2", "title": "Income" }
+    ]
+  },
+
+  "lessonData": {
+    "id": "1.1",
+    "title": "What is Cash Flow and a Budget?",
+    "learningGoal": "By the end of this lesson, you'll understand what a budget is, why it's important, and how to calculate basic cash flow.",
+    "estimatedMin": 5,
+    "passingScore": 70,
+    "microLessons": [
+      {
+        "id": "1.1.1",
+        "title": "Meet Abigail!",
+        "microLessonContent": [
+          {
+            "type": "characterIntro",
+            "characterId": "abigail",
+            "text": "Meet Abigail! Abigail is a single mom with twin 14-year-olds."
+          },
+          {
+            "type": "paragraph",
+            "text": "She manages all her family's expenses, including her children's activities."
+          },
+          {
+            "type": "callout",
+            "text": "To help her feel in control of her money, Abigail has decided to create a budget."
+          },
+          {
+            "type": "formula",
+            "text": "Money In (Income) - Money Out (Expenses) = Cash Flow"
+          },
+          {
+            "type": "unorderedList",
+            "items": ["Rent", "Car Payment"]
+          },
+          {
+            "type": "table",
+            "tableId": "abigail-income"
+          },
+          {
+            "type": "budget-summary",
+            "budgetId": "abigail-complete-budget",
+            "show": { "income": true, "totals": true }
+          },
+          {
+            "type": "knowledgeCheck",
+            "id": "1.1.1-q1",
+            "questionType": "multipleChoice",
+            "question": "What is the purpose of a budget?",
+            "answerChoices": [
+              { "key": "a", "text": "To help you feel in control of your money" },
+              { "key": "b", "text": "A plan for your money" },
+              { "key": "c", "text": "Includes your income and expenses" },
+              { "key": "d", "text": "All of the above" }
+            ],
+            "correctResponse": "d",
+            "explanation": "A budget lays out income and expenses and creates a plan for your money."
+          },
+          {
+            "type": "knowledgeCheck",
+            "id": "1.1.1-q2",
+            "questionType": "multiSelect",
+            "question": "Which of these belong in a budget?",
+            "answerChoices": [
+              { "key": "a", "text": "Income" },
+              { "key": "b", "text": "Expenses" },
+              { "key": "c", "text": "Your favorite colour" }
+            ],
+            "correctResponse": ["a", "b"],
+            "explanation": "Budgets track income and expenses."
+          }
+        ]
+      },
+      {
+        "id": "1.1.2",
+        "title": "What is a Budget?",
+        "microLessonContent": [
+          {
+            "type": "paragraph",
+            "text": "A budget is simply a plan for your money."
+          },
+          {
+            "type": "paragraph",
+            "text": "Budgets involve two main categories: income and expenses."
+          }
+        ]
+      }
+    ]
+  },
+
+  "progress": {
+    "currentModule": "cashFlow",
+    "currentLessonId": "1.1",
+    "currentMicroLessonId": "1.1.2",
+    "completedLessons": [],
+    "completedMicroLessons": ["1.1.1"],
+    "isModuleCompleted": false
+  }
+}

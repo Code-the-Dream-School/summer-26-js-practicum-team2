@@ -1,0 +1,72 @@
+name: Sync CHANGELOG to docs
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - CHANGELOG.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-changelog-to-docs
+  cancel-in-progress: true
+
+jobs:
+  sync-changelog:
+    name: Create docs changelog sync PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Prepare docs branch changes
+        id: prepare
+        run: |
+          git fetch origin development docs
+          git switch docs
+          git restore --source "${{ github.sha }}" -- CHANGELOG.md
+
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit sync change on PR branch
+        if: steps.prepare.outputs.changed == 'true'
+        run: |
+          git switch -C chore/sync-changelog-from-development
+          git add CHANGELOG.md
+          git commit -m "Sync CHANGELOG from development"
+          git push --force-with-lease origin chore/sync-changelog-from-development
+
+      - name: Create or update PR to docs
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE="Sync CHANGELOG from development"
+          PR_BODY="Automated sync of CHANGELOG.md from development."
+          PR_BODY+=$'\n\n'
+          PR_BODY+="Source commit: ${GITHUB_SHA}"
+
+          PR_NUMBER=$(gh pr list --repo "$GITHUB_REPOSITORY" --base docs --head chore/sync-changelog-from-development --json number --jq '.[0].number // ""')
+
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --title "$PR_TITLE" --body "$PR_BODY" --add-label documentation --add-label changelog
+          else
+            gh pr create --repo "$GITHUB_REPOSITORY" --base docs --head chore/sync-changelog-from-development --title "$PR_TITLE" --body "$PR_BODY" --label documentation --label changelog
+          fi
