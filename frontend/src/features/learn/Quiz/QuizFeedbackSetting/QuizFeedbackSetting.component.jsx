@@ -10,7 +10,7 @@ import {
 export default function QuizFeedbackSetting({ onChange }) {
   const [feedbackPreference, setFeedbackPreference] = useState(() => getQuizFeedbackPreference());
   function toggleFeedbackPreference() {
-    // This function is not called, but this pattern would be useful to apply inside the profile page
+    // Persist preference in localStorage and notify parent (if provided).
     setFeedbackPreference((current) => {
       const next = current === "immediate" ? "end" : "immediate";
       setQuizFeedbackPreference(next);

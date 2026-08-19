@@ -11,6 +11,7 @@ import {
   getQuizCompletionWord,
   getAllCaughtUpPhrase,
 } from "../Quiz/encouragingCopy";
+import { aggregateLessonScore } from "../../../utils/quizScoring";
 
 import QuizComponent from "../Quiz/Quiz.component";
 import QuizReview from "../Quiz/QuizReview/QuizReview.component";
@@ -136,14 +137,10 @@ export default function LearnFlow({
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
 
   const gradedSubmissions = Object.values(submissions);
-  const gradedPercentage = gradedSubmissions.length
-    ? Math.round(
-        gradedSubmissions.reduce((total, submission) => total + (submission.score ?? 0), 0) /
-          gradedSubmissions.length,
-      )
-    : 0;
-  const gradedPassed =
-    gradedSubmissions.length > 0 && gradedSubmissions.every((submission) => submission.passed);
+  const { percentage: gradedPercentage, passed: gradedPassed } = aggregateLessonScore(
+    gradedSubmissions,
+    learnData.passThreshold,
+  );
   const hasQuiz = learnData.questions.length > 0;
   // Only a passing lesson unlocks the next one.
   const canContinue = !hasQuiz || gradedPassed;
@@ -188,7 +185,10 @@ export default function LearnFlow({
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
 
     if (submission) {
-      setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
+      setSubmissions((current) => ({
+        ...current,
+        [currentMicroLessonId]: { ...submission, totalQuestions: currentStepQuestions.length },
+      }));
     }
 
     setCompletedAttempts((current) => [
@@ -311,7 +311,6 @@ export default function LearnFlow({
             </p>
           ) : null}
         </div>
-        <div className="mb-2 flex justify-end"></div>
         {phase === "quiz" ? (
           <>
             <QuizComponent
