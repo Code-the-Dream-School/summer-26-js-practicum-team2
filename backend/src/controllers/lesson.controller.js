@@ -10,6 +10,7 @@ function shapeProgress(progressRecord) {
     currentModule: progressRecord.module_id,
     currentLessonId: progressRecord.course_lesson_id,
     currentMicroLessonId: progressRecord.current_micro_lesson_id,
+    currentChunkIndex: progressRecord.current_chunk_index,
     completedLessons: progressRecord.completed_lessons,
     completedMicroLessons: progressRecord.completed_micro_lessons,
     isModuleCompleted: progressRecord.is_module_completed,
@@ -55,6 +56,8 @@ exports.getLesson = async (req, res, next) => {
 // Returns progress only, so the learning path can render without loading lesson content.
 exports.getLessonProgress = async (req, res, next) => {
   try {
+    console.log("BODY: ", req.body);
+
     const moduleId = req.query.moduleId || DEFAULT_MODULE_ID;
 
     if (!getModule(moduleId)) {
@@ -86,7 +89,7 @@ exports.getLessonProgress = async (req, res, next) => {
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
 exports.updateLessonProgress = async (req, res, next) => {
   try {
-    const { moduleId = DEFAULT_MODULE_ID, lessonId, microLessonId } = req.body;
+    const { moduleId = DEFAULT_MODULE_ID, lessonId, microLessonId, currentChunkIndex } = req.body;
 
     if (!lessonId && !microLessonId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -106,6 +109,9 @@ exports.updateLessonProgress = async (req, res, next) => {
     }
     if (microLessonId) {
       update.current_micro_lesson_id = microLessonId;
+    }
+    if (typeof currentChunkIndex === "number") {
+      update.current_chunk_index = currentChunkIndex;
     }
 
     const progressRecord = await UserProgress.findOneAndUpdate(
