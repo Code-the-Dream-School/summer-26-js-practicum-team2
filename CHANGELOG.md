@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Content Accuracy section to README files
 - Backfilled lesson content with passing metadata when it was completed
 
+## [0.3.1] - 2026-08-18
+
+### Fixed
+
+- Fixed cross-site authentication between the Netlify frontend and Render backend by making session cookie security and `SameSite` settings configurable through environment variables.
+
 ---
 
 ## [0.3.0] - 2026-08-16
