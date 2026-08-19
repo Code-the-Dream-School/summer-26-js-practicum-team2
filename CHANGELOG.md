@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added function to generate random encouraging phrases and words for quiz feedback
+- Add ExpandableWhy component for quiz explanation display when the explanation is greater than 30 words
+- Added a step-by-step quiz review flow after lesson completion.
+- Preserved submitted quiz answers for later review.
+- Added read-only answer feedback with correct and incorrect choice indicators.
+- Added Previous, Next, and Back to Results navigation during quiz review.
+- Added a quiz feedback preference (instant vs. at-the-end) with a toggle on the Profile page.
+- Wired the quiz feedback preference into the lesson flow so it controls whether answers are revealed per question or only after quiz submission.
+- Added character introductions for Abigail and Ramona in budgeting lessons
+- Added additional randomized phrases and words for quiz completion, and catching up on lessons
+
+### Changed
+
+- Extracted the lesson/quiz flow out of LearnPage into a new LearnFlow component, reducing LearnPage's size.
+- Refactored CharacterIntro component to only render text
+- Refactored Table component for better accessibility and prevent crashes with optional chaining
+- Changed the review quiz to only show explanations, not the encouraging text that shows up while taking a quiz
+
+---
+
 ## [0.3.0] - 2026-08-16
 
 ### Added
