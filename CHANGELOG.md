@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added function to generate random encouraging phrases and words for quiz feedback
-- Add ExpandableWhy component for quiz explanation display when the explanation is greater than 30 words
+- Added ExpandableWhy component for quiz explanation display when the explanation is greater than 30 words
 - Added a step-by-step quiz review flow after lesson completion.
 - Preserved submitted quiz answers for later review.
 - Added read-only answer feedback with correct and incorrect choice indicators.
@@ -34,6 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Resolved a Mongoose deprecation warning by replacing the obsolete `new: true` option with `returnDocument: "after"` in the lesson progress and quiz submission controllers.
+- Added `aggregateLessonScore` helper for calculating lesson quiz scores based on the total number of questions
+- Added `quizScoring.test.js` tests for weighted scoring, passing and failing scores, and empty submissions
+- Added `quiz.scoring.test.js` backend tests to make sure each micro-lesson quiz is still graded on its own
+
+### Fixed
+
+- Fixed lesson quiz scoring to use the total number of questions across all quizzes, preventing incorrect percentages and false "Fail" results
 
 ---
 
@@ -46,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added issue templates for bug reports, feature requests, and security vulnerabilities with issue-chooser contact links
 - Added docs index and split guides under `docs/` for setup, API overview, Postman testing, workflow, and roadmap
 - Added Postman environment files for remote development and remote production backend testing
+- Added GitHub workflows for syncing `docs` with `development` and also `development` with `docs`
 
 ### Changed
 
@@ -64,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed login rate limiter IP key generation
 - In backend/server.js, conditionally sets DNS override only outside of production to prevent the app from crashing in some environments
 - Allowed Vite to access shared lesson content by updating the vite.config.js file
-- Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined 
+- Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined
 - Fixed Tailwind breakpoint class typo in CharacterIntro component
 - Fixed typo with duplicate JWT_SECRET is backend/.env.example
 - Improved lesson table rendering by safely handling missing module, table, and budget data, and by selecting the correct budget when a `budgetId` is provided instead of always defaulting to the first budget.
