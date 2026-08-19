@@ -12,7 +12,7 @@ export default function ExpandableWhy({ explanation = "" }) {
     <div className="text-foreground">
       <p>Explanation: {displayedText}</p>
       {shouldCollapse ? (
-        <div className="mt-2 flex justify-end">
+        <div className="absolute end-10 mt-2.5">
           <Button onClick={() => setIsExpanded((current) => !current)} variant="secondary">
             {isExpanded ? "Show less" : "Show more"}
           </Button>

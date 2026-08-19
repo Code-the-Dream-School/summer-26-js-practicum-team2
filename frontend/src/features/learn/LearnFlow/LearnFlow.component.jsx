@@ -11,7 +11,7 @@ import {
   getQuizCompletionWord,
   getAllCaughtUpPhrase,
 } from "../Quiz/encouragingCopy";
-import { aggregateLessonScore } from "../utils/quizScoring";
+import { aggregateLessonScore } from "../../../utils/quizScoring";
 
 import QuizComponent from "../Quiz/Quiz.component";
 import QuizReview from "../Quiz/QuizReview/QuizReview.component";
@@ -312,7 +312,7 @@ export default function LearnFlow({
           ) : null}
         </div>
         {phase === "quiz" ? (
-          <div className="mb-2 flex justify-end">
+          <>
             <QuizComponent
               question={quiz.currentQuestion}
               questionNumber={quiz.questionIndex + 1}
@@ -365,7 +365,7 @@ export default function LearnFlow({
                 </Button>
               )}
             </div>
-          </div>
+          </>
         ) : (
           <>
             <LessonComponent
