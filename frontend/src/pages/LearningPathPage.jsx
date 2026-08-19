@@ -389,7 +389,7 @@ function LearningPathPage() {
               }
               onClick={() => openLesson(currentNode)}
             >
-              Next
+              Resume
             </Button>
           )}
         </div>

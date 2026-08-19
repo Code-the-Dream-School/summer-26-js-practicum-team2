@@ -118,11 +118,17 @@ export const getLessonProgress = (moduleId) =>
     basePath: LESSONS_BASE_PATH,
   });
 
-export const updateLessonProgress = ({ moduleId, lessonId, microLessonId, csrfToken }) =>
+export const updateLessonProgress = ({
+  moduleId,
+  lessonId,
+  microLessonId,
+  currentChunkIndex,
+  csrfToken,
+}) =>
   apiRequest("/progress", {
     method: "PATCH",
     csrfToken,
-    body: { moduleId, lessonId, microLessonId },
+    body: { moduleId, lessonId, microLessonId, currentChunkIndex },
     basePath: LESSONS_BASE_PATH,
   });
 

@@ -56,8 +56,24 @@ function LearnFlow({
   const { lessonSteps } = learnData;
 
   const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
-  const [chunkIndex, setChunkIndex] = useState(0);
+  const [chunkIndex, setChunkIndex] = useState(() => savedProgress?.currentChunkIndex ?? 0);
   const [phase, setPhase] = useState("lesson");
+
+  //Restore chunk position when progress arrives
+  useEffect(() => {
+    console.log("savedProgress:", savedProgress);
+    if (typeof savedProgress?.currentChunkIndex === "number") {
+      setChunkIndex(savedProgress.currentChunkIndex);
+    }
+  }, [savedProgress]);
+
+  // Restore step (micro-lesson) position when progress arrives
+  useEffect(() => {
+    if (savedProgress) {
+      setStepIndex(getResumeIndex(lessonSteps, savedProgress));
+    }
+  }, [lessonSteps, savedProgress]);
+
   const [isComplete, setIsComplete] = useState(false);
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
   const [submissions, setSubmissions] = useState({});
@@ -90,11 +106,19 @@ function LearnFlow({
       moduleId: learnData.moduleId,
       lessonId: learnData.id,
       microLessonId: currentMicroLessonId,
+      currentChunkIndex: chunkIndex,
       csrfToken,
     }).catch(() => {
       // A dropped position update should never interrupt the lesson.
     });
-  }, [canSyncProgress, csrfToken, currentMicroLessonId, learnData.id, learnData.moduleId]);
+  }, [
+    canSyncProgress,
+    csrfToken,
+    currentMicroLessonId,
+    learnData.id,
+    learnData.moduleId,
+    chunkIndex,
+  ]);
 
   const { totalUnits, completedUnits } = useMemo(() => {
     const countQuestions = (stepId) =>
