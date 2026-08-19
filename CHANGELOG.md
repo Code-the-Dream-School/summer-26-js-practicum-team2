@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Add core rules implementation and corresponding tests for XP calculations and lesson unlocking
+
+---
+
 ## [0.3.4] - 2026-08-19
 
 ### Added
