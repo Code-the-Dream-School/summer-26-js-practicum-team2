@@ -14,6 +14,7 @@ import {
 import LessonComponent from "../features/learn/Lesson/Lesson.component";
 import QuizComponent from "../features/learn/Quiz/Quiz.component";
 import { useQuiz } from "../hooks/useQuiz";
+import { aggregateLessonScore } from "../utils/quizScoring";
 import Button from "../shared/Button/Button.component";
 import Card from "../shared/Card/Card.component";
 import ProgressBar from "../shared/ProgressBar/ProgressBar.component";
@@ -127,22 +128,10 @@ function LearnFlow({
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
 
   const gradedSubmissions = Object.values(submissions);
-  // Score based on question count so a small quiz doesn't outweight a larger one.
-  const totalQuestionsGraded = gradedSubmissions.reduce(
-    (total, submission) => total + (submission.totalQuestions ?? 0),
-    0,
+  const { percentage: gradedPercentage, passed: gradedPassed } = aggregateLessonScore(
+    gradedSubmissions,
+    learnData.passThreshold,
   );
-  const missedQuestionsGraded = gradedSubmissions.reduce(
-    (total, submission) => total + (submission.missed?.length ?? 0),
-    0,
-  );
-  const gradedPercentage =
-    totalQuestionsGraded === 0
-      ? 0
-      : Math.round(((totalQuestionsGraded - missedQuestionsGraded) / totalQuestionsGraded) * 100);
-  // Pass/fail is based on the combined score, not on every individual micro-lesson quiz passing.
-  const gradedPassed =
-    gradedSubmissions.length > 0 && gradedPercentage >= (learnData.passThreshold ?? 0.7) * 100;
   const hasQuiz = learnData.questions.length > 0;
   // Only a passing lesson unlocks the next one.
   const canContinue = !hasQuiz || gradedPassed;

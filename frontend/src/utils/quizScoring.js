@@ -72,3 +72,26 @@ export function scoreQuizAttempt({ questions = [], answers = [], passThreshold =
     totalQuestions,
   };
 }
+
+// Combines per-micro-lesson quiz submissions into one lesson-wide result.
+// Weighting by question count (instead of averaging each submission's percentage) keeps a
+// 3-question quiz from swinging the lesson score as much as a 10-question quiz, and passing
+// is based on the combined score instead of every submission passing on its own.
+export function aggregateLessonScore(submissions = [], passThreshold = 0.7) {
+  const normalizedSubmissions = Array.isArray(submissions) ? submissions : [];
+
+  const totalQuestions = normalizedSubmissions.reduce(
+    (total, submission) => total + (submission?.totalQuestions ?? 0),
+    0,
+  );
+  const missedCount = normalizedSubmissions.reduce(
+    (total, submission) => total + (submission?.missed?.length ?? 0),
+    0,
+  );
+
+  const percentage =
+    totalQuestions === 0 ? 0 : Math.round(((totalQuestions - missedCount) / totalQuestions) * 100);
+  const passed = normalizedSubmissions.length > 0 && percentage >= passThreshold * 100;
+
+  return { percentage, passed, totalQuestions, missedCount };
+}
