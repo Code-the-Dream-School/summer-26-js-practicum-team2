@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added dashboard cache coverage for malformed and expired entries
 - Installed Playwright
 - Added Playwright smoke coverage for protected-route redirects and keyboard-accessible mobile navigation
+- Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
 
 ### Fixed
 
