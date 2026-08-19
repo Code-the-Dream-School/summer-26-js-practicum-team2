@@ -42,6 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed lesson quiz scoring to use the total number of questions across all quizzes, preventing incorrect percentages and false "Fail" results
 
+## [0.3.1] - 2026-08-18
+
+### Fixed
+
+- Fixed cross-site authentication between the Netlify frontend and Render backend by making session cookie security and `SameSite` settings configurable through environment variables.
+
 ---
 
 ## [0.3.0] - 2026-08-16
