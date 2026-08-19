@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.2] - 2026-09-05
 
+### Added
+
+- Add core rules implementation and corresponding tests for XP calculations and lesson unlocking
+
+---
+
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Implemented soft deletion, reactivation, and avatar upload updates
+- Integrated Joi validation for profile route
+- Added profile and account lifecycle tests to Postman collection
+- Added Postman collection tests for Express routes
+
 ### Changed
 
 - Updated dashboard, profile, and lesson onboarding descriptions and renamed the sample lesson tour heading to "Lesson Page".
