@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Added setup script for environment configuration and update package.json
+
+### Changed
+
+- Combines sync-shared-files into a single GitHub workflow file
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+
+### Removed
+
+- Removed kill-port as devDependency and removes the predev script
+
+---
+
 ## [0.3.3] - 2026-08-19
 
 ### Added
