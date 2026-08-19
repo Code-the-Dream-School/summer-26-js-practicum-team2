@@ -39,7 +39,7 @@
   "author": "DanyloHet,kwishart24,berenicerojas,BytesOfStrength,mnichols08",
   "scripts": {
     "setup": "npm i && npm --prefix backend i && npm --prefix frontend i && ./setup.sh",
-    "dev": "dotenv -e .env --npm-run-all --parallel --race -l development:backend development:frontend",
+    "dev": "dotenv -e .env -- npm-run-all --parallel --race -l development:backend development:frontend",
     "development:backend": "npm --prefix backend run dev",
     "development:frontend": "npm --prefix frontend run dev",
     "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
