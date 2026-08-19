@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth.js";
 
 export default function ProfilePage() {
   const { user } = useAuth();
+   
 
   const [name, setName] = useState(user?.displayName || "Ramona");
   const [goals, setGoals] = useState("");
