@@ -23,9 +23,9 @@
 
 ## Required Content Sign-off (if modifying lesson or quiz content)
 
-- [ ] Reviewed for factual accuracy by @.. (tag reviewer if possible)
+- [ ] Reviewed for factual accuracy by @<github-handle> (tag reviewer if possible)
 - [ ] Content lessons reviewed against the accuracy checklist
-- Content PRs will not be approved without this sign-off.
+- Content PRs should not be approved without this sign-off.
 
 ## Quick Checklist
 

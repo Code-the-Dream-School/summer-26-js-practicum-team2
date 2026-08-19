@@ -2,7 +2,7 @@
 
 ### Accuracy Reviewer Role
 
-The role of the accuracy reviewer is to confirm that content in our project is factually correct, is complete, and consistent within a reasonable constraint. Because this is a educational demo application never intended for production, we can be more laxed that if it were deployed to actual users. This role is created more as a formality to meet the criteria of our user story
+The role of the accuracy reviewer is to confirm that content in our project is factually correct, complete, and consistent within reasonable constraints. Because this is an educational demo application never intended for production, we can be more lax than if it were deployed to actual users. This role is primarily a formality to meet the criteria of our user story.
 
 ### Who do we define as the content reviewer?
 
@@ -36,8 +36,8 @@ When somebody identifies an issue in published lesson content, we treat it as a 
 - Create a GitHub issue labeled `content-issues`
 - Add the issue to the team backlog in JIRA where it can be tracked
 - Assign an owner for the issue
-- The issue is reolved through this flow: Report -> Fix -> Assign Owner -> Fix/Close Issue
-
+ - The issue is resolved through this flow: Report -> Assign Owner -> Fix -> Close Issue
+ 
 #### Assigned Owner
 
 - A designated team member is assigned as the owner of the issue
