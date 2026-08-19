@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added content accuracy review policy document
 - Added accuracy review fields to budgeting lessons
-- Added lesson accuracy metadata check to CI workflow
+- Added lesson accuracy metadata test
 - Added content sign-off section to PR template for accuracy review
 - Added content accuracy checklist for review process
 - Added Content Accuracy section to README files
