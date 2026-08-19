@@ -127,14 +127,22 @@ function LearnFlow({
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
 
   const gradedSubmissions = Object.values(submissions);
-  const gradedPercentage = gradedSubmissions.length
-    ? Math.round(
-        gradedSubmissions.reduce((total, submission) => total + (submission.score ?? 0), 0) /
-          gradedSubmissions.length,
-      )
-    : 0;
+  // Score based on question count so a small quiz doesn't outweight a larger one.
+  const totalQuestionsGraded = gradedSubmissions.reduce(
+    (total, submission) => total + (submission.totalQuestions ?? 0),
+    0,
+  );
+  const missedQuestionsGraded = gradedSubmissions.reduce(
+    (total, submission) => total + (submission.missed?.length ?? 0),
+    0,
+  );
+  const gradedPercentage =
+    totalQuestionsGraded === 0
+      ? 0
+      : Math.round(((totalQuestionsGraded - missedQuestionsGraded) / totalQuestionsGraded) * 100);
+  // Pass/fail is based on the combined score, not on every individual micro-lesson quiz passing.
   const gradedPassed =
-    gradedSubmissions.length > 0 && gradedSubmissions.every((submission) => submission.passed);
+    gradedSubmissions.length > 0 && gradedPercentage >= (learnData.passThreshold ?? 0.7) * 100;
   const hasQuiz = learnData.questions.length > 0;
   // Only a passing lesson unlocks the next one.
   const canContinue = !hasQuiz || gradedPassed;
@@ -178,7 +186,10 @@ function LearnFlow({
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
 
     if (submission) {
-      setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
+      setSubmissions((current) => ({
+        ...current,
+        [currentMicroLessonId]: { ...submission, totalQuestions: currentStepQuestions.length },
+      }));
     }
 
     quiz.reset();
