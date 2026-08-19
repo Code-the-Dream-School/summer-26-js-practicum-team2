@@ -71,6 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
+- Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
+- Added user API integration tests for registration, verification, and login flows
 
 ---
 
