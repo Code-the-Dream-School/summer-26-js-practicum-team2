@@ -311,9 +311,8 @@ export default function LearnFlow({
             </p>
           ) : null}
         </div>
-        <div className="mb-2 flex justify-end"></div>
         {phase === "quiz" ? (
-          <>
+          <div className="mb-2 flex justify-end">
             <QuizComponent
               question={quiz.currentQuestion}
               questionNumber={quiz.questionIndex + 1}
@@ -366,7 +365,7 @@ export default function LearnFlow({
                 </Button>
               )}
             </div>
-          </>
+          </div>
         ) : (
           <>
             <LessonComponent
