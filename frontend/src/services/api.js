@@ -8,7 +8,7 @@ const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
 
 // Helper function to make API requests to the backend.
-const CSRF_METHODS = new Set (["POST", "PATCH", "DELETE", "PUT"])
+const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
 
 async function apiRequest(path, options = {}) {
   const { method = "GET", body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options;
@@ -81,38 +81,39 @@ export const getDashboard = () =>
   });
 
 export const getProfile = () =>
-  apiRequest("",{
-    basePath: PROFILE_BASE_PATH, 
-  }); 
+  apiRequest("", {
+    basePath: PROFILE_BASE_PATH,
+    method: "GET"
+  });
 
-export const updateProfile = ({csrfToken, ...profile}) => 
-  apiRequest("",{
+export const updateProfile = ({ csrfToken, ...profile }) =>
+  apiRequest("", {
     method: "PATCH",
     body: profile,
     csrfToken,
     basePath: PROFILE_BASE_PATH,
   });
 
-export const changeProfilePassword = ({currentPassword, newPassword, csrfToken}) =>
+export const changeProfilePassword = ({ currentPassword, newPassword, csrfToken }) =>
   apiRequest("password", {
     method: "POST",
-    body: {currentPassword, newPassword},
+    body: { currentPassword, newPassword },
     csrfToken,
     basePath: PROFILE_BASE_PATH,
   });
 
-export const deleteProfile = ({email, csrfToken}) =>
-  apiRequest("",{
+export const deleteProfile = ({ email, csrfToken }) =>
+  apiRequest("", {
     method: "DELETE",
-    body: {email},
+    body: { email },
     csrfToken,
     basePath: PROFILE_BASE_PATH,
   });
-  
+
 // Dispatches a custom event to notify the application that dashboard progress has been updated
 // This allows other components to listen for this event and update their state accordingly
-export const notifyDashboardProgressChanged = (detail={}) => {
-  window.dispatchEvent(new Event("sprout:progress-updated", {detail}));
+export const notifyDashboardProgressChanged = (detail = {}) => {
+  window.dispatchEvent(new Event("sprout:progress-updated", { detail }));
 };
 
 // Tracks a dashboard event by sending it to the backend and notifying listeners of progress changes
