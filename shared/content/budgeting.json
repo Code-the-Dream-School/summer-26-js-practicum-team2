@@ -139,6 +139,8 @@
     {
       "id": "1.1",
       "title": "What is Cash Flow and a Budget?",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll understand what a budget is, why it's important, and how to calculate basic cash flow.",
       "estimatedMin": 5,
       "passingScore": 70,
@@ -327,6 +329,8 @@
     {
       "id": "1.2",
       "title": "Income",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to identify different sources of income, calculate monthly income, and explain the difference between gross pay and net pay.",
       "estimatedMin": 5,
       "passingScore": 70,
@@ -605,6 +609,8 @@
     {
       "id": "1.3",
       "title": "Understanding Needs vs Wants",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to identify the difference between needs and wants, as well as categorizing common expenses into each group.",
       "estimatedMin": 5,
       "passingScore": 70,
@@ -733,6 +739,8 @@
     {
       "id": "1.4",
       "title": "Fixed vs Variable Expenses",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to identify the difference between fixed and variable expenses, as well as categorize common expenses into each type.",
       "estimatedMin": 10,
       "passingScore": 70,
@@ -840,6 +848,8 @@
     {
       "id": "1.5",
       "title": "Creating a Budget",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to create a basic budget by listing income and expenses, categorizing expenses, and calculating monthly cash flow.",
       "estimatedMin": 10,
       "passingScore": 70,
@@ -1154,6 +1164,8 @@
     {
       "id": "1.6",
       "title": "Tracking Your Expenses",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to track your expenses, compare your spending to your budget, and make adjustments based on your spending habits.",
       "estimatedMin": 10,
       "passingScore": 70,
