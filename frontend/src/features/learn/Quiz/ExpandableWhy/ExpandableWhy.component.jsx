@@ -1,26 +1,23 @@
 import { useState } from "react";
-import Button from "../../../../shared/Button/Button.component.jsx";
-export default function ExpandableWhy({ explanation }) {
+import Button from "../../../../shared/Button/Button.component";
+export default function ExpandableWhy({ explanation = "" }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const words = explanation.split(" ");
-  const wordsToShow = isExpanded ? words : words.slice(0, 29);
+  const words = explanation.trim().split(/\s+/).filter(Boolean);
+  const shouldCollapse = words.length > 30;
+  const previewText = words.slice(0, 30).join(" ");
+  const displayedText = !shouldCollapse || isExpanded ? explanation : `${previewText}...`;
 
   return (
-    <p className="text-foreground">
-      Explanation:{" "}
-      {isExpanded ? explanation : words.length > 29 ? wordsToShow.join(" ") + "..." : explanation}
-      {words.length > 29 ? (
-        <div className="absolute end-10 mt-2.5 ">
-          <Button onClick={toggleExpanded} variant="secondary">
-            {isExpanded ? "Show Less" : "Show More"}
+    <div className="text-foreground">
+      <p>Explanation: {displayedText}</p>
+      {shouldCollapse ? (
+        <div className="mt-2 flex justify-end">
+          <Button onClick={() => setIsExpanded((current) => !current)} variant="secondary">
+            {isExpanded ? "Show less" : "Show more"}
           </Button>
         </div>
       ) : null}
-    </p>
+    </div>
   );
 }
