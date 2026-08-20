@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.3.5] - 2026-08-20
+
+### Added
+
+- Added a failing test reproducing the refresh-redirect bug where an authenticated user on the Learn page was sent to login before auth storage finished hydrating
+
+### Fixed
+
+- Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
 ## [0.3.4] - 2026-08-19
 
 ### Added
