@@ -39,4 +39,12 @@ describe("write endpoint input validation", () => {
 
     expectValidationError(response);
   });
+
+  test("rejects quiz starts without a micro-lesson ID", async () => {
+    // Leave out the required microLessonId before the request reaches quiz logic.
+    const response = await request(app).post("/api/v1/quizzes/start").set(authHeader()).send({});
+
+    expectValidationError(response);
+    expect(response.body.errors.join(" ")).toContain("required");
+  });
 });
