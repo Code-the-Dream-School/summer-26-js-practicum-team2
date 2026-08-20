@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
 - Added user API integration tests for registration, verification, and login flows
+- Added integration tests for lesson and dashboard APIs
 
 ---
 
