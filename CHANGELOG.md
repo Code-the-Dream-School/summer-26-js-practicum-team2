@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added `aggregateLessonScore` helper for calculating lesson quiz scores based on the total number of questions
+- Added `quizScoring.test.js` tests for weighted scoring, passing and failing scores, and empty submissions
+- Added `quiz.scoring.test.js` backend tests to make sure each micro-lesson quiz is still graded on its own
+
+### Fixed
+
+- Fixed lesson quiz scoring to use the total number of questions across all quizzes, preventing incorrect percentages and false "Fail" results
+
+---
+
 ## [0.3.0] - 2026-08-16
 
 ### Added
@@ -37,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed login rate limiter IP key generation
 - In backend/server.js, conditionally sets DNS override only outside of production to prevent the app from crashing in some environments
 - Allowed Vite to access shared lesson content by updating the vite.config.js file
-- Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined 
+- Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined
 - Fixed Tailwind breakpoint class typo in CharacterIntro component
 - Fixed typo with duplicate JWT_SECRET is backend/.env.example
 - Improved lesson table rendering by safely handling missing module, table, and budget data, and by selecting the correct budget when a `budgetId` is provided instead of always defaulting to the first budget.

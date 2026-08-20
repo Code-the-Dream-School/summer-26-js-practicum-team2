@@ -72,3 +72,29 @@ export function scoreQuizAttempt({ questions = [], answers = [], passThreshold =
     totalQuestions,
   };
 }
+
+// Combines per-micro-lesson quiz submissions into one lesson-wide result.
+export function aggregateLessonScore(submissions = [], passThreshold = 0.7) {
+  const normalizedSubmissions = Array.isArray(submissions) ? submissions : [];
+
+  const totalQuestions = normalizedSubmissions.reduce(
+    (total, submission) => total + (submission?.totalQuestions ?? 0),
+    0,
+  );
+
+  const missedCount = normalizedSubmissions.reduce(
+    (total, submission) => total + (submission?.missed?.length ?? 0),
+    0,
+  );
+
+  // The correct count is derived from the total and missed counts, and is clamped to zero.
+  const correctCount = Math.max(totalQuestions - missedCount, 0);
+  // The final score is the ratio of correct answers to total questions, with a fallback to zero if there are no questions.
+  const score = totalQuestions === 0 ? 0 : correctCount / totalQuestions;
+  // The percentage is the score expressed as a whole number, and the pass/fail status is determined by the threshold.
+  const percentage = Math.round(score * 100);
+  // The pass/fail status is determined by whether the score meets or exceeds the threshold, and there are questions to evaluate.
+  const passed = totalQuestions > 0 && score >= passThreshold;
+
+  return { percentage, passed, totalQuestions, missedCount, correctCount };
+}

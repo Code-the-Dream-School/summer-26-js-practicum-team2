@@ -14,6 +14,7 @@ import {
 import LessonComponent from "../features/learn/Lesson/Lesson.component";
 import QuizComponent from "../features/learn/Quiz/Quiz.component";
 import { useQuiz } from "../hooks/useQuiz";
+import { aggregateLessonScore } from "../utils/quizScoring";
 import Button from "../shared/Button/Button.component";
 import Card from "../shared/Card/Card.component";
 import ProgressBar from "../shared/ProgressBar/ProgressBar.component";
@@ -127,14 +128,10 @@ function LearnFlow({
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
 
   const gradedSubmissions = Object.values(submissions);
-  const gradedPercentage = gradedSubmissions.length
-    ? Math.round(
-        gradedSubmissions.reduce((total, submission) => total + (submission.score ?? 0), 0) /
-          gradedSubmissions.length,
-      )
-    : 0;
-  const gradedPassed =
-    gradedSubmissions.length > 0 && gradedSubmissions.every((submission) => submission.passed);
+  const { percentage: gradedPercentage, passed: gradedPassed } = aggregateLessonScore(
+    gradedSubmissions,
+    learnData.passThreshold,
+  );
   const hasQuiz = learnData.questions.length > 0;
   // Only a passing lesson unlocks the next one.
   const canContinue = !hasQuiz || gradedPassed;
@@ -178,7 +175,10 @@ function LearnFlow({
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
 
     if (submission) {
-      setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
+      setSubmissions((current) => ({
+        ...current,
+        [currentMicroLessonId]: { ...submission, totalQuestions: currentStepQuestions.length },
+      }));
     }
 
     quiz.reset();
