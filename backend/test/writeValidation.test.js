@@ -67,4 +67,24 @@ describe("write endpoint input validation", () => {
 
     expectValidationError(response);
   });
+
+  test("rejects malformed forgot-password email addresses", async () => {
+    // Send an invalid email format so the request fails before password reset processing starts.
+    const response = await request(app)
+      .post("/api/v1/users/forgot-password")
+      .send({ email: "not-an-email" });
+
+    expectValidationError(response);
+    expect(response.body.errors.join(" ")).toContain("valid email address");
+  });
+
+  test("rejects invalid reset tokens and weak passwords", async () => {
+    // Make both reset values invalid so validation can report more than one problem.
+    const response = await request(app)
+      .post("/api/v1/users/reset-password")
+      .send({ token: "invalid", newPassword: "weak" });
+
+    expectValidationError(response);
+    expect(response.body.errors.length).toBeGreaterThan(1);
+  });
 });
