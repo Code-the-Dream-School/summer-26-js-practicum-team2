@@ -90,23 +90,24 @@ export default function Footer({ currentGlossary = [] }) {
 
       {/* Floating Button */}
       {showGlossary && !isGlossaryHidden && (
-        <div
-          className="fixed bottom-4 right-4 z-50 flex items-center gap-1 rounded-lg border-2 border-heading bg-surface-raised p-0.5 shadow-md transition-all hover:bg-accent hover:shadow-lg sm:bottom-6 sm:right-6 sm:p-1">
-            {/* px-4 py-3 text-sm font-semibold text-heading shad ow-lg
-          transition-all 
-          hover:bg-accent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-focus-bg-primary-alt focus:ring-offset-2" */}
+        <div className="fixed top-1/2 right-4 z-50 -translate-y-1/2 flex items-center gap-1 rounded-lg border-2 border-heading bg-surface-raised p-0.5 shadow-md transition-all hover:bg-accent hover:shadow-lg  sm:right-6 sm:p-1">
 
-        {/* Glossary button */}
-        
-        <button
-          type="button"
-          onClick={() => setIsGlossaryOpen(true)}
-          aria-label="Open Glossary"
-          className="inline-flex min-h-7 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold text-heading focus:outline-none focus:ring-2 focus:ring-focus sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
-        >
-            <img src={glossaryIcon} alt="" aria-hidden="true" className="h-4 w-4 sm:h-5 sm:w-5"/>
+          {/* Glossary button */}
+
+          <button
+            type="button"
+            onClick={() => setIsGlossaryOpen(true)}
+            aria-label="Open Glossary"
+            className="inline-flex min-h-7 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold text-heading focus:outline-none focus:ring-2 focus:ring-focus sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+          >
+            <img
+              src={glossaryIcon}
+              alt=""
+              aria-hidden="true"
+              className="h-6 w-6 sm:h-7 sm:w-7"
+            />
             <span></span>
-        </button>
+          </button>
 
           {/*Hide Glossary Button*/}
           <button

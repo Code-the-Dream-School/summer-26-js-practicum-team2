@@ -59,11 +59,17 @@ export default function GlossaryModal({ isOpen, onClose, glossary = [] }) {
               placeholder="Search terms..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-neutral-300 bg-surface-raised p-3 text-sm text-heading placeholder-neutral-500 focus:outline-none focus:rounded-xl focus:ring-2 focus:ring"
+              className="w-full rounded-lg border border-neutral-300 bg-surface-raised p-3 text-sm text-heading placeholder-neutral-500 focus:outline-none focus:rounded-xl focus:ring-2 focus:ring-focus"
             />
           </div>
         )}
-        <div className="flex-1 overflow-y-auto pr-1 space-y-4">
+        {/* More keyboard controlling of sections to scroll, tabIndex={0} allow browswer to use up/down/pageup/pagedown/space keys to scroll  */}
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label="Glossary terms list with definitions"
+          className="flex-1 overflow-y-auto pr-1 space-y-4 focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 rounded-md"
+        >
           {sortLetters.length > 0 ? (
             sortLetters.map((letter) => (
               <div key={letter} className="space-y-2">
@@ -71,9 +77,12 @@ export default function GlossaryModal({ isOpen, onClose, glossary = [] }) {
                   {letter}
                 </h3>
                 <div className="space-y-3 pt-1">
-                  {groupTerms[letter].map((item) => (
-                    <div key={item.term} className="rounded-lg bg-surface-inset p-3">
-                      <p className="font-semibold text-sm text-heading"> {item.term}</p>
+                  {groupTerms[letter].map((item, index) => (
+                    <div
+                      key={`${letter}-${item.term || index}`}
+                      className="rounded-lg bg-surface-inset p-3"
+                    >
+                      <p className="font-semibold text-sm text-heading">{item.term}</p>
                       <p className="mt-1 text-xs text-neutral-600 leading-relaxed">
                         {item.definition}
                       </p>
