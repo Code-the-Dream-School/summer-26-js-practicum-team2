@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added user API integration tests for registration, verification, and login flows
 - Added integration tests for lesson and dashboard APIs
 - Added integration tests for lesson progress and dashboard resolution
+- Added integration test coverage for marking a lesson complete after all required quizzes are passed
 
 ---
 
