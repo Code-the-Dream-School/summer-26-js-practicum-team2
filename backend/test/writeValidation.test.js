@@ -57,4 +57,14 @@ describe("write endpoint input validation", () => {
 
     expectValidationError(response);
   });
+
+  test("rejects invalid quiz submission bodies before database access", async () => {
+    // Use an invalid attempt ID so the request is rejected before any database lookup is needed.
+    const response = await request(app)
+      .post("/api/v1/quizzes/1.1.1/submit")
+      .set(authHeader())
+      .send({ attemptId: "not-an-object-id" });
+
+    expectValidationError(response);
+  });
 });
