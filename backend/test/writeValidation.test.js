@@ -29,4 +29,14 @@ describe("write endpoint input validation", () => {
     expect(passwordSchema.validate("longpasswordwithoutnumber").error).toBeDefined();
     expect(passwordSchema.validate("weakpass").error).toBeDefined();
   });
+
+  test("rejects invalid lesson progress payloads", async () => {
+    // Send the wrong type for moduleId along with a field the endpoint does not support.
+    const response = await request(app)
+      .patch("/api/v1/lessons/progress")
+      .set(authHeader())
+      .send({ moduleId: 42, unexpected: true });
+
+    expectValidationError(response);
+  });
 });
