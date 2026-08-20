@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
 const { getModule, getLesson } = require("../utils/content");
+const { lessonProgressSchema, validateRequest } = require("../validation/userValidation");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
