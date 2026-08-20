@@ -5,7 +5,13 @@ const { sendVerificationEmail } = require("../utils/sendEmail.js");
 //User is capitalized because it represents a model which is a collection of items forthe database
 const User = require("../models/User.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
-const { registerSchema, loginSchema } = require("../validation/userValidation.js");
+const {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  validateRequest,
+} = require("../validation/userValidation.js");
 const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
@@ -236,12 +242,9 @@ const verifyEmail = async (req, res, next) => {
 };
 const forgotPassword = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    if (!email) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Please provide an email address." });
-    }
+    const validatedBody = validateRequest(res, forgotPasswordSchema, req.body);
+    if (!validatedBody) return;
+    const { email } = validatedBody;
     const user = await User.findOne({ email }).select("+password_reset_token");
     if (!user) {
       return res.status(StatusCodes.OK).json({
@@ -281,12 +284,9 @@ const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    const { token, newPassword } = req.body;
-    if (!token || !newPassword) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Token and new password are needed." });
-    }
+    const validatedBody = validateRequest(res, resetPasswordSchema, req.body);
+    if (!validatedBody) return;
+    const { token, newPassword } = validatedBody;
     const user = await User.findOne({
       password_reset_token: token,
       password_reset_expires_at: { $gt: new Date() },
