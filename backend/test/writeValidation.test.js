@@ -87,4 +87,14 @@ describe("write endpoint input validation", () => {
     expectValidationError(response);
     expect(response.body.errors.length).toBeGreaterThan(1);
   });
+
+  test("rejects unsupported dashboard event types", async () => {
+    // Send an event type that is not part of the supported dashboard event list.
+    const response = await request(app)
+      .post("/api/v1/dashboard/events")
+      .set(authHeader())
+      .send({ type: "cache_bypass" });
+
+    expectValidationError(response);
+  });
 });
