@@ -8,12 +8,8 @@ const UserProgress = require("../src/models/UserProgress.model");
 
 useTestDb();
 
-// Creates a basic verified learner and gives us a token
-// so each test does not have to repeat all of this setup.
-async function createAuthedUser(
-  name = "Progress User",
-  email = "progress-user@example.com",
-) {
+// Creates a basic verified learner and gives us a token so each test does not have to repeat all of this setup
+async function createAuthedUser(name = "Progress User", email = "progress-user@example.com") {
   const user = await User.create({
     name,
     email,
@@ -23,6 +19,7 @@ async function createAuthedUser(
     email_verified_at: new Date(),
   });
 
+  // Create the same kind of JWT our protected routes expect.
   const token = jwt.sign(
     {
       id: user._id.toString(),
@@ -32,6 +29,7 @@ async function createAuthedUser(
     process.env.JWT_SECRET,
   );
 
+  // Return both since some tests need the user record while others only need authentication.
   return {
     user,
     authHeader: `Bearer ${token}`,
@@ -40,10 +38,7 @@ async function createAuthedUser(
 
 describe("lesson and dashboard API integration", () => {
   it("returns progress data and updates the active lesson cursor", async () => {
-    const { authHeader } = await createAuthedUser(
-      "Lesson Reader",
-      "lesson-progress@example.com",
-    );
+    const { authHeader } = await createAuthedUser("Lesson Reader", "lesson-progress@example.com");
 
     // A new user should start at the beginning of the module.
     const progressRes = await request(app)
@@ -91,6 +86,7 @@ describe("lesson and dashboard API integration", () => {
       "dashboard-example@example.com",
     );
 
+    // A brand-new learner should get the dashboard's new-user state.
     const dashboardRes = await request(app)
       .get("/api/v1/dashboard")
       .set("Authorization", authHeader);
@@ -102,6 +98,7 @@ describe("lesson and dashboard API integration", () => {
       state: "new_user",
     });
 
+    // The dashboard should point a new learner toward their first lesson.
     expect(dashboardRes.body.nextAction).toMatchObject({
       href: expect.stringContaining("/learn/cashFlow/1.1"),
       ctaLabel: expect.stringContaining("Start"),
@@ -118,6 +115,7 @@ describe("lesson and dashboard API integration", () => {
       ]),
     );
 
+    // A new learner should not have anything in their activity history yet.
     expect(dashboardRes.body.recentActivity).toEqual([]);
   });
 
@@ -142,6 +140,8 @@ describe("lesson and dashboard API integration", () => {
       answers: [],
     });
 
+    // Loading the dashboard should notice the passed attempt
+    // and use it to update the learner's saved progress.
     const dashboardRes = await request(app)
       .get("/api/v1/dashboard")
       .set("Authorization", authHeader);
@@ -157,9 +157,57 @@ describe("lesson and dashboard API integration", () => {
 
     expect(progress.completed_micro_lessons).toContain("1.1.2");
 
-    expect(dashboardRes.body.recentActivity[0].label).toContain(
-      "Passed quiz: What is a Budget?",
-    );
+    // The same passed attempt should also show up in recent activity.
+    expect(dashboardRes.body.recentActivity[0].label).toContain("Passed quiz: What is a Budget?");
     expect(dashboardRes.body.recentActivity[0].label).toContain("(100%)");
+  });
+
+  it("marks a lesson complete when all of its quizzes have passed", async () => {
+    const { user, authHeader } = await createAuthedUser(
+      "Lesson Completer",
+      "lesson-completer@example.com",
+    );
+
+    // Lesson 1.1 has quizzes in these two micro-lessons.
+    // Passing both should be enough to complete the lesson.
+    const passedMicroLessons = ["1.1.2", "1.1.4"];
+
+    // Create a passed attempt for each quiz in the lesson.
+    for (const [index, microLessonId] of passedMicroLessons.entries()) {
+      await QuizAttempt.create({
+        user_id: user._id,
+        module_id: "cashFlow",
+        lesson_id: "1.1",
+        micro_lesson_id: microLessonId,
+        attempt_number: index + 1,
+        started_at: new Date(),
+        submitted_at: new Date(),
+        score: 100,
+        passed: true,
+        answers: [],
+      });
+    }
+
+    // Loading the dashboard should resolve both quiz attempts
+    // and recognize that the whole lesson is now complete.
+    const dashboardRes = await request(app)
+      .get("/api/v1/dashboard")
+      .set("Authorization", authHeader);
+
+    expect(dashboardRes.status).toBe(200);
+
+    // Read the saved progress back from the database so we can verify
+    // that both the micro-lessons and the lesson were marked complete.
+    const progress = await UserProgress.findOne({
+      user_id: user._id,
+      module_id: "cashFlow",
+    });
+
+    expect(progress.completed_micro_lessons).toEqual(expect.arrayContaining(passedMicroLessons));
+
+    expect(progress.completed_lessons).toContain("1.1");
+
+    // The dashboard summary should reflect the completed lesson too.
+    expect(dashboardRes.body.units[0].completedLessons).toBeGreaterThan(0);
   });
 });
