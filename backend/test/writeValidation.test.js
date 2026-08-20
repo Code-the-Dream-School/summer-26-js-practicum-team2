@@ -47,4 +47,14 @@ describe("write endpoint input validation", () => {
     expectValidationError(response);
     expect(response.body.errors.join(" ")).toContain("required");
   });
+
+  test("rejects invalid quiz submission route parameters before grading", async () => {
+    // Use an invalid micro-lesson route value so validation stops the request before grading.
+    const response = await request(app)
+      .post("/api/v1/quizzes/%20/submit")
+      .set(authHeader())
+      .send({});
+
+    expectValidationError(response);
+  });
 });
