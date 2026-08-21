@@ -1,294 +1,225 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 
+import { useAuthContext } from "../context/AuthContext";
+import {
+  changeProfilePassword,
+  // deleteProfile,
+  getProfile,
+  notifyDashboardProgressChanged,
+  updateProfile,
+} from "../services/api";
+
+import Button from "../shared/Button/Button.component";
+import Input from "../shared/Input/Input.component";
+import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
-import { useAuth } from "../hooks/useAuth.js";
+import Skeleton from "../shared/Skeleton/Skeleton.component";
+
+const errorMessage = (error) =>
+  error.errors?.length ? error.errors.join(" ") : error.message || "uh oh spaghetti-o";
+
+const Stat = ({label, value}) => {
+  return (
+    <p className="text-center">
+      <span>{label}</span>
+      <span>{value}</span>
+    </p>
+  );
+};
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { csrfToken } = useAuthContext();
+  const [profile, setProfile] = useState(null);
 
-  const [name, setName] = useState(user?.displayName || "Ramona");
+  const [name, setName] = useState("");
   const [goals, setGoals] = useState("");
-  const [theme, setTheme] = useState("Light");
-  const [notifications, setNotifications] = useState(true);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [deleteEmailInput, setDeleteEmailInput] = useState("");
+  // const [deleteEmail, setDeleteEmail] = useState("");
 
   const [toastMessage, setToastMessage] = useState("");
-  const [avatarError, setAvatarError] = useState("");
+  const [pending, setPending] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const showToast = (message) => {
-    setToastMessage(message);
-    setTimeout(() => setToastMessage(""), 3000);
-  };
+  const showToast = useCallback((message, variant = "default") => {
+    setToastMessage({ isOpen: true, message, variant });
+  }, []);
 
-  const handleProfileSave = (e) => {
-    e.preventDefault();
-    showToast("Profile updated successfully!");
-  };
+  const closeToast = useCallback(() => {setToastMessage((value)=> ({...value, isOpen:false}))},[])
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const applyProfile = useCallback((user) => {
+    if (!user) return;
+    setProfile(user);
+    setName(user.name);
+    setGoals(user.goals);
+  }, []);
 
-    const allowedTypes = ["image/jpeg", "image/png"];
-    const maxSize = 2 * 1024 * 1024;
+  useEffect(() => {
+      let active = true;
+      getProfile()
+        .then(({ user }) => {if (!active) return;
+          applyProfile(user);
+        })
+        .catch((error) => active && showToast(errorMessage(error)))
+        .finally(() => active && setLoading(false));
+        return () => {
+          active=false;
+        };
+    }, [applyProfile, showToast]);
 
-    if (!allowedTypes.includes(file.type)) {
-      setAvatarError("Friendly Warning: Please upload a JPG or PNG file only.");
-      return;
+  const saveProfile = async (event) => {
+    event.preventDefault();
+    setPending("Profile");
+    try {
+      const result = await updateProfile({name, goals, csrfToken});
+      applyProfile(result.user);
+      notifyDashboardProgressChanged({ avatarLabel: result.user?.name?.charAt(0) || "A" });
+      showToast(result.message, "success");
+    } catch (error) {
+      showToast(errorMessage(error));
+    } finally {
+      setPending("");
     }
-    if (file.size > maxSize) {
-      setAvatarError("Friendly Warning: File is too large! Maximum size allowed is 2MB.");
-      return;
+  };
+
+  const changePassword = async(event) =>{
+    event.preventDefault();
+    setPending("Password");
+    try{
+      const result = await changeProfilePassword({currentPassword, newPassword, csrfToken});
+      setCurrentPassword("")
+      setNewPassword("")
+      showToast(result.message, "success");
+    } catch(error) {
+      showToast(errorMessage(error));
+    } finally {
+      setPending("");
     }
-    setAvatarError("");
-    showToast("Avatar uploaded successfully!");
   };
 
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    if (!currentPassword) {
-      alert("Current password is required!");
-      return;
-    }
-    showToast("Password changed! Sessions invalidated on other devices.");
-    setCurrentPassword("");
-    setNewPassword("");
-  };
 
-  const handleDeleteAccount = (e) => {
-    e.preventDefault();
-    if (deleteEmailInput !== user?.email && deleteEmailInput !== "ramona@example.com") {
-      alert("Email mismatch! Please type your exact account email to confirm deletion.");
-      return;
-    }
-    alert(`Account marked for soft-deletion (30-day grace period initiated). Profile hidden.`);
-  };
-
-  const getInitials = (nameStr) => {
-    if (!nameStr) return "??";
-    return nameStr
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
-  };
-
-  //   if (!isAuthenticated) {
-  //     return (
-  //       <EmptyState
-  //         icon="🔐"
-  //         title="Sign in to view your profile"
-  //         message="Manage your preferences, view learning milestones, and update security metrics after signing in."
-  //         action={
-  //           <Link
-  //             to={ROUTES.LOGIN}
-  //             className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover"
-  //           >
-  //             Go to sign in
-  //           </Link>
-  //         }
-  //       />
-  //     )
+  // const deleteAccount = async(event) => {
+  //   event.preventDefault();
+  //   setPending("Delete");
+  //   try{
+  //     await deleteProfile({email:deleteEmail, csrfToken})
+  //     try{
+  //       await logout()
+  //     }catch{}  
+  //   }catch(error) {
+  //     showToast(result.message, "success");
+  //   } finally{
+  //     setPending("");
   //   }
+  // };
+
+  if(loading){
+    return <Skeleton />
+  }
+
+  const savedDisplayName = profile?.name || "username"
+
 
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 flex items-center gap-2 rounded-md bg-green-600 px-5 py-3 font-semibold text-white shadow-lg animate-bounce">
-          🍞 {toastMessage}
-        </div>
-      )}
+      <Toast {...toastMessage} onClose={closeToast}/>
 
+      {/* Header Profile Summary */}
       <header className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-surface-raised p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-xl font-bold text-white shadow-sm">
-            {getInitials(name)}
-          </div>
-          <div>
+        <div>
             <h1 className="font-heading text-h3 font-bold text-heading">
-              {name || "User Profile"}
+              {savedDisplayName}
             </h1>
             <p className="text-small text-neutral-600">
-              Manage your profile metrics and preferences.
+              Manage your profile and preferences.
             </p>
-          </div>
         </div>
 
         <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-surface-app px-4 py-3 shadow-inner">
-          <div className="text-center">
-            <span className="block text-small font-semibold text-primary uppercase tracking-wide">
-              XP Points
-            </span>
-            <span className="font-heading text-h5 font-bold text-heading">
-              {user?.xp !== undefined ? user.xp.toLocaleString() : "0"}
-            </span>
-          </div>
+         <Stat label="XP Points:" value={` ${(profile?.xp?? 0).toLocaleString()}`}/>
           <div className="h-8 w-px bg-neutral-200" />
-          <div className="text-center">
-            <span className="block text-small font-semibold text-primary uppercase tracking-wide">
-              Streak
-            </span>
-            <span className="font-heading text-h5 font-bold text-heading">
-              {user?.streak !== undefined ? `${user.streak} Days` : "0 Days"}
-            </span>
-          </div>
+            <Stat label="Streak:" value={` ${profile?.streak?? 0} days`}/>
         </div>
       </header>
 
+      {/* Identity & Goals Card */}
       <Card className="space-y-4">
-        <h2 className="font-heading text-h4 font-bold text-heading">Identity & Goals</h2>
-        <form onSubmit={handleProfileSave} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-small font-semibold text-heading block">Display Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 bg-surface-app px-3 py-2 text-heading shadow-sm focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-small font-semibold text-heading block">
-              Current Learning Goals
-            </label>
-            <textarea
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-              placeholder="What are you working on..."
-              className="w-full h-20 rounded-md border border-neutral-300 bg-surface-app px-3 py-2 text-heading shadow-sm focus:border-primary focus:outline-none resize-none"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-small font-semibold text-heading block">
-              Update Profile Picture
-            </label>
-            <input
-              type="file"
-              accept="image/png, image/jpeg"
-              onChange={handleAvatarChange}
-              className="block w-full text-sm text-neutral-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-surface-inset file:text-heading hover:file:bg-neutral-200"
-            />
-            {avatarError && <p className="text-xs text-red-600 font-medium">{avatarError}</p>}
-          </div>
-          <button
-            type="submit"
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-hover transition-colors"
-          >
-            Save Profile
-          </button>
+        <h2 className="font-heading text-h4 font-bold text-heading">
+          Identity & Goals
+          </h2>
+        <form onSubmit={saveProfile} className="space-y-4 max-w-md">
+          <Input id="profile-name" label="Display Name" required minLength={2} maxLength={30} value={name} onChange={e => setName(e.target.value)}/>
+          <Button type="submit">
+            Save Changes 
+          </Button>
         </form>
       </Card>
 
+    {/* Security & Credentials */}
       <Card className="space-y-4">
-        <h2 className="font-heading text-h4 font-bold text-heading">Preferences</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-            <div>
-              <p className="font-semibold text-heading">Interface Theme</p>
-              <p className="text-xs text-neutral-500">Toggle dark styling layouts</p>
-            </div>
-
-            <select
-              value={theme}
-              onChange={(e) => {
-                setTheme(e.target.value);
-                showToast(`Changed theme to ${e.target.value}`);
-              }}
-              className="rounded-md border border-neutral-300 bg-surface-app px-3 py-1.5 text-heading shadow-sm focus:outline-none"
-            >
-              <option value="Light">Light Mode</option>
-              <option value="Dark">Dark Mode</option>
-            </select>
-          </div>
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={notifications}
-              onChange={(e) => {
-                setNotifications(e.target.checked);
-                showToast(e.target.checked ? "Notifications active" : "Notifications muted");
-              }}
-              className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary"
-            />
-            <div>
-              <p className="font-semibold text-heading">Enable Task Notifications</p>
-              <p className="text-xs text-neutral-500">
-                Receive periodic update emails on missing course assignments
-              </p>
-            </div>
-          </label>
-        </div>
-      </Card>
-
-      <Card className="space-y-4">
-        <h2 className="font-heading text-h4 font-bold text-heading">Security & Credentials</h2>
-        <form onSubmit={handlePasswordChange} className="space-y-4 max-w-md">
-          <div className="space-y-1">
-            <label className="text-small font-semibold text-heading block">Current Password</label>
-            <input
+        <h2 className="font-heading text-h4 font-bold text-heading">
+          Security & Credentials
+          </h2>
+        <form onSubmit={changePassword} className="space-y-4 max-w-md">
+            <label className="text-small font-semibold text-heading block"> Current Password</label>
+            <Input
+              id="current-password"
               type="password"
               required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-md border border-neutral-300 bg-surface-app px-3 py-2 text-heading shadow-sm focus:outline-none"
             />
-          </div>
-          <div className="space-y-1">
-            <label className="text-small font-semibold text-heading block">New Password</label>
-            <input
+            <Input
+              id="new-password"
               type="password"
+              label="New Password"
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-md border border-neutral-300 bg-surface-app px-3 py-2 text-heading shadow-sm focus:outline-none"
             />
-          </div>
-          <button
+          <Button
             type="submit"
-            className="inline-flex min-h-10 items-center justify-center rounded-md bg-neutral-600 px-4 py-2 font-semibold text-white hover:bg-neutral-700 transition-colors text-sm"
+            disable={pending==="password"}
           >
-            Update Password
-          </button>
+            {pending==="password"?"Updating...":"Update Password"}
+          </Button>
         </form>
       </Card>
 
-      <div className="rounded-2xl border-2 border-dashed border-red-300 bg-red-50/50 p-6 space-y-4">
+      {/* Danger Zone
+      <div className="space-y-4 rounded-2xl border-2 border-dashed border-danger/40 bg-danger/5 p-6">
         <header className="space-y-1">
-          <h2 className="font-heading text-h4 font-bold text-red-600">Danger Zone</h2>
+          <h2 className="font-heading text-h4 font-bold text-danger">
+            Danger Zone
+          </h2>
           <p className="text-small text-neutral-600">
             Deleting your account triggers an irreversible data purge. You will immediately lose
             platform streaks, course rewards, and accumulated lesson progress records.
           </p>
         </header>
 
-        <form onSubmit={handleDeleteAccount} className="space-y-3 max-w-md">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-neutral-700 block">
-              Type account email to verify permanent extraction:
-            </label>
-            <input
-              type="email"
-              required
-              value={deleteEmailInput}
-              onChange={(e) => setDeleteEmailInput(e.target.value)}
-              placeholder="you@domain.com"
-              className="w-full rounded-md border border-red-300 bg-surface-app px-3 py-2 text-heading shadow-sm focus:outline-none focus:ring-1 focus:ring-red-500"
-            />
-          </div>
-          <button
+        <form onSubmit={deleteAccount} className="space-y-4 max-w-md">
+          <Input
+            id="delete-account-email"
+            type="email"
+            label="Type account email to verify permanent deletion:"
+            required
+            value={deleteEmail}
+            onChange={(e) => setDeleteEmail(e.target.value)}
+            placeholder="you@domain.com"
+          />
+          <Button
             type="submit"
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-red-600 px-5 py-2.5 font-semibold text-white hover:bg-red-700 transition-colors shadow-sm"
+            disabled={pending === "delete"}
+            className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
           >
-            Delete Account
-          </button>
-        </form>
-      </div>
+            {pending === "delete" ? "Deleting..." : "Delete Account"}
+    //       </Button> */}
+    {/* //     </form> */}
+    {/* //   </div> */}
     </section>
   );
 }
