@@ -221,6 +221,11 @@ describe("write endpoint input validation", () => {
       id: "uploaded-module",
       title: "Uploaded module",
       lessons: [{ id: "1.1", title: "Uploaded lesson", microLessons: [] }],
+      tags: ["budgeting"],
+      metadata: { version: 1 },
+      characters: [],
+      budgets: [],
+      tables: [],
     };
 
     const response = await request(app)
@@ -234,6 +239,8 @@ describe("write endpoint input validation", () => {
     expect(response.status).toBe(200);
     expect(response.body.id).toBe("uploaded-module");
     expect(response.body.lessons[0].title).toBe("Uploaded lesson");
+    expect(response.body.tags).toEqual(["budgeting"]);
+    expect(response.body.metadata.version).toBe(1);
   });
 
   test("rejects invalid JSON lesson files", async () => {

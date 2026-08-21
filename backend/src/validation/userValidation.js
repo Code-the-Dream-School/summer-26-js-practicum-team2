@@ -114,7 +114,7 @@ const lessonImportSchema = Joi.object({
   id: Joi.string().trim().min(1).required(),
   title: Joi.string().trim().min(1).required(),
   lessons: Joi.array().required(),
-});
+}).unknown(true);
 
 function validateRequest(res, schema, payload) {
   const { error, value } = schema.validate(payload, { abortEarly: false });
