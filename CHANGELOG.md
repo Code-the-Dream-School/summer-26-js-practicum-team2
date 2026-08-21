@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added integration coverage for retrieving and verifying saved quiz progress
 - Added integration coverage for processing supported dashboard events
 - Added integration test coverage for backend API error handling and negative paths, including missing/invalid/expired authentication, CSRF validation, invalid lesson progress, quiz submission errors, and duplicate submission conflict handling.
+- Added backend Jest coverage guardrails with a dedicated coverage script and global thresholds to prevent test-coverage regression.
 
 ---
 
