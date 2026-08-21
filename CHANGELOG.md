@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased Patch 3]
 
+### Added
+
+- Added a MongoDB lesson-module model for storing imported lesson content
+
+### Changed
+
+- Updated content loading to prefer MongoDB while retaining JSON fallback support
+
 ---
 
 ## [Unreleased Patch 2]

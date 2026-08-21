@@ -1,5 +1,6 @@
 const path = require("node:path");
 const fs = require("node:fs");
+const LessonModule = require("../models/LessonModule.model");
 
 // shared/content lives outside the backend package, alongside it in the repo root.
 const CONTENT_ROOT = path.resolve(__dirname, "../../../shared/content");
@@ -12,7 +13,7 @@ const readJson = (relativeFile) => {
 let manifestCache = null;
 let moduleCache = new Map();
 
-const getManifest = () => {
+const getManifest = async () => {
   if (!manifestCache) {
     manifestCache = readJson("manifest.json");
   }
@@ -20,12 +21,22 @@ const getManifest = () => {
 };
 
 // Look a module up in the manifest, then load the JSON file the manifest points at.
-const getModule = (moduleId) => {
+const getModule = async (moduleId) => {
   if (moduleCache.has(moduleId)) {
     return moduleCache.get(moduleId);
   }
 
-  const manifest = getManifest();
+  try {
+    const databaseModule = await LessonModule.findOne({ id: moduleId }).lean();
+    if (databaseModule) {
+      moduleCache.set(moduleId, databaseModule);
+      return databaseModule;
+    }
+  } catch (error) {
+    console.warn(`Falling back to JSON content for module '${moduleId}': ${error.message}`);
+  }
+
+  const manifest = await getManifest();
   const learningPath = manifest.learningPaths?.[0];
   const moduleMeta = learningPath?.modules?.find((mod) => mod.id === moduleId);
   if (!moduleMeta) {
@@ -42,8 +53,8 @@ const getModule = (moduleId) => {
   }
 };
 
-const getLesson = (moduleId, lessonId) => {
-  const moduleData = getModule(moduleId);
+const getLesson = async (moduleId, lessonId) => {
+  const moduleData = await getModule(moduleId);
   if (!moduleData) {
     return null;
   }
