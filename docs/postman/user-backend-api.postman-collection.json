@@ -147,15 +147,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "register"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "register"]
             }
           },
           "response": []
@@ -201,15 +194,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/verify?token={{verificationToken}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "verify"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "verify"],
               "query": [
                 {
                   "key": "token",
@@ -258,23 +244,14 @@
                   "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
-                  "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
-                  "if (setCookieHeaders.length) {",
-                  "  const cookiePairs = setCookieHeaders",
-                  "    .map((header) => header.value || '')",
-                  "    .flatMap((value) => value.split(',').map((part) => part.trim()).filter(Boolean))",
-                  "    .filter((part) => part.includes('='))",
-                  "    .map((part) => part.split(';')[0].trim())",
-                  "    .filter(Boolean);",
-                  "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
-                  "  if (sessionCookie) {",
-                  "    pm.environment.set('sessionCookie', sessionCookie);",
-                  "    pm.variables.set('sessionCookie', sessionCookie);",
-                  "    console.log('Session cookie saved:', sessionCookie);",
-                  "  }",
+                  "const sessionCookie = pm.cookies.get('session_token') || '';",
+                  "if (sessionCookie) {",
+                  "  pm.environment.set('sessionCookie', `session_token=${sessionCookie}`);",
+                  "  pm.variables.set('sessionCookie', `session_token=${sessionCookie}`);",
+                  "  console.log('Session cookie saved from Postman cookie jar.');",
                   "}",
                   "pm.test('Login response captures session cookie', function () {",
-                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
+                  "  pm.expect(pm.environment.get('sessionCookie')).to.be.a('string').and.not.empty;",
                   "});",
                   "console.log('CSRF token saved:', responseJson.csrfToken);"
                 ],
@@ -302,15 +279,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "login"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "login"]
             }
           },
           "response": []
@@ -370,15 +340,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "logout"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "logout"]
             }
           },
           "response": []
@@ -422,15 +385,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "logout"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "logout"]
             }
           },
           "response": []
@@ -492,15 +448,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/forgot-password",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "forgot-password"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "forgot-password"]
             }
           },
           "response": []
@@ -582,15 +531,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/reset-password",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "reset-password"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "reset-password"]
             }
           },
           "response": []
@@ -634,14 +576,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/dashboard",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "dashboard"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dashboard"]
             }
           },
           "response": []
@@ -696,15 +632,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/dashboard/events",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "dashboard",
-                "events"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dashboard", "events"]
             }
           },
           "response": []
@@ -743,15 +672,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/quizzes/progress",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "quizzes",
-                "progress"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "progress"]
             }
           },
           "response": []
@@ -785,15 +707,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/quizzes/attempts",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "quizzes",
-                "attempts"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "attempts"]
             }
           },
           "response": []
@@ -849,15 +764,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/quizzes/start",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "quizzes",
-                "start"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "start"]
             }
           },
           "response": []
@@ -912,16 +820,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/quizzes/1.1.2/submit",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "quizzes",
-                "1.1.2",
-                "submit"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "1.1.2", "submit"]
             }
           },
           "response": []
@@ -963,16 +863,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/lessons/cashFlow/1.1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "lessons",
-                "cashFlow",
-                "1.1"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "cashFlow", "1.1"]
             }
           },
           "response": []
@@ -1009,15 +901,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/lessons/progress?moduleId=cashFlow",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "lessons",
-                "progress"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "progress"],
               "query": [
                 {
                   "key": "moduleId",
@@ -1078,15 +963,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/lessons/progress",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "lessons",
-                "progress"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "progress"]
             }
           },
           "response": []

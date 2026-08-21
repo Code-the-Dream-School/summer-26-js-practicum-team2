@@ -99,15 +99,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/status",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "status"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "status"]
             }
           },
           "response": []
@@ -137,15 +130,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/users",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "users"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "users"]
             }
           },
           "response": []
@@ -175,15 +161,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "modules"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules"]
             }
           },
           "response": []
@@ -234,15 +213,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "modules"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules"]
             }
           },
           "response": []
@@ -291,16 +263,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "modules",
-                "{{adminModuleId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules", "{{adminModuleId}}"]
             }
           },
           "response": []
@@ -330,16 +294,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "modules",
-                "{{adminModuleId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules", "{{adminModuleId}}"]
             }
           },
           "response": []
@@ -374,16 +330,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/seed-budgeting",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "modules",
-                "seed-budgeting"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules", "seed-budgeting"]
             }
           },
           "response": []
@@ -434,9 +382,7 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}/lessons",
-              "host": [
-                "{{baseUrl}}"
-              ],
+              "host": ["{{baseUrl}}"],
               "path": [
                 "api",
                 "v1",
@@ -493,9 +439,7 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}/lessons/{{adminLessonId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
+              "host": ["{{baseUrl}}"],
               "path": [
                 "api",
                 "v1",
@@ -538,9 +482,7 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}/lessons/{{adminLessonId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
+              "host": ["{{baseUrl}}"],
               "path": [
                 "api",
                 "v1",
@@ -585,16 +527,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "modules",
-                "{{adminModuleId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules", "{{adminModuleId}}"]
             }
           },
           "response": []
@@ -611,7 +545,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('POST /lessons/import returns 200', function () {",
+                  "pm.test('POST /admin/modules/import returns 200', function () {",
                   "  pm.response.to.have.status(200);",
                   "});",
                   "const responseJson = pm.response.json();",
@@ -627,8 +561,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "X-Import-Secret",
-                "value": "{{lessonImportSecret}}",
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
                 "type": "text"
               }
             ],
@@ -643,16 +582,9 @@
               ]
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/lessons/import",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "lessons",
-                "import"
-              ]
+              "raw": "{{baseUrl}}/api/v1/admin/modules/import",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "modules", "import"]
             }
           },
           "response": []
