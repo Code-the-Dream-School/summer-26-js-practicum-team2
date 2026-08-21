@@ -57,7 +57,7 @@ expect(screen.queryByPlaceholderText("Search terms...")).not.toBeInTheDocument()
 });
 
 it("respond with no matches message when search query has no results", () => {
-  render(<GlossaryModal isOpen={true} onClose={vi.fn} glossary={mockGlossData} />);
+  render(<GlossaryModal isOpen={true} onClose={vi.fn()} glossary={mockGlossData} />);
   const searchInput = screen.getByPlaceholderText("Search terms...");
   fireEvent.change(searchInput, { target: {value: "Crypto"}});
   expect(screen.getByText("No matching terms found")).toBeInTheDocument();
