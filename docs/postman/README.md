@@ -8,4 +8,4 @@ Use the shared environment files with the collection that matches the workflow:
 
 The admin collection requires an authenticated admin session. The local environment's `lessonImportSecret` is only needed for the legacy service-secret import request; admin-session imports use the admin session and CSRF token.
 
-The original `local-backend-api.postman-collection.json` remains as the combined regression collection.
+Run the collections independently when testing a specific workflow. The three collections share the same local and remote environment files.
