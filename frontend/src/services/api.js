@@ -5,6 +5,7 @@ const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
+const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 
 // Helper function to make API requests to the backend.
 async function apiRequest(path, options = {}) {
@@ -76,6 +77,20 @@ export const getDashboard = () =>
     method: "GET",
     basePath: DASHBOARD_BASE_PATH,
   });
+
+export const getAdminUsers = ({ page, limit, role, emailVerified, search } = {}) => {
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  if (role) params.set("role", role);
+  if (emailVerified !== undefined) params.set("emailVerified", emailVerified);
+  if (search) params.set("search", search);
+  const query = params.toString();
+  return apiRequest(`/users${query ? `?${query}` : ""}`, {
+    method: "GET",
+    basePath: ADMIN_BASE_PATH,
+  });
+};
 
 // Dispatches a custom event to notify the application that dashboard progress has been updated
 // This allows other components to listen for this event and update their state accordingly

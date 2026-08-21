@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import { ROUTES } from "./routes";
 import MainLayout from "../../shared/MainLayout/MainLayout.component";
 import ProtectedRoute from "./ProtectedRoute";
+import RoleProtectedRoute from "./RoleProtectedRoute";
 
 import HomePage from "../../pages/HomePage";
 import LoginPage from "../../pages/LoginPage";
@@ -16,6 +17,7 @@ import LastLessonRedirect from "../../pages/LastLessonRedirect";
 import PrivacyPage from "../../pages/PrivacyPage";
 import TermsPage from "../../pages/TermsPage";
 import NotFoundPage from "../../pages/NotFoundPage";
+import AdminDashboardPage from "../../pages/AdminDashboardPage";
 
 export default function AppRouter() {
   return (
@@ -42,6 +44,14 @@ export default function AppRouter() {
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN}
+          element={
+            <RoleProtectedRoute requiredRole="admin">
+              <AdminDashboardPage />
+            </RoleProtectedRoute>
           }
         />
         <Route
