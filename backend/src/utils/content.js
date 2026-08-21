@@ -70,4 +70,16 @@ const sanitizeLessonData = (lessonData) => {
   return sanitizedLesson;
 };
 
-module.exports = { getManifest, getModule, getLesson, sanitizeLessonData, clearCache };
+const sanitizeModuleData = (moduleData) => ({
+  ...moduleData,
+  lessons: (moduleData.lessons || []).map(sanitizeLessonData),
+});
+
+module.exports = {
+  getManifest,
+  getModule,
+  getLesson,
+  sanitizeLessonData,
+  sanitizeModuleData,
+  clearCache,
+};

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prevented lesson content APIs from exposing `correctResponse` and `explanation`
 - Added a stateless public quiz answer-check endpoint
+- Sanitized all lessons nested in the module payload, not just the requested lesson
 
 ### Added
 

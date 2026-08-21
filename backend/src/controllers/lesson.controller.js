@@ -1,6 +1,11 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
-const { getModule, getLesson, sanitizeLessonData } = require("../utils/content");
+const {
+  getModule,
+  getLesson,
+  sanitizeLessonData,
+  sanitizeModuleData,
+} = require("../utils/content");
 const { lessonProgressSchema, validateRequest } = require("../validation/userValidation");
 
 const DEFAULT_MODULE_ID = "cashFlow";
@@ -43,7 +48,7 @@ exports.getLesson = async (req, res, next) => {
     });
 
     return res.status(StatusCodes.OK).json({
-      moduleData,
+      moduleData: sanitizeModuleData(moduleData),
       lessonData: sanitizeLessonData(lessonData),
       progress: progressRecord ? shapeProgress(progressRecord) : null,
     });
@@ -73,7 +78,7 @@ exports.getPublicLesson = async (req, res, next) => {
     }
 
     return res.status(StatusCodes.OK).json({
-      moduleData,
+      moduleData: sanitizeModuleData(moduleData),
       lessonData: sanitizeLessonData(lessonData),
     });
   } catch (error) {

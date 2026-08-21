@@ -107,34 +107,21 @@ describe("write endpoint input validation", () => {
 
     expect(response.status).toBe(200);
     expect(knowledgeChecks.length).toBeGreaterThan(0);
-    expect(knowledgeChecks).toEqual(
-      expect.not.arrayContaining([
-        expect.objectContaining({ correctResponse: expect.anything() }),
-      ]),
-    );
-    expect(knowledgeChecks).toEqual(
-      expect.not.arrayContaining([expect.objectContaining({ explanation: expect.anything() })]),
-    );
+    expect(JSON.stringify(response.body)).not.toContain("correctResponse");
+    expect(JSON.stringify(response.body)).not.toContain("explanation");
   });
 
   test("sanitizes correct answers from authenticated lesson content", async () => {
-    const response = await request(app)
-      .get("/api/v1/lessons/cashFlow/1.1")
-      .set(authHeader());
+    const response = await request(app).get("/api/v1/lessons/cashFlow/1.1").set(authHeader());
     const content = response.body.lessonData.microLessons.flatMap(
       (microLesson) => microLesson.microLessonContent,
     );
     const knowledgeChecks = content.filter((item) => item.type === "knowledgeCheck");
 
     expect(response.status).toBe(200);
-    expect(knowledgeChecks).toEqual(
-      expect.not.arrayContaining([
-        expect.objectContaining({ correctResponse: expect.anything() }),
-      ]),
-    );
-    expect(knowledgeChecks).toEqual(
-      expect.not.arrayContaining([expect.objectContaining({ explanation: expect.anything() })]),
-    );
+    expect(knowledgeChecks.length).toBeGreaterThan(0);
+    expect(JSON.stringify(response.body)).not.toContain("correctResponse");
+    expect(JSON.stringify(response.body)).not.toContain("explanation");
   });
 
   test("checks a correct quiz answer without authentication", async () => {
