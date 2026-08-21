@@ -15,11 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added focused backend integration tests for invalid lesson progress, quiz, password recovery, and dashboard event requests
 - Added reusable Joi schemas for backend write endpoint validation
+- Added documentation for write endpoint validation and the standard validation error response
 
 ### Changed
 
 - Validated backend lesson progress, quiz, password recovery, and dashboard event inputs before processing or persistence
 - Updated password validation to accept 16-character passwords with uppercase, lowercase, and numeric characters; shorter passwords also require a special character
+
+---
+
 ## [0.3.5] - 2026-08-20
 
 ### Added
@@ -29,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
+
 ## [0.3.4] - 2026-08-19
 
 ### Added
@@ -38,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Combines sync-shared-files into a single GitHub workflow file
-- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend
 
 ### Removed
 
