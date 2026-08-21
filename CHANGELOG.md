@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevented disabled or deleted users from signing in
 - Disabled self-targeting admin account actions and repeated email verification
 - Labeled account blocking controls as Ban/Unban in the admin panel
+- Fixed soft-delete validation to accept the admin panel's delete state payload
 - Added an admin-only Admin link to the shared desktop and mobile navigation
 - Replaced admin panel action buttons with the shared Button component
 

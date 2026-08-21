@@ -143,7 +143,7 @@ describe("admin access boundary", () => {
     const deleted = await request(app)
       .patch(`/api/v1/admin/users/${target._id}/deleted`)
       .set(auth)
-      .send({ confirmation: "CONFIRM" });
+      .send({ confirmation: "CONFIRM", deleted: true });
     expect(deleted.status).toBe(200);
     expect(deleted.body.deleted_at).toBeTruthy();
     expect(new Date(deleted.body.deletion_scheduled_at).getTime()).toBeGreaterThan(Date.now());
@@ -151,7 +151,7 @@ describe("admin access boundary", () => {
     const restored = await request(app)
       .patch(`/api/v1/admin/users/${target._id}/deleted`)
       .set(auth)
-      .send({ confirmation: "CONFIRM" });
+      .send({ confirmation: "CONFIRM", deleted: false });
     expect(restored.status).toBe(200);
     expect(restored.body.deleted_at).toBeNull();
 
@@ -175,7 +175,7 @@ describe("admin access boundary", () => {
     const deleteSelf = await request(app)
       .patch(`/api/v1/admin/users/${admin._id}/deleted`)
       .set(auth)
-      .send({ confirmation: "CONFIRM" });
+      .send({ confirmation: "CONFIRM", deleted: true });
     expect(deleteSelf.status).toBe(409);
 
     admin.email_verified_at = new Date();

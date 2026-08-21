@@ -8,6 +8,7 @@ const {
   adminActionSchema,
   adminDisableSchema,
   adminDeleteSchema,
+  adminSoftDeleteSchema,
   adminRoleSchema,
   adminUserQuerySchema,
   adminModuleSchema,
@@ -79,7 +80,7 @@ exports.listUsers = async (req, res, next) => {
 
 exports.resetUserProgress = async (req, res, next) => {
   try {
-    const body = validateRequest(res, adminActionSchema, req.body);
+    const body = validateRequest(res, adminSoftDeleteSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
     if (!target || target.deleted_at) {
@@ -119,7 +120,7 @@ exports.verifyUserEmail = async (req, res, next) => {
 
 exports.setUserDeleted = async (req, res, next) => {
   try {
-    const body = validateRequest(res, adminActionSchema, req.body);
+    const body = validateRequest(res, adminSoftDeleteSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
     if (!target) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
@@ -139,7 +140,7 @@ exports.setUserDeleted = async (req, res, next) => {
           .status(StatusCodes.CONFLICT)
           .json({ message: "The last active admin cannot be deleted." });
     }
-    target.deleted_at = target.deleted_at ? null : new Date();
+    target.deleted_at = body.deleted ? new Date() : null;
     target.deletion_scheduled_at = target.deleted_at
       ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       : null;
