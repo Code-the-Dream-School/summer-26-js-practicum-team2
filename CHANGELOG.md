@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made dashboard next actions and empty states database-driven for unseeded applications
 - Added a full lesson JSON editor for lesson metadata, micro-lessons, quizzes, and content blocks
 - Added renderer block-type controls for switching paragraph, callout, formula, list, quiz, table, and budget blocks
+- Added structured editing for lists, character intros, knowledge checks, tables, and budget summaries
 
 ---
 
