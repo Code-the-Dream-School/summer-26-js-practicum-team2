@@ -4,6 +4,7 @@ const request = require("supertest");
 process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const { hashPassword } = require("../src/utils/password");
 const { useTestDb } = require("./setup");
 
 useTestDb();
@@ -198,5 +199,20 @@ describe("admin access boundary", () => {
 
     expect(response.status).toBe(403);
     expect(response.body.message).toContain("banned");
+  });
+
+  test("shows banned users a banned message at login", async () => {
+    const user = await createUser();
+    user.password_hash = await hashPassword("P@ssword123!");
+    user.is_disabled = true;
+    await user.save();
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password: "P@ssword123!",
+    });
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe("This account has been banned.");
   });
 });
