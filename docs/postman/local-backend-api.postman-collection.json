@@ -1106,7 +1106,7 @@
                   "});",
                   "const responseJson = pm.response.json();",
                   "pm.test('Imported module response includes its ID', function () {",
-                  "  pm.expect(responseJson.id).to.eql('postman-test-module');",
+                  "  pm.expect(responseJson.id).to.be.a('string').and.not.empty;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1128,13 +1128,14 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": \"postman-test-module\",\n  \"title\": \"Postman test module\",\n  \"lessons\": []\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/lessons/import",

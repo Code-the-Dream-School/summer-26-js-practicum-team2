@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added integration coverage for refreshed content after module re-imports
 - Added Postman requests for public lessons, quiz answer checks, and lesson imports
 - Added the lesson import secret to the local Postman environment configuration
+- Added multipart `.json` file uploads for complete lesson module imports
 
 ### Changed
 

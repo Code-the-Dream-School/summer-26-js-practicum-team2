@@ -161,7 +161,24 @@ exports.updateLessonProgress = async (req, res, next) => {
 // Upserts a complete lesson module from a trusted operator request.
 exports.importLessonModule = async (req, res, next) => {
   try {
-    const validatedBody = validateRequest(res, lessonImportSchema, req.body);
+    let importBody = req.body;
+    if (req.file) {
+      if (!req.file.originalname.toLowerCase().endsWith(".json")) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Lesson imports must be .json files.",
+        });
+      }
+
+      try {
+        importBody = JSON.parse(req.file.buffer.toString("utf8"));
+      } catch {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Uploaded lesson file contains invalid JSON.",
+        });
+      }
+    }
+
+    const validatedBody = validateRequest(res, lessonImportSchema, importBody);
     if (!validatedBody) return;
 
     const lessonModule = await LessonModule.findOneAndUpdate(

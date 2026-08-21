@@ -215,6 +215,39 @@ describe("write endpoint input validation", () => {
     expect(response.status).toBe(200);
     expect(response.body.moduleData.title).toBe("Updated title");
   });
+
+  test("imports a complete lesson module from a JSON file", async () => {
+    const moduleFile = {
+      id: "uploaded-module",
+      title: "Uploaded module",
+      lessons: [{ id: "1.1", title: "Uploaded lesson", microLessons: [] }],
+    };
+
+    const response = await request(app)
+      .post("/api/v1/lessons/import")
+      .set("X-Import-Secret", process.env.LESSON_IMPORT_SECRET)
+      .attach("file", Buffer.from(JSON.stringify(moduleFile)), {
+        filename: "uploaded-module.json",
+        contentType: "application/json",
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.id).toBe("uploaded-module");
+    expect(response.body.lessons[0].title).toBe("Uploaded lesson");
+  });
+
+  test("rejects invalid JSON lesson files", async () => {
+    const response = await request(app)
+      .post("/api/v1/lessons/import")
+      .set("X-Import-Secret", process.env.LESSON_IMPORT_SECRET)
+      .attach("file", Buffer.from("not json"), {
+        filename: "broken.json",
+        contentType: "application/json",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("invalid JSON");
+  });
 });
 
 describe("public lesson content endpoint", () => {
