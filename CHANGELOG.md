@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made learning-path module discovery database-driven instead of defaulting to `cashFlow`
 - Styled the empty learning-path state with the shared EmptyState component and lesson artwork
 - Made dashboard next actions and empty states database-driven for unseeded applications
+- Added a full lesson JSON editor for lesson metadata, micro-lessons, quizzes, and content blocks
 
 ---
 

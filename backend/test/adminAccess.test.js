@@ -106,9 +106,21 @@ describe("admin access boundary", () => {
     const updatedLesson = await request(app)
       .patch("/api/v1/admin/modules/admin-module/lessons/1.1")
       .set(auth)
-      .send({ id: "1.1", title: "Updated lesson", microLessons: [] });
+      .send({
+        id: "1.1",
+        title: "Updated lesson",
+        learningGoal: "Understand the updated lesson.",
+        microLessons: [
+          {
+            id: "1.1.1",
+            title: "Updated step",
+            microLessonContent: [{ type: "paragraph", text: "Updated content." }],
+          },
+        ],
+      });
     expect(updatedLesson.status).toBe(200);
     expect(updatedLesson.body.title).toBe("Updated lesson");
+    expect(updatedLesson.body.microLessons[0].microLessonContent[0].text).toBe("Updated content.");
 
     const deletedLesson = await request(app)
       .delete("/api/v1/admin/modules/admin-module/lessons/1.1")

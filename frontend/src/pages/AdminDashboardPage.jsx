@@ -14,6 +14,7 @@ import {
   setAdminUserDisabled,
   setAdminUserDeleted,
   updateAdminModule,
+  updateAdminLesson,
   updateAdminUserRole,
   verifyAdminUserEmail,
 } from "../services/api";
@@ -29,6 +30,8 @@ export default function AdminDashboardPage() {
   const [selectedModuleId, setSelectedModuleId] = useState("");
   const [moduleForm, setModuleForm] = useState(emptyModule);
   const [lessonTitle, setLessonTitle] = useState("");
+  const [selectedLessonId, setSelectedLessonId] = useState("");
+  const [lessonJson, setLessonJson] = useState("");
   const [state, setState] = useState({ isLoading: true, error: "", message: "" });
 
   const loadData = useCallback(async () => {
@@ -63,6 +66,21 @@ export default function AdminDashboardPage() {
   function handleModuleSelect(module) {
     setSelectedModuleId(module.id);
     setModuleForm({ id: module.id, title: module.title, lessons: module.lessons ?? [] });
+    setSelectedLessonId(module.lessons?.[0]?.id || "");
+    setLessonJson(module.lessons?.[0] ? JSON.stringify(module.lessons[0], null, 2) : "");
+  }
+
+  function handleLessonSelect(lesson) {
+    setSelectedLessonId(lesson.id);
+    setLessonJson(JSON.stringify(lesson, null, 2));
+  }
+
+  function parseLessonJson() {
+    try {
+      return JSON.parse(lessonJson);
+    } catch {
+      throw new Error("Lesson JSON is invalid. Check commas, quotes, and brackets.");
+    }
   }
 
   return (
@@ -377,29 +395,83 @@ export default function AdminDashboardPage() {
                 {(selectedModule.lessons ?? []).map((lesson) => (
                   <div
                     key={lesson.id}
-                    className="flex items-center justify-between border-b border-primary/10 py-2"
+                    className={`flex items-center justify-between border-b border-primary/10 py-2 ${lesson.id === selectedLessonId ? "font-semibold text-primary" : ""}`}
                   >
-                    <span className="text-foreground">{lesson.title}</span>
                     <Button
                       variant="ghost"
-                      className="min-h-8 px-2 py-1 text-xs text-danger underline"
-                      onClick={() => {
-                        if (window.confirm("Delete this lesson?"))
-                          void runAction(
-                            () =>
-                              deleteAdminLesson({
-                                moduleId: selectedModule.id,
-                                lessonId: lesson.id,
-                                csrfToken,
-                              }),
-                            "Lesson deleted.",
-                          );
-                      }}
+                      className="justify-start px-2"
+                      onClick={() => handleLessonSelect(lesson)}
                     >
-                      Delete
+                      {lesson.title || lesson.id}
                     </Button>
+                    <div className="flex gap-2">
+                      <span className="text-xs text-foreground">
+                        {lesson.microLessons?.length ?? 0} micro-lessons
+                      </span>
+                      <Button
+                        variant="ghost"
+                        className="min-h-8 px-2 py-1 text-xs text-danger underline"
+                        onClick={() => {
+                          if (window.confirm("Delete this lesson?"))
+                            void runAction(
+                              () =>
+                                deleteAdminLesson({
+                                  moduleId: selectedModule.id,
+                                  lessonId: lesson.id,
+                                  csrfToken,
+                                }),
+                              "Lesson deleted.",
+                            );
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                 ))}
+                {selectedLessonId ? (
+                  <div className="space-y-3 border-t border-primary/10 pt-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <h4 className="font-heading text-lg font-bold text-heading">
+                          Lesson content editor
+                        </h4>
+                        <p className="text-sm text-foreground">
+                          Edit lesson metadata, micro-lessons, quizzes, and content blocks.
+                        </p>
+                      </div>
+                      <Button
+                        variant="primary"
+                        onClick={() => {
+                          try {
+                            const lesson = parseLessonJson();
+                            void runAction(
+                              () =>
+                                updateAdminLesson({
+                                  moduleId: selectedModule.id,
+                                  lessonId: selectedLessonId,
+                                  lesson,
+                                  csrfToken,
+                                }),
+                              "Lesson content saved.",
+                            );
+                          } catch (error) {
+                            setState((current) => ({ ...current, error: error.message }));
+                          }
+                        }}
+                      >
+                        Save content
+                      </Button>
+                    </div>
+                    <textarea
+                      className="min-h-[28rem] w-full rounded-md border border-primary/20 bg-surface-input p-4 font-mono text-sm text-heading"
+                      value={lessonJson}
+                      onChange={(event) => setLessonJson(event.target.value)}
+                      spellCheck="false"
+                      aria-label="Lesson JSON content"
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : (
               <p className="text-foreground">Choose a module or create one to manage lessons.</p>

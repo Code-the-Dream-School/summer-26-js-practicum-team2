@@ -130,6 +130,14 @@ export const createAdminLesson = ({ moduleId, lesson, csrfToken }) =>
     basePath: ADMIN_BASE_PATH,
   });
 
+export const updateAdminLesson = ({ moduleId, lessonId, lesson, csrfToken }) =>
+  apiRequest(`/modules/${encodeURIComponent(moduleId)}/lessons/${encodeURIComponent(lessonId)}`, {
+    method: "PATCH",
+    csrfToken,
+    body: lesson,
+    basePath: ADMIN_BASE_PATH,
+  });
+
 export const deleteAdminLesson = ({ moduleId, lessonId, csrfToken }) =>
   apiRequest(`/modules/${encodeURIComponent(moduleId)}/lessons/${encodeURIComponent(lessonId)}`, {
     method: "DELETE",
