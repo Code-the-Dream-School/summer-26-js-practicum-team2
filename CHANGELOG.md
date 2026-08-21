@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Added the unauthenticated lesson route before the protected lesson routes
+- Updated the lesson content hook and API client to support public lesson requests
 
 ---
 

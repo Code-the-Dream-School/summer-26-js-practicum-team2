@@ -106,6 +106,12 @@ export const getLesson = (moduleId, lessonId) =>
     basePath: LESSONS_BASE_PATH,
   });
 
+export const getPublicLesson = (moduleId, lessonId) =>
+  apiRequest(`/public/${encodeURIComponent(moduleId)}/${encodeURIComponent(lessonId)}`, {
+    method: "GET",
+    basePath: LESSONS_BASE_PATH,
+  });
+
 export const getLastLesson = () =>
   apiRequest("/last", {
     method: "GET",
