@@ -22,6 +22,7 @@ const UserProgress = require("../models/UserProgress.model");
 const { invalidateDashboardCache } = require("./dashboard.controller");
 const {
   quizStartSchema,
+  quizCheckSchema,
   quizSubmissionParamsSchema,
   quizSubmissionSchema,
   validateRequest,
@@ -154,6 +155,38 @@ exports.startQuiz = async (req, res, next) => {
       attempt_number: newAttempt.attempt_number,
       micro_lesson_id: newAttempt.micro_lesson_id,
       started_at: newAttempt.started_at,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// Route: POST /api/v1/quizzes/check
+// Checks one answer without creating an attempt or requiring authentication.
+exports.checkAnswer = async (req, res, next) => {
+  try {
+    const validatedBody = validateRequest(res, quizCheckSchema, req.body);
+    if (!validatedBody) return;
+
+    const { moduleId, microLessonId, questionId, choiceIds } = validatedBody;
+    const question = getQuestionsFromLesson(moduleId, microLessonId).find(
+      (item) => item.id === questionId,
+    );
+
+    if (!question) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Question '${questionId}' was not found in micro-lesson '${microLessonId}'.`,
+      });
+    }
+
+    const correctChoiceIds = Array.isArray(question.correctResponse)
+      ? question.correctResponse
+      : [question.correctResponse];
+
+    return res.status(StatusCodes.OK).json({
+      isCorrect: arraysMatch(choiceIds, correctChoiceIds),
+      correctChoiceIds,
+      explanation: question.explanation,
     });
   } catch (error) {
     return next(error);

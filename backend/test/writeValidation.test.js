@@ -97,6 +97,73 @@ describe("write endpoint input validation", () => {
 
     expectValidationError(response);
   });
+
+  test("sanitizes correct answers from public lesson content", async () => {
+    const response = await request(app).get("/api/v1/lessons/public/cashFlow/1.1");
+    const content = response.body.lessonData.microLessons.flatMap(
+      (microLesson) => microLesson.microLessonContent,
+    );
+    const knowledgeChecks = content.filter((item) => item.type === "knowledgeCheck");
+
+    expect(response.status).toBe(200);
+    expect(knowledgeChecks.length).toBeGreaterThan(0);
+    expect(JSON.stringify(response.body)).not.toContain("correctResponse");
+    expect(JSON.stringify(response.body)).not.toContain("explanation");
+  });
+
+  test("sanitizes correct answers from authenticated lesson content", async () => {
+    const response = await request(app).get("/api/v1/lessons/cashFlow/1.1").set(authHeader());
+    const content = response.body.lessonData.microLessons.flatMap(
+      (microLesson) => microLesson.microLessonContent,
+    );
+    const knowledgeChecks = content.filter((item) => item.type === "knowledgeCheck");
+
+    expect(response.status).toBe(200);
+    expect(knowledgeChecks.length).toBeGreaterThan(0);
+    expect(JSON.stringify(response.body)).not.toContain("correctResponse");
+    expect(JSON.stringify(response.body)).not.toContain("explanation");
+  });
+
+  test("checks a correct quiz answer without authentication", async () => {
+    const response = await request(app).post("/api/v1/quizzes/check").send({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.2",
+      questionId: "1.1.2-q3",
+      choiceIds: "a",
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      isCorrect: true,
+      correctChoiceIds: ["a"],
+      explanation: expect.any(String),
+    });
+  });
+
+  test("checks an incorrect quiz answer and returns the correct choice", async () => {
+    const response = await request(app).post("/api/v1/quizzes/check").send({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.2",
+      questionId: "1.1.2-q3",
+      choiceIds: "b",
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.isCorrect).toBe(false);
+    expect(response.body.correctChoiceIds).toEqual(["a"]);
+    expect(response.body.explanation).toEqual(expect.any(String));
+  });
+
+  test("returns not found for an unknown quiz question", async () => {
+    const response = await request(app).post("/api/v1/quizzes/check").send({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.2",
+      questionId: "missing-question",
+      choiceIds: "a",
+    });
+
+    expect(response.status).toBe(404);
+  });
 });
 
 describe("public lesson content endpoint", () => {

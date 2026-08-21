@@ -8,8 +8,6 @@ export function normalizeContent(content = []) {
 
 export function normalizeQuestion(question, index) {
   // Support both the current answerChoices fields and the legacy choices fields.
-  const correctResponse = question.correctResponse;
-  const correctChoiceIds = Array.isArray(correctResponse) ? correctResponse : [correctResponse];
   const answerChoices = question.answerChoices ?? question.choices ?? [];
 
   return {
@@ -21,8 +19,6 @@ export function normalizeQuestion(question, index) {
       id: choice.key ?? choice.id,
       label: choice.text ?? choice.label,
     })),
-    correctChoiceIds: correctChoiceIds.filter(Boolean),
-    explanation: question.explanation ?? "Review the lesson and try this one again.",
   };
 }
 

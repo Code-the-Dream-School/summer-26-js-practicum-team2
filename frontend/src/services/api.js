@@ -112,6 +112,13 @@ export const getPublicLesson = (moduleId, lessonId) =>
     basePath: LESSONS_BASE_PATH,
   });
 
+export const checkQuizAnswer = ({ moduleId, microLessonId, questionId, choiceIds }) =>
+  apiRequest("/check", {
+    method: "POST",
+    body: { moduleId, microLessonId, questionId, choiceIds },
+    basePath: QUIZZES_BASE_PATH,
+  });
+
 export const getLastLesson = () =>
   apiRequest("/last", {
     method: "GET",
