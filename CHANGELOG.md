@@ -14,19 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added sanitized public and authenticated lesson responses that hide quiz answers
+- Added server-side correctness checks for individual quiz answers
 
 ### Changed
 
 - Prevented lesson content APIs from exposing `correctResponse` and `explanation`
 - Added a stateless public quiz answer-check endpoint
 - Sanitized all lessons nested in the module payload, not just the requested lesson
-
-### Added
-
-- Added server-side correctness checks for individual quiz answers
-
-### Changed
-
 - Updated quiz state to store server-provided correctness metadata
 
 ### Removed
