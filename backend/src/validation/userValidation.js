@@ -108,7 +108,7 @@ const resetPasswordSchema = Joi.object({
 
 const dashboardEventSchema = Joi.object({
   type: Joi.string().trim().valid("lesson_complete", "quiz_submit").required(),
-});
+}).unknown(true);
 
 const lessonImportSchema = Joi.object({
   id: Joi.string().trim().min(1).required(),

@@ -393,6 +393,9 @@
         },
         {
           "name": "Logout Again (Expect No Auth)",
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
           "event": [
             {
               "listen": "test",
@@ -1116,11 +1119,6 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              },
               {
                 "key": "X-Import-Secret",
                 "value": "{{lessonImportSecret}}",
