@@ -1,4 +1,5 @@
-const { User, ArchivedUser } = require("../models/User.model");
+//const { User, ArchivedUser } = require("../models/User.model");
+const { User } = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
@@ -33,7 +34,6 @@ const getProfile = async (req, res, next) => {
         name: user.name,
         email: user.email,
         goals: user.goals ?? "",
-        theme: user.theme ?? "Light",
         notifications: user.notifications ?? true,
         xp: user.xp ?? 0,
         streak: user.streak ?? 0,
@@ -81,7 +81,7 @@ const updateProfile = async (req, res, next) => {
         error: error.details.map((detail) => detail.message),
       });
     }
-    const { name, email, goals, theme, notifications } = value;
+    const { name, email, goals, notifications } = value;
     const user = await User.findById(req.user.id);
 
     if (!user || user.is_deleted) {
@@ -98,10 +98,10 @@ const updateProfile = async (req, res, next) => {
       user.goals = goals;
       hasUpdates = true;
     }
-    if (theme !== undefined) {
+    /*if (theme !== undefined) {
       user.theme = theme;
       hasUpdates = true;
-    }
+    }*/
     if (notifications !== undefined) {
       user.notifications = notifications;
       hasUpdates = true;
@@ -125,7 +125,6 @@ const updateProfile = async (req, res, next) => {
         name: user.name,
         email: user.email,
         goals: user.goals,
-        theme: user.theme,
         notifications: user.notifications,
         xp: user.xp ?? 0,
         streak: user.streak ?? 0,
@@ -195,6 +194,7 @@ const updateProfile = async (req, res, next) => {
     return next(error);
   }
 }; REMOVED Aug 13*/
+
 //POST /api/v1/profile/password (uS 2.4.7)
 const changePassword = async (req, res, next) => {
   try {
@@ -249,26 +249,47 @@ const deleteAccount = async (req, res, next) => {
       });
     }
     const user = await User.findById(req.user.id);
-    if (!user || user.is_deleted) {
+    if (!user || user.is_deleted || user.is_archived) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
-    if (user.email.toLocaleLowerCase() !== value.email.toLowerCase()) {
+    // user must type email to confirm the user wanting to delete their account
+    if (user.email.toLowerCase() !== value.email.toLowerCase()) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Email does not match account email on record. Please try again.",
       });
     }
-    user.is_deleted = true;
-    user.deleted_at = new Date();
-    user.token_version = (user.token_version || 0) + 1;
+
+    // Flag deletion status as pending so Admin Dashboard can review it
+    user.deletion_status = "pending";
+    user.deletion_requested_at = new Date();
     await user.save();
 
-    await ArchivedUser.create({
+    return res.status(StatusCodes.OK).json({
+      message: "Deletion of user account request sent. Our admin will review your request.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+module.exports = {
+  getFirstInitial,
+  getProfile,
+  updateProfile,
+  changePassword,
+  deleteAccount,
+  uploadAvatar,
+};
+/*  
+    ==========removed creating a separate collection of archived user to a model in database 
+   await ArchivedUser.create({
       original_user_id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       deleted_at: new Date(),
-    });
+   }); 
+
+   //clear session cookie THIS IS REMOVED SINCE WE ARE NOT LETTING USER TO INSTANTLY REMOVE ACCOUNT
     res.clearCookie("session_token", {
       path: "/",
       httpOnly: true,
@@ -279,13 +300,4 @@ const deleteAccount = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-};
-
-module.exports = {
-  getFirstInitial,
-  getProfile,
-  updateProfile,
-  changePassword,
-  deleteAccount,
-  uploadAvatar,
-};
+}; */
