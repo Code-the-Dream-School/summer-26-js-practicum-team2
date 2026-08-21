@@ -11,6 +11,7 @@ export default function NavBar({
   streak = 0,
   onLogout,
   isSigningOut = false,
+  isAdmin = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,6 +19,7 @@ export default function NavBar({
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Learn", href: "/learn" },
+        ...(isAdmin ? [{ label: "Admin", href: "/admin" }] : []),
       ]
     : [];
 

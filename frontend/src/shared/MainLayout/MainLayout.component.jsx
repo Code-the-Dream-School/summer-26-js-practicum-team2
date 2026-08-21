@@ -23,6 +23,7 @@ export default function MainLayout() {
       <Header
         signedIn={isAuthenticated}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
+        isAdmin={user?.role === "admin"}
         onLogout={handleLogout}
         isSigningOut={isSigningOut}
       />

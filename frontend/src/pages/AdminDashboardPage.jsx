@@ -18,6 +18,7 @@ import {
   verifyAdminUserEmail,
 } from "../services/api";
 import Card from "../shared/Card/Card.component";
+import Button from "../shared/Button/Button.component";
 
 const emptyModule = { id: "", title: "", lessons: [] };
 
@@ -115,8 +116,10 @@ export default function AdminDashboardPage() {
                           : "Active"}
                     </td>
                     <td className="flex flex-wrap gap-2 px-5 py-3">
-                      <button
-                        className="text-primary underline"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="min-h-8 px-2 py-1 text-xs underline"
                         disabled={adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
@@ -126,9 +129,11 @@ export default function AdminDashboardPage() {
                         }
                       >
                         Reset progress
-                      </button>
-                      <button
-                        className="text-primary underline"
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="min-h-8 px-2 py-1 text-xs underline"
                         disabled={adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
@@ -143,10 +148,12 @@ export default function AdminDashboardPage() {
                         }
                       >
                         {adminUser.is_disabled ? "Unban" : "Ban"}
-                      </button>
+                      </Button>
                       {!adminUser.email_verified_at ? (
-                        <button
-                          className="text-primary underline"
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-8 px-2 py-1 text-xs underline"
                           disabled={adminUser.id === currentUser?.id}
                           onClick={() =>
                             void runAction(
@@ -156,11 +163,13 @@ export default function AdminDashboardPage() {
                           }
                         >
                           Verify email
-                        </button>
+                        </Button>
                       ) : null}
                       {adminUser.id !== currentUser?.id ? (
-                        <button
-                          className="text-primary underline"
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-8 px-2 py-1 text-xs underline"
                           onClick={() =>
                             void runAction(
                               () =>
@@ -174,10 +183,12 @@ export default function AdminDashboardPage() {
                           }
                         >
                           {adminUser.role === "admin" ? "Demote" : "Promote"}
-                        </button>
+                        </Button>
                       ) : null}
-                      <button
-                        className="text-primary underline"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="min-h-8 px-2 py-1 text-xs underline"
                         disabled={adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
@@ -192,10 +203,12 @@ export default function AdminDashboardPage() {
                         }
                       >
                         {adminUser.deleted_at ? "Restore" : "Delete"}
-                      </button>
+                      </Button>
                       {adminUser.deleted_at ? (
-                        <button
-                          className="text-danger underline"
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-8 px-2 py-1 text-xs text-danger underline"
                           disabled={adminUser.id === currentUser?.id}
                           onClick={() => {
                             if (window.confirm(`Permanently delete ${adminUser.email}?`)) {
@@ -212,7 +225,7 @@ export default function AdminDashboardPage() {
                           }}
                         >
                           Hard delete
-                        </button>
+                        </Button>
                       ) : null}
                     </td>
                   </tr>
@@ -227,8 +240,8 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-h3 font-bold text-heading">Lesson modules</h2>
           <div className="flex flex-wrap gap-3">
-            <button
-              className="rounded-md bg-primary px-4 py-2 font-semibold text-white"
+            <Button
+              variant="primary"
               onClick={() =>
                 void runAction(
                   () => seedAdminBudgetingModule(csrfToken),
@@ -237,7 +250,7 @@ export default function AdminDashboardPage() {
               }
             >
               Seed budgeting
-            </button>
+            </Button>
             <label className="cursor-pointer rounded-md border border-primary px-4 py-2 font-semibold text-primary">
               Upload JSON
               <input
@@ -260,24 +273,26 @@ export default function AdminDashboardPage() {
         <div className="grid gap-5 lg:grid-cols-[minmax(0,18rem)_1fr]">
           <div className="space-y-2">
             {modules.map((module) => (
-              <button
+              <Button
+                variant={module.id === selectedModuleId ? "primary" : "secondary"}
                 key={module.id}
-                className={`block w-full rounded-md border px-4 py-3 text-left ${module.id === selectedModuleId ? "border-primary bg-primary/10" : "border-primary/15"}`}
+                className="w-full justify-start text-left"
                 onClick={() => handleModuleSelect(module)}
               >
                 {module.title}{" "}
                 <span className="text-sm text-foreground">({module.lessonCount})</span>
-              </button>
+              </Button>
             ))}
-            <button
-              className="w-full rounded-md border border-dashed border-primary px-4 py-3 text-primary"
+            <Button
+              variant="secondary"
+              className="w-full border-dashed text-primary"
               onClick={() => {
                 setSelectedModuleId("");
                 setModuleForm(emptyModule);
               }}
             >
               New module
-            </button>
+            </Button>
           </div>
           <div className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
@@ -296,8 +311,8 @@ export default function AdminDashboardPage() {
               />
             </div>
             <div className="flex flex-wrap gap-3">
-              <button
-                className="rounded-md bg-primary px-4 py-2 font-semibold text-white"
+              <Button
+                variant="primary"
                 onClick={() =>
                   void runAction(
                     () =>
@@ -313,10 +328,11 @@ export default function AdminDashboardPage() {
                 }
               >
                 {selectedModule ? "Save module" : "Create module"}
-              </button>
+              </Button>
               {selectedModule ? (
-                <button
-                  className="rounded-md border border-danger px-4 py-2 font-semibold text-danger"
+                <Button
+                  variant="ghost"
+                  className="border border-danger text-danger"
                   onClick={() => {
                     if (window.confirm("Delete this module?"))
                       void runAction(
@@ -326,7 +342,7 @@ export default function AdminDashboardPage() {
                   }}
                 >
                   Delete module
-                </button>
+                </Button>
               ) : null}
             </div>
             {selectedModule ? (
@@ -339,8 +355,8 @@ export default function AdminDashboardPage() {
                     value={lessonTitle}
                     onChange={(event) => setLessonTitle(event.target.value)}
                   />
-                  <button
-                    className="rounded-md bg-primary px-4 py-2 font-semibold text-white"
+                  <Button
+                    variant="primary"
                     onClick={() => {
                       const id = `${selectedModule.id}-lesson-${Date.now()}`;
                       void runAction(
@@ -356,7 +372,7 @@ export default function AdminDashboardPage() {
                     }}
                   >
                     Add lesson
-                  </button>
+                  </Button>
                 </div>
                 {(selectedModule.lessons ?? []).map((lesson) => (
                   <div
@@ -364,8 +380,9 @@ export default function AdminDashboardPage() {
                     className="flex items-center justify-between border-b border-primary/10 py-2"
                   >
                     <span className="text-foreground">{lesson.title}</span>
-                    <button
-                      className="text-danger underline"
+                    <Button
+                      variant="ghost"
+                      className="min-h-8 px-2 py-1 text-xs text-danger underline"
                       onClick={() => {
                         if (window.confirm("Delete this lesson?"))
                           void runAction(
@@ -380,7 +397,7 @@ export default function AdminDashboardPage() {
                       }}
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
