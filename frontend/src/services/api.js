@@ -11,10 +11,12 @@ const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 async function apiRequest(path, options = {}) {
   const { method = "GET", body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options;
 
+  const isFormData = body instanceof FormData;
   const requestHeaders = {
     "Content-Type": "application/json",
     ...headers,
   };
+  if (isFormData) delete requestHeaders["Content-Type"];
 
   if (csrfToken && ["POST", "PATCH", "PUT", "DELETE", "CONNECT"].includes(method.toUpperCase())) {
     requestHeaders["X-CSRF-TOKEN"] = csrfToken;
@@ -24,7 +26,7 @@ async function apiRequest(path, options = {}) {
     method,
     credentials: "include",
     headers: requestHeaders,
-    body: body ? JSON.stringify(body) : undefined,
+    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
   // Checks if the response is JSON and parses it if it is, otherwise returns null
   const isJson = response.headers.get("content-type")?.includes("application/json");
@@ -88,6 +90,84 @@ export const getAdminUsers = ({ page, limit, role, emailVerified, search } = {})
   const query = params.toString();
   return apiRequest(`/users${query ? `?${query}` : ""}`, {
     method: "GET",
+    basePath: ADMIN_BASE_PATH,
+  });
+};
+
+export const getAdminModules = () =>
+  apiRequest("/modules", { method: "GET", basePath: ADMIN_BASE_PATH });
+
+export const seedAdminBudgetingModule = (csrfToken) =>
+  apiRequest("/modules/seed-budgeting", {
+    method: "POST",
+    csrfToken,
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const createAdminModule = ({ module, csrfToken }) =>
+  apiRequest("/modules", { method: "POST", csrfToken, body: module, basePath: ADMIN_BASE_PATH });
+
+export const updateAdminModule = ({ moduleId, updates, csrfToken }) =>
+  apiRequest(`/modules/${encodeURIComponent(moduleId)}`, {
+    method: "PATCH",
+    csrfToken,
+    body: updates,
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const deleteAdminModule = ({ moduleId, csrfToken }) =>
+  apiRequest(`/modules/${encodeURIComponent(moduleId)}`, {
+    method: "DELETE",
+    csrfToken,
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const createAdminLesson = ({ moduleId, lesson, csrfToken }) =>
+  apiRequest(`/modules/${encodeURIComponent(moduleId)}/lessons`, {
+    method: "POST",
+    csrfToken,
+    body: lesson,
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const deleteAdminLesson = ({ moduleId, lessonId, csrfToken }) =>
+  apiRequest(`/modules/${encodeURIComponent(moduleId)}/lessons/${encodeURIComponent(lessonId)}`, {
+    method: "DELETE",
+    csrfToken,
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const updateAdminUserRole = ({ userId, role, csrfToken }) =>
+  apiRequest(`/users/${encodeURIComponent(userId)}/role`, {
+    method: "PATCH",
+    csrfToken,
+    body: { role, confirmation: "CONFIRM" },
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const setAdminUserDisabled = ({ userId, disabled, csrfToken }) =>
+  apiRequest(`/users/${encodeURIComponent(userId)}/disabled`, {
+    method: "PATCH",
+    csrfToken,
+    body: { disabled, confirmation: "CONFIRM" },
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const resetAdminUserProgress = ({ userId, csrfToken }) =>
+  apiRequest(`/users/${encodeURIComponent(userId)}/progress/reset`, {
+    method: "POST",
+    csrfToken,
+    body: { confirmation: "CONFIRM" },
+    basePath: ADMIN_BASE_PATH,
+  });
+
+export const importAdminLessonModule = ({ file, csrfToken }) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiRequest("/modules/import", {
+    method: "POST",
+    csrfToken,
+    body: formData,
     basePath: ADMIN_BASE_PATH,
   });
 };

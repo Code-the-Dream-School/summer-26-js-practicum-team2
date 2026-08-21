@@ -164,7 +164,8 @@ exports.listModules = async (req, res, next) => {
 exports.getModule = async (req, res, next) => {
   try {
     const module = await LessonModule.findOne({ id: req.params.moduleId }).lean();
-    if (!module) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
+    if (!module)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
     return res.status(StatusCodes.OK).json(module);
   } catch (error) {
     return next(error);
@@ -195,7 +196,8 @@ exports.updateModule = async (req, res, next) => {
       { $set: body },
       { returnDocument: "after" },
     ).lean();
-    if (!module) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
+    if (!module)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
     clearModuleCache(req.params.moduleId);
     return res.status(StatusCodes.OK).json(module);
   } catch (error) {
@@ -206,7 +208,8 @@ exports.updateModule = async (req, res, next) => {
 exports.deleteModule = async (req, res, next) => {
   try {
     const result = await LessonModule.deleteOne({ id: req.params.moduleId });
-    if (!result.deletedCount) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
+    if (!result.deletedCount)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
     clearModuleCache(req.params.moduleId);
     return res.status(StatusCodes.OK).json({ message: "Lesson module deleted." });
   } catch (error) {
@@ -232,9 +235,12 @@ exports.createLesson = async (req, res, next) => {
     const body = validateRequest(res, adminLessonSchema, req.body);
     if (!body) return;
     const module = await LessonModule.findOne({ id: req.params.moduleId });
-    if (!module) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
+    if (!module)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
     if ((module.lessons || []).some((lesson) => lesson.id === body.id)) {
-      return res.status(StatusCodes.CONFLICT).json({ message: "Lesson already exists in this module." });
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "Lesson already exists in this module." });
     }
     module.lessons = [...(module.lessons || []), body];
     await module.save();
@@ -250,11 +256,14 @@ exports.updateLesson = async (req, res, next) => {
     const body = validateRequest(res, adminLessonSchema, req.body);
     if (!body) return;
     const module = await LessonModule.findOne({ id: req.params.moduleId });
-    if (!module) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
+    if (!module)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
     const index = (module.lessons || []).findIndex((lesson) => lesson.id === req.params.lessonId);
     if (index < 0) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson not found." });
     if (body.id !== req.params.lessonId && module.lessons.some((lesson) => lesson.id === body.id)) {
-      return res.status(StatusCodes.CONFLICT).json({ message: "Lesson already exists in this module." });
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "Lesson already exists in this module." });
     }
     module.lessons[index] = body;
     module.markModified("lessons");
@@ -269,7 +278,8 @@ exports.updateLesson = async (req, res, next) => {
 exports.deleteLesson = async (req, res, next) => {
   try {
     const module = await LessonModule.findOne({ id: req.params.moduleId });
-    if (!module) return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
+    if (!module)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson module not found." });
     if (!(module.lessons || []).some((lesson) => lesson.id === req.params.lessonId)) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "Lesson not found." });
     }

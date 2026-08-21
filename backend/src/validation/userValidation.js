@@ -146,7 +146,9 @@ const adminModuleSchema = Joi.object({
 const adminModuleUpdateSchema = Joi.object({
   title: Joi.string().trim().min(1),
   lessons: Joi.array(),
-}).min(1).unknown(true);
+})
+  .min(1)
+  .unknown(true);
 
 const adminLessonSchema = Joi.object({
   id: Joi.string().trim().min(1).required(),

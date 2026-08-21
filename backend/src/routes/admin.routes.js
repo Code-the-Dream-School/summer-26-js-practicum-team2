@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+const { importLessonModule } = require("../controllers/lesson.controller");
 const {
   getAdminStatus,
   listUsers,
@@ -17,6 +19,7 @@ const {
 } = require("../controllers/admin.controller");
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 router.get("/status", getAdminStatus);
 router.get("/users", listUsers);
@@ -32,5 +35,6 @@ router.delete("/modules/:moduleId", deleteModule);
 router.post("/modules/:moduleId/lessons", createLesson);
 router.patch("/modules/:moduleId/lessons/:lessonId", updateLesson);
 router.delete("/modules/:moduleId/lessons/:lessonId", deleteLesson);
+router.post("/modules/import", upload.single("file"), importLessonModule);
 
 module.exports = router;
