@@ -1,0 +1,660 @@
+{
+  "info": {
+    "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
+    "name": "Sprout Admin API",
+    "description": "Admin-only workflows for user and lesson management. Requires an authenticated admin session.",
+    "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "csrfToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionCookie",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserPassword",
+      "value": "P@ssword123!",
+      "type": "string"
+    },
+    {
+      "key": "newTestUserPassword",
+      "value": "N3wP@ssword!",
+      "type": "string"
+    },
+    {
+      "key": "adminModuleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminLessonId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /admin/status returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Admin status confirms access', function () { pm.expect(pm.response.json().isAdmin).to.eql(true); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Admin Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /admin/users returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Admin users response is safe', function () { const body = pm.response.json(); pm.expect(body.users).to.be.an('array'); pm.expect(JSON.stringify(body)).not.to.include('password_hash'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Admin Modules",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /admin/modules returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Admin modules response is an array', function () { pm.expect(pm.response.json().modules).to.be.an('array'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Admin Test Module",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /admin/modules returns 201', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('adminModuleId', body.id);",
+                  "pm.test('Created module has an ID', function () { pm.expect(body.id).to.eql('postman-admin-module'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"postman-admin-module\",\n  \"title\": \"Postman admin module\",\n  \"lessons\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Admin Test Module",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('PATCH /admin/modules/:moduleId returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Module title was updated', function () { pm.expect(pm.response.json().title).to.eql('Updated Postman admin module'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Postman admin module\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "{{adminModuleId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Admin Module Detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /admin/modules/:moduleId returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Module detail includes lessons', function () { pm.expect(pm.response.json().lessons).to.be.an('array'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "{{adminModuleId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Seed Budgeting Module",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /admin/modules/seed-budgeting returns an expected status', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+                  "pm.test('Seed response is JSON', function () { pm.expect(pm.response.json()).to.be.an('object'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/seed-budgeting",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "seed-budgeting"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Admin Test Lesson",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /admin/modules/:moduleId/lessons returns 201', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('adminLessonId', body.id);",
+                  "pm.test('Created lesson has an ID', function () { pm.expect(body.id).to.eql('postman-admin-lesson'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"postman-admin-lesson\",\n  \"title\": \"Postman admin lesson\",\n  \"learningGoal\": \"Test lesson editing\",\n  \"microLessons\": [{\n    \"id\": \"postman-admin-lesson-1\",\n    \"title\": \"First step\",\n    \"microLessonContent\": [{\"type\": \"paragraph\", \"text\": \"Editable content\"}]\n  }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}/lessons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "{{adminModuleId}}",
+                "lessons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Admin Test Lesson Content",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('PATCH /admin/modules/:moduleId/lessons/:lessonId returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Nested lesson content was updated', function () { pm.expect(pm.response.json().microLessons[0].microLessonContent[0].text).to.eql('Updated editable content'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"postman-admin-lesson\",\n  \"title\": \"Updated Postman admin lesson\",\n  \"learningGoal\": \"Updated goal\",\n  \"microLessons\": [{\n    \"id\": \"postman-admin-lesson-1\",\n    \"title\": \"Updated step\",\n    \"microLessonContent\": [{\"type\": \"callout\", \"text\": \"Updated editable content\"}]\n  }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}/lessons/{{adminLessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "{{adminModuleId}}",
+                "lessons",
+                "{{adminLessonId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Admin Test Lesson",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('DELETE /admin/modules/:moduleId/lessons/:lessonId returns 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}/lessons/{{adminLessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "{{adminModuleId}}",
+                "lessons",
+                "{{adminLessonId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Admin Test Module",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('DELETE /admin/modules/:moduleId returns 200', function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set('adminModuleId', '');",
+                  "pm.collectionVariables.set('adminLessonId', '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/modules/{{adminModuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "modules",
+                "{{adminModuleId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "Import Lesson Module",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /lessons/import returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Imported module response includes its ID', function () {",
+                  "  pm.expect(responseJson.id).to.be.a('string').and.not.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Import-Secret",
+                "value": "{{lessonImportSecret}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                "import"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

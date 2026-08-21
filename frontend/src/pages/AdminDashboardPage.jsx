@@ -706,36 +706,191 @@ export default function AdminDashboardPage() {
                                 <div className="grid gap-2 sm:grid-cols-2">
                                   <label className="space-y-1 text-sm text-heading">
                                     Character ID
-                                    <input className="w-full rounded-md border border-primary/20 px-3 py-2" value={block.characterId ?? ""} onChange={(event) => updateBlockField(microLesson.id, blockIndex, "characterId", event.target.value)} />
+                                    <input
+                                      className="w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={block.characterId ?? ""}
+                                      onChange={(event) =>
+                                        updateBlockField(
+                                          microLesson.id,
+                                          blockIndex,
+                                          "characterId",
+                                          event.target.value,
+                                        )
+                                      }
+                                    />
                                   </label>
                                   <label className="space-y-1 text-sm text-heading">
                                     Intro text
-                                    <textarea className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2" value={block.text ?? ""} onChange={(event) => updateBlock(microLesson.id, blockIndex, event.target.value)} />
+                                    <textarea
+                                      className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={block.text ?? ""}
+                                      onChange={(event) =>
+                                        updateBlock(microLesson.id, blockIndex, event.target.value)
+                                      }
+                                    />
                                   </label>
                                 </div>
                               ) : block.type === "unorderedList" ? (
                                 <div className="space-y-2">
                                   {(block.items ?? []).map((item, itemIndex) => (
-                                    <input key={itemIndex} className="w-full rounded-md border border-primary/20 px-3 py-2" value={item} onChange={(event) => updateListItem(microLesson.id, blockIndex, itemIndex, event.target.value)} />
+                                    <input
+                                      key={itemIndex}
+                                      className="w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={item}
+                                      onChange={(event) =>
+                                        updateListItem(
+                                          microLesson.id,
+                                          blockIndex,
+                                          itemIndex,
+                                          event.target.value,
+                                        )
+                                      }
+                                    />
                                   ))}
-                                  <Button variant="secondary" onClick={() => updateBlockField(microLesson.id, blockIndex, "items", [...(block.items ?? []), "New list item"])}>Add list item</Button>
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() =>
+                                      updateBlockField(microLesson.id, blockIndex, "items", [
+                                        ...(block.items ?? []),
+                                        "New list item",
+                                      ])
+                                    }
+                                  >
+                                    Add list item
+                                  </Button>
                                 </div>
                               ) : block.type === "knowledgeCheck" ? (
                                 <div className="space-y-2">
-                                  <label className="space-y-1 text-sm text-heading">Question<textarea className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2" value={block.question ?? ""} onChange={(event) => updateBlockField(microLesson.id, blockIndex, "question", event.target.value)} /></label>
+                                  <label className="space-y-1 text-sm text-heading">
+                                    Question
+                                    <textarea
+                                      className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={block.question ?? ""}
+                                      onChange={(event) =>
+                                        updateBlockField(
+                                          microLesson.id,
+                                          blockIndex,
+                                          "question",
+                                          event.target.value,
+                                        )
+                                      }
+                                    />
+                                  </label>
                                   {(block.answerChoices ?? []).map((choice, choiceIndex) => (
-                                    <div key={choiceIndex} className="grid gap-2 sm:grid-cols-[5rem_1fr]">
-                                      <input className="rounded-md border border-primary/20 px-3 py-2" value={choice.key ?? ""} onChange={(event) => updateChoice(microLesson.id, blockIndex, choiceIndex, "key", event.target.value)} />
-                                      <input className="rounded-md border border-primary/20 px-3 py-2" value={choice.text ?? ""} onChange={(event) => updateChoice(microLesson.id, blockIndex, choiceIndex, "text", event.target.value)} />
+                                    <div
+                                      key={choiceIndex}
+                                      className="grid gap-2 sm:grid-cols-[5rem_1fr]"
+                                    >
+                                      <input
+                                        className="rounded-md border border-primary/20 px-3 py-2"
+                                        value={choice.key ?? ""}
+                                        onChange={(event) =>
+                                          updateChoice(
+                                            microLesson.id,
+                                            blockIndex,
+                                            choiceIndex,
+                                            "key",
+                                            event.target.value,
+                                          )
+                                        }
+                                      />
+                                      <input
+                                        className="rounded-md border border-primary/20 px-3 py-2"
+                                        value={choice.text ?? ""}
+                                        onChange={(event) =>
+                                          updateChoice(
+                                            microLesson.id,
+                                            blockIndex,
+                                            choiceIndex,
+                                            "text",
+                                            event.target.value,
+                                          )
+                                        }
+                                      />
                                     </div>
                                   ))}
-                                  <label className="space-y-1 text-sm text-heading">Correct choice IDs<input className="w-full rounded-md border border-primary/20 px-3 py-2" value={Array.isArray(block.correctResponse) ? block.correctResponse.join(", ") : block.correctResponse ?? ""} onChange={(event) => updateBlockField(microLesson.id, blockIndex, "correctResponse", event.target.value.split(",").map((item) => item.trim()).filter(Boolean))} /></label>
-                                  <label className="space-y-1 text-sm text-heading">Explanation<textarea className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2" value={block.explanation ?? ""} onChange={(event) => updateBlockField(microLesson.id, blockIndex, "explanation", event.target.value)} /></label>
+                                  <label className="space-y-1 text-sm text-heading">
+                                    Correct choice IDs
+                                    <input
+                                      className="w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={
+                                        Array.isArray(block.correctResponse)
+                                          ? block.correctResponse.join(", ")
+                                          : (block.correctResponse ?? "")
+                                      }
+                                      onChange={(event) =>
+                                        updateBlockField(
+                                          microLesson.id,
+                                          blockIndex,
+                                          "correctResponse",
+                                          event.target.value
+                                            .split(",")
+                                            .map((item) => item.trim())
+                                            .filter(Boolean),
+                                        )
+                                      }
+                                    />
+                                  </label>
+                                  <label className="space-y-1 text-sm text-heading">
+                                    Explanation
+                                    <textarea
+                                      className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={block.explanation ?? ""}
+                                      onChange={(event) =>
+                                        updateBlockField(
+                                          microLesson.id,
+                                          blockIndex,
+                                          "explanation",
+                                          event.target.value,
+                                        )
+                                      }
+                                    />
+                                  </label>
                                 </div>
                               ) : block.type === "table" || block.type === "budget-summary" ? (
                                 <div className="grid gap-2 sm:grid-cols-2">
-                                  <label className="space-y-1 text-sm text-heading">Table/Budget ID<input className="w-full rounded-md border border-primary/20 px-3 py-2" value={block.tableId ?? block.budgetId ?? ""} onChange={(event) => updateBlockField(microLesson.id, blockIndex, block.type === "table" ? "tableId" : "budgetId", event.target.value)} /></label>
-                                  {block.type === "budget-summary" ? <div className="space-y-1 text-sm text-heading">Show sections{["income", "totals", "cashFlow"].map((key) => <label key={key} className="flex gap-2 font-normal"><input type="checkbox" checked={Boolean(block.show?.[key])} onChange={(event) => updateBlockDraftShow(microLesson.id, blockIndex, key, event.target.checked)} />{key}</label>)}</div> : <p className="text-xs text-foreground">Edit table headers and reference IDs in the advanced JSON editor.</p>}
+                                  <label className="space-y-1 text-sm text-heading">
+                                    Table/Budget ID
+                                    <input
+                                      className="w-full rounded-md border border-primary/20 px-3 py-2"
+                                      value={block.tableId ?? block.budgetId ?? ""}
+                                      onChange={(event) =>
+                                        updateBlockField(
+                                          microLesson.id,
+                                          blockIndex,
+                                          block.type === "table" ? "tableId" : "budgetId",
+                                          event.target.value,
+                                        )
+                                      }
+                                    />
+                                  </label>
+                                  {block.type === "budget-summary" ? (
+                                    <div className="space-y-1 text-sm text-heading">
+                                      Show sections
+                                      {["income", "totals", "cashFlow"].map((key) => (
+                                        <label key={key} className="flex gap-2 font-normal">
+                                          <input
+                                            type="checkbox"
+                                            checked={Boolean(block.show?.[key])}
+                                            onChange={(event) =>
+                                              updateBlockDraftShow(
+                                                microLesson.id,
+                                                blockIndex,
+                                                key,
+                                                event.target.checked,
+                                              )
+                                            }
+                                          />
+                                          {key}
+                                        </label>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-foreground">
+                                      Edit table headers and reference IDs in the advanced JSON
+                                      editor.
+                                    </p>
+                                  )}
                                 </div>
                               ) : (
                                 <p className="text-xs text-foreground">
