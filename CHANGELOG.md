@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased Patch 2]
+
+### Added
+
+- Added a public lesson content endpoint for signed-out lesson previews
+- Added backend integration tests for public lesson loading and unknown lessons
+
+### Changed
+
+- Added the unauthenticated lesson route before the protected lesson routes
+
+---
+
 ## [Unreleased]
 
 ### Added

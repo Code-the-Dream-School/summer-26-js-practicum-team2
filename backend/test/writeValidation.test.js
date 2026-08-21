@@ -98,3 +98,19 @@ describe("write endpoint input validation", () => {
     expectValidationError(response);
   });
 });
+
+describe("public lesson content endpoint", () => {
+  test("returns a lesson without requiring authentication", async () => {
+    const response = await request(app).get("/api/v1/lessons/public/cashFlow/1.1");
+
+    expect(response.status).toBe(200);
+    expect(response.body.moduleData.id).toBe("cashFlow");
+    expect(response.body.lessonData.id).toBe("1.1");
+  });
+
+  test("returns not found for an unknown lesson", async () => {
+    const response = await request(app).get("/api/v1/lessons/public/cashFlow/does-not-exist");
+
+    expect(response.status).toBe(404);
+  });
+});
