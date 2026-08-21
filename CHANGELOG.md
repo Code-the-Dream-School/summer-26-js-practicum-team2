@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added explicit admin-role checks for admin API routes
 - Prevented disabled or deleted users from signing in
 - Disabled self-targeting admin account actions and repeated email verification
+- Labeled account blocking controls as Ban/Unban in the admin panel
 
 ---
 

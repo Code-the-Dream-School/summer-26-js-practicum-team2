@@ -142,7 +142,7 @@ export default function AdminDashboardPage() {
                           )
                         }
                       >
-                        {adminUser.is_disabled ? "Enable" : "Disable"}
+                        {adminUser.is_disabled ? "Unban" : "Ban"}
                       </button>
                       {!adminUser.email_verified_at ? (
                         <button
