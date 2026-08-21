@@ -108,11 +108,16 @@ export default function AdminDashboardPage() {
                     <td className="px-5 py-4 text-foreground">{adminUser.email}</td>
                     <td className="px-5 py-4 capitalize text-foreground">{adminUser.role}</td>
                     <td className="px-5 py-4 text-foreground">
-                      {adminUser.is_disabled ? "Disabled" : "Active"}
+                      {adminUser.deleted_at
+                        ? `Deletion scheduled${adminUser.deletion_scheduled_at ? ` (${new Date(adminUser.deletion_scheduled_at).toLocaleDateString()})` : ""}`
+                        : adminUser.is_disabled
+                          ? "Banned"
+                          : "Active"}
                     </td>
                     <td className="flex flex-wrap gap-2 px-5 py-3">
                       <button
                         className="text-primary underline"
+                        disabled={adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
                             () => resetAdminUserProgress({ userId: adminUser.id, csrfToken }),
@@ -124,6 +129,7 @@ export default function AdminDashboardPage() {
                       </button>
                       <button
                         className="text-primary underline"
+                        disabled={adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
                             () =>
@@ -138,17 +144,20 @@ export default function AdminDashboardPage() {
                       >
                         {adminUser.is_disabled ? "Enable" : "Disable"}
                       </button>
-                      <button
-                        className="text-primary underline"
-                        onClick={() =>
-                          void runAction(
-                            () => verifyAdminUserEmail({ userId: adminUser.id, csrfToken }),
-                            "Email verified.",
-                          )
-                        }
-                      >
-                        Verify email
-                      </button>
+                      {!adminUser.email_verified_at ? (
+                        <button
+                          className="text-primary underline"
+                          disabled={adminUser.id === currentUser?.id}
+                          onClick={() =>
+                            void runAction(
+                              () => verifyAdminUserEmail({ userId: adminUser.id, csrfToken }),
+                              "Email verified.",
+                            )
+                          }
+                        >
+                          Verify email
+                        </button>
+                      ) : null}
                       {adminUser.id !== currentUser?.id ? (
                         <button
                           className="text-primary underline"
@@ -169,6 +178,7 @@ export default function AdminDashboardPage() {
                       ) : null}
                       <button
                         className="text-primary underline"
+                        disabled={adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
                             () =>
@@ -186,6 +196,7 @@ export default function AdminDashboardPage() {
                       {adminUser.deleted_at ? (
                         <button
                           className="text-danger underline"
+                          disabled={adminUser.id === currentUser?.id}
                           onClick={() => {
                             if (window.confirm(`Permanently delete ${adminUser.email}?`)) {
                               void runAction(

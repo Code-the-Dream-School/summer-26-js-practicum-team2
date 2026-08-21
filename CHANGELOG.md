@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Assigned the first successfully registered user the admin role through an atomic bootstrap claim
 - Added admin user listing, progress reset, account disable/enable, and role management APIs
 - Added admin email verification and reversible user deletion actions
+- Added 30-day scheduled deletion metadata and banned-session enforcement
 - Added a role-protected admin route with an initial user control panel
 - Added admin module and nested lesson CRUD APIs with budgeting seed support
 - Added duplicate module and lesson protection with cache invalidation
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added explicit admin-role checks for admin API routes
 - Prevented disabled or deleted users from signing in
+- Disabled self-targeting admin account actions and repeated email verification
 
 ---
 

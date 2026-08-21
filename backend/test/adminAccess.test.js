@@ -146,6 +146,7 @@ describe("admin access boundary", () => {
       .send({ confirmation: "CONFIRM" });
     expect(deleted.status).toBe(200);
     expect(deleted.body.deleted_at).toBeTruthy();
+    expect(new Date(deleted.body.deletion_scheduled_at).getTime()).toBeGreaterThan(Date.now());
 
     const restored = await request(app)
       .patch(`/api/v1/admin/users/${target._id}/deleted`)
@@ -159,5 +160,43 @@ describe("admin access boundary", () => {
       .set(auth)
       .send({ confirmation: "CONFIRM", email: target.email });
     expect(hardDeleted.status).toBe(200);
+  });
+
+  test("rejects self-targeted account actions and repeated verification", async () => {
+    const admin = await createUser("admin");
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    const disableSelf = await request(app)
+      .patch(`/api/v1/admin/users/${admin._id}/disabled`)
+      .set(auth)
+      .send({ disabled: true, confirmation: "CONFIRM" });
+    expect(disableSelf.status).toBe(409);
+
+    const deleteSelf = await request(app)
+      .patch(`/api/v1/admin/users/${admin._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM" });
+    expect(deleteSelf.status).toBe(409);
+
+    admin.email_verified_at = new Date();
+    await admin.save();
+    const verifyAgain = await request(app)
+      .patch(`/api/v1/admin/users/${admin._id}/verify-email`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM" });
+    expect(verifyAgain.status).toBe(409);
+  });
+
+  test("blocks banned users from authenticated routes", async () => {
+    const user = await createUser("admin");
+    user.is_disabled = true;
+    await user.save();
+
+    const response = await request(app)
+      .get("/api/v1/admin/status")
+      .set("Authorization", `Bearer ${tokenFor(user._id, "admin")}`);
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toContain("banned");
   });
 });

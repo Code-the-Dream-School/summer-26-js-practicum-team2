@@ -163,12 +163,18 @@ export const resetAdminUserProgress = ({ userId, csrfToken }) =>
 
 export const verifyAdminUserEmail = ({ userId, csrfToken }) =>
   apiRequest(`/users/${encodeURIComponent(userId)}/verify-email`, {
-    method: "PATCH", csrfToken, body: { confirmation: "CONFIRM" }, basePath: ADMIN_BASE_PATH,
+    method: "PATCH",
+    csrfToken,
+    body: { confirmation: "CONFIRM" },
+    basePath: ADMIN_BASE_PATH,
   });
 
 export const setAdminUserDeleted = ({ userId, deleted, csrfToken }) =>
   apiRequest(`/users/${encodeURIComponent(userId)}/deleted`, {
-    method: "PATCH", csrfToken, body: { confirmation: "CONFIRM", deleted }, basePath: ADMIN_BASE_PATH,
+    method: "PATCH",
+    csrfToken,
+    body: { confirmation: "CONFIRM", deleted },
+    basePath: ADMIN_BASE_PATH,
   });
 
 export const hardDeleteAdminUser = ({ userId, email, csrfToken }) =>

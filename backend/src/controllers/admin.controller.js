@@ -25,6 +25,7 @@ const safeUser = (user) => ({
   is_disabled: user.is_disabled,
   disabled_at: user.disabled_at,
   deleted_at: user.deleted_at,
+  deletion_scheduled_at: user.deletion_scheduled_at,
   created_at: user.created_at,
 });
 
@@ -57,7 +58,9 @@ exports.listUsers = async (req, res, next) => {
     }
     const [users, total] = await Promise.all([
       User.find(filters)
-        .select("name email role email_verified_at is_disabled disabled_at deleted_at created_at")
+        .select(
+          "name email role email_verified_at is_disabled disabled_at deleted_at deletion_scheduled_at created_at",
+        )
         .sort({ created_at: 1 })
         .skip((query.page - 1) * query.limit)
         .limit(query.limit),
@@ -94,7 +97,16 @@ exports.verifyUserEmail = async (req, res, next) => {
     const body = validateRequest(res, adminActionSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
-    if (!target || target.deleted_at) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (!target || target.deleted_at)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (target._id.equals(req.user.id)) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "You cannot manage your own account." });
+    }
+    if (target.email_verified_at) {
+      return res.status(StatusCodes.CONFLICT).json({ message: "User email is already verified." });
+    }
     target.email_verified_at = target.email_verified_at || new Date();
     target.verification_token = null;
     target.verification_token_expires_at = null;
@@ -111,11 +123,26 @@ exports.setUserDeleted = async (req, res, next) => {
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
     if (!target) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (target._id.equals(req.user.id)) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "You cannot manage your own account." });
+    }
     if (target.role === "admin" && !target.deleted_at) {
-      const activeAdmins = await User.countDocuments({ role: "admin", is_disabled: false, deleted_at: null });
-      if (activeAdmins <= 1) return res.status(StatusCodes.CONFLICT).json({ message: "The last active admin cannot be deleted." });
+      const activeAdmins = await User.countDocuments({
+        role: "admin",
+        is_disabled: false,
+        deleted_at: null,
+      });
+      if (activeAdmins <= 1)
+        return res
+          .status(StatusCodes.CONFLICT)
+          .json({ message: "The last active admin cannot be deleted." });
     }
     target.deleted_at = target.deleted_at ? null : new Date();
+    target.deletion_scheduled_at = target.deleted_at
+      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      : null;
     await target.save();
     return res.status(StatusCodes.OK).json(safeUser(target));
   } catch (error) {
@@ -128,10 +155,23 @@ exports.hardDeleteUser = async (req, res, next) => {
     const body = validateRequest(res, adminDeleteSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
-    if (!target || target.email !== body.email) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (!target || target.email !== body.email)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (target._id.equals(req.user.id)) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "You cannot manage your own account." });
+    }
     if (target.role === "admin") {
-      const activeAdmins = await User.countDocuments({ role: "admin", is_disabled: false, deleted_at: null });
-      if (activeAdmins <= 1) return res.status(StatusCodes.CONFLICT).json({ message: "The last active admin cannot be deleted." });
+      const activeAdmins = await User.countDocuments({
+        role: "admin",
+        is_disabled: false,
+        deleted_at: null,
+      });
+      if (activeAdmins <= 1)
+        return res
+          .status(StatusCodes.CONFLICT)
+          .json({ message: "The last active admin cannot be deleted." });
     }
     await UserProgress.deleteMany({ user_id: target._id });
     await User.deleteOne({ _id: target._id });
@@ -143,11 +183,16 @@ exports.hardDeleteUser = async (req, res, next) => {
 
 exports.setUserDisabled = async (req, res, next) => {
   try {
-    const body = validateRequest(res, adminActionSchema, req.body);
+    const body = validateRequest(res, adminDisableSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
     if (!target || target.deleted_at) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    }
+    if (target._id.equals(req.user.id)) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "You cannot manage your own account." });
     }
     if (target.role === "admin" && body.disabled) {
       const activeAdmins = await User.countDocuments({

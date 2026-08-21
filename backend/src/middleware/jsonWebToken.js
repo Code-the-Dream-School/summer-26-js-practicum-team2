@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
+const User = require("../models/User.model");
 
 const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -8,7 +9,7 @@ const send401 = (res) => {
   return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
 };
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const cookieToken = req?.cookies?.session_token;
   const authorization = req.get("authorization") || "";
   const headerToken = authorization.startsWith("Bearer ") ? authorization.slice(7) : null;
@@ -19,9 +20,23 @@ module.exports = (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id).select("role is_disabled deleted_at");
+    if (!user) return send401(res);
+    if (user.is_disabled) {
+      res.clearCookie("session_token", { httpOnly: true, sameSite: "lax", path: "/" });
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ message: "This account has been banned or disabled." });
+    }
+    if (user.deleted_at) {
+      res.clearCookie("session_token", { httpOnly: true, sameSite: "lax", path: "/" });
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ message: "This account is scheduled for deletion." });
+    }
     req.user = {
       id: decoded.id,
-      role: decoded.role,
+      role: user.role,
       csrfToken: decoded.csrfToken,
     };
 

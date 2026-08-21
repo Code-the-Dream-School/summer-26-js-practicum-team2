@@ -57,6 +57,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    deletion_scheduled_at: {
+      type: Date,
+      default: null,
+    },
     tos_agreement: {
       type: Boolean,
       required: true,
