@@ -137,6 +137,21 @@ const adminDisableSchema = adminActionSchema.keys({
   disabled: Joi.boolean().required(),
 });
 
+const adminModuleSchema = Joi.object({
+  id: Joi.string().trim().min(1).required(),
+  title: Joi.string().trim().min(1).required(),
+  lessons: Joi.array().required(),
+}).unknown(true);
+
+const adminModuleUpdateSchema = Joi.object({
+  title: Joi.string().trim().min(1),
+  lessons: Joi.array(),
+}).min(1).unknown(true);
+
+const adminLessonSchema = Joi.object({
+  id: Joi.string().trim().min(1).required(),
+}).unknown(true);
+
 function validateRequest(res, schema, payload) {
   const { error, value } = schema.validate(payload, { abortEarly: false });
   if (error) {
@@ -166,5 +181,8 @@ module.exports = {
   adminRoleSchema,
   adminActionSchema,
   adminDisableSchema,
+  adminModuleSchema,
+  adminModuleUpdateSchema,
+  adminLessonSchema,
   validateRequest,
 };

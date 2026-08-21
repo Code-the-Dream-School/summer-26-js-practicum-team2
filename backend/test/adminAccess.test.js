@@ -83,4 +83,49 @@ describe("admin access boundary", () => {
     const user = await User.findOne({ email: "first-admin@example.com" });
     expect(user.role).toBe("admin");
   });
+
+  test("manages modules and nested lessons through admin APIs", async () => {
+    const admin = await createUser("admin");
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+    const moduleBody = { id: "admin-module", title: "Admin module", lessons: [] };
+
+    const created = await request(app).post("/api/v1/admin/modules").set(auth).send(moduleBody);
+    expect(created.status).toBe(201);
+
+    const duplicate = await request(app).post("/api/v1/admin/modules").set(auth).send(moduleBody);
+    expect(duplicate.status).toBe(409);
+
+    const lesson = { id: "1.1", title: "First lesson", microLessons: [] };
+    const createdLesson = await request(app)
+      .post("/api/v1/admin/modules/admin-module/lessons")
+      .set(auth)
+      .send(lesson);
+    expect(createdLesson.status).toBe(201);
+
+    const updatedLesson = await request(app)
+      .patch("/api/v1/admin/modules/admin-module/lessons/1.1")
+      .set(auth)
+      .send({ id: "1.1", title: "Updated lesson", microLessons: [] });
+    expect(updatedLesson.status).toBe(200);
+    expect(updatedLesson.body.title).toBe("Updated lesson");
+
+    const deletedLesson = await request(app)
+      .delete("/api/v1/admin/modules/admin-module/lessons/1.1")
+      .set(auth);
+    expect(deletedLesson.status).toBe(200);
+  });
+
+  test("prevents duplicate budgeting seed imports", async () => {
+    const admin = await createUser("admin");
+    const response = await request(app)
+      .post("/api/v1/admin/modules/seed-budgeting")
+      .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`);
+
+    expect(response.status).toBe(201);
+
+    const duplicate = await request(app)
+      .post("/api/v1/admin/modules/seed-budgeting")
+      .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`);
+    expect(duplicate.status).toBe(409);
+  });
 });
