@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased Patch 4]
+
+### Added
+
+- Added frontend API support for fetching public lesson content
+
+### Changed
+
+- Updated signed-out lesson previews to use the public lesson API through `useLessonContent`
+
+### Removed
+
+- Removed the frontend preview dependency on bundled lesson content and `getSampleLesson`
+
+---
+
 ## [Unreleased Patch 3]
 
 ### Added
