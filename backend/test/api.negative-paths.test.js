@@ -1,0 +1,131 @@
+const jwt = require("jsonwebtoken");
+const request = require("supertest");
+const { useTestDb } = require("./setup");
+const app = require("../src/app");
+const User = require("../src/models/User.model");
+
+useTestDb();
+
+// Creates a verified learner and gives us authentication values so each negative-path test can focus on the failure being tested.
+async function createAuthedUser(name = "Negative Path User", email = "negative-path@example.com") {
+  const user = await User.create({
+    name,
+    email,
+    password_hash: "not-a-real-hash",
+    role: "learner",
+    tos_agreement: true,
+    email_verified_at: new Date(),
+  });
+
+  // Create a valid token so authentication itself is not what causes the request to fail.
+  const token = jwt.sign(
+    { id: user._id.toString(), role: user.role, csrfToken: "test-csrf" },
+    process.env.JWT_SECRET,
+  );
+
+  return {
+    token,
+    authHeader: `Bearer ${token}`,
+  };
+}
+
+describe("backend API negative paths", () => {
+  it("rejects protected routes when no authentication is provided", async () => {
+    // Call several protected routes without sending any authentication.
+    const dashboardRes = await request(app).get("/api/v1/dashboard");
+    const lessonProgressRes = await request(app).get("/api/v1/lessons/progress");
+    const quizProgressRes = await request(app).get("/api/v1/quizzes/progress");
+
+    // Each protected route should reject the request the same way.
+    for (const res of [dashboardRes, lessonProgressRes, quizProgressRes]) {
+      expect(res.status).toBe(401);
+      expect(res.body.message).toContain("No user is authenticated");
+    }
+  });
+
+  it("rejects cookie-authenticated logout when CSRF token is missing", async () => {
+    const { token } = await createAuthedUser("Missing Csrf User", "missing-csrf@example.com");
+
+    // Send a valid session cookie but leave out the required CSRF header.
+    const logoutRes = await request(app)
+      .post("/api/v1/users/logout")
+      .set("Cookie", [`session_token=${token}`]);
+
+    expect(logoutRes.status).toBe(403);
+    expect(logoutRes.body.message).toContain("Invalid CSRF token");
+  });
+
+  it("returns 404 when lesson progress is requested for an unknown module", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Unknown Module User",
+      "unknown-module@example.com",
+    );
+
+    // Use a module ID that does not exist in the lesson content.
+    const progressRes = await request(app)
+      .get("/api/v1/lessons/progress")
+      .set("Authorization", authHeader)
+      .query({ moduleId: "missingModule" });
+
+    expect(progressRes.status).toBe(404);
+    expect(progressRes.body.message).toContain("was not found");
+  });
+
+  it("returns 400 when lesson progress update has no lesson or micro-lesson cursor", async () => {
+    const { authHeader } = await createAuthedUser("Empty Cursor User", "empty-cursor@example.com");
+
+    // Send the module ID without telling the API which lesson or micro-lesson to update.
+    const updateRes = await request(app)
+      .patch("/api/v1/lessons/progress")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "cashFlow" });
+
+    expect(updateRes.status).toBe(400);
+    expect(updateRes.body.message).toContain("lessonId or microLessonId is required");
+  });
+
+  it("returns 400 when quiz start is missing microLessonId", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Missing Micro User",
+      "missing-micro@example.com",
+    );
+
+    // Starting a quiz requires both the module and the micro-lesson being attempted.
+    const startRes = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "cashFlow" });
+
+    expect(startRes.status).toBe(400);
+    expect(startRes.body.message).toContain("microLessonId is required");
+  });
+
+  it("returns 404 when submitting a quiz for a micro-lesson that has no knowledge checks", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Missing Questions User",
+      "missing-questions@example.com",
+    );
+
+    // Use a micro-lesson ID that does not have any quiz questions tied to it.
+    const submitRes = await request(app)
+      .post("/api/v1/quizzes/9.9.9/submit")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "cashFlow", answers: {} });
+
+    expect(submitRes.status).toBe(404);
+    expect(submitRes.body.message).toContain("No quiz questions found");
+  });
+
+  it("returns 404 when submitting a valid quiz without a started attempt", async () => {
+    const { authHeader } = await createAuthedUser("No Attempt User", "no-attempt@example.com");
+
+    // Use a real quiz, but skip the quiz start request so no attempt exists yet.
+    const submitRes = await request(app)
+      .post("/api/v1/quizzes/1.1.2/submit")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "cashFlow", answers: {} });
+
+    expect(submitRes.status).toBe(404);
+    expect(submitRes.body.message).toContain("No record of any quiz attempt");
+  });
+});

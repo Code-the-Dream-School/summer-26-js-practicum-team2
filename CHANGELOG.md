@@ -9,18 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased]
+### [Unreleased]
 
 ### Added
 
-- Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
-- Added user API integration tests for registration, verification, and login flows
-- Added integration tests for lesson and dashboard APIs
-- Added integration tests for lesson progress and dashboard resolution
-- Added integration test coverage for marking a lesson complete after all required quizzes are passed
-- Added integration test coverage for the hello endpoint, root redirect, and authenticated logout flow.
-- Added integration test coverage for retrieving and verifying saved quiz progress
-- Added integration test coverage for processing supported dashboard events
+- Added core rules and tests for XP calculations and lesson unlocking
+- Added user API integration tests for registration, verification, and login
+- Added lesson and dashboard API integration tests
+- Added integration tests for lesson progress and dashboard reconciliation
+- Added integration coverage for completing lessons after all required quizzes are passed
+- Added integration coverage for the hello endpoint, root redirect, and authenticated logout
+- Added integration coverage for retrieving and verifying saved quiz progress
+- Added integration coverage for processing supported dashboard events
+- Added integration test coverage for backend API error handling and negative paths, including authentication, CSRF validation, invalid lesson progress, and quiz submission errors.
 
 ---
 
@@ -33,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Combines sync-shared-files into a single GitHub workflow file
-- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend
 
 ### Removed
 
