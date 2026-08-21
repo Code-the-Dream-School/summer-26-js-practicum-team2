@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added cache invalidation after lesson module imports
 - Added integration coverage for refreshed content after module re-imports
 - Added Postman requests for public lessons, quiz answer checks, and lesson imports
+- Added the lesson import secret to the local Postman environment configuration
 
 ### Changed
 

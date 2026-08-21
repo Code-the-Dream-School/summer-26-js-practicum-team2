@@ -55,11 +55,6 @@
       "key": "newTestUserPassword",
       "value": "N3wP@ssword!",
       "type": "string"
-    },
-    {
-      "key": "lessonImportSecret",
-      "value": "",
-      "type": "string"
     }
   ],
   "item": [
