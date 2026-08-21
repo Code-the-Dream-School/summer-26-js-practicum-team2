@@ -24,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added server-side correctness checks for individual quiz answers
 
+### Changed
+
+- Updated quiz state to store server-provided correctness metadata
+
+### Removed
+
+- Removed client-side quiz correctness and explanation data from normalized questions
+
 ---
 
 ## [Unreleased]

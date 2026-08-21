@@ -318,7 +318,7 @@ function LearnFlow({
                   variant="quiz"
                   className="min-w-40"
                   disabled={quiz.selectedChoiceIds.length === 0}
-                  onClick={() => quiz.checkAnswer(quiz.currentQuestion, quiz.selectedChoiceIds)}
+                  onClick={() => void quiz.checkAnswer(quiz.currentQuestion, quiz.selectedChoiceIds)}
                 >
                   Check answer
                 </Button>
