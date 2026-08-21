@@ -18,7 +18,11 @@ const mockGlossary = [{ term: "Budget", definition: "Spending plan." }];
 
 describe("Footer - Floating Glossary Button", () => {
   it("renders floating glossary button when glossary exists", () => {
-    render(<MemoryRouter initialEntries={["/learn"]}><Footer currentGlossary={mockGlossary} /> </MemoryRouter>);
+    render(
+      <MemoryRouter initialEntries={["/learn"]}>
+        <Footer currentGlossary={mockGlossary} />
+      </MemoryRouter>,
+    );
     const glossaryBtn = screen.getByRole("button", {
       name: /open glossary/i,
     });
@@ -27,7 +31,7 @@ describe("Footer - Floating Glossary Button", () => {
   it("opens the GlossaryModal when the floating button is clicked", () => {
     render(
       <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />{" "}
+        <Footer currentGlossary={mockGlossary} />
       </MemoryRouter>,
     );
     const glossaryBtn = screen.getByRole("button", {
@@ -42,7 +46,7 @@ describe("Footer - Floating Glossary Button", () => {
   it("closes the GlossaryModal when onClose is chosen inside modal", () => {
     render(
       <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />{" "}
+        <Footer currentGlossary={mockGlossary} />
       </MemoryRouter>,
     );
     // open modal
@@ -55,11 +59,11 @@ describe("Footer - Floating Glossary Button", () => {
     fireEvent.click(closeBtn);
     expect(screen.queryByTestId("mock-glossary-modal")).not.toBeInTheDocument();
   });
-  it("is keyboard accessible and can make choices when enter key is pressed", async() => {
+  it("is keyboard accessible and can make choices when enter key is pressed", async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />{" "}
+        <Footer currentGlossary={mockGlossary} />
       </MemoryRouter>,
     );
     const glossaryBtn = screen.getByRole("button", {
@@ -70,5 +74,32 @@ describe("Footer - Floating Glossary Button", () => {
     await user.keyboard("{Enter}");
     //fireEvent.keyDown(glossaryBtn, { key: "Enter", code: "Enter" });
     expect(screen.getByTestId("mock-glossary-modal")).toBeInTheDocument();
+  });
+});
+
+///check if glossary button is hidden on non-allowed routes
+
+describe("Footer - Floating Glossary Button(Hidden)", () => {
+  it("will not render floating glossary button on non-allowed routes", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Footer currentGlossary={mockGlossary} />
+      </MemoryRouter>,
+    );
+    const glossaryBtn = screen.queryByRole("button", {
+      name: /open glossary/i,
+    });
+    expect(glossaryBtn).not.toBeInTheDocument();
+  });
+  it("render floating glossary button using default fallback data when current glossary is empty", () => {
+    render(
+      <MemoryRouter initialEntries={["/learn"]}>
+        <Footer currentGlossary={[]} />
+      </MemoryRouter>,
+    );
+    const glossaryBtn = screen.getByRole("button", {
+      name: /open glossary/i,
+    });
+    expect(glossaryBtn).toBeInTheDocument();
   });
 });
