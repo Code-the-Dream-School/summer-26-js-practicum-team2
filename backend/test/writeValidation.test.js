@@ -4,6 +4,8 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const LessonModule = require("../src/models/LessonModule.model");
+const budgetingModule = require("../../shared/content/budgeting.json");
 const { passwordSchema } = require("../src/validation/userValidation");
 
 useTestDb();
@@ -17,6 +19,7 @@ beforeEach(async () => {
     tos_agreement: true,
   });
   validationUserId = user._id.toString();
+  await LessonModule.create(budgetingModule);
 });
 
 // Create a valid bearer token so validation tests can reach protected endpoints.
@@ -270,6 +273,12 @@ describe("write endpoint input validation", () => {
 });
 
 describe("public lesson content endpoint", () => {
+  test("does not load unseeded lesson modules from repository JSON", async () => {
+    const response = await request(app).get("/api/v1/lessons/public/not-seeded/1.1");
+
+    expect(response.status).toBe(404);
+  });
+
   test("returns a lesson without requiring authentication", async () => {
     const response = await request(app).get("/api/v1/lessons/public/cashFlow/1.1");
 

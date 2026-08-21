@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a role-protected admin route with an initial user control panel
 - Added admin module and nested lesson CRUD APIs with budgeting seed support
 - Added duplicate module and lesson protection with cache invalidation
+- Added explicit admin-only budgeting seed behavior for runtime lesson availability
 
 ### Changed
 
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Showed banned users an explicit banned-account message during login
 - Added an admin-only Admin link to the shared desktop and mobile navigation
 - Replaced admin panel action buttons with the shared Button component
+- Removed automatic runtime loading of lesson JSON files
 
 ---
 
