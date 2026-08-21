@@ -81,6 +81,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed error handler middleware signature to include next parameter
+- Added focused backend integration tests for invalid lesson progress, quiz, password recovery, and dashboard event requests
+- Added reusable Joi schemas for backend write endpoint validation
+- Added documentation for write endpoint validation and the standard validation error response
+
+### Changed
+
+- Validated backend lesson progress, quiz, password recovery, and dashboard event inputs before processing or persistence
+- Updated password validation to accept 16-character passwords with uppercase, lowercase, and numeric characters; shorter passwords also require a special character
 
 ---
 
