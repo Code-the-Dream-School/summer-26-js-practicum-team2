@@ -274,7 +274,7 @@ exports.submitQuiz = async (req, res, next) => {
             current_micro_lesson_id: microLessonId,
           },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
       const allMicroLessonsIds = getMicroLessonIdsForLesson(moduleId, lessonId);
       const userCompletedMicros = new Set(updatedProgress.completed_micro_lessons || []);
