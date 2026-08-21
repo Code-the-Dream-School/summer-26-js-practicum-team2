@@ -28,14 +28,14 @@ exports.getLesson = async (req, res, next) => {
   try {
     const { moduleId, lessonId } = req.params;
 
-    const moduleData = getModule(moduleId);
+    const moduleData = await getModule(moduleId);
     if (!moduleData) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Module '${moduleId}' was not found.`,
       });
     }
 
-    const lessonData = getLesson(moduleId, lessonId);
+    const lessonData = await getLesson(moduleId, lessonId);
     if (!lessonData) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Lesson '${lessonId}' was not found in module '${moduleId}'.`,
@@ -63,14 +63,14 @@ exports.getPublicLesson = async (req, res, next) => {
   try {
     const { moduleId, lessonId } = req.params;
 
-    const moduleData = getModule(moduleId);
+    const moduleData = await getModule(moduleId);
     if (!moduleData) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Module '${moduleId}' was not found.`,
       });
     }
 
-    const lessonData = getLesson(moduleId, lessonId);
+    const lessonData = await getLesson(moduleId, lessonId);
     if (!lessonData) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Lesson '${lessonId}' was not found in module '${moduleId}'.`,
@@ -92,7 +92,7 @@ exports.getLessonProgress = async (req, res, next) => {
   try {
     const moduleId = req.query.moduleId || DEFAULT_MODULE_ID;
 
-    if (!getModule(moduleId)) {
+    if (!(await getModule(moduleId))) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Module '${moduleId}' was not found.`,
       });
@@ -125,7 +125,7 @@ exports.updateLessonProgress = async (req, res, next) => {
     if (!validatedBody) return;
     const { moduleId, lessonId, microLessonId } = validatedBody;
 
-    if (!getModule(moduleId)) {
+    if (!(await getModule(moduleId))) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Module '${moduleId}' was not found.`,
       });
