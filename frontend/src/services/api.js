@@ -5,6 +5,7 @@ const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
+const AUTH_BASE_PATH = `${API_BASE_URL}/api/v1/auth`;
 
 // Helper function to make API requests to the backend.
 async function apiRequest(path, options = {}) {
@@ -56,6 +57,12 @@ export const logoutUser = (csrfToken) =>
     method: "POST",
     csrfToken,
   });
+
+export const getCurrentUser = () => apiRequest("/me", { method: "GET" });
+
+// Full-page navigation targets — the browser must follow the OAuth provider's redirect chain,
+// so these are used as anchor hrefs rather than fetched with apiRequest.
+export const getOAuthUrl = (provider) => `${AUTH_BASE_PATH}/${provider}`;
 
 export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);
 

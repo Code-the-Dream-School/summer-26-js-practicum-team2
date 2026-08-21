@@ -8,15 +8,29 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     email: {
+      // Optional because some GitHub accounts don't expose a verified email via the API.
       type: String,
-      required: [true, "Email is required"],
       unique: true,
+      sparse: true,
       lowercase: true,
       trim: true,
     },
     password_hash: {
+      // Optional because OAuth users (Google/GitHub) never set a local password.
       type: String,
-      required: [true, "Password is required"],
+      default: null,
+    },
+    google_id: {
+      type: String,
+      default: null,
+      unique: true,
+      sparse: true,
+    },
+    github_id: {
+      type: String,
+      default: null,
+      unique: true,
+      sparse: true,
     },
     email_verified_at: {
       type: Date,

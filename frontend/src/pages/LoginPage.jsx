@@ -7,6 +7,7 @@ import { loginSchema } from "../features/auth/schemas";
 import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
+import OAuthButtons from "../shared/OAuthButtons/OAuthButtons.component";
 
 export default function LoginPage() {
   const { login } = useAuthContext();
@@ -35,11 +36,19 @@ export default function LoginPage() {
     }
   };
 
+  const oauthError = new URLSearchParams(location.search).get("error") === "oauth_failed";
+
   return (
     <div className="mx-auto max-w-md py-8">
       <Card>
         <h1 className="font-heading text-h2 font-bold text-heading">Login</h1>
         <p className="mt-1 text-small text-neutral-600">Log in to keep growing your streak.</p>
+
+        {oauthError && (
+          <p role="alert" className="mt-4 text-small font-medium text-danger">
+            That sign-in attempt didn't work. Please try again.
+          </p>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-6 flex flex-col gap-4">
           <Input
@@ -73,6 +82,13 @@ export default function LoginPage() {
             Log in
           </Button>
         </form>
+
+        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
+          <span className="h-px flex-1 bg-neutral-200" />
+          or
+          <span className="h-px flex-1 bg-neutral-200" />
+        </div>
+        <OAuthButtons />
 
         <div className="mt-4 flex items-center justify-between text-small">
           <Link to={ROUTES.REGISTER} className="text-primary underline hover:text-primary-hover">

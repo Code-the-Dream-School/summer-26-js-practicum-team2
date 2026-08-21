@@ -9,6 +9,7 @@ import { pickPlaceholderIdentity } from "../features/auth/placeholderIdentities"
 import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
+import OAuthButtons from "../shared/OAuthButtons/OAuthButtons.component";
 
 export default function RegisterPage() {
   const { register: registerUser } = useAuthContext();
@@ -141,6 +142,13 @@ export default function RegisterPage() {
             </Link>
           </div>
         </form>
+
+        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
+          <span className="h-px flex-1 bg-neutral-200" />
+          or
+          <span className="h-px flex-1 bg-neutral-200" />
+        </div>
+        <OAuthButtons />
       </Card>
     </div>
   );

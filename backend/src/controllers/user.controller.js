@@ -326,6 +326,27 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+// GET /users/me - lets the SPA hydrate auth state after an OAuth redirect (no JSON body returned by that flow).
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
+    }
+    return res.status(StatusCodes.OK).json({
+      csrfToken: req.user.csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -333,4 +354,5 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getCurrentUser,
 };
