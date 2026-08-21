@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased Patch 3]
+
+---
+
 ## [Unreleased Patch 2]
 
 ### Added
@@ -29,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased Patch 3]
+## [Unreleased Patch 1]
 
 ### Added
 
