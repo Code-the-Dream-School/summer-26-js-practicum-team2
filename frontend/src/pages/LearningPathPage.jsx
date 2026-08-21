@@ -40,7 +40,10 @@ function LearningPathPage() {
         const modulePayload = await getLessonModules();
         const firstModuleId = modulePayload.modules?.[0]?.id;
         if (!firstModuleId) {
-          if (isActive) setError("No lesson modules have been seeded yet. Ask an admin to seed or import lessons.");
+          if (isActive)
+            setError(
+              "No lesson modules have been seeded yet. Ask an admin to seed or import lessons.",
+            );
           return;
         }
 
