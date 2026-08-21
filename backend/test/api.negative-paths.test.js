@@ -42,6 +42,32 @@ describe("backend API negative paths", () => {
       expect(res.body.message).toContain("No user is authenticated");
     }
   });
+  it("rejects protected routes when bearer token is malformed", async () => {
+    // Send something that looks like a bearer token, but is not a valid JWT.
+    const dashboardRes = await request(app)
+      .get("/api/v1/dashboard")
+      .set("Authorization", "Bearer not-a-real-jwt");
+
+    expect(dashboardRes.status).toBe(401);
+    expect(dashboardRes.body.message).toContain("No user is authenticated");
+  });
+
+  it("rejects protected routes when bearer token is expired", async () => {
+    // Create a valid JWT that is already expired.
+    const expiredToken = jwt.sign(
+      { id: "507f1f77bcf86cd799439011", role: "learner", csrfToken: "test-csrf" },
+      process.env.JWT_SECRET,
+      { expiresIn: -1 },
+    );
+
+    // Even though the token is formatted correctly, an expired token should not authenticate the user.
+    const lessonRes = await request(app)
+      .get("/api/v1/lessons/progress")
+      .set("Authorization", `Bearer ${expiredToken}`);
+
+    expect(lessonRes.status).toBe(401);
+    expect(lessonRes.body.message).toContain("No user is authenticated");
+  });
 
   it("rejects cookie-authenticated logout when CSRF token is missing", async () => {
     const { token } = await createAuthedUser("Missing Csrf User", "missing-csrf@example.com");
@@ -127,5 +153,50 @@ describe("backend API negative paths", () => {
 
     expect(submitRes.status).toBe(404);
     expect(submitRes.body.message).toContain("No record of any quiz attempt");
+  });
+
+  it("returns 409 when the same quiz attempt is submitted more than once", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Duplicate Submit User",
+      "duplicate-submit@example.com",
+    );
+
+    const startRes = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Authorization", authHeader)
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+
+    expect(startRes.status).toBe(201);
+
+    const firstSubmitRes = await request(app)
+      .post("/api/v1/quizzes/1.1.2/submit")
+      .set("Authorization", authHeader)
+      .send({
+        attemptId: startRes.body.attemptId,
+        moduleId: "cashFlow",
+        answers: {
+          "1.1.2-q2": ["d"],
+          "1.1.2-q3": ["a"],
+          "1.1.2-q4": ["a"],
+        },
+      });
+
+    expect(firstSubmitRes.status).toBe(200);
+
+    const duplicateSubmitRes = await request(app)
+      .post("/api/v1/quizzes/1.1.2/submit")
+      .set("Authorization", authHeader)
+      .send({
+        attemptId: startRes.body.attemptId,
+        moduleId: "cashFlow",
+        answers: {
+          "1.1.2-q2": ["d"],
+          "1.1.2-q3": ["a"],
+          "1.1.2-q4": ["a"],
+        },
+      });
+
+    expect(duplicateSubmitRes.status).toBe(409);
+    expect(duplicateSubmitRes.body.message).toContain("already been submitted");
   });
 });
