@@ -4,7 +4,9 @@ import { useAuthContext } from "../context/AuthContext";
 import { getLesson, getLessonModules, getLessonProgress } from "../services/api";
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
+import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
+import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -219,6 +221,22 @@ function LearningPathPage() {
   }
 
   if (error) {
+    const isContentEmpty =
+      error.includes("No lesson modules") || error.includes("does not contain any lessons");
+
+    if (isContentEmpty) {
+      return (
+        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+          <EmptyState
+            className="border-primary/20 bg-surface-inset py-16"
+            icon={<img src={dabbingBeaverImg} alt="" className="h-14 w-14 object-contain" />}
+            title="Content coming soon"
+            message="New lessons are being prepared. Check back soon for something new to explore."
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <p className="text-sm font-medium text-danger">{error}</p>
