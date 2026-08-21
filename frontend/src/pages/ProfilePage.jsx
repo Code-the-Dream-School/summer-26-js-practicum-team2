@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router";
 
 import { useAuthContext } from "../context/AuthContext";
 import {
   changeProfilePassword,
-  deleteProfile,
+  // deleteProfile,
   getProfile,
   notifyDashboardProgressChanged,
   updateProfile,
@@ -14,6 +13,7 @@ import Button from "../shared/Button/Button.component";
 import Input from "../shared/Input/Input.component";
 import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
+import Skeleton from "../shared/Skeleton/Skeleton.component";
 
 const errorMessage = (error) =>
   error.errors?.length ? error.errors.join(" ") : error.message || "uh oh spaghetti-o";
@@ -28,24 +28,19 @@ const Stat = ({label, value}) => {
 };
 
 export default function ProfilePage() {
-  const { csrfToken, logout } = useAuthContext();
-
-  const navigate = useNavigate();
+  const { csrfToken } = useAuthContext();
   const [profile, setProfile] = useState(null);
 
   const [name, setName] = useState("");
   const [goals, setGoals] = useState("");
-  // const [theme, setTheme] = useState("Light");
-  const [notifications, setNotifications] = useState(true);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [deleteEmail, setDeleteEmail] = useState("");
+  // const [deleteEmail, setDeleteEmail] = useState("");
 
   const [toastMessage, setToastMessage] = useState("");
   const [pending, setPending] = useState("");
   const [loading, setLoading] = useState(true);
-  // const [avatarError, setAvatarError] = useState("");
 
   const showToast = useCallback((message, variant = "default") => {
     setToastMessage({ isOpen: true, message, variant });
@@ -77,7 +72,7 @@ export default function ProfilePage() {
     event.preventDefault();
     setPending("Profile");
     try {
-      const result = await updateProfile({name, goals, notifications, csrfToken});
+      const result = await updateProfile({name, goals, csrfToken});
       applyProfile(result.user);
       notifyDashboardProgressChanged({ avatarLabel: result.user?.name?.charAt(0) || "A" });
       showToast(result.message, "success");
@@ -92,7 +87,7 @@ export default function ProfilePage() {
     event.preventDefault();
     setPending("Password");
     try{
-      const result = await updateProfilePassword({currentPassword, newPassword, csrfToken});
+      const result = await changeProfilePassword({currentPassword, newPassword, csrfToken});
       setCurrentPassword("")
       setNewPassword("")
       showToast(result.message, "success");
@@ -104,74 +99,26 @@ export default function ProfilePage() {
   };
 
 
-  const deleteAccount = async(event) => {
-    event.preventDefault();
-    setPending("Delete");
-    try{
-      await deleteProfile({email:deleteEmail, csrfToken})
-      try{
-        await logout()
-      }catch{}  
-    }catch(error) {
-      showToast(result.message, "success");
-    } finally{
-      setPending("");
-    }
-  };
+  // const deleteAccount = async(event) => {
+  //   event.preventDefault();
+  //   setPending("Delete");
+  //   try{
+  //     await deleteProfile({email:deleteEmail, csrfToken})
+  //     try{
+  //       await logout()
+  //     }catch{}  
+  //   }catch(error) {
+  //     showToast(result.message, "success");
+  //   } finally{
+  //     setPending("");
+  //   }
+  // };
 
   if(loading){
-    return<p>Loading profile...</p>
+    return <Skeleton />
   }
 
-  const savedDisplayName = profile?.name || "username" 
-  // const handleAvatarChange = (e) => {       ollllllddddd codeeee donot activate again
-  // const file = e.target.files[0];
-  // if (!file) return;
-
-  // const allowedTypes = ["image/jpeg", "image/png"];
-  // const maxSize = 2 * 1024 * 1024;
-
-  //   if (!allowedTypes.includes(file.type)) {
-  //     setAvatarError("Friendly Warning: Please upload a JPG or PNG file only.");
-  //     return;
-  //   }
-  //   if (file.size > maxSize) {
-  //     setAvatarError("Friendly Warning: File is too large! Maximum size allowed is 2MB.");
-  //     return;
-  //   }
-  //   setAvatarError("");
-  //   showToast("Avatar uploaded successfully!");
-  // }; -> END OF OLD CODE
-
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    if (!currentPassword) {
-      alert("Current password is required!");
-      return;
-    }
-    showToast("Password changed! Sessions invalidated on other devices.");
-    setCurrentPassword("");
-    setNewPassword("");
-  };
-
-  const handleDeleteAccount = (e) => {
-    e.preventDefault();
-    if (deleteEmailInput !== user?.email && deleteEmailInput !== "ramona@example.com") {
-      alert("Email mismatch! Please type your exact account email to confirm deletion.");
-      return;
-    }
-    alert(`Account marked for soft-deletion (30-day grace period initiated). Profile hidden.`);
-  };
-
-  const getInitials = (nameStr) => {
-    if (!nameStr) return "??";
-    return nameStr
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
-  };
+  const savedDisplayName = profile?.name || "username"
 
 
   return (
@@ -190,9 +137,9 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-surface-app px-4 py-3 shadow-inner">
-         <Stat label="xp points" value={(profile?.xp?? 0).toLocaleString()}/>
+         <Stat label="XP Points:" value={` ${(profile?.xp?? 0).toLocaleString()}`}/>
           <div className="h-8 w-px bg-neutral-200" />
-            <Stat label="streak" value={`${profile?.streak??0} days`}/>
+            <Stat label="Streak:" value={` ${profile?.streak?? 0} days`}/>
         </div>
       </header>
 
@@ -203,9 +150,9 @@ export default function ProfilePage() {
           </h2>
         <form onSubmit={saveProfile} className="space-y-4 max-w-md">
           <Input id="profile-name" label="Display Name" required minLength={2} maxLength={30} value={name} onChange={e => setName(e.target.value)}/>
-          <button type="submit" className="inline-flex min-h-10 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visble:ring-2 focus-visible:ring-primary">
+          <Button type="submit">
             Save Changes 
-          </button>
+          </Button>
         </form>
       </Card>
 
@@ -214,9 +161,9 @@ export default function ProfilePage() {
         <h2 className="font-heading text-h4 font-bold text-heading">
           Security & Credentials
           </h2>
-        <form onSubmit={changeProfilePassword} className="space-y-4 max-w-md">
-            <label className="text-small font-semibold text-heading block">Current Password</label>
-            <input
+        <form onSubmit={changePassword} className="space-y-4 max-w-md">
+            <label className="text-small font-semibold text-heading block"> Current Password</label>
+            <Input
               id="current-password"
               type="password"
               required
@@ -224,7 +171,7 @@ export default function ProfilePage() {
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="••••••••"
             />
-            <input
+            <Input
               id="new-password"
               type="password"
               label="New Password"
@@ -233,17 +180,16 @@ export default function ProfilePage() {
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="••••••••"
             />
-          <button
+          <Button
             type="submit"
             disable={pending==="password"}
-            className="rounded-xl bg-neutral-700 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
           >
             {pending==="password"?"Updating...":"Update Password"}
-          </button>
+          </Button>
         </form>
       </Card>
 
-      {/* Danger Zone */}
+      {/* Danger Zone
       <div className="space-y-4 rounded-2xl border-2 border-dashed border-danger/40 bg-danger/5 p-6">
         <header className="space-y-1">
           <h2 className="font-heading text-h4 font-bold text-danger">
@@ -255,7 +201,7 @@ export default function ProfilePage() {
           </p>
         </header>
 
-        <form onSubmit={handleDeleteAccount} className="space-y-4 max-w-md">
+        <form onSubmit={deleteAccount} className="space-y-4 max-w-md">
           <Input
             id="delete-account-email"
             type="email"
@@ -271,9 +217,9 @@ export default function ProfilePage() {
             className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
           >
             {pending === "delete" ? "Deleting..." : "Delete Account"}
-          </Button>
-        </form>
-      </div>
+    //       </Button> */}
+    {/* //     </form> */}
+    {/* //   </div> */}
     </section>
   );
 }

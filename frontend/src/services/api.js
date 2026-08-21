@@ -18,7 +18,7 @@ async function apiRequest(path, options = {}) {
     ...headers,
   };
 
-  if (csrfToken && CSRF_METHODS.includes(method.toUpperCase())) {
+  if (csrfToken && CSRF_METHODS.has(method.toUpperCase())) {
     requestHeaders["X-CSRF-TOKEN"] = csrfToken;
   }
 
@@ -95,7 +95,7 @@ export const updateProfile = ({ csrfToken, ...profile }) =>
   });
 
 export const changeProfilePassword = ({ currentPassword, newPassword, csrfToken }) =>
-  apiRequest("password", {
+  apiRequest("/password", {
     method: "POST",
     body: { currentPassword, newPassword },
     csrfToken,
