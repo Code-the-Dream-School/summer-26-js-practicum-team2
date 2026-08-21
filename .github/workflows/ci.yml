@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - development
-      - docs
+      - main
   workflow_dispatch:
 
 jobs:
@@ -56,8 +56,8 @@ jobs:
       - name: Run backend lint checks
         run: npm --prefix backend run lint
 
-      - name: Run backend test checks
-        run: npm --prefix backend run test
+      - name: Run backend coverage-enforced test checks
+        run: npm --prefix backend run test:coverage
 
       - name: Run backend syntax checks
         run: |
