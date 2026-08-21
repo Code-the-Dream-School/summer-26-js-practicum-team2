@@ -5,13 +5,14 @@ const { useTestDb } = require("./setup");
 // setup.js sets JWT_SECRET before these modules are required, so the middleware/tokens match.
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const UserProgress = require("../src/models/UserProgress.model");
 
 useTestDb();
 
-async function createAuthedUser() {
+async function createAuthedUser(name = "Test Learner", email = "quiz-scoring@example.com") {
   const user = await User.create({
-    name: "Test Learner",
-    email: "quiz-scoring@example.com",
+    name,
+    email,
     password_hash: "not-a-real-hash",
     tos_agreement: true,
   });
@@ -26,6 +27,29 @@ async function createAuthedUser() {
 }
 
 describe("quiz submission grading (backend)", () => {
+  it("returns the current user progress record for quiz tracking", async () => {
+    const authHeader = await createAuthedUser("Progress Reader", "quiz-progress@example.com");
+
+    // Request the progress record for the authenticated user.
+    const progressRes = await request(app)
+      .get("/api/v1/quizzes/progress")
+      .set("Authorization", authHeader);
+
+    expect(progressRes.status).toBe(200);
+    expect(progressRes.body).toMatchObject({
+      user_id: expect.any(String),
+      module_id: "cashFlow",
+    });
+
+    // Make sure the progress returned by the API was also saved to the database.
+    const savedProgress = await UserProgress.findOne({
+      user_id: progressRes.body.user_id,
+      module_id: "cashFlow",
+    });
+
+    expect(savedProgress).not.toBeNull();
+  });
+
   it("grades each micro-lesson quiz independently, with no lesson-wide aggregate", async () => {
     const authHeader = await createAuthedUser();
 
