@@ -83,6 +83,73 @@ export default function AdminDashboardPage() {
     }
   }
 
+  function getLessonDraft() {
+    try {
+      return JSON.parse(lessonJson);
+    } catch {
+      return null;
+    }
+  }
+
+  function updateLessonDraft(updater) {
+    try {
+      const draft = updater(parseLessonJson());
+      setLessonJson(JSON.stringify(draft, null, 2));
+    } catch (error) {
+      setState((current) => ({ ...current, error: error.message }));
+    }
+  }
+
+  function updateLessonField(field, value) {
+    updateLessonDraft((lesson) => ({ ...lesson, [field]: value }));
+  }
+
+  function updateMicroLesson(microLessonId, field, value) {
+    updateLessonDraft((lesson) => ({
+      ...lesson,
+      microLessons: (lesson.microLessons ?? []).map((microLesson) =>
+        microLesson.id === microLessonId ? { ...microLesson, [field]: value } : microLesson,
+      ),
+    }));
+  }
+
+  function updateBlock(microLessonId, blockIndex, value) {
+    updateLessonDraft((lesson) => ({
+      ...lesson,
+      microLessons: (lesson.microLessons ?? []).map((microLesson) => {
+        if (microLesson.id !== microLessonId) return microLesson;
+        const content = [...(microLesson.microLessonContent ?? [])];
+        content[blockIndex] = { ...content[blockIndex], text: value };
+        return { ...microLesson, microLessonContent: content };
+      }),
+    }));
+  }
+
+  function addMicroLesson() {
+    updateLessonDraft((lesson) => ({
+      ...lesson,
+      microLessons: [
+        ...(lesson.microLessons ?? []),
+        {
+          id: `${lesson.id}-micro-${Date.now()}`,
+          title: "New micro-lesson",
+          microLessonContent: [{ type: "paragraph", text: "Write lesson content here." }],
+        },
+      ],
+    }));
+  }
+
+  function removeMicroLesson(microLessonId) {
+    updateLessonDraft((lesson) => ({
+      ...lesson,
+      microLessons: (lesson.microLessons ?? []).filter(
+        (microLesson) => microLesson.id !== microLessonId,
+      ),
+    }));
+  }
+
+  const lessonDraft = getLessonDraft();
+
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
       <header className="space-y-2">
@@ -462,6 +529,79 @@ export default function AdminDashboardPage() {
                       >
                         Save content
                       </Button>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="space-y-1 text-sm font-semibold text-heading">
+                        Lesson title
+                        <input
+                          className="w-full rounded-md border border-primary/20 px-3 py-2 font-normal"
+                          value={lessonDraft?.title ?? ""}
+                          onChange={(event) => updateLessonField("title", event.target.value)}
+                        />
+                      </label>
+                      <label className="space-y-1 text-sm font-semibold text-heading">
+                        Learning goal
+                        <input
+                          className="w-full rounded-md border border-primary/20 px-3 py-2 font-normal"
+                          value={lessonDraft?.learningGoal ?? ""}
+                          onChange={(event) =>
+                            updateLessonField("learningGoal", event.target.value)
+                          }
+                        />
+                      </label>
+                    </div>
+                    <div className="space-y-3 rounded-xl border border-primary/10 bg-surface-inset p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <h5 className="font-heading text-lg font-bold text-heading">
+                          Micro-lessons
+                        </h5>
+                        <Button variant="secondary" onClick={addMicroLesson}>
+                          Add micro-lesson
+                        </Button>
+                      </div>
+                      {(lessonDraft?.microLessons ?? []).map((microLesson) => (
+                        <div
+                          key={microLesson.id}
+                          className="space-y-3 rounded-lg border border-primary/10 bg-surface-raised p-3"
+                        >
+                          <div className="flex items-end gap-2">
+                            <label className="flex-1 space-y-1 text-sm font-semibold text-heading">
+                              Title
+                              <input
+                                className="w-full rounded-md border border-primary/20 px-3 py-2 font-normal"
+                                value={microLesson.title ?? ""}
+                                onChange={(event) =>
+                                  updateMicroLesson(microLesson.id, "title", event.target.value)
+                                }
+                              />
+                            </label>
+                            <Button
+                              variant="ghost"
+                              className="text-danger"
+                              onClick={() => removeMicroLesson(microLesson.id)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                          {(microLesson.microLessonContent ?? []).map((block, blockIndex) =>
+                            block.type === "paragraph" || block.type === "callout" ? (
+                              <label
+                                key={`${microLesson.id}-${blockIndex}`}
+                                className="space-y-1 text-sm text-heading"
+                              >
+                                <span className="font-semibold capitalize">{block.type} text</span>
+                                <textarea
+                                  className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2"
+                                  value={block.text ?? ""}
+                                  onChange={(event) =>
+                                    updateBlock(microLesson.id, blockIndex, event.target.value)
+                                  }
+                                />
+                              </label>
+                            ) : null,
+                          )}
+                        </div>
+                      ))}
                     </div>
                     <textarea
                       className="min-h-[28rem] w-full rounded-md border border-primary/20 bg-surface-input p-4 font-mono text-sm text-heading"
