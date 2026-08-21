@@ -12,11 +12,6 @@
       "type": "string"
     },
     {
-      "key": "csrfToken",
-      "value": "",
-      "type": "string"
-    },
-    {
       "key": "verificationToken",
       "value": "",
       "type": "string"
@@ -33,11 +28,6 @@
     },
     {
       "key": "resetUrl",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "sessionCookie",
       "value": "",
       "type": "string"
     },
@@ -265,7 +255,7 @@
                   "  pm.expect(responseJson.csrfToken).to.be.a('string').and.not.empty;",
                   "});",
                   "if (responseJson && responseJson.csrfToken) {",
-                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
                   "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
@@ -278,7 +268,7 @@
                   "    .filter(Boolean);",
                   "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
                   "  if (sessionCookie) {",
-                  "    pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "    pm.environment.set('sessionCookie', sessionCookie);",
                   "    pm.variables.set('sessionCookie', sessionCookie);",
                   "    console.log('Session cookie saved:', sessionCookie);",
                   "  }",
@@ -356,7 +346,7 @@
                   "pm.test('First logout confirms success message', function () {",
                   "  pm.expect(responseJson.message).to.eql('Logout successful.');",
                   "});",
-                  "pm.collectionVariables.set('sessionCookie', '');",
+                  "    pm.environment.set('sessionCookie', sessionCookie);",
                   "pm.variables.set('sessionCookie', '');",
                   "console.log('Session cookie cleared after logout.');"
                 ],
@@ -550,7 +540,7 @@
                   "pm.collectionVariables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
                   "pm.variables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
                   "if (responseJson && responseJson.csrfToken) {",
-                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
                   "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
@@ -563,7 +553,7 @@
                   "    .filter(Boolean);",
                   "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
                   "  if (sessionCookie) {",
-                  "    pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "    pm.environment.set('sessionCookie', sessionCookie);",
                   "    pm.variables.set('sessionCookie', sessionCookie);",
                   "  }",
                   "}"

@@ -5,15 +5,23 @@
     "description": "Admin-only workflows for user and lesson management. Requires an authenticated admin session.",
     "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
   },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('csrfToken') || !pm.environment.get('sessionCookie')) {",
+          "  throw new Error('Run User API > Login first so shared csrfToken and sessionCookie values are populated.');",
+          "}"
+        ]
+      }
+    }
+  ],
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8080",
-      "type": "string"
-    },
-    {
-      "key": "csrfToken",
-      "value": "",
       "type": "string"
     },
     {
@@ -33,11 +41,6 @@
     },
     {
       "key": "resetUrl",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "sessionCookie",
       "value": "",
       "type": "string"
     },

@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added admin module and nested lesson CRUD APIs with budgeting seed support
 - Added duplicate module and lesson protection with cache invalidation
 - Added explicit admin-only budgeting seed behavior for runtime lesson availability
+- Shared Postman CSRF and session variables across User and Admin collections
 
 ### Changed
 
