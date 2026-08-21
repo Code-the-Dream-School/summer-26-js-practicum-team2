@@ -110,6 +110,12 @@ const dashboardEventSchema = Joi.object({
   type: Joi.string().trim().valid("lesson_complete", "quiz_submit").required(),
 });
 
+const lessonImportSchema = Joi.object({
+  id: Joi.string().trim().min(1).required(),
+  title: Joi.string().trim().min(1).required(),
+  lessons: Joi.array().required(),
+});
+
 function validateRequest(res, schema, payload) {
   const { error, value } = schema.validate(payload, { abortEarly: false });
   if (error) {
@@ -134,5 +140,6 @@ module.exports = {
   forgotPasswordSchema,
   resetPasswordSchema,
   dashboardEventSchema,
+  lessonImportSchema,
   validateRequest,
 };

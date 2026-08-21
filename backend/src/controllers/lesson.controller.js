@@ -1,12 +1,18 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
+const LessonModule = require("../models/LessonModule.model");
 const {
   getModule,
   getLesson,
   sanitizeLessonData,
   sanitizeModuleData,
+  clearModuleCache,
 } = require("../utils/content");
-const { lessonProgressSchema, validateRequest } = require("../validation/userValidation");
+const {
+  lessonProgressSchema,
+  lessonImportSchema,
+  validateRequest,
+} = require("../validation/userValidation");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -146,6 +152,26 @@ exports.updateLessonProgress = async (req, res, next) => {
     );
 
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// POST /api/v1/lessons/import
+// Upserts a complete lesson module from a trusted operator request.
+exports.importLessonModule = async (req, res, next) => {
+  try {
+    const validatedBody = validateRequest(res, lessonImportSchema, req.body);
+    if (!validatedBody) return;
+
+    const lessonModule = await LessonModule.findOneAndUpdate(
+      { id: validatedBody.id },
+      validatedBody,
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    ).lean();
+
+    clearModuleCache(validatedBody.id);
+    return res.status(StatusCodes.OK).json(lessonModule);
   } catch (error) {
     return next(error);
   }

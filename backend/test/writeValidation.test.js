@@ -164,6 +164,31 @@ describe("write endpoint input validation", () => {
 
     expect(response.status).toBe(404);
   });
+
+  test("rejects lesson imports without the shared secret", async () => {
+    const response = await request(app).post("/api/v1/lessons/import").send({});
+
+    expect(response.status).toBe(401);
+  });
+
+  test("validates lesson imports with the shared secret", async () => {
+    const response = await request(app)
+      .post("/api/v1/lessons/import")
+      .set("X-Import-Secret", process.env.LESSON_IMPORT_SECRET)
+      .send({ id: "cashFlow" });
+
+    expectValidationError(response);
+  });
+
+  test("imports a lesson module with the shared secret", async () => {
+    const response = await request(app)
+      .post("/api/v1/lessons/import")
+      .set("X-Import-Secret", process.env.LESSON_IMPORT_SECRET)
+      .send({ id: "imported", title: "Imported lessons", lessons: [] });
+
+    expect(response.status).toBe(200);
+    expect(response.body.id).toBe("imported");
+  });
 });
 
 describe("public lesson content endpoint", () => {

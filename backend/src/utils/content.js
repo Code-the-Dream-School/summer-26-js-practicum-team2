@@ -66,6 +66,10 @@ const clearCache = () => {
   moduleCache = new Map();
 };
 
+const clearModuleCache = (moduleId) => {
+  moduleCache.delete(moduleId);
+};
+
 const sanitizeLessonData = (lessonData) => {
   const sanitizedLesson = JSON.parse(JSON.stringify(lessonData));
 
@@ -93,4 +97,5 @@ module.exports = {
   sanitizeLessonData,
   sanitizeModuleData,
   clearCache,
+  clearModuleCache,
 };

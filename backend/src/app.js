@@ -15,6 +15,7 @@ const helloRoutes = require("./routes/hello.routes");
 const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
 const lessonPublicRoutes = require("./routes/lessonPublic.routes");
+const lessonImportRoutes = require("./routes/lessonImport.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const quizRoutes = require("./routes/quiz.routes");
 const quizPublicRoutes = require("./routes/quizPublic.routes");
@@ -69,6 +70,7 @@ app.use(limiter);
 // Routes
 app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/lessons", lessonImportRoutes);
 app.use("/api/v1/lessons", lessonPublicRoutes);
 app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);

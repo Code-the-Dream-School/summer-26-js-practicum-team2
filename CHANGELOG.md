@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated content loading to prefer MongoDB while retaining JSON fallback support
 
+### Added
+
+- Added a shared-secret lesson module import endpoint with Joi validation
+- Added cache invalidation after lesson module imports
+
 ---
 
 ## [Unreleased Patch 2]
