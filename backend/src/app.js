@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const jwtMiddleware = require("./middleware/jsonWebToken");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const notFoundMiddleware = require("./middleware/notFound");
+const requireAdmin = require("./middleware/requireAdmin");
 
 // Route imports
 const helloRoutes = require("./routes/hello.routes");
@@ -19,6 +20,7 @@ const lessonImportRoutes = require("./routes/lessonImport.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const quizRoutes = require("./routes/quiz.routes");
 const quizPublicRoutes = require("./routes/quizPublic.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 // Create Express app
 const app = express();
@@ -76,6 +78,7 @@ app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
 app.use("/api/v1/quizzes", quizPublicRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
+app.use("/api/v1/admin", jwtMiddleware, requireAdmin, adminRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application

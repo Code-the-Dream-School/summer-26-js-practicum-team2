@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased Patch 5]
+
+### Added
+
+- Added the backend admin authorization boundary and protected admin status endpoint
+- Assigned the first successfully registered user the admin role through an atomic bootstrap claim
+
+### Changed
+
+- Added explicit admin-role checks for admin API routes
+
+---
+
 ## [Unreleased Patch 4]
 
 ### Added
