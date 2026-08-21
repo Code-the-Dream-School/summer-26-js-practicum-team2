@@ -119,6 +119,23 @@ describe("lesson and dashboard API integration", () => {
     expect(dashboardRes.body.recentActivity).toEqual([]);
   });
 
+  it("accepts a supported dashboard event payload and responds as accepted", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Dashboard Event User",
+      "dashboard-event@example.com",
+    );
+
+    // Send a supported dashboard event as an authenticated user.
+    const eventRes = await request(app)
+      .post("/api/v1/dashboard/events")
+      .set("Authorization", authHeader)
+      .send({ type: "quiz_submit" });
+
+    // The event should be accepted and processed successfully.
+    expect(eventRes.status).toBe(202);
+    expect(eventRes.body.message).toContain("Dashboard event processed");
+  });
+
   it("resolves passed quiz attempts into dashboard progress data", async () => {
     const { user, authHeader } = await createAuthedUser(
       "Progress Resolver",
