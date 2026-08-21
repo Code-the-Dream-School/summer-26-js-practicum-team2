@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a full lesson JSON editor for lesson metadata, micro-lessons, quizzes, and content blocks
 - Added renderer block-type controls for switching paragraph, callout, formula, list, quiz, table, and budget blocks
 - Added structured editing for lists, character intros, knowledge checks, tables, and budget summaries
+- Added Postman coverage for admin status, user listing, module seed/detail/CRUD, and nested lesson CRUD
 
 ---
 
