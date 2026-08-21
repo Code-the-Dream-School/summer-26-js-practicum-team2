@@ -116,6 +116,27 @@ const lessonImportSchema = Joi.object({
   lessons: Joi.array().required(),
 }).unknown(true);
 
+const adminUserQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(25),
+  role: Joi.string().valid("learner", "admin"),
+  emailVerified: Joi.boolean(),
+  search: Joi.string().trim().max(100),
+});
+
+const adminRoleSchema = Joi.object({
+  role: Joi.string().valid("learner", "admin").required(),
+  confirmation: Joi.string().valid("CONFIRM").required(),
+});
+
+const adminActionSchema = Joi.object({
+  confirmation: Joi.string().valid("CONFIRM").required(),
+});
+
+const adminDisableSchema = adminActionSchema.keys({
+  disabled: Joi.boolean().required(),
+});
+
 function validateRequest(res, schema, payload) {
   const { error, value } = schema.validate(payload, { abortEarly: false });
   if (error) {
@@ -141,5 +162,9 @@ module.exports = {
   resetPasswordSchema,
   dashboardEventSchema,
   lessonImportSchema,
+  adminUserQuerySchema,
+  adminRoleSchema,
+  adminActionSchema,
+  adminDisableSchema,
   validateRequest,
 };

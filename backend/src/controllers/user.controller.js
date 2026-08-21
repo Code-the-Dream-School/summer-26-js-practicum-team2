@@ -131,6 +131,9 @@ const login = async (req, res, next) => {
       });
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
+    if (user.is_disabled || user.deleted_at) {
+      return res.status(StatusCodes.FORBIDDEN).json({ message: "This account is unavailable." });
+    }
     //compared hashed password
 
     const isMatched = await comparePassword(password, user.password_hash);

@@ -15,10 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added the backend admin authorization boundary and protected admin status endpoint
 - Assigned the first successfully registered user the admin role through an atomic bootstrap claim
+- Added admin user listing, progress reset, account disable/enable, and role management APIs
 
 ### Changed
 
 - Added explicit admin-role checks for admin API routes
+- Prevented disabled or deleted users from signing in
 
 ---
 

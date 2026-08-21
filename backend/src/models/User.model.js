@@ -45,6 +45,18 @@ const userSchema = new mongoose.Schema(
       enum: ["learner", "admin"],
       default: "learner",
     },
+    is_disabled: {
+      type: Boolean,
+      default: false,
+    },
+    disabled_at: {
+      type: Date,
+      default: null,
+    },
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
     tos_agreement: {
       type: Boolean,
       required: true,
