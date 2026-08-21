@@ -50,29 +50,54 @@ function LearnFlow({
   characterImages,
   guideImage,
   savedProgress = null,
+  selectedMicroLessonId = null,
   csrfToken,
   isReadOnly = false,
 }) {
   const { lessonSteps } = learnData;
 
-  const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
-  const [chunkIndex, setChunkIndex] = useState(() => savedProgress?.currentChunkIndex ?? 0);
+  // const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
+
+  const [stepIndex, setStepIndex] = useState(() => {
+    if (selectedMicroLessonId) {
+      const index = lessonSteps.findIndex((step) => step.id === selectedMicroLessonId);
+
+      if (index >= 0) {
+        return index;
+      }
+    }
+
+    return getResumeIndex(lessonSteps, savedProgress);
+  });
+
+  //For the resume button to make sure you jump back to the right chunk
+ const shouldResumeChunk =
+   !selectedMicroLessonId || selectedMicroLessonId === savedProgress?.currentMicroLessonId;
+
+ const resumeChunkIndex = shouldResumeChunk ? (savedProgress?.currentChunkIndex ?? 0) : 0;
+
+  console.log("resumeChunkIndex", resumeChunkIndex);
+  const [chunkIndex, setChunkIndex] = useState(() => resumeChunkIndex);
   const [phase, setPhase] = useState("lesson");
 
   //Restore chunk position when progress arrives
-  useEffect(() => {
-    console.log("savedProgress:", savedProgress);
-    if (typeof savedProgress?.currentChunkIndex === "number") {
-      setChunkIndex(savedProgress.currentChunkIndex);
-    }
-  }, [savedProgress]);
+  // useEffect(() => {
+  //   console.log("savedProgress:", savedProgress);
+  //   if (typeof savedProgress?.currentChunkIndex === "number") {
+  //     setChunkIndex(savedProgress.currentChunkIndex);
+  //   }
+  // }, [savedProgress]);
 
-  // Restore step (micro-lesson) position when progress arrives
-  useEffect(() => {
-    if (savedProgress) {
-      setStepIndex(getResumeIndex(lessonSteps, savedProgress));
-    }
-  }, [lessonSteps, savedProgress]);
+  // // Restore step (micro-lesson) position when progress arrives
+  // useEffect(() => {
+  //   if (selectedMicroLessonId) {
+  //     return;
+  //   }
+
+  //   if (savedProgress) {
+  //     setStepIndex(getResumeIndex(lessonSteps, savedProgress));
+  //   }
+  // }, [lessonSteps, savedProgress, selectedMicroLessonId]);
 
   const [isComplete, setIsComplete] = useState(false);
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
@@ -82,6 +107,14 @@ function LearnFlow({
   const chunks = currentStep?.content ?? [];
   const currentChunk = chunks[chunkIndex];
   const currentMicroLessonId = currentStep?.id;
+
+  console.log("selectedMicroLessonId", selectedMicroLessonId);
+  console.log("savedProgress.currentChunkIndex", savedProgress?.currentChunkIndex);
+  console.log("chunkIndex state", chunkIndex);
+
+  console.log("currentMicroLessonId", currentMicroLessonId);
+  console.log("currentChunk", currentChunk);
+
   const canSyncProgress = !isReadOnly && Boolean(csrfToken);
 
   const isAtLessonStart = stepIndex === 0 && chunkIndex === 0 && phase === "lesson";
@@ -374,7 +407,7 @@ function LearnFlow({
           <>
             {/* This is for the resume banner button */}
             {savedProgress && !isAtLessonStart && (
-              <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4">
+              <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4 ">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-sm font-medium">
                     Welcome Back! Resuming "{currentStep.title}"
@@ -428,6 +461,8 @@ export default function LearnPage() {
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+
+  const selectedMicroLessonId = location.state?.microLessonId;
 
   const isSamplePreview = searchParams.get("sample") === "true";
 
@@ -518,11 +553,12 @@ export default function LearnPage() {
 
   return (
     <LearnFlow
-      key={`${learnData.moduleId}:${learnData.id}`}
+      key={`${learnData.moduleId}:${learnData.id}:${selectedMicroLessonId ?? "resume"}`}
       learnData={learnData}
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
+      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
     />
   );
