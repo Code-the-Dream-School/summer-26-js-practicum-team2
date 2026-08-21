@@ -3,14 +3,26 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
+const User = require("../src/models/User.model");
 const { passwordSchema } = require("../src/validation/userValidation");
 
 useTestDb();
 
+let validationUserId;
+beforeEach(async () => {
+  const user = await User.create({
+    name: "Validation User",
+    email: `validation-${new mongoose.Types.ObjectId()}@example.com`,
+    password_hash: "hashed-password",
+    tos_agreement: true,
+  });
+  validationUserId = user._id.toString();
+});
+
 // Create a valid bearer token so validation tests can reach protected endpoints.
 const authHeader = () => ({
   Authorization: `Bearer ${jwt.sign(
-    { id: new mongoose.Types.ObjectId().toString(), role: "learner" },
+    { id: validationUserId, role: "learner", csrfToken: "test-csrf" },
     process.env.JWT_SECRET,
   )}`,
 });
