@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased Patch 1]
+
+### Added
+
+- Added sanitized public and authenticated lesson responses that hide quiz answers
+
+### Changed
+
+- Prevented lesson content APIs from exposing `correctResponse` and `explanation`
+
+---
+
 ## [Unreleased]
 
 ### Added

@@ -55,4 +55,19 @@ const clearCache = () => {
   moduleCache = new Map();
 };
 
-module.exports = { getManifest, getModule, getLesson, clearCache };
+const sanitizeLessonData = (lessonData) => {
+  const sanitizedLesson = JSON.parse(JSON.stringify(lessonData));
+
+  for (const microLesson of sanitizedLesson.microLessons || []) {
+    for (const contentItem of microLesson.microLessonContent || []) {
+      if (contentItem.type === "knowledgeCheck") {
+        delete contentItem.correctResponse;
+        delete contentItem.explanation;
+      }
+    }
+  }
+
+  return sanitizedLesson;
+};
+
+module.exports = { getManifest, getModule, getLesson, sanitizeLessonData, clearCache };

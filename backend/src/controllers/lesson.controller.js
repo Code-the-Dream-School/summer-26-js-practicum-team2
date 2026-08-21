@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
-const { getModule, getLesson } = require("../utils/content");
+const { getModule, getLesson, sanitizeLessonData } = require("../utils/content");
 const { lessonProgressSchema, validateRequest } = require("../validation/userValidation");
 
 const DEFAULT_MODULE_ID = "cashFlow";
@@ -44,8 +44,37 @@ exports.getLesson = async (req, res, next) => {
 
     return res.status(StatusCodes.OK).json({
       moduleData,
-      lessonData,
+      lessonData: sanitizeLessonData(lessonData),
       progress: progressRecord ? shapeProgress(progressRecord) : null,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// GET /api/v1/lessons/public/:moduleId/:lessonId
+// Returns sanitized lesson content for signed-out previews without reading user progress.
+exports.getPublicLesson = async (req, res, next) => {
+  try {
+    const { moduleId, lessonId } = req.params;
+
+    const moduleData = getModule(moduleId);
+    if (!moduleData) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Module '${moduleId}' was not found.`,
+      });
+    }
+
+    const lessonData = getLesson(moduleId, lessonId);
+    if (!lessonData) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Lesson '${lessonId}' was not found in module '${moduleId}'.`,
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      moduleData,
+      lessonData: sanitizeLessonData(lessonData),
     });
   } catch (error) {
     return next(error);
