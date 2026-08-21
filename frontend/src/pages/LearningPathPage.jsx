@@ -1,8 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
-import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from "../hooks/useLessonContent";
-import { getLesson, getLessonProgress } from "../services/api";
+import { getLesson, getLessonModules, getLessonProgress } from "../services/api";
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
@@ -36,11 +35,23 @@ function LearningPathPage() {
 
     async function loadLearningPath() {
       try {
-        // The saved progress tells us which module and lesson to load the content for.
-        const progressPayload = await getLessonProgress(DEFAULT_MODULE_ID);
+        const modulePayload = await getLessonModules();
+        const firstModuleId = modulePayload.modules?.[0]?.id;
+        if (!firstModuleId) {
+          if (isActive) setError("No lesson modules have been seeded yet. Ask an admin to seed or import lessons.");
+          return;
+        }
+
+        const progressPayload = await getLessonProgress(firstModuleId);
+        const firstLessonId =
+          progressPayload.currentLessonId || modulePayload.modules[0].firstLessonId;
+        if (!firstLessonId) {
+          if (isActive) setError("The selected module does not contain any lessons yet.");
+          return;
+        }
         const lessonPayload = await getLesson(
-          progressPayload.currentModule || DEFAULT_MODULE_ID,
-          progressPayload.currentLessonId || DEFAULT_LESSON_ID,
+          progressPayload.currentModule || firstModuleId,
+          firstLessonId,
         );
 
         if (!isActive) {

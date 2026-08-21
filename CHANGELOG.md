@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added an admin-only Admin link to the shared desktop and mobile navigation
 - Replaced admin panel action buttons with the shared Button component
 - Removed automatic runtime loading of lesson JSON files
+- Made learning-path module discovery database-driven instead of defaulting to `cashFlow`
 
 ---
 

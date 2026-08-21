@@ -225,6 +225,9 @@ export const getLesson = (moduleId, lessonId) =>
     basePath: LESSONS_BASE_PATH,
   });
 
+export const getLessonModules = () =>
+  apiRequest("/modules", { method: "GET", basePath: LESSONS_BASE_PATH });
+
 export const getPublicLesson = (moduleId, lessonId) =>
   apiRequest(`/public/${encodeURIComponent(moduleId)}/${encodeURIComponent(lessonId)}`, {
     method: "GET",

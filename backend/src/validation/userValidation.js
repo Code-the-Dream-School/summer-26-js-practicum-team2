@@ -53,7 +53,7 @@ const loginSchema = Joi.object({
   remember: Joi.boolean().optional().default(false),
 });
 
-const moduleIdSchema = Joi.string().trim().valid("cashFlow").default("cashFlow");
+const moduleIdSchema = Joi.string().trim().min(1).required();
 const microLessonIdSchema = Joi.string().trim().min(1);
 
 const lessonProgressSchema = Joi.object({

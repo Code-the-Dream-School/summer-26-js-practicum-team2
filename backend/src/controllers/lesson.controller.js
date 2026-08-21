@@ -14,8 +14,6 @@ const {
   validateRequest,
 } = require("../validation/userValidation");
 
-const DEFAULT_MODULE_ID = "cashFlow";
-
 // Shape a UserProgress document into the fields the frontend needs to render the learning path.
 function shapeProgress(progressRecord) {
   return {
@@ -27,6 +25,21 @@ function shapeProgress(progressRecord) {
     isModuleCompleted: progressRecord.is_module_completed,
   };
 }
+
+exports.getLessonModules = async (req, res, next) => {
+  try {
+    const modules = await LessonModule.find({}).select("id title lessons").sort({ id: 1 }).lean();
+    return res.status(StatusCodes.OK).json({
+      modules: modules.map(({ id, title, lessons }) => ({
+        id,
+        title,
+        firstLessonId: lessons?.[0]?.id ?? null,
+      })),
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 // GET /api/v1/lessons/:moduleId/:lessonId
 // Returns the module + lesson content along with the caller's progress, without mutating it.
@@ -96,7 +109,12 @@ exports.getPublicLesson = async (req, res, next) => {
 // Returns progress only, so the learning path can render without loading lesson content.
 exports.getLessonProgress = async (req, res, next) => {
   try {
-    const moduleId = req.query.moduleId || DEFAULT_MODULE_ID;
+    const moduleId = req.query.moduleId;
+    if (!moduleId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "A moduleId is required to load lesson progress.",
+      });
+    }
 
     if (!(await getModule(moduleId))) {
       return res.status(StatusCodes.NOT_FOUND).json({
