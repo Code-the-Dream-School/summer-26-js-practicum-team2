@@ -71,6 +71,15 @@ const quizSubmissionParamsSchema = Joi.object({
   id: microLessonIdSchema.required(),
 });
 
+const quizCheckSchema = Joi.object({
+  moduleId: moduleIdSchema,
+  microLessonId: microLessonIdSchema.required(),
+  questionId: Joi.string().trim().min(1).required(),
+  choiceIds: Joi.alternatives()
+    .try(Joi.string().trim(), Joi.array().items(Joi.string().trim()))
+    .required(),
+});
+
 const quizSubmissionSchema = Joi.object({
   attemptId: Joi.string().trim().hex().length(24),
   moduleId: moduleIdSchema,
@@ -120,6 +129,7 @@ module.exports = {
   lessonProgressSchema,
   quizStartSchema,
   quizSubmissionParamsSchema,
+  quizCheckSchema,
   quizSubmissionSchema,
   forgotPasswordSchema,
   resetPasswordSchema,

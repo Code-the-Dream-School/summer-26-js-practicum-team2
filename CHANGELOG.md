@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Prevented lesson content APIs from exposing `correctResponse` and `explanation`
+- Added a stateless public quiz answer-check endpoint
+
+### Added
+
+- Added server-side correctness checks for individual quiz answers
 
 ---
 

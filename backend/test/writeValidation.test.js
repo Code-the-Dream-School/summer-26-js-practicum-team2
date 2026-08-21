@@ -136,4 +136,45 @@ describe("write endpoint input validation", () => {
       expect.not.arrayContaining([expect.objectContaining({ explanation: expect.anything() })]),
     );
   });
+
+  test("checks a correct quiz answer without authentication", async () => {
+    const response = await request(app).post("/api/v1/quizzes/check").send({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.2",
+      questionId: "1.1.2-q3",
+      choiceIds: "a",
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      isCorrect: true,
+      correctChoiceIds: ["a"],
+      explanation: expect.any(String),
+    });
+  });
+
+  test("checks an incorrect quiz answer and returns the correct choice", async () => {
+    const response = await request(app).post("/api/v1/quizzes/check").send({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.2",
+      questionId: "1.1.2-q3",
+      choiceIds: "b",
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.isCorrect).toBe(false);
+    expect(response.body.correctChoiceIds).toEqual(["a"]);
+    expect(response.body.explanation).toEqual(expect.any(String));
+  });
+
+  test("returns not found for an unknown quiz question", async () => {
+    const response = await request(app).post("/api/v1/quizzes/check").send({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.2",
+      questionId: "missing-question",
+      choiceIds: "a",
+    });
+
+    expect(response.status).toBe(404);
+  });
 });

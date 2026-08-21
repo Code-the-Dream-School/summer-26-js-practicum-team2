@@ -17,6 +17,7 @@ const lessonRoutes = require("./routes/lesson.routes");
 const lessonPublicRoutes = require("./routes/lessonPublic.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const quizRoutes = require("./routes/quiz.routes");
+const quizPublicRoutes = require("./routes/quizPublic.routes");
 
 // Create Express app
 const app = express();
@@ -71,6 +72,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", lessonPublicRoutes);
 app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
+app.use("/api/v1/quizzes", quizPublicRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
 // Root route
 app.get("/", (req, res) => {
