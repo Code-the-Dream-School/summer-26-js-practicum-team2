@@ -22,6 +22,16 @@ import Card from "../shared/Card/Card.component";
 import Button from "../shared/Button/Button.component";
 
 const emptyModule = { id: "", title: "", lessons: [] };
+const lessonBlockTypes = [
+  "paragraph",
+  "characterIntro",
+  "formula",
+  "callout",
+  "unorderedList",
+  "knowledgeCheck",
+  "table",
+  "budget-summary",
+];
 
 export default function AdminDashboardPage() {
   const { csrfToken, user: currentUser } = useAuthContext();
@@ -120,6 +130,26 @@ export default function AdminDashboardPage() {
         if (microLesson.id !== microLessonId) return microLesson;
         const content = [...(microLesson.microLessonContent ?? [])];
         content[blockIndex] = { ...content[blockIndex], text: value };
+        return { ...microLesson, microLessonContent: content };
+      }),
+    }));
+  }
+
+  function updateBlockType(microLessonId, blockIndex, type) {
+    updateLessonDraft((lesson) => ({
+      ...lesson,
+      microLessons: (lesson.microLessons ?? []).map((microLesson) => {
+        if (microLesson.id !== microLessonId) return microLesson;
+        const content = [...(microLesson.microLessonContent ?? [])];
+        const currentBlock = content[blockIndex] ?? {};
+        const nextBlock = { ...currentBlock, type };
+        if (type === "paragraph" || type === "callout" || type === "formula") {
+          nextBlock.text = currentBlock.text ?? "Write content here.";
+        }
+        if (type === "unorderedList" && !Array.isArray(nextBlock.items)) {
+          nextBlock.items = ["Add a list item"];
+        }
+        content[blockIndex] = nextBlock;
         return { ...microLesson, microLessonContent: content };
       }),
     }));
@@ -583,23 +613,47 @@ export default function AdminDashboardPage() {
                               Remove
                             </Button>
                           </div>
-                          {(microLesson.microLessonContent ?? []).map((block, blockIndex) =>
-                            block.type === "paragraph" || block.type === "callout" ? (
-                              <label
-                                key={`${microLesson.id}-${blockIndex}`}
-                                className="space-y-1 text-sm text-heading"
-                              >
-                                <span className="font-semibold capitalize">{block.type} text</span>
-                                <textarea
-                                  className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2"
-                                  value={block.text ?? ""}
+                          {(microLesson.microLessonContent ?? []).map((block, blockIndex) => (
+                            <div
+                              key={`${microLesson.id}-${blockIndex}`}
+                              className="space-y-2 rounded-md border border-primary/10 bg-surface-inset p-3"
+                            >
+                              <label className="space-y-1 text-sm font-semibold text-heading">
+                                Block type
+                                <select
+                                  className="w-full rounded-md border border-primary/20 bg-surface-input px-3 py-2 font-normal"
+                                  value={lessonBlockTypes.includes(block.type) ? block.type : "paragraph"}
                                   onChange={(event) =>
-                                    updateBlock(microLesson.id, blockIndex, event.target.value)
+                                    updateBlockType(microLesson.id, blockIndex, event.target.value)
                                   }
-                                />
+                                >
+                                  {lessonBlockTypes.map((type) => (
+                                    <option key={type} value={type}>
+                                      {type}
+                                    </option>
+                                  ))}
+                                </select>
                               </label>
-                            ) : null,
-                          )}
+                              {block.type === "paragraph" ||
+                              block.type === "callout" ||
+                              block.type === "formula" ? (
+                                <label className="space-y-1 text-sm text-heading">
+                                  <span className="font-semibold">Text</span>
+                                  <textarea
+                                    className="min-h-20 w-full rounded-md border border-primary/20 px-3 py-2"
+                                    value={block.text ?? ""}
+                                    onChange={(event) =>
+                                      updateBlock(microLesson.id, blockIndex, event.target.value)
+                                    }
+                                  />
+                                </label>
+                              ) : (
+                                <p className="text-xs text-foreground">
+                                  This block has type-specific fields. Use the advanced JSON editor below to edit them.
+                                </p>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       ))}
                     </div>
