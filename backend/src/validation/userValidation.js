@@ -137,6 +137,10 @@ const adminDisableSchema = adminActionSchema.keys({
   disabled: Joi.boolean().required(),
 });
 
+const adminDeleteSchema = adminActionSchema.keys({
+  email: Joi.string().trim().email().required(),
+});
+
 const adminModuleSchema = Joi.object({
   id: Joi.string().trim().min(1).required(),
   title: Joi.string().trim().min(1).required(),
@@ -183,6 +187,7 @@ module.exports = {
   adminRoleSchema,
   adminActionSchema,
   adminDisableSchema,
+  adminDeleteSchema,
   adminModuleSchema,
   adminModuleUpdateSchema,
   adminLessonSchema,

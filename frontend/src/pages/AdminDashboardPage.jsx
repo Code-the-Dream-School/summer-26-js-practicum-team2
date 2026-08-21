@@ -7,12 +7,15 @@ import {
   deleteAdminModule,
   getAdminModules,
   getAdminUsers,
+  hardDeleteAdminUser,
   importAdminLessonModule,
   resetAdminUserProgress,
   seedAdminBudgetingModule,
   setAdminUserDisabled,
+  setAdminUserDeleted,
   updateAdminModule,
   updateAdminUserRole,
+  verifyAdminUserEmail,
 } from "../services/api";
 import Card from "../shared/Card/Card.component";
 
@@ -135,6 +138,17 @@ export default function AdminDashboardPage() {
                       >
                         {adminUser.is_disabled ? "Enable" : "Disable"}
                       </button>
+                      <button
+                        className="text-primary underline"
+                        onClick={() =>
+                          void runAction(
+                            () => verifyAdminUserEmail({ userId: adminUser.id, csrfToken }),
+                            "Email verified.",
+                          )
+                        }
+                      >
+                        Verify email
+                      </button>
                       {adminUser.id !== currentUser?.id ? (
                         <button
                           className="text-primary underline"
@@ -151,6 +165,42 @@ export default function AdminDashboardPage() {
                           }
                         >
                           {adminUser.role === "admin" ? "Demote" : "Promote"}
+                        </button>
+                      ) : null}
+                      <button
+                        className="text-primary underline"
+                        onClick={() =>
+                          void runAction(
+                            () =>
+                              setAdminUserDeleted({
+                                userId: adminUser.id,
+                                deleted: !adminUser.deleted_at,
+                                csrfToken,
+                              }),
+                            adminUser.deleted_at ? "User restored." : "User deleted.",
+                          )
+                        }
+                      >
+                        {adminUser.deleted_at ? "Restore" : "Delete"}
+                      </button>
+                      {adminUser.deleted_at ? (
+                        <button
+                          className="text-danger underline"
+                          onClick={() => {
+                            if (window.confirm(`Permanently delete ${adminUser.email}?`)) {
+                              void runAction(
+                                () =>
+                                  hardDeleteAdminUser({
+                                    userId: adminUser.id,
+                                    email: adminUser.email,
+                                    csrfToken,
+                                  }),
+                                "User permanently deleted.",
+                              );
+                            }
+                          }}
+                        >
+                          Hard delete
                         </button>
                       ) : null}
                     </td>

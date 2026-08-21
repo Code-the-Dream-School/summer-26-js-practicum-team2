@@ -128,4 +128,36 @@ describe("admin access boundary", () => {
       .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`);
     expect(duplicate.status).toBe(409);
   });
+
+  test("supports verification, reversible deletion, and confirmed hard deletion", async () => {
+    const admin = await createUser("admin");
+    const target = await createUser();
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    const verified = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/verify-email`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM" });
+    expect(verified.status).toBe(200);
+
+    const deleted = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM" });
+    expect(deleted.status).toBe(200);
+    expect(deleted.body.deleted_at).toBeTruthy();
+
+    const restored = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM" });
+    expect(restored.status).toBe(200);
+    expect(restored.body.deleted_at).toBeNull();
+
+    const hardDeleted = await request(app)
+      .delete(`/api/v1/admin/users/${target._id}`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", email: target.email });
+    expect(hardDeleted.status).toBe(200);
+  });
 });

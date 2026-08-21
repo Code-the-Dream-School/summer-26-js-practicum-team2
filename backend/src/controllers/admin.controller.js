@@ -7,6 +7,7 @@ const { clearModuleCache } = require("../utils/content");
 const {
   adminActionSchema,
   adminDisableSchema,
+  adminDeleteSchema,
   adminRoleSchema,
   adminUserQuerySchema,
   adminModuleSchema,
@@ -75,7 +76,7 @@ exports.listUsers = async (req, res, next) => {
 
 exports.resetUserProgress = async (req, res, next) => {
   try {
-    const body = validateRequest(res, adminDisableSchema, req.body);
+    const body = validateRequest(res, adminActionSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
     if (!target || target.deleted_at) {
@@ -83,6 +84,58 @@ exports.resetUserProgress = async (req, res, next) => {
     }
     await UserProgress.deleteMany({ user_id: target._id });
     return res.status(StatusCodes.OK).json({ message: "User progress reset." });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.verifyUserEmail = async (req, res, next) => {
+  try {
+    const body = validateRequest(res, adminActionSchema, req.body);
+    if (!body) return;
+    const target = await getTargetUser(req.params.userId);
+    if (!target || target.deleted_at) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    target.email_verified_at = target.email_verified_at || new Date();
+    target.verification_token = null;
+    target.verification_token_expires_at = null;
+    await target.save();
+    return res.status(StatusCodes.OK).json(safeUser(target));
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.setUserDeleted = async (req, res, next) => {
+  try {
+    const body = validateRequest(res, adminActionSchema, req.body);
+    if (!body) return;
+    const target = await getTargetUser(req.params.userId);
+    if (!target) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (target.role === "admin" && !target.deleted_at) {
+      const activeAdmins = await User.countDocuments({ role: "admin", is_disabled: false, deleted_at: null });
+      if (activeAdmins <= 1) return res.status(StatusCodes.CONFLICT).json({ message: "The last active admin cannot be deleted." });
+    }
+    target.deleted_at = target.deleted_at ? null : new Date();
+    await target.save();
+    return res.status(StatusCodes.OK).json(safeUser(target));
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.hardDeleteUser = async (req, res, next) => {
+  try {
+    const body = validateRequest(res, adminDeleteSchema, req.body);
+    if (!body) return;
+    const target = await getTargetUser(req.params.userId);
+    if (!target || target.email !== body.email) return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    if (target.role === "admin") {
+      const activeAdmins = await User.countDocuments({ role: "admin", is_disabled: false, deleted_at: null });
+      if (activeAdmins <= 1) return res.status(StatusCodes.CONFLICT).json({ message: "The last active admin cannot be deleted." });
+    }
+    await UserProgress.deleteMany({ user_id: target._id });
+    await User.deleteOne({ _id: target._id });
+    return res.status(StatusCodes.OK).json({ message: "User permanently deleted." });
   } catch (error) {
     return next(error);
   }

@@ -161,6 +161,24 @@ export const resetAdminUserProgress = ({ userId, csrfToken }) =>
     basePath: ADMIN_BASE_PATH,
   });
 
+export const verifyAdminUserEmail = ({ userId, csrfToken }) =>
+  apiRequest(`/users/${encodeURIComponent(userId)}/verify-email`, {
+    method: "PATCH", csrfToken, body: { confirmation: "CONFIRM" }, basePath: ADMIN_BASE_PATH,
+  });
+
+export const setAdminUserDeleted = ({ userId, deleted, csrfToken }) =>
+  apiRequest(`/users/${encodeURIComponent(userId)}/deleted`, {
+    method: "PATCH", csrfToken, body: { confirmation: "CONFIRM", deleted }, basePath: ADMIN_BASE_PATH,
+  });
+
+export const hardDeleteAdminUser = ({ userId, email, csrfToken }) =>
+  apiRequest(`/users/${encodeURIComponent(userId)}`, {
+    method: "DELETE",
+    csrfToken,
+    body: { confirmation: "CONFIRM", email },
+    basePath: ADMIN_BASE_PATH,
+  });
+
 export const importAdminLessonModule = ({ file, csrfToken }) => {
   const formData = new FormData();
   formData.append("file", file);

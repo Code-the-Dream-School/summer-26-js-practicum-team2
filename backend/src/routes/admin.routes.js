@@ -7,6 +7,9 @@ const {
   resetUserProgress,
   setUserDisabled,
   updateUserRole,
+  verifyUserEmail,
+  setUserDeleted,
+  hardDeleteUser,
   listModules,
   getModule,
   createModule,
@@ -26,6 +29,9 @@ router.get("/users", listUsers);
 router.post("/users/:userId/progress/reset", resetUserProgress);
 router.patch("/users/:userId/disabled", setUserDisabled);
 router.patch("/users/:userId/role", updateUserRole);
+router.patch("/users/:userId/verify-email", verifyUserEmail);
+router.patch("/users/:userId/deleted", setUserDeleted);
+router.delete("/users/:userId", hardDeleteUser);
 router.get("/modules", listModules);
 router.post("/modules/seed-budgeting", seedBudgetingModule);
 router.get("/modules/:moduleId", getModule);
