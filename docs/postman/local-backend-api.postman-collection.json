@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
-    "name": "Local Backend API",
+    "name": "Sprout Backend API",
     "description": "Requests for testing the local Express backend during development.",
     "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
   },
@@ -54,6 +54,11 @@
     {
       "key": "newTestUserPassword",
       "value": "N3wP@ssword!",
+      "type": "string"
+    },
+    {
+      "key": "lessonImportSecret",
+      "value": "",
       "type": "string"
     }
   ],
@@ -813,6 +818,53 @@
           "response": []
         },
         {
+          "name": "Check Quiz Answer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /quizzes/check returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Answer check returns correctness details', function () {",
+                  "  pm.expect(responseJson.isCorrect).to.be.a('boolean');",
+                  "  pm.expect(responseJson.correctChoiceIds).to.be.an('array');",
+                  "  pm.expect(responseJson.explanation).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"moduleId\": \"cashFlow\",\n  \"microLessonId\": \"1.1.2\",\n  \"questionId\": \"1.1.2-q3\",\n  \"choiceIds\": \"a\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/check",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "check"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Submit Quiz",
           "event": [
             {
@@ -873,6 +925,42 @@
     {
       "name": "Lessons",
       "item": [
+        {
+          "name": "Get Public Lesson Content",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /lessons/public/:moduleId/:lessonId returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Public lesson response includes module and lesson data', function () {",
+                  "  pm.expect(responseJson.moduleData).to.be.an('object');",
+                  "  pm.expect(responseJson.lessonData).to.be.an('object');",
+                  "  pm.expect(responseJson.lessonData.id).to.eql('1.1');",
+                  "});",
+                  "pm.test('Public lesson response does not expose quiz answers', function () {",
+                  "  pm.expect(pm.response.text()).not.to.include('correctResponse');",
+                  "  pm.expect(pm.response.text()).not.to.include('explanation');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/public/cashFlow/1.1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "public", "cashFlow", "1.1"]
+            }
+          },
+          "response": []
+        },
         {
           "name": "Get Lesson Content",
           "event": [
@@ -1007,6 +1095,56 @@
               "raw": "{{baseUrl}}/api/v1/lessons/progress",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "lessons", "progress"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Import Lesson Module",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /lessons/import returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Imported module response includes its ID', function () {",
+                  "  pm.expect(responseJson.id).to.eql('postman-test-module');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Import-Secret",
+                "value": "{{lessonImportSecret}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"postman-test-module\",\n  \"title\": \"Postman test module\",\n  \"lessons\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/import",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "import"]
             }
           },
           "response": []

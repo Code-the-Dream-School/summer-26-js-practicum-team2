@@ -14,16 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added a MongoDB lesson-module model for storing imported lesson content
+- Added a shared-secret lesson module import endpoint with Joi validation
+- Added cache invalidation after lesson module imports
+- Added integration coverage for refreshed content after module re-imports
+- Added Postman requests for public lessons, quiz answer checks, and lesson imports
 
 ### Changed
 
 - Updated content loading to prefer MongoDB while retaining JSON fallback support
-
-### Added
-
-- Added a shared-secret lesson module import endpoint with Joi validation
-- Added cache invalidation after lesson module imports
-- Added integration coverage for refreshed content after module re-imports
 
 ---
 
