@@ -189,6 +189,32 @@ describe("write endpoint input validation", () => {
     expect(response.status).toBe(200);
     expect(response.body.id).toBe("imported");
   });
+
+  test("refreshes cached lesson content after re-importing a module", async () => {
+    const initialModule = {
+      id: "cache-test",
+      title: "Initial title",
+      lessons: [{ id: "1.1", title: "Initial lesson", microLessons: [] }],
+    };
+    const updatedModule = {
+      ...initialModule,
+      title: "Updated title",
+    };
+
+    await request(app)
+      .post("/api/v1/lessons/import")
+      .set("X-Import-Secret", process.env.LESSON_IMPORT_SECRET)
+      .send(initialModule);
+    await request(app)
+      .post("/api/v1/lessons/import")
+      .set("X-Import-Secret", process.env.LESSON_IMPORT_SECRET)
+      .send(updatedModule);
+
+    const response = await request(app).get("/api/v1/lessons/public/cache-test/1.1");
+
+    expect(response.status).toBe(200);
+    expect(response.body.moduleData.title).toBe("Updated title");
+  });
 });
 
 describe("public lesson content endpoint", () => {

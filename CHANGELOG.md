@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added a shared-secret lesson module import endpoint with Joi validation
 - Added cache invalidation after lesson module imports
+- Added integration coverage for refreshed content after module re-imports
 
 ---
 
