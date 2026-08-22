@@ -125,3 +125,42 @@ exports.updateLessonProgress = async (req, res, next) => {
     return next(error);
   }
 };
+
+//For restarting lesson progress when the start over button is clicked
+exports.restartLessonProgress = async (req, res, next) => {
+  try {
+    const { moduleId = DEFAULT_MODULE_ID } = req.body;
+
+    const moduleData = getModule(moduleId);
+
+    if (!moduleData) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Module ${moduleId} was not found.`,
+      });
+    }
+
+    const firstLesson = moduleData.lessons?.[0];
+    const firstMicroLesson = firstLesson?.microLessons?.[0];
+
+    const progressRecord = await UserProgress.findOneAndUpdate(
+      {
+        user_id: req.user.id,
+        module_id: moduleId,
+      },
+      {
+        $set: {
+          course_lesson_id: firstLesson.id,
+          current_micro_lesson_id: firstMicroLesson.id,
+          current_chunk_index: 0,
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
+  } catch (error) {
+    return next(error);
+  }
+};

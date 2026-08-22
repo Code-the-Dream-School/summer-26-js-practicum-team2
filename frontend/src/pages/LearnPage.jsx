@@ -3,7 +3,7 @@ import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-r
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
-import { updateLessonProgress } from "../services/api";
+import { updateLessonProgress, restartLessonProgress } from "../services/api";
 import {
   getResumeIndex,
   getSampleLesson,
@@ -56,8 +56,6 @@ function LearnFlow({
 }) {
   const { lessonSteps } = learnData;
 
-  // const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
-
   const [stepIndex, setStepIndex] = useState(() => {
     if (selectedMicroLessonId) {
       const index = lessonSteps.findIndex((step) => step.id === selectedMicroLessonId);
@@ -71,33 +69,13 @@ function LearnFlow({
   });
 
   //For the resume button to make sure you jump back to the right chunk
- const shouldResumeChunk =
-   !selectedMicroLessonId || selectedMicroLessonId === savedProgress?.currentMicroLessonId;
+  const shouldResumeChunk =
+    !selectedMicroLessonId || selectedMicroLessonId === savedProgress?.currentMicroLessonId;
 
- const resumeChunkIndex = shouldResumeChunk ? (savedProgress?.currentChunkIndex ?? 0) : 0;
+  const resumeChunkIndex = shouldResumeChunk ? (savedProgress?.currentChunkIndex ?? 0) : 0;
 
-  console.log("resumeChunkIndex", resumeChunkIndex);
   const [chunkIndex, setChunkIndex] = useState(() => resumeChunkIndex);
   const [phase, setPhase] = useState("lesson");
-
-  //Restore chunk position when progress arrives
-  // useEffect(() => {
-  //   console.log("savedProgress:", savedProgress);
-  //   if (typeof savedProgress?.currentChunkIndex === "number") {
-  //     setChunkIndex(savedProgress.currentChunkIndex);
-  //   }
-  // }, [savedProgress]);
-
-  // // Restore step (micro-lesson) position when progress arrives
-  // useEffect(() => {
-  //   if (selectedMicroLessonId) {
-  //     return;
-  //   }
-
-  //   if (savedProgress) {
-  //     setStepIndex(getResumeIndex(lessonSteps, savedProgress));
-  //   }
-  // }, [lessonSteps, savedProgress, selectedMicroLessonId]);
 
   const [isComplete, setIsComplete] = useState(false);
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
@@ -107,13 +85,6 @@ function LearnFlow({
   const chunks = currentStep?.content ?? [];
   const currentChunk = chunks[chunkIndex];
   const currentMicroLessonId = currentStep?.id;
-
-  console.log("selectedMicroLessonId", selectedMicroLessonId);
-  console.log("savedProgress.currentChunkIndex", savedProgress?.currentChunkIndex);
-  console.log("chunkIndex state", chunkIndex);
-
-  console.log("currentMicroLessonId", currentMicroLessonId);
-  console.log("currentChunk", currentChunk);
 
   const canSyncProgress = !isReadOnly && Boolean(csrfToken);
 
@@ -257,24 +228,21 @@ function LearnFlow({
     }
   }
 
-  function handleStartOver() {
-    setStepIndex(0);
-    setChunkIndex(0);
-    setPhase("lesson");
+
+  async function handleStartOver() {
+    try {
+      await restartLessonProgress({
+        moduleId: learnData.moduleId,
+        csrfToken,
+      });
+
+      setStepIndex(0);
+      setChunkIndex(0);
+      setPhase("lesson");
+    } catch (error) {
+      console.error(error);
+    }
   }
-
-  // ******************* ADD BACKEND HERE *************
-
-  // async function handleStartOver() {
-  //   await updateLessonProgress({
-  //     moduleId: learnData.moduleId,
-  //     lessonId: learnData.id,
-  //     microLessonId: lessonSteps[0]?.id,
-  //     sectionIndex: 0,
-  //     scrollPercent: 0,
-  //     csrfToken,
-  //   });
-  // }
 
   if (isComplete) {
     return (
