@@ -4,9 +4,10 @@ import { describe, it, expect, vi } from "vitest";
 import GlossaryModal from "./GlossaryModal.component";
 
 vi.mock("../../../shared/Modal/Modal.component.jsx", () => ({
-  default: ({ children, isOpen, title }) => isOpen ? (
+  default: ({ children, isOpen, title, onClose }) => isOpen ? (
     <div data-testid="mock-modal">
       <h2>{title}</h2>
+      <button onClick={onClose} data-testid="modal-close-btn">Close</button>
       {children}
     </div>
   ) : null,
@@ -21,11 +22,19 @@ const mockGlossData = [
     "definition": "Money you owe another person or a business."
   },
 ];
-
+const mockWorksCitedData = [
+  {
+    id: "cfpb-youth-glossary",
+    title: "Youth Financial Education Glossary",
+    author: "Consumer Financial Protection Bureau (CFPB)",
+    citation: 'Consumer Financial Protection Bureau. "Youth Financial Education Glossary."',
+    url: "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/glossary/#b",
+  },
+];
 //Step 2. Verify terms, def, ABC headers, and search filters work with data provided
 
 describe("GlossaryModal - Content Renders", () => {
-  it("renders terms, definitions, alphabetical headers for sections when open", () => { render (<GlossaryModal isOpen={true} onClose={vi.fn()} glossary={mockGlossData} />);
+  it("renders terms, definitions, alphabetical headers for sections when open", () => { render (<GlossaryModal isOpen={true} onClose={vi.fn()} glossary={mockGlossData} worksCited={mockWorksCitedData} />);
     expect(screen.getByText(/APR \(Annual Percentage Rate\)/i)).toBeInTheDocument();
   expect(screen.getByText("Debt")).toBeInTheDocument();
 expect(screen.getByText("Budget")).toBeInTheDocument();
@@ -37,6 +46,7 @@ expect(screen.getByText("D")).toBeInTheDocument();
 });
 it("filters terms based on search input", () => {
   render(<GlossaryModal isOpen={true} onClose={vi.fn()} glossary={mockGlossData} />);
+
   const searchInput = screen.getByPlaceholderText("Search terms...");
   fireEvent.change(searchInput, { target: { value: "Budget" } });
   expect(screen.getByText("Budget")).toBeInTheDocument();
@@ -65,17 +75,65 @@ it("respond with no matches message when search query has no results", () => {
 });
 });
 
-//Step 4. Accessiblity and Navigation across page
-describe("GlossaryModal - Accessibility and Keyboard Navigation", () => {
+//Step 4. Accessiblity and Navigation across page -The esc key is already part of generic modal
+
+/*describe("GlossaryModal - Accessibility and Keyboard Navigation", () => {
   it("closes modal when escape key is pressed", () => {
     const handleClose = vi.fn();
     render(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);
     fireEvent.keyDown(window, { key: "Escape"});
     expect(handleClose).toHaveBeenCalledTimes(1);
+  });*/
+describe("GlossaryModal - Works Cited Tab and Navigation", ()=>{
+  it("renders tab buttons and switches between Glossary and works cited tabs", () =>{
+    render(
+      <GlossaryModal
+      isOpen={true}
+      onClose={vi.fn()}
+      glossary={mockGlossData}
+      worksCited={mockWorksCitedData}
+      />
+    );
+    const glossaryTab =screen.getByRole("tab", { name:"Glossary"});
+    const worksCitedTab=screen.getByRole("tab", {name: "Works Cited"});
+    expect(glossaryTab).toBeInTheDocument();
+    expect(worksCitedTab).toBeInTheDocument();
+
+    //Default tab is glossary
+    expect(screen.getByText("Budget")).toBeInTheDocument();
+
+    //Click the works cited tab
+    fireEvent.click(worksCitedTab);
+
+    //When Works Cited Tab is active, then no glosssary terms are present
+    expect(screen.queryByText("Budget")).not.toBeInTheDocument();
+    expect(screen.getByText("Youth Financial Education Glossary")).toBeInTheDocument();
+    expect(screen.getByText(/Author: Consumer Financial Protection Bureau/i)).toBeInTheDocument();
+    expect(screen.getByText("View Source")).toHaveAttribute(
+      "href",
+      mockWorksCitedData[0].url
+    );
   });
+  it("renders empty state message when worksCited is empty", () => {
+    render(
+    <GlossaryModal
+      isOpen={true}
+      onClose={vi.fn()}
+      glossary={mockGlossData}
+      worksCited={[]}
+      />
+
+    );
+    fireEvent.click(screen.getByRole("tab", {name: "Works Cited"}));
+    expect(screen.getByText("No resources available")).toBeInTheDocument();
+    expect(screen.getByText(/There are no works cited listed for this module/i)).toBeInTheDocument();
+  });
+});
+//Accessibility 
+describe("GlossaryModal - Accessibility Attributes", () => {
   it("has accessible dialog attributes and scroll region focus capability", () => {
 render(<GlossaryModal isOpen={true} onClose={vi.fn()} glossary={mockGlossData} />);
-const dialog =screen.getByRole("dialog", { name: "Module Glossary" });
+const dialog =screen.getByRole("dialog", { name: "Module Glossary and Works Cited" });
 expect (dialog).toBeInTheDocument();
 expect(dialog).toHaveAttribute("aria-modal", "true");
 
@@ -94,16 +152,23 @@ describe("GlossaryModal -Open or Closed State separate from Lesson State" , () =
   });
   it("resets search term when closed", () => {
     const handleClose = vi.fn();
-    const { rerender } = render( <GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} /> );
+    const {rerender} = render( <GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} /> );
 
     const searchInput = screen.getByPlaceholderText("Search terms...");
     fireEvent.change(searchInput, { target: { value: "Asset" } });
     expect(searchInput.value).toBe("Asset");
 
     //Simulate close and reopen modal
-    fireEvent.keyDown(window, { key: "Escape" });
-    rerender(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);
-
+    //fireEvent.keyDown(window, { key: "Escape" });
+   /*rerender(<GlossaryModal isOpen={false} onClose={handleClose} glossary={mockGlossData} />);
+   expect(screen.queryByPlaceholderText("Search terms...")).not.toBeInTheDocument();
+   //reopen modal
+    rerender(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);*/
+ const closeBtn =screen.getByTestId("modal-close-btn");
+ fireEvent.click(closeBtn);
+ expect(handleClose).toHaveBeenCalledTimes(1);
+ //Confirm new search is back to default placeholder text
+   rerender(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);
     const newSearch = screen.getByPlaceholderText("Search terms...");
     expect(newSearch.value).toBe("");
   });

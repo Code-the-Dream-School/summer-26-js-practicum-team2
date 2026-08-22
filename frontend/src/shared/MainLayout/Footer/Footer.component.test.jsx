@@ -6,9 +6,12 @@ import Footer from "./Footer.component";
 import userEvent from "@testing-library/user-event";
 //Mock GlossaryModal so we test Footer
 vi.mock("../../../features/learn/GlossaryModal/GlossaryModal.component.jsx", () => ({
-  default: ({ isOpen, onClose }) =>
+  default: ({ isOpen, onClose, glossary, worksCited }) =>
     isOpen ? (
       <div data-testid="mock-glossary-modal">
+        <span data-testid="modal-glossary-count">{glossary?.length || 0}</span>
+        <span data-testid="modal-cited-count">{worksCited?.length || 0}</span>
+
         <button onClick={onClose}>Close Modal</button>
       </div>
     ) : null,
@@ -24,7 +27,7 @@ describe("Footer - Floating Glossary Button", () => {
       </MemoryRouter>,
     );
     const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary/i,
+      name: /open glossary and references/i,
     });
     expect(glossaryBtn).toBeInTheDocument();
   });
@@ -35,7 +38,7 @@ describe("Footer - Floating Glossary Button", () => {
       </MemoryRouter>,
     );
     const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary/i,
+      name: /open glossary and references/i,
     });
     //modal should be closed on default
     expect(screen.queryByTestId("mock-glossary-modal")).not.toBeInTheDocument();
@@ -51,7 +54,7 @@ describe("Footer - Floating Glossary Button", () => {
     );
     // open modal
     const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary/i,
+      name: /open glossary and references/i,
     });
     fireEvent.click(glossaryBtn);
     // close modal with mock button
@@ -67,7 +70,7 @@ describe("Footer - Floating Glossary Button", () => {
       </MemoryRouter>,
     );
     const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary/i,
+      name: /open glossary and references/i,
     });
     //Simulate enter button
     glossaryBtn.focus();
@@ -87,7 +90,7 @@ describe("Footer - Floating Glossary Button(Hidden)", () => {
       </MemoryRouter>,
     );
     const glossaryBtn = screen.queryByRole("button", {
-      name: /open glossary/i,
+      name: /open glossary and references/i,
     });
     expect(glossaryBtn).not.toBeInTheDocument();
   });
@@ -98,7 +101,7 @@ describe("Footer - Floating Glossary Button(Hidden)", () => {
       </MemoryRouter>,
     );
     const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary/i,
+      name: /open glossary and references/i,
     });
     expect(glossaryBtn).toBeInTheDocument();
   });

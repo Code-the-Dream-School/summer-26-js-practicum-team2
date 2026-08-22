@@ -2,7 +2,8 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import GlossaryModal from "../../../features/learn/GlossaryModal/GlossaryModal.component.jsx";
 import glossaryIcon from "../../../assets/glossary_icon.svg";
-import glossaryData from "../../../../../shared/content/budgeting.json";
+//import glossaryData from "../../../../../shared/content/budgeting.json";
+import defaultContent from "../../../../../shared/content/budgeting.json";
 
 const footerNavLinks = [
   { label: "Home", to: "/" },
@@ -17,7 +18,7 @@ const footerNavLinks = [
 //route prefixes for glossary access
 const allowedGlossaryPaths = ["/dashboard", "/onboarding", "/learn"];
 
-export default function Footer({ currentGlossary = [] }) {
+export default function Footer({ currentGlossary = [], currentWorksCited = [] }) {
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isGlossaryHidden, setIsGlossaryHidden] = useState(false);
   const location = useLocation();
@@ -26,14 +27,22 @@ export default function Footer({ currentGlossary = [] }) {
   const showGlossary = allowedGlossaryPaths.some((path) => location.pathname.startsWith(path));
 
   const glossaryList =
-    currentGlossary && currentGlossary.length > 0 ? currentGlossary : glossaryData?.glossary;
+    //currentGlossary && currentGlossary.length > 0 ? currentGlossary : glossaryData?.glossary;
+    currentGlossary && currentGlossary.length > 0
+      ? currentGlossary
+      : defaultContent?.glossary || [];
 
-  const handleOpenGlossary = () => {
+  const worksCitedList =
+    currentWorksCited && currentWorksCited.length > 0
+      ? currentGlossary
+      : defaultContent?.worksCited || [];
+
+  /*const handleOpenGlossary = () => {
     setIsGlossaryOpen(true);
   };
   const handleReviveGlossaryButton = () => {
     setIsGlossaryHidden(false);
-  };
+  };*/
   return (
     <>
       <footer className="border-t border-neutral-200 bg-surface-app/90 px-4 py-8 text-sm text-neutral-600 sm:px-6 lg:px-8">
@@ -67,10 +76,14 @@ export default function Footer({ currentGlossary = [] }) {
             {showGlossary && (
               <button
                 type="button"
-                onClick={isGlossaryHidden ? handleReviveGlossaryButton : handleOpenGlossary}
+                onClick={
+                  isGlossaryHidden
+                    ? () => setIsGlossaryHidden(false)
+                    : () => setIsGlossaryOpen(true)
+                }
                 className="rounded-lg px-3 py-2 font-semibold text-heading transition-colors hover:bg-surface-inset hover:text-primary"
               >
-                Glossary {isGlossaryHidden}
+                Glossary & References
               </button>
             )}
           </nav>
@@ -91,21 +104,15 @@ export default function Footer({ currentGlossary = [] }) {
       {/* Floating Button */}
       {showGlossary && !isGlossaryHidden && (
         <div className="fixed top-1/2 right-4 z-50 -translate-y-1/2 flex items-center gap-1 rounded-lg border-2 border-heading bg-surface-raised p-0.5 shadow-md transition-all hover:bg-accent hover:shadow-lg  sm:right-6 sm:p-1">
-
           {/* Glossary button */}
 
           <button
             type="button"
             onClick={() => setIsGlossaryOpen(true)}
-            aria-label="Open Glossary"
+            aria-label="Open Glossary and References"
             className="inline-flex min-h-7 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold text-heading focus:outline-none focus:ring-2 focus:ring-focus sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
           >
-            <img
-              src={glossaryIcon}
-              alt=""
-              aria-hidden="true"
-              className="h-6 w-6 sm:h-7 sm:w-7"
-            />
+            <img src={glossaryIcon} alt="" aria-hidden="true" className="h-6 w-6 sm:h-7 sm:w-7" />
             <span></span>
           </button>
 
@@ -113,7 +120,7 @@ export default function Footer({ currentGlossary = [] }) {
           <button
             type="button"
             onClick={() => setIsGlossaryHidden(true)}
-            aria-label="Hide glossary button"
+            aria-label="Hide glossary and references button"
             className="flex h-5 w-5 items-center justify-center rounded-full text-heading transition-colors hover:bg-surface-inset hover:text-danger focus:outline-none sm:h-7 sm:w-7 sm:text-sm"
             title="Hide glossary"
           >
@@ -128,6 +135,7 @@ export default function Footer({ currentGlossary = [] }) {
           isOpen={isGlossaryOpen}
           onClose={() => setIsGlossaryOpen(false)}
           glossary={glossaryList}
+          worksCited={worksCitedList}
         />
       )}
     </>
