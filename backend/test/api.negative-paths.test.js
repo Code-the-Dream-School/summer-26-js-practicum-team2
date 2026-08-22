@@ -81,6 +81,19 @@ describe("backend API negative paths", () => {
     expect(logoutRes.body.message).toContain("Invalid CSRF token");
   });
 
+  it("rejects cookie-authenticated logout when CSRF token does not match", async () => {
+    const { token } = await createAuthedUser("Mismatched Csrf User", "mismatched-csrf@example.com");
+
+    // Send a valid session cookie, but use a CSRF token that does not match the one in the JWT.
+    const logoutRes = await request(app)
+      .post("/api/v1/users/logout")
+      .set("Cookie", [`session_token=${token}`])
+      .set("x-csrf-token", "different-csrf-token");
+
+    expect(logoutRes.status).toBe(403);
+    expect(logoutRes.body.message).toContain("Invalid CSRF token");
+  });
+
   it("returns 404 when lesson progress is requested for an unknown module", async () => {
     const { authHeader } = await createAuthedUser(
       "Unknown Module User",
@@ -108,6 +121,36 @@ describe("backend API negative paths", () => {
 
     expect(updateRes.status).toBe(400);
     expect(updateRes.body.message).toContain("lessonId or microLessonId is required");
+  });
+
+  it("returns 404 when lesson content is requested for an unknown module", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Unknown Lesson Module User",
+      "unknown-lesson-module@example.com",
+    );
+
+    // Request lesson content from a module that does not exist.
+    const lessonRes = await request(app)
+      .get("/api/v1/lessons/missingModule/1.1")
+      .set("Authorization", authHeader);
+
+    expect(lessonRes.status).toBe(404);
+    expect(lessonRes.body.message).toContain("Module 'missingModule' was not found");
+  });
+
+  it("returns 404 when lesson content is requested for an unknown lesson id", async () => {
+    const { authHeader } = await createAuthedUser(
+      "Unknown Lesson Id User",
+      "unknown-lesson-id@example.com",
+    );
+
+    // Use a real module, but request a lesson ID that does not exist in it.
+    const lessonRes = await request(app)
+      .get("/api/v1/lessons/cashFlow/9.9")
+      .set("Authorization", authHeader);
+
+    expect(lessonRes.status).toBe(404);
+    expect(lessonRes.body.message).toContain("Lesson '9.9' was not found in module 'cashFlow'");
   });
 
   it("returns 400 when quiz start is missing microLessonId", async () => {

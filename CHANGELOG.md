@@ -82,6 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added integration test coverage for backend API error handling and negative paths, including authentication, CSRF validation, invalid lesson progress, and quiz submission errors.
 - Added integration test coverage for backend API error handling and negative paths, including missing/invalid/expired authentication, CSRF validation, invalid lesson progress, quiz submission errors, and duplicate submission conflict handling.
 - Added backend Jest coverage guardrails with a dedicated coverage script and global thresholds to prevent test-coverage regression.
+- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID.
 
 ---
 
