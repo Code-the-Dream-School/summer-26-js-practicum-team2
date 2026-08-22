@@ -1,6 +1,5 @@
 //import React hooks from "react" to manage search text and keyboard listeners and import generic Modal container
-//import { useState, useEffect, useCallback } from "react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Modal from "../../../shared/Modal/Modal.component.jsx";
 
 //import generic modal component that is in shared directory of frontend
@@ -8,18 +7,13 @@ export default function GlossaryModal({ isOpen, onClose, glossary = [], worksCit
   //separate tab for works cited and tab for glossary
   const [activeTab, setActiveTab] = useState("glossary");
   const [searchTerm, setSearchTerm] = useState("");
-  //Esc key listener to close modal
-  //const handleClose = useCallback(() => {
-  const handleClose = () => {
+
+  const handleClose = useCallback(() => {
     setSearchTerm("");
-    // go back to initial default state of glossary tab showing
     setActiveTab("glossary");
     onClose();
-  };
-
-  //, [onClose]);
-  //Esc key will be handled by shared Modal design
-  /*useEffect(() => {
+  }, [onClose]);
+  useEffect(() => {
     const handleKeyDown = (esc) => {
       if (esc.key === "Escape" && isOpen) {
         handleClose();
@@ -31,7 +25,7 @@ export default function GlossaryModal({ isOpen, onClose, glossary = [], worksCit
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, handleClose]);
 
-  if (!isOpen) return null; */
+  if (!isOpen) return null;
   //Determine if glossary data exists
 
   const hasGlossaryInfo = Array.isArray(glossary) && glossary.length > 0;
@@ -172,7 +166,7 @@ export default function GlossaryModal({ isOpen, onClose, glossary = [], worksCit
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-block text-sm font-medium text-focuse hover: underline"
+                      className="mt-2 inline-block text-sm font-medium text-focus hover: underline"
                     >
                       View Source
                     </a>

@@ -75,15 +75,16 @@ it("respond with no matches message when search query has no results", () => {
 });
 });
 
-//Step 4. Accessiblity and Navigation across page -The esc key is already part of generic modal
+//Step 4. Accessiblity and Navigation 
 
-/*describe("GlossaryModal - Accessibility and Keyboard Navigation", () => {
+describe("GlossaryModal - Accessibility and Keyboard Navigation", () => {
   it("closes modal when escape key is pressed", () => {
     const handleClose = vi.fn();
     render(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);
     fireEvent.keyDown(window, { key: "Escape"});
     expect(handleClose).toHaveBeenCalledTimes(1);
-  });*/
+  });
+});
 describe("GlossaryModal - Works Cited Tab and Navigation", ()=>{
   it("renders tab buttons and switches between Glossary and works cited tabs", () =>{
     render(
@@ -145,7 +146,7 @@ expect(scrollRegion).toHaveAttribute("tabIndex", "0");
 });
 
 //step 5. Lesson isn't affected when glossary modal closes
-describe("GlossaryModal -Open or Closed State separate from Lesson State" , () => {
+describe("GlossaryModal - Open or Closed State separate from Lesson State" , () => {
   it("does not render into the DOM when isOpen is false", () => {
     render(<GlossaryModal isOpen={false} onClose={vi.fn()} glossary ={mockGlossData} />);
     expect(screen.queryByTestId("mock-modal")).not.toBeInTheDocument();
