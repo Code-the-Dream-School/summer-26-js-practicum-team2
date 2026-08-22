@@ -28,10 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID
 - Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID.
 - Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
+- Added rate-limiter contract coverage for register and login endpoint throttle behavior.
 
 ### Fixed
 
-- Fix error handler middleware signature to include next parameter
+- Fixed error handler middleware signature to include next parameter
 
 ---
 
