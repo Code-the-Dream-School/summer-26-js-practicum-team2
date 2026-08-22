@@ -10,6 +10,7 @@ function shapeProgress(progressRecord) {
     currentModule: progressRecord.module_id,
     currentLessonId: progressRecord.course_lesson_id,
     currentMicroLessonId: progressRecord.current_micro_lesson_id,
+    currentChunkIndex: progressRecord.current_chunk_index,
     completedLessons: progressRecord.completed_lessons,
     completedMicroLessons: progressRecord.completed_micro_lessons,
     isModuleCompleted: progressRecord.is_module_completed,
@@ -55,6 +56,7 @@ exports.getLesson = async (req, res, next) => {
 // Returns progress only, so the learning path can render without loading lesson content.
 exports.getLessonProgress = async (req, res, next) => {
   try {
+
     const moduleId = req.query.moduleId || DEFAULT_MODULE_ID;
 
     if (!getModule(moduleId)) {
@@ -86,7 +88,7 @@ exports.getLessonProgress = async (req, res, next) => {
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
 exports.updateLessonProgress = async (req, res, next) => {
   try {
-    const { moduleId = DEFAULT_MODULE_ID, lessonId, microLessonId } = req.body;
+    const { moduleId = DEFAULT_MODULE_ID, lessonId, microLessonId, currentChunkIndex } = req.body;
 
     if (!lessonId && !microLessonId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -107,11 +109,53 @@ exports.updateLessonProgress = async (req, res, next) => {
     if (microLessonId) {
       update.current_micro_lesson_id = microLessonId;
     }
+    if (typeof currentChunkIndex === "number") {
+      update.current_chunk_index = currentChunkIndex;
+    }
 
     const progressRecord = await UserProgress.findOneAndUpdate(
       { user_id: req.user.id, module_id: moduleId },
       { $set: update },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    );
+
+    return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
+  } catch (error) {
+    return next(error);
+  }
+};
+
+//For restarting lesson progress when the start over button is clicked
+exports.restartLessonProgress = async (req, res, next) => {
+  try {
+    const { moduleId = DEFAULT_MODULE_ID } = req.body;
+
+    const moduleData = getModule(moduleId);
+
+    if (!moduleData) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Module ${moduleId} was not found.`,
+      });
+    }
+
+    const firstLesson = moduleData.lessons?.[0];
+    const firstMicroLesson = firstLesson?.microLessons?.[0];
+
+    const progressRecord = await UserProgress.findOneAndUpdate(
+      {
+        user_id: req.user.id,
+        module_id: moduleId,
+      },
+      {
+        $set: {
+          course_lesson_id: firstLesson.id,
+          current_micro_lesson_id: firstMicroLesson.id,
+          current_chunk_index: 0,
+        },
+      },
+      {
+        new: true,
+      },
     );
 
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
