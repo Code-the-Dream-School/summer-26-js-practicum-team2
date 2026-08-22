@@ -56,7 +56,6 @@ exports.getLesson = async (req, res, next) => {
 // Returns progress only, so the learning path can render without loading lesson content.
 exports.getLessonProgress = async (req, res, next) => {
   try {
-    console.log("BODY: ", req.body);
 
     const moduleId = req.query.moduleId || DEFAULT_MODULE_ID;
 
