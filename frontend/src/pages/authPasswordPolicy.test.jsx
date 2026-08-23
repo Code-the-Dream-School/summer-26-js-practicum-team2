@@ -49,9 +49,9 @@ describe("auth form password policy UX", () => {
     });
   });
 
-  it("shows conditional helper text on register and static helper text on reset", async () => {
+  it("shows conditional helper text on register and reset", async () => {
     const user = userEvent.setup();
-    renderRegisterPage();
+    const registerView = renderRegisterPage();
 
     expect(
       screen.getByText(
@@ -65,13 +65,21 @@ describe("auth form password policy UX", () => {
       screen.getByText("Use 16+ characters with upper and lower case letters plus a number."),
     ).toBeInTheDocument();
 
+    registerView.unmount();
+
     renderResetConfirmPage();
 
     expect(
-      screen.getAllByText(
-        "Use 16+ characters with upper and lower case letters plus a number, or 8+ characters with upper and lower case letters, a number, and a symbol.",
-      ).length,
-    ).toBeGreaterThan(0);
+      screen.getByText(
+        "Use 8+ characters with upper and lower case letters, a number, and a symbol.",
+      ),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("New password"), "YxNqSSe9uqCCVAEx");
+
+    expect(
+      screen.getByText("Use 16+ characters with upper and lower case letters plus a number."),
+    ).toBeInTheDocument();
   });
 
   it("shows the policy error and blocks registration submit for invalid passwords", async () => {
