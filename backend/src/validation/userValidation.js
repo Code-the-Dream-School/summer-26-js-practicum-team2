@@ -32,7 +32,7 @@ const registerSchema = Joi.object({
   }),
   email: emailSchema.required(),
   password: passwordSchema,
-  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+  confirmPassword: Joi.string().trim().valid(Joi.ref("password")).required().messages({
     "string.empty": "Please confirm password.",
     "any.only": "Passwords do not match.",
     "any.required": "Please confirm password.",
