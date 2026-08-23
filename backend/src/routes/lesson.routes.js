@@ -15,10 +15,7 @@ router.get("/progress", getLessonProgress);
 router.patch("/progress", updateLessonProgress);
 
 //PATCH /api/v1/lessons/progress/restart
-router.patch(
-  "/progress/restart",
-  restartLessonProgress,
-);
+router.patch("/progress/restart", restartLessonProgress);
 
 // Declared last so "/progress" is not swallowed by the :moduleId param.
 // GET /api/v1/lessons/:moduleId/:lessonId

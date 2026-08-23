@@ -105,12 +105,7 @@ describe("lesson progress regression coverage (backend)", () => {
 
     // Restarting should change the current position without removing completion history.
     expect(response.body.completedLessons).toEqual(["1.1"]);
-    expect(response.body.completedMicroLessons).toEqual([
-      "1.1.1",
-      "1.1.2",
-      "1.1.3",
-      "1.1.4",
-    ]);
+    expect(response.body.completedMicroLessons).toEqual(["1.1.1", "1.1.2", "1.1.3", "1.1.4"]);
   });
 
   it("is idempotent for existing progress and does not create duplicate records", async () => {
