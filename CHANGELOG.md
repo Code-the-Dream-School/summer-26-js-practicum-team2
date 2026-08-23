@@ -93,34 +93,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
-- Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
-- Added user API integration tests for registration, verification, and login flows
-- Added integration tests for lesson and dashboard APIs
-- Added integration tests for lesson progress and dashboard resolution
-- Added integration test coverage for marking a lesson complete after all required quizzes are passed
-- Added integration test coverage for the hello endpoint, root redirect, and authenticated logout flow.
-- Added integration test coverage for retrieving and verifying saved quiz progress
-- Added integration test coverage for processing supported dashboard events
-- Added integration test coverage for backend API error handling and negative paths, including authentication, CSRF validation, invalid lesson progress, and quiz submission errors.
-- Added integration test coverage for backend API error handling and negative paths, including missing/invalid/expired authentication, CSRF validation, invalid lesson progress, quiz submission errors, and duplicate submission conflict handling.
-- Added backend Jest coverage guardrails with a dedicated coverage script and global thresholds to prevent test-coverage regression.
-- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID.
-- Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
-- Added rate-limiter contract coverage for register and login endpoint throttle behavior
-- Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches
-- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs
-- Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy)
-- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites
-- Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup
-- Added frontend hook test coverage for restoring saved authentication, logging in with remembered sessions, and clearing auth state on logout
-- Added frontend integration test coverage for password reset requests and protected route access for authenticated and unauthenticated users.
-- Added frontend hook test coverage for dashboard loading, session caching, and refreshing cached data after progress updates.
-- Added frontend integration test coverage for lesson navigation and immediate quiz answer feedback.
-
-
-### Fixed
-
-- Fixed error handler middleware signature to include next parameter
 
 ---
 
