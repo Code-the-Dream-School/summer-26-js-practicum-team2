@@ -13,8 +13,7 @@ describe("middleware contracts", () => {
   });
 
   it("returns a stable JSON error payload for malformed JSON bodies", async () => {
-    // Send intentionally broken JSON to make sure the parsing error
-    // is returned in the same format as the rest of the API errors.
+    // Send intentionally broken JSON to make sure the parsing error is returned in the same format as the rest of the API errors.
     const res = await request(app)
       .post("/api/v1/users/login")
       .set("Content-Type", "application/json")
@@ -27,13 +26,21 @@ describe("middleware contracts", () => {
   });
 
   it("applies core helmet security headers on API responses", async () => {
-    // Use a simple successful route to check that Helmet adds
-    // the expected security headers to API responses.
+    // Use a simple successful route to check that Helmet adds the expected security headers to API responses.
     const res = await request(app).get("/api/hello");
 
     expect(res.status).toBe(200);
     expect(res.headers["x-content-type-options"]).toBe("nosniff");
     expect(res.headers["x-frame-options"]).toBeDefined();
     expect(res.headers["x-dns-prefetch-control"]).toBeDefined();
+  });
+
+  it("applies policy-oriented helmet headers on API responses", async () => {
+    // Check the headers that control browser content and referrer policies.
+    const res = await request(app).get("/api/hello");
+
+    expect(res.status).toBe(200);
+    expect(res.headers["content-security-policy"]).toBeDefined();
+    expect(res.headers["referrer-policy"]).toBeDefined();
   });
 });
