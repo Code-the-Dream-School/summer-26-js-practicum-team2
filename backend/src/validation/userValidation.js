@@ -1,13 +1,12 @@
 const Joi = require("joi");
 
+const LONG_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+const SHORT_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9\s]).+$/;
+
 const passwordSchema = Joi.alternatives()
   .try(
-    Joi.string()
-      .min(16)
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/),
-    Joi.string()
-      .min(8)
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/),
+    Joi.string().trim().min(16).pattern(LONG_PASSWORD_PATTERN),
+    Joi.string().trim().min(8).pattern(SHORT_PASSWORD_PATTERN),
   )
   .required()
   .messages({
@@ -102,7 +101,7 @@ const dashboardEventSchema = Joi.object({
 });
 
 function validateRequest(res, schema, payload) {
-  const { error, value } = schema.validate(payload, { abortEarly: false });
+  const { error, value } = schema.validate(payload ?? {}, { abortEarly: false });
   if (error) {
     res.status(400).json({
       message: "Validation error",
