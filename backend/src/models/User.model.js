@@ -1,5 +1,16 @@
 //need to import mongoose
 const mongoose = require("mongoose");
+
+//present pageTourSchema for onboarding so userSchema can use it
+
+const pageTourSchema = new mongoose.Schema(
+  {
+    step: { type: Number, default: 0 },
+    dismissed: { type: Boolean, default:false },
+  },
+  { _id: false },
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -52,6 +63,32 @@ const userSchema = new mongoose.Schema(
     tos_agreement_at: {
       type: Date,
       default: null,
+    },
+    onboarding: {
+      is_completed: { type: Boolean, default: false },
+      started_at: {
+        type: Date,
+        default: null,
+      },
+      completed_at: { type: Date, default: null },
+      tours: {
+        dashboardPage: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+        learningPath: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+        lessonPage: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+        profilePage: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+      },
     },
   },
   {
