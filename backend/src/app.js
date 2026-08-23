@@ -33,7 +33,7 @@ const parseAllowedOrigins = () => {
 };
 
 // Rate Limiting Configuration for Production But Not Development
-// Sets a limit of 100 requests per 15 minutes per IP address
+// Sets a limit of 200 requests per 15 minutes per IP address
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
 
