@@ -4,6 +4,7 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const {
+  registerSchema,
   passwordSchema,
   lessonProgressSchema,
   quizSubmissionSchema,
@@ -34,6 +35,18 @@ describe("write endpoint input validation", () => {
     expect(passwordSchema.validate("longpasswordwithoutnumber").error).toBeDefined();
     expect(passwordSchema.validate("Password1 ").error).toBeDefined();
     expect(passwordSchema.validate("weakpass").error).toBeDefined();
+  });
+
+  test("accepts matching trimmed register passwords", () => {
+    const { error } = registerSchema.validate({
+      name: "Learner",
+      email: "learner@example.com",
+      password: " StrongPass1! ",
+      confirmPassword: " StrongPass1! ",
+      tos: true,
+    });
+
+    expect(error).toBeUndefined();
   });
 
   test("rejects unknown lesson progress fields", async () => {
