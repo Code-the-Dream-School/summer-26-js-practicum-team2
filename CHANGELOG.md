@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
 - Added rate-limiter contract coverage for register and login endpoint throttle behavior.
 - Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches.
-- Added backend CI upload of the coverage report artifact for easier debugging on failed or passing runs.
+- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs.
 
 ### Fixed
 
