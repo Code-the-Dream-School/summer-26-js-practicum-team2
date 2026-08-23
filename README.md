@@ -48,7 +48,7 @@ first-paycheck recent grad.
 <!--
 ## 📸 Screenshots
 
-<!-- Add screenshots or GIFs of key features here. -->
+Add screenshots or GIFs of key features here. -->
 
 ## 🛠 Tech Stack
 

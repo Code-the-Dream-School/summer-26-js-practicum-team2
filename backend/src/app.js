@@ -2,19 +2,20 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 
 // Middleware imports
 const jwtMiddleware = require("./middleware/jsonWebToken");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const notFoundMiddleware = require("./middleware/notFound");
+const { apiLimiter } = require("./middleware/rateLimiter");
 
 // Route imports
 const helloRoutes = require("./routes/hello.routes");
 const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
+const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
 
 // Create Express app
@@ -31,13 +32,6 @@ const parseAllowedOrigins = () => {
 
   return [...new Set([...configuredOrigins, ...fallbackOrigins])];
 };
-
-// Rate Limiting Configuration
-// Sets a limit of 100 requests per 15 minutes per IP address
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
 
 // CORS Configuration
 const allowedOrigins = parseAllowedOrigins();
@@ -62,13 +56,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan(morganConfig));
-app.use(limiter);
+app.use(apiLimiter);
 
 // Routes
 app.use("/api/hello", helloRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
+app.use("/api/v1/profile", jwtMiddleware, profileRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
 // Root route
 app.get("/", (req, res) => {

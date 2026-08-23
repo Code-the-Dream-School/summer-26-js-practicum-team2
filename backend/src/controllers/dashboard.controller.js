@@ -1,5 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
-const User = require("../models/User.model");
+const { User } = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const QuizAttempt = require("../models/QuizAttempt.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
