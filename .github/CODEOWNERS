@@ -1,11 +1,14 @@
 # GitHub process docs
+
 /.github/ @mnichols08
 
 # Application areas
+
 /frontend/ @berenicerojas @kwishart24 @mnichols08
 /backend/ @mnichols08 @BytesOfStrength
 
 # Shared docs and release notes
-/README.md @mntri4 @hectarek @mnichols08
-/CHANGELOG.md @mntri4 @hectarek @mnichols08
-/docs/ @mntri4 @hectarek @mnichols08
+
+/README.md @mnichols08
+/CHANGELOG.md @mnichols08
+/docs/ @mnichols08
