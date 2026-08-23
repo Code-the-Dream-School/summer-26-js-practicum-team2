@@ -16,7 +16,7 @@ const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const quizRoutes = require("./routes/quiz.routes");
-
+const onboardingRoutes = require("./routes/onboarding.routes");
 // Create Express app
 const app = express();
 
@@ -70,6 +70,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
+app.use("/api/v1/onboarding", onboardingRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application
