@@ -19,6 +19,7 @@ import Button from "../../../shared/Button/Button.component";
 import Card from "../../../shared/Card/Card.component";
 import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
 import LessonComponent from "../Lesson/Lesson.component";
+import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.component";
 
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
@@ -412,19 +413,12 @@ export default function LearnFlow({
           </>
         ) : (
           <>
-            {/* This is for the resume banner button */}
-            {savedProgress && !isAtLessonStart && (
-              <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4 ">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm font-medium">
-                    Welcome Back! Resuming "{currentStep.title}"
-                  </p>
-                  <Button variant="quizSecondary" onClick={handleStartOver}>
-                    Start Over
-                  </Button>
-                </div>
-              </Card>
-            )}
+            <LessonControlPanel
+              savedProgress={savedProgress}
+              isAtLessonStart={isAtLessonStart}
+              currentStep={currentStep}
+              onStartOver={handleStartOver}
+            />
             <LessonComponent
               title={titlesOverlap(learnData.title, currentStep.title) ? null : currentStep.title}
               eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
