@@ -75,16 +75,7 @@ it("respond with no matches message when search query has no results", () => {
 });
 });
 
-//Step 4. Accessiblity and Navigation 
-
-describe("GlossaryModal - Accessibility and Keyboard Navigation", () => {
-  it("closes modal when escape key is pressed", () => {
-    const handleClose = vi.fn();
-    render(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);
-    fireEvent.keyDown(window, { key: "Escape"});
-    expect(handleClose).toHaveBeenCalledTimes(1);
-  });
-});
+//Step 4.  Navigation 
 describe("GlossaryModal - Works Cited Tab and Navigation", ()=>{
   it("renders tab buttons and switches between Glossary and works cited tabs", () =>{
     render(
@@ -132,11 +123,10 @@ describe("GlossaryModal - Works Cited Tab and Navigation", ()=>{
 });
 //Accessibility 
 describe("GlossaryModal - Accessibility Attributes", () => {
-  it("has accessible dialog attributes and scroll region focus capability", () => {
+  it("renders within modal wrapper and keeps scroll region focus capability", () => {
 render(<GlossaryModal isOpen={true} onClose={vi.fn()} glossary={mockGlossData} />);
-const dialog =screen.getByRole("dialog", { name: "Module Glossary and Works Cited" });
-expect (dialog).toBeInTheDocument();
-expect(dialog).toHaveAttribute("aria-modal", "true");
+// confirm renders inside shared modal component
+expect(screen.getByTestId("mock-modal")).toBeInTheDocument();
 
 const scrollRegion =screen.getByRole("region", {
   name: "Glossary terms list with definitions",
@@ -144,7 +134,6 @@ const scrollRegion =screen.getByRole("region", {
 expect(scrollRegion).toHaveAttribute("tabIndex", "0");
   });
 });
-
 //step 5. Lesson isn't affected when glossary modal closes
 describe("GlossaryModal - Open or Closed State separate from Lesson State" , () => {
   it("does not render into the DOM when isOpen is false", () => {
@@ -159,12 +148,6 @@ describe("GlossaryModal - Open or Closed State separate from Lesson State" , () 
     fireEvent.change(searchInput, { target: { value: "Asset" } });
     expect(searchInput.value).toBe("Asset");
 
-    //Simulate close and reopen modal
-    //fireEvent.keyDown(window, { key: "Escape" });
-   /*rerender(<GlossaryModal isOpen={false} onClose={handleClose} glossary={mockGlossData} />);
-   expect(screen.queryByPlaceholderText("Search terms...")).not.toBeInTheDocument();
-   //reopen modal
-    rerender(<GlossaryModal isOpen={true} onClose={handleClose} glossary={mockGlossData} />);*/
  const closeBtn =screen.getByTestId("modal-close-btn");
  fireEvent.click(closeBtn);
  expect(handleClose).toHaveBeenCalledTimes(1);
