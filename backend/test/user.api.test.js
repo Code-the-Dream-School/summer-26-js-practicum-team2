@@ -3,6 +3,7 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const { withSessionCsrf } = require("./helpers/requestTestHelpers");
 
 useTestDb();
 
@@ -136,10 +137,11 @@ describe("user API integration", () => {
     expect(rootRes.headers.location).toBe(process.env.CLIENT_URL);
 
     // Send both the session cookie and matching CSRF token required by logout.
-    const logoutRes = await request(app)
-      .post("/api/v1/users/logout")
-      .set("Cookie", [`session_token=${token}`])
-      .set("x-csrf-token", "test-csrf");
+    const logoutRes = await withSessionCsrf(
+      request(app).post("/api/v1/users/logout"),
+      token,
+      "test-csrf",
+    );
 
     expect(logoutRes.status).toBe(200);
     expect(logoutRes.body.message).toContain("Logout successful");

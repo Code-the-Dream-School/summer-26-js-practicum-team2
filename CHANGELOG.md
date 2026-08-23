@@ -89,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs.
 - Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy).
 - Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites.
-
+- Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup.
 
 ### Fixed
 
