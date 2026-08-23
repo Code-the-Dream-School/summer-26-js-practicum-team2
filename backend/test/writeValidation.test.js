@@ -3,7 +3,11 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
-const { passwordSchema } = require("../src/validation/userValidation");
+const {
+  passwordSchema,
+  lessonProgressSchema,
+  quizSubmissionSchema,
+} = require("../src/validation/userValidation");
 
 useTestDb();
 
@@ -24,18 +28,38 @@ const expectValidationError = (response) => {
 };
 
 describe("write endpoint input validation", () => {
-  test("requires long passwords to include uppercase, lowercase, and numeric characters", () => {
+  test("accepts supported password policy variants while rejecting weak passwords", () => {
     expect(passwordSchema.validate("YxNqSSe9uqCCVAEx").error).toBeUndefined();
+    expect(passwordSchema.validate("StrongPass1!").error).toBeUndefined();
     expect(passwordSchema.validate("longpasswordwithoutnumber").error).toBeDefined();
+    expect(passwordSchema.validate("Password1 ").error).toBeDefined();
     expect(passwordSchema.validate("weakpass").error).toBeDefined();
   });
 
-  test("rejects invalid lesson progress payloads", async () => {
-    // Send the wrong type for moduleId along with a field the endpoint does not support.
+  test("rejects unknown lesson progress fields", async () => {
     const response = await request(app)
       .patch("/api/v1/lessons/progress")
       .set(authHeader())
-      .send({ moduleId: 42, unexpected: true });
+      .send({ lessonId: "1.1", unexpected: true });
+
+    expectValidationError(response);
+    expect(response.body.errors.join(" ")).toContain("unexpected");
+  });
+
+  test("requires a lesson or micro-lesson ID", async () => {
+    const response = await request(app)
+      .patch("/api/v1/lessons/progress")
+      .set(authHeader())
+      .send({ moduleId: "cashFlow" });
+
+    expectValidationError(response);
+  });
+
+  test("rejects invalid lesson progress module IDs", async () => {
+    const response = await request(app)
+      .patch("/api/v1/lessons/progress")
+      .set(authHeader())
+      .send({ moduleId: 42, lessonId: "1.1" });
 
     expectValidationError(response);
   });
@@ -43,6 +67,13 @@ describe("write endpoint input validation", () => {
   test("rejects quiz starts without a micro-lesson ID", async () => {
     // Leave out the required microLessonId before the request reaches quiz logic.
     const response = await request(app).post("/api/v1/quizzes/start").set(authHeader()).send({});
+
+    expectValidationError(response);
+    expect(response.body.errors.join(" ")).toContain("required");
+  });
+
+  test("rejects quiz starts with a missing request body", async () => {
+    const response = await request(app).post("/api/v1/quizzes/start").set(authHeader());
 
     expectValidationError(response);
     expect(response.body.errors.join(" ")).toContain("required");
@@ -96,5 +127,15 @@ describe("write endpoint input validation", () => {
       .send({ type: "cache_bypass" });
 
     expectValidationError(response);
+  });
+
+  test("accepts valid lesson progress and quiz submission payloads", () => {
+    expect(lessonProgressSchema.validate({ lessonId: "1.1" }).error).toBeUndefined();
+    expect(
+      quizSubmissionSchema.validate({
+        attemptId: new mongoose.Types.ObjectId().toString(),
+        answers: { "question-1": "answer-1" },
+      }).error,
+    ).toBeUndefined();
   });
 });
