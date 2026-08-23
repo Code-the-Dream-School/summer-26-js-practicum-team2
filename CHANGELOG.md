@@ -13,33 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added core rules and tests for XP calculations and lesson unlocking
-- Added user API integration tests for registration, verification, and login
-- Added lesson and dashboard API integration tests
-- Added integration tests for lesson progress and dashboard reconciliation
-- Added integration coverage for completing lessons after all required quizzes are passed
-- Added integration coverage for the hello endpoint, root redirect, and authenticated logout
-- Added integration coverage for retrieving and verifying saved quiz progress
-- Added integration coverage for processing supported dashboard events
-- Added integration test coverage for backend API error handling and negative paths, including missing/invalid/expired authentication, CSRF validation, invalid lesson progress, quiz submission errors, and duplicate submission conflict handling
-- Added backend Jest coverage guardrails with a dedicated coverage script and global thresholds to prevent test-coverage regression
-- Added backend CI enforcement for test coverage thresholds by running the coverage test command in the backend workflow job
-- Added integration test coverage for rejecting logout requests with mismatched CSRF tokens
-- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID
-- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID.
-- Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
-- Added rate-limiter contract coverage for register and login endpoint throttle behavior.
-- Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches.
-- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs.
-- Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy).
-- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites.
+- Added `backend/src/utils/coreRules.js` with coverage for XP caps and award rules, streak/freeze status, and lesson-unlock gating.
+- Added end-to-end backend API coverage for user auth flows (register, verify email, login/logout, forgot/reset password), lesson/dashboard progress flows, and quiz-progress persistence.
+- Added negative-path API coverage for missing, malformed, and expired auth; CSRF mismatches; invalid lesson progress payloads; missing lesson/module resources; and duplicate quiz submissions.
+- Added middleware and error-contract test coverage for 404 and malformed JSON responses, Helmet headers (including CSP and referrer-policy), rate-limiter behavior for register/login, and stable error payload mappings.
+- Added a shared backend auth test helper to reduce repeated authenticated-user setup across integration suites.
+- Added backend coverage guardrails via `test:coverage` and Jest global thresholds (statements: 85, branches: 60, functions: 90, lines: 85).
+- Added CI artifacts for frontend tests, frontend build output, and backend coverage to improve diagnostics in pull-request runs.
 
+### Changed
+
+- Updated CI pull-request trigger branches from `docs` to `main`.
+- Switched backend CI test execution to the coverage-enforced command (`npm --prefix backend run test:coverage`).
 
 ### Fixed
 
-- Fixed error handler middleware signature to include next parameter
+- Fixed error-handler middleware signature to include the Express `next` parameter for middleware contract compatibility.
 
 ---
+
+## [0.3.5] - 2026-08-20
+
+### Added
+
+- Added a failing test reproducing the refresh-redirect bug where an authenticated user on the Learn page was sent to login before auth storage finished hydrating
+
+### Fixed
+
+- Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
 
 ## [0.3.4] - 2026-08-19
 
