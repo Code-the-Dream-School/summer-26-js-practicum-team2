@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added chunk-level lesson progress tracking so learners can resume at the exact lesson, micro-lesson, and chunk they left off on
+- Added a lesson progress restart endpoint and frontend API helper for restarting saved progress
+- Added `LessonControlPanel` with a welcome-back message and --Start Over-- option when resuming saved lesson progress
+- Added backend regression and validation tests for lesson progress creation, updates, restarting, and invalid requests
+- Added frontend regression tests for lesson resume, restart, progress syncing, and `LessonControlPanel` behavior
+- Added the lesson progress restart endpoint to the API documentation and Postman collection
+
+### Changed
+
+- Updated Learning Path navigation to pass the selected micro-lesson into the lesson flow and changed the current lesson action from --Next-- to --Resume--
+- Updated lesson progress syncing to save the learner's current chunk along with the lesson and micro-lesson
+- Updated global API rate limiting to allow 200 requests per 15 minutes in production and use a higher limit during development
+
+### Fixed
+
+- Fixed lesson resume behavior so saved progress returns learners to the correct micro-lesson and chunk instead of restarting at the beginning of the micro-lesson
+- Fixed learning path resume navigation to open the learner's current micro-lesson instead of only opening the containing lesson
+
+
+---
+
 ## [0.3.5] - 2026-08-20
 
 ### Added
@@ -18,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
+
+---
+
 ## [0.3.4] - 2026-08-19
 
 ### Added
