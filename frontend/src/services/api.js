@@ -132,6 +132,14 @@ export const updateLessonProgress = ({
     basePath: LESSONS_BASE_PATH,
   });
 
+export const restartLessonProgress = ({ moduleId, csrfToken }) =>
+  apiRequest("/progress/restart", {
+    method: "PATCH",
+    csrfToken,
+    body: { moduleId },
+    basePath: LESSONS_BASE_PATH,
+  });
+
 export const getQuizProgress = () =>
   apiRequest("/progress", {
     method: "GET",

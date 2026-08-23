@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import { updateLessonProgress } from "../../../services/api";
+import { updateLessonProgress, restartLessonProgress } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -49,13 +49,32 @@ export default function LearnFlow({
   characterImages,
   guideImage,
   savedProgress = null,
+  selectedMicroLessonId = null,
   csrfToken,
   isReadOnly = false,
 }) {
   const { lessonSteps } = learnData;
 
-  const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
-  const [chunkIndex, setChunkIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(() => {
+    if (selectedMicroLessonId) {
+      const index = lessonSteps.findIndex((step) => step.id === selectedMicroLessonId);
+
+      if (index >= 0) {
+        return index;
+      }
+    }
+
+    return getResumeIndex(lessonSteps, savedProgress);
+  });
+
+  //For the resume button to make sure you jump back to the right chunk
+  const shouldResumeChunk =
+    !selectedMicroLessonId || selectedMicroLessonId === savedProgress?.currentMicroLessonId;
+
+  const resumeChunkIndex = shouldResumeChunk ? (savedProgress?.currentChunkIndex ?? 0) : 0;
+
+  const [chunkIndex, setChunkIndex] = useState(() => resumeChunkIndex);
+
   const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
@@ -69,6 +88,8 @@ export default function LearnFlow({
   const currentChunk = chunks[chunkIndex];
   const currentMicroLessonId = currentStep?.id;
   const canSyncProgress = !isReadOnly && Boolean(csrfToken);
+
+  const isAtLessonStart = stepIndex === 0 && chunkIndex === 0 && phase === "lesson";
 
   const currentStepQuestions = useMemo(
     () => learnData.questions.filter((question) => question.lessonStepId === currentMicroLessonId),
@@ -90,11 +111,19 @@ export default function LearnFlow({
       moduleId: learnData.moduleId,
       lessonId: learnData.id,
       microLessonId: currentMicroLessonId,
+      currentChunkIndex: chunkIndex,
       csrfToken,
     }).catch(() => {
       // A dropped position update should never interrupt the lesson.
     });
-  }, [canSyncProgress, csrfToken, currentMicroLessonId, learnData.id, learnData.moduleId]);
+  }, [
+    canSyncProgress,
+    csrfToken,
+    currentMicroLessonId,
+    learnData.id,
+    learnData.moduleId,
+    chunkIndex,
+  ]);
 
   useEffect(() => {
     function handleStorageChange() {
@@ -210,6 +239,21 @@ export default function LearnFlow({
       const previousStep = lessonSteps[stepIndex - 1];
       setStepIndex((current) => current - 1);
       setChunkIndex(Math.max(countChunks(previousStep) - 1, 0));
+    }
+  }
+
+  async function handleStartOver() {
+    try {
+      await restartLessonProgress({
+        moduleId: learnData.moduleId,
+        csrfToken,
+      });
+
+      setStepIndex(0);
+      setChunkIndex(0);
+      setPhase("lesson");
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -368,6 +412,19 @@ export default function LearnFlow({
           </>
         ) : (
           <>
+            {/* This is for the resume banner button */}
+            {savedProgress && !isAtLessonStart && (
+              <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4 ">
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm font-medium">
+                    Welcome Back! Resuming "{currentStep.title}"
+                  </p>
+                  <Button variant="quizSecondary" onClick={handleStartOver}>
+                    Start Over
+                  </Button>
+                </div>
+              </Card>
+            )}
             <LessonComponent
               title={titlesOverlap(learnData.title, currentStep.title) ? null : currentStep.title}
               eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
