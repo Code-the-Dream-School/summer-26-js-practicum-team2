@@ -2,32 +2,9 @@ const jwt = require("jsonwebtoken");
 const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
-const User = require("../src/models/User.model");
+const { createAuthedUser } = require("./helpers/authTestHelpers");
 
 useTestDb();
-
-// Creates a verified learner and gives us authentication values so each negative-path test can focus on the failure being tested.
-async function createAuthedUser(name = "Negative Path User", email = "negative-path@example.com") {
-  const user = await User.create({
-    name,
-    email,
-    password_hash: "not-a-real-hash",
-    role: "learner",
-    tos_agreement: true,
-    email_verified_at: new Date(),
-  });
-
-  // Create a valid token so authentication itself is not what causes the request to fail.
-  const token = jwt.sign(
-    { id: user._id.toString(), role: user.role, csrfToken: "test-csrf" },
-    process.env.JWT_SECRET,
-  );
-
-  return {
-    token,
-    authHeader: `Bearer ${token}`,
-  };
-}
 
 describe("backend API negative paths", () => {
   it("rejects protected routes when no authentication is provided", async () => {

@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches.
 - Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs.
 - Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy).
+- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites.
+
 
 ### Fixed
 
