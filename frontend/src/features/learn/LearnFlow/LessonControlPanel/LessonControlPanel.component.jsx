@@ -16,13 +16,15 @@ export default function LessonControlPanel({
   onStartOver,
 }) {
   // If the user has saved progress and is not at the start of the lesson, show a card with a "Start Over" button.
-  if (savedProgress && !isAtLessonStart)
-    return (
-      <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4 ">
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm font-medium">Welcome Back! Resuming "{currentStep.title}"</p>
-          <StartOverButton onStartOver={onStartOver} />
-        </div>
-      </Card>
-    );
+  const showResumeBanner = savedProgress && !isAtLessonStart;
+  if (!showResumeBanner) return null;
+
+  return (
+    <Card className="mt-4 mb-4 border-primary/20 bg-primary/5 p-4 ">
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm font-medium">Welcome Back! Resuming "{currentStep.title}"</p>
+        <StartOverButton onStartOver={onStartOver} />
+      </div>
+    </Card>
+  );
 }
