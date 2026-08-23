@@ -1,40 +1,11 @@
-const jwt = require("jsonwebtoken");
 const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
-const User = require("../src/models/User.model");
 const QuizAttempt = require("../src/models/QuizAttempt.model");
 const UserProgress = require("../src/models/UserProgress.model");
+const { createAuthedUser } = require("./helpers/authTestHelpers");
 
 useTestDb();
-
-// Creates a basic verified learner and gives us a token so each test does not have to repeat all of this setup
-async function createAuthedUser(name = "Progress User", email = "progress-user@example.com") {
-  const user = await User.create({
-    name,
-    email,
-    password_hash: "not-a-real-hash",
-    role: "learner",
-    tos_agreement: true,
-    email_verified_at: new Date(),
-  });
-
-  // Create the same kind of JWT our protected routes expect.
-  const token = jwt.sign(
-    {
-      id: user._id.toString(),
-      role: user.role,
-      csrfToken: "test-csrf",
-    },
-    process.env.JWT_SECRET,
-  );
-
-  // Return both since some tests need the user record while others only need authentication.
-  return {
-    user,
-    authHeader: `Bearer ${token}`,
-  };
-}
 
 describe("lesson and dashboard API integration", () => {
   it("returns progress data and updates the active lesson cursor", async () => {
