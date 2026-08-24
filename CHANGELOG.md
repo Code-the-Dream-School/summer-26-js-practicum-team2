@@ -26,14 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added backend CI enforcement for test coverage thresholds by running the coverage test command in the backend workflow job
 - Added integration test coverage for rejecting logout requests with mismatched CSRF tokens
 - Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID
-- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID.
 - Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
-- Added rate-limiter contract coverage for register and login endpoint throttle behavior.
-- Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches.
-- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs.
-- Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy).
-- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites.
-- Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup.
+- Added rate-limiter contract coverage for register and login endpoint throttle behavior
+- Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches
+- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs
+- Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy)
+- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites
+- Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup
+- Added frontend hook test coverage for restoring saved authentication, logging in with remembered sessions, and clearing auth state on logout
 
 ### Fixed
 
