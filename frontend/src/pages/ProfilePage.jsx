@@ -189,7 +189,7 @@ export default function ProfilePage() {
         </form>
       </Card>
 
-      {/* Danger Zone
+      {/* Danger Zone - Don't comment in we are no longer using this
       <div className="space-y-4 rounded-2xl border-2 border-dashed border-danger/40 bg-danger/5 p-6">
         <header className="space-y-1">
           <h2 className="font-heading text-h4 font-bold text-danger">
@@ -217,9 +217,9 @@ export default function ProfilePage() {
             className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
           >
             {pending === "delete" ? "Deleting..." : "Delete Account"}
-    //       </Button> */}
-    {/* //     </form> */}
-    {/* //   </div> */}
+       </Button>
+    </form>
+    </div> */}
     </section>
   );
 }
