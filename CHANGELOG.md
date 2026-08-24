@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added frontend hook test coverage for restoring saved authentication, logging in with remembered sessions, and clearing auth state on logout
 - Added frontend integration test coverage for login redirects, login errors, successful registration, and registration conflict errors
 - Added frontend integration test coverage for password reset requests and protected route access for authenticated and unauthenticated users.
+- Added frontend hook test coverage for dashboard loading, session caching, and refreshing cached data after progress updates.
 
 ### Fixed
 
