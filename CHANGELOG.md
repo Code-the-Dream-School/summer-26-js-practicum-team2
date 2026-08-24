@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites
 - Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup
 - Added frontend hook test coverage for restoring saved authentication, logging in with remembered sessions, and clearing auth state on logout
+- Added frontend integration test coverage for login redirects, login errors, successful registration, and registration conflict errors
 
 ### Fixed
 
