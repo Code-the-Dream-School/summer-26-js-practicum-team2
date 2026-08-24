@@ -1,12 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const User = require("../models/User.model.js");
 
-/* pseudocode: get the authenticated user's ID attached by JWTMIddleware 
-    2. get's the user from the mongoDB filtering only by the onboarding subdocument
-    3.handle edge case if user doesn't exist
-    return success status with onboarding DataTransfer
-    pass errors to error handling skipMiddlewareFunction*/
-
 //GET /api/v1/onboarding
 const getOnboardingState = async (req, res, next) => {
   try {
@@ -25,16 +19,6 @@ const getOnboardingState = async (req, res, next) => {
 };
 
 //PATCH /api/v1/onboarding (receives updates from frontend when a user moves to next step or new step or dismisses a tour or completes all tours)
-/*1. get user id from req.user via jwt middleware
-2. Define the expected fields  from the JSON response body we are interested in which will need to be sent via front end to update any Selection
-get the user information from the mongoDB  by finding by the id 
-handle edge case if user doesnt' exist
-otherwise wait for user to start onboarding and record today's date
-validate and update specific page TOO_MANY_REQUESTS
-if not valid tourkeys as in pages to ViewTransition, give a code for a bad request and a json message
-send information for which step user is in and if user dismissed tour KeyboardEvent
-mark total dismissed and  all complete , save the user information for the dataabase
-send an okay status update from JSON */
 
 const updateOnboardingProgress = async (req, res, next) => {
   try {
@@ -68,7 +52,8 @@ const updateOnboardingProgress = async (req, res, next) => {
       tours.learningPath.dismissed &&
       tours.lessonPage.dismissed &&
       tours.profilePage.dismissed;
-    //how many total onboarding completed
+
+    //how many total onboarding completed or dismissed 
     if ((markAllComplete || allDismissed) && !user.onboarding.is_completed) {
       user.onboarding.is_completed = true;
       user.onboarding.completed_at = new Date();
@@ -83,7 +68,7 @@ const updateOnboardingProgress = async (req, res, next) => {
   }
 };
 
-//POST /api/v1/onboarding
+//POST /api/v1/onboarding/reset
 //reset onboarding document to initial state
 
 const resetOnboardingProgress = async (req, res, next) => {
