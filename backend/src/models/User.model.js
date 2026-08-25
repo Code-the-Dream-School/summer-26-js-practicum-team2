@@ -97,7 +97,7 @@ const userSchema = new mongoose.Schema(
     },
     //archival status
     is_archived: { type: Boolean, default: false },
-    archived_at: {type: Date, default: null },
+    archived_at: { type: Date, default: null },
 
     //admin verification for deletion
     deletion_status: {
@@ -107,14 +107,14 @@ const userSchema = new mongoose.Schema(
     },
     deletion_requested_at: {
       type: Date,
-      default: null
+      default: null,
     },
     deletion_approved_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: null
+      default: null,
     },
-    reactivation_token: { type: String, select: false},
+    reactivation_token: { type: String, select: false },
     reactivation_expires_at: { type: Date },
   },
   {
@@ -122,16 +122,19 @@ const userSchema = new mongoose.Schema(
   },
 );
 //auto middleware: excludes archived/deleted users from normal search queries. hides the users marked is_archived. $ne: true in MongoDB means not equal to : true
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^find/, function () {
   const queryFilter = this.getFilter();
+  const multipleExclusionConditions = {};
 
-if(queryFilter.is_archived === undefined) {
-  this.find({ is_archived: { $ne: true}});
-}
-if(queryFilter.is_deleted === undefined) {
-  this.find({ is_deleted: { $ne: true } });
-}
-next();
+  if (queryFilter.is_archived === undefined) {
+    multipleExclusionConditions.is_archived = { $ne: true };
+  }
+  if (queryFilter.is_deleted === undefined) {
+    multipleExclusionConditions.is_deleted = { $ne: true };
+  }
+  if (Object.keys(multipleExclusionConditions).length > 0) {
+    this.find(multipleExclusionConditions);
+  }
 });
 /* ====== Removed archivedUserSchema because we created a flag directly in the user Schema
 const archivedUserSchema = new mongoose.Schema(
@@ -154,10 +157,10 @@ const archivedUserSchema = new mongoose.Schema(
   },
 );*/
 userSchema.index({ deletion_status: 1 });
-userSchema.index({ reactivation_token: 1});
+userSchema.index({ reactivation_token: 1 });
 
 const User = mongoose.model("User", userSchema);
 //const ArchivedUser = mongoose.model("ArchivedUser", archivedUserSchema);
 
 //module.exports = { User, ArchivedUser };
-module.exports = {User};
+module.exports = User;
