@@ -64,7 +64,10 @@ function RequestResetForm() {
       </form>
 
       {notice && (
-        <p className="mt-4 break-all rounded-xl bg-primary-alt/30 p-3 text-small text-heading">
+        <p
+          role="status"
+          className="mt-4 break-all rounded-xl bg-primary-alt/30 p-3 text-small text-heading"
+        >
           {notice}
         </p>
       )}
