@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - development
-      - docs
+      - main
   workflow_dispatch:
 
 jobs:
@@ -30,10 +30,29 @@ jobs:
         run: npm --prefix frontend run lint
 
       - name: Run frontend test checks
-        run: npm --prefix frontend run test
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm --prefix frontend run test 2>&1 | tee frontend/test-results/vitest-output.txt
+
+      - name: Upload frontend test artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-report
+          path: frontend/test-results
+          if-no-files-found: warn
 
       - name: Run frontend build checks
         run: npm --prefix frontend run build
+
+      - name: Upload frontend build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-report
+          path: frontend/dist
+          if-no-files-found: warn
 
   backend:
     name: Backend checks
@@ -56,8 +75,16 @@ jobs:
       - name: Run backend lint checks
         run: npm --prefix backend run lint
 
-      - name: Run backend test checks
-        run: npm --prefix backend run test
+      - name: Run backend coverage-enforced test checks
+        run: npm --prefix backend run test:coverage
+
+      - name: Upload backend coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/coverage
+          if-no-files-found: warn
 
       - name: Run backend syntax checks
         run: |

@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+### [Unreleased]
+
+### Added
+
+- Added `backend/src/utils/coreRules.js` with coverage for XP caps and award rules, streak/freeze status, and lesson-unlock gating.
+- Added end-to-end backend API coverage for user auth flows (register, verify email, login/logout, forgot/reset password), lesson/dashboard progress flows, and quiz-progress persistence.
+- Added negative-path API coverage for missing, malformed, and expired auth; CSRF mismatches; invalid lesson progress payloads; missing lesson/module resources; and duplicate quiz submissions.
+- Added middleware and error-contract test coverage for 404 and malformed JSON responses, Helmet headers (including CSP and referrer-policy), rate-limiter behavior for register/login, and stable error payload mappings.
+- Added a shared backend auth test helper to reduce repeated authenticated-user setup across integration suites.
+- Added backend coverage guardrails via `test:coverage` and Jest global thresholds (statements: 85, branches: 60, functions: 90, lines: 85).
+- Added CI artifacts for frontend tests, frontend build output, and backend coverage to improve diagnostics in pull-request runs.
+
+### Changed
+
+- Updated CI pull-request trigger branches from `docs` to `main`.
+- Switched backend CI test execution to the coverage-enforced command (`npm --prefix backend run test:coverage`).
+
+### Fixed
+
+- Fixed error-handler middleware signature to include the Express `next` parameter for middleware contract compatibility.
+
+---
+
 ## [0.3.5] - 2026-08-20
 
 ### Added
@@ -18,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
+
 ## [0.3.4] - 2026-08-19
 
 ### Added
@@ -27,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Combines sync-shared-files into a single GitHub workflow file
-- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend
 
 ### Removed
 

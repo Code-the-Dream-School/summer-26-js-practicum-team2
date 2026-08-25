@@ -27,7 +27,8 @@
     "dev": "nodemon server",
     "start": "node server",
     "test": "cross-env NODE_ENV=test jest --runInBand",
-    "lint": "eslint . --max-warnings 0 && node -e \"console.log('✅ ESLint checks passed successfully')\"",
+    "test:coverage": "cross-env NODE_ENV=test jest --runInBand --coverage",
+    "lint": "eslint . --max-warnings 0 && node -e \"console.log('ESLint checks passed successfully')\"",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
@@ -66,7 +67,15 @@
     "testEnvironment": "node",
     "testMatch": [
       "<rootDir>/test/**/*.test.js"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 85,
+        "branches": 60,
+        "functions": 90,
+        "lines": 85
+      }
+    }
   },
   "allowScripts": {
     "mongodb-memory-server@10.4.3": true,
