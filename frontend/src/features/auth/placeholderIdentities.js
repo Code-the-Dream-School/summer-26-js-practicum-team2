@@ -11,7 +11,6 @@ const identities = [
   { name: "Fiona Finance", email: "fiona@expertcapital.com" },
   { name: "Benny Bucks", email: "venmo-me@peer2peer.xyz" },
   { name: "Sally Saver", email: "retirementgoals2050@nestegg.org" },
-  { name: "Charlie Ching", email: "cha-ching@moneycomic.net" },
 ];
 
 export const pickPlaceholderIdentity = () =>

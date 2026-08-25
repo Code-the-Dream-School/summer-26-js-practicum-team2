@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
-    "name": "Local Backend API",
-    "description": "Requests for testing the local Express backend during development.",
+    "name": "Sprout API",
+    "description": "Requests for testing the Sprout API.",
     "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
