@@ -1,7 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
-const jwtMiddleware = require("../middleware/jsonWebToken");
 const {authenticateUser, authorizeRoles} = require("../middleware/jsonWebToken");
 const {
   getPendingDeleteAccount,
@@ -13,19 +11,11 @@ const {
 router.use(authenticateUser, authorizeRoles("admin"));
 
 //Admin endpoints;
-// GET /api/v1/users/register
-router.post("/register", registerLimiter, register);
-// GET/ verify ? token = (new endpoint for email verification link clicks)
-router.get("/verify", verifyEmail);
-// POST /api/v1/users/reactivate
-router.post("/reactivate", reactivate);
-// POST /api/v1/users/login
-router.post("/login", loginLimiter, login);
-// POST /api/v1/users/logout
-router.post("/logout", jwtMiddleware, logout);
-// POST /api/v1/users/forgot-password
-router.post("/forgot-password", forgotPassword);
-// POST /api/v1/users/reset-password
-router.post("/reset-password", resetPassword);
+// GET /api/v1/admin/deletions/pending
+router.get("/deletions/pending", getPendingDeleteAccount);
+//POST /api/v1/admin/deletions/approve/:userId
+router.post("/deletions/approve/:userId", approveDeleteAccount);
+//POST /api/v1/admin/deletions/deny/:userId
+router.post("/deletions/deny/:userId", rejectDeleteAccount);
 
 module.exports = router;
