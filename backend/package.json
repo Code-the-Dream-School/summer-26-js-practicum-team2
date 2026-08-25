@@ -51,7 +51,7 @@
     "sprout": "file:.."
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^10.0.1",
     "cross-env": "^7.0.3",
     "eslint": "^10.9.0",
     "eslint-config-prettier": "^10.1.8",
