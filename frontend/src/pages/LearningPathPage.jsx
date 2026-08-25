@@ -7,6 +7,10 @@ import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNod
 import Button from "../shared/Button/Button.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 
+// Import onboarding overlay component
+import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
+
+
 function getMicroLessonPreview(content = []) {
   return content
     .filter(
@@ -18,7 +22,7 @@ function getMicroLessonPreview(content = []) {
     .join(" ");
 }
 
-function LearningPathPage() {
+export default function LearningPathPage({onboarding}) {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
@@ -393,6 +397,16 @@ function LearningPathPage() {
             </Button>
           )}
         </div>
+
+        {/* onboarding Path */}
+        {onboarding && !onboarding.hasCompleted && (
+        <OnboardingOverlay
+          currentStep={onboarding.currentStep}
+          activePage={onboarding.activePage}
+          pageName="lessonPath"
+          onNext={onboarding.handleNextStep}
+        />
+      )}
       </footer>
     </div>
   );

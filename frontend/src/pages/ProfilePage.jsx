@@ -15,6 +15,9 @@ import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 
+// I imported the onboarding overlay
+import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
+
 const errorMessage = (error) =>
   error.errors?.length ? error.errors.join(" ") : error.message || "uh oh spaghetti-o";
 
@@ -27,7 +30,8 @@ const Stat = ({label, value}) => {
   );
 };
 
-export default function ProfilePage() {
+// i passed in the onboarding 
+export default function ProfilePage({onboarding}) {
   const { csrfToken } = useAuthContext();
   const [profile, setProfile] = useState(null);
 
@@ -97,7 +101,9 @@ export default function ProfilePage() {
       setPending("");
     }
   };
-
+   
+  // Please create a simple frontend action for "Goals" like a radio dial option for
+  // users to choose from. Once a week, twice, three times max.
 
   // const deleteAccount = async(event) => {
   //   event.preventDefault();
@@ -220,6 +226,15 @@ export default function ProfilePage() {
        </Button>
     </form>
     </div> */}
+
+          {!loading && onboarding && !onboarding.hasCompleted && (
+        <OnboardingOverlay
+          currentStep={onboarding.currentStep}
+          activePage={onboarding.activePage}
+          pageName="profile"
+          onNext={onboarding.handleNextStep}
+        />
+      )}
     </section>
   );
 }

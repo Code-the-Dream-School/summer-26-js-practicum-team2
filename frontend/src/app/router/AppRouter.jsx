@@ -17,7 +17,7 @@ import PrivacyPage from "../../pages/PrivacyPage";
 import TermsPage from "../../pages/TermsPage";
 import NotFoundPage from "../../pages/NotFoundPage";
 
-export default function AppRouter() {
+export default function AppRouter({}) {
   return (
     <Routes>
       <Route element={<MainLayout />}>
