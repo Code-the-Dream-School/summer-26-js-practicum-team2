@@ -27,8 +27,6 @@ function calculateXpDelta({
     lesson_complete: { amount: 20 },
     quiz_pass: { amount: 10 },
     quiz_perfect: { amount: 5 },
-    // review_complete: { amount: 15 },
-    // daily_goal_met: { amount: 5 },
   };
 
   const rule = rules[eventType];
@@ -84,4 +82,37 @@ function getConsecutiveRunLength(activeSet, endKey, timezone = "UTC") {
   }
 
   return streak;
+}
+
+//Calculating Streaks removed freeze capabilities
+function calculateStreakStatus({ activeDates = [], today = new Date(), timezone = "UTC" } = {}) {
+  const activeSet = new Set(
+    activeDates.map((value) => toDateKey(value, timezone)).filter((value) => value !== null),
+  );
+
+  const todayKey = toDateKey(today, timezone);
+  const yesterday = new Date(`${todayKey}T00:00:00Z`);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayKey = toDateKey(yesterday);
+
+  const sortedDates = [...activeSet].sort();
+  const lastActiveDate = sortedDates.filter((dateKey) => dateKey <= todayKey).at(-1) || null;
+
+  const currentStreak = lastActiveDate
+    ? getConsecutiveRunLength(activeSet, lastActiveDate, timezone)
+    : 0;
+  const longestStreak = sortedDates.reduce((max, dateKey) => {
+    let streak = 1;
+    let cursor = new Date(`${dateKey}T00:00:00Z`);
+    while (true) {
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+      const nextKey = toDateKey(cursor);
+      if (!activeSet.has(nextKey)) break;
+      streak += 1;
+    }
+    return Math.max(max, streak);
+  }, 0);
+
+  return;
+  (currentStreak, longestStreak);
 }
