@@ -68,4 +68,28 @@ describe("learn flow", () => {
     expect(screen.getByText("Correct")).toBeInTheDocument();
     expect(screen.getByText(/Cash flow describes money moving in and out\./)).toBeInTheDocument();
   });
+
+  it("shows the passed score and registration call-to-action after a preview quiz", async () => {
+    const user = userEvent.setup();
+
+    // Render the lesson as a preview so finishing the quiz leads to the registration prompt.
+    render(
+      <MemoryRouter>
+        <LearnFlow learnData={learnData} characterImages={{}} guideImage="guide.png" isReadOnly />
+      </MemoryRouter>,
+    );
+
+    // Complete the quick check with the correct answer and open the results.
+    await user.click(screen.getByRole("button", { name: "Quick check" }));
+    await user.click(screen.getByRole("radio", { name: /Money moving in and out/i }));
+    await user.click(screen.getByRole("button", { name: "Check answer" }));
+    await user.click(screen.getByRole("button", { name: "View results" }));
+
+    // A passing preview should show the score and encourage the visitor to register.
+    expect(screen.getByText(/Score: 100% — Pass/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Register to keep learning" })).toHaveAttribute(
+      "href",
+      "/register",
+    );
+  });
 });
