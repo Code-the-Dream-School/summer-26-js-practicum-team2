@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
 const { getModule, getLesson } = require("../utils/content");
+const { lessonProgressSchema, validateRequest } = require("../validation/userValidation");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -86,13 +87,9 @@ exports.getLessonProgress = async (req, res, next) => {
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
 exports.updateLessonProgress = async (req, res, next) => {
   try {
-    const { moduleId = DEFAULT_MODULE_ID, lessonId, microLessonId } = req.body;
-
-    if (!lessonId && !microLessonId) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "lessonId or microLessonId is required.",
-      });
-    }
+    const validatedBody = validateRequest(res, lessonProgressSchema, req.body);
+    if (!validatedBody) return;
+    const { moduleId, lessonId, microLessonId } = validatedBody;
 
     if (!getModule(moduleId)) {
       return res.status(StatusCodes.NOT_FOUND).json({
