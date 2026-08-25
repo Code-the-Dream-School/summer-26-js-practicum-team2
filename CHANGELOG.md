@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added frontend component test coverage for rendering dashboard content and showing the empty state for new learners
 - Added frontend integration test coverage for last-lesson redirects using API results and cached fallback paths
 - Added frontend integration test coverage for sample lesson previews and redirecting unauthenticated learners to login
+- Added frontend integration test coverage for lesson navigation and immediate quiz answer feedback.
 
 
 ### Fixed
