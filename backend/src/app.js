@@ -5,7 +5,8 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
 // Middleware imports
-const jwtMiddleware = require("./middleware/jsonWebToken");
+//const jwtMiddleware = require("./middleware/jsonWebToken"); - need to remove with admin update
+const { authenticateUser: jwtMiddleware } = require("./middleware/jsonWebToken");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const notFoundMiddleware = require("./middleware/notFound");
 const { apiLimiter } = require("./middleware/rateLimiter");
