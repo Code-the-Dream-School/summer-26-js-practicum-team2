@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.3.6] - 2026-08-25
+
+### Added
+
+- Added focused backend integration tests for invalid lesson progress, quiz, password recovery, and dashboard event requests
+- Added backend write-endpoint validation tests covering body-less requests and valid schema regression cases
+- Added reusable Joi schemas and request validation helpers for backend write endpoint validation
+- Added frontend password policy coverage with schema tests and form-level integration tests
+- Added shared frontend password helper-text utility for registration and password reset forms
+- Added documentation for write endpoint validation and the standard validation error response
+
+### Changed
+
+- Validated backend lesson progress, quiz, password recovery, and dashboard event inputs before processing or persistence
+- Updated password validation to accept 16+ character passwords with uppercase, lowercase, and numeric characters; shorter passwords require a special character
+- Updated registration and password reset helper text to render conditionally based on password length using shared logic
+
+### Fixed
+
+- Fixed validation behavior for missing request bodies so empty payloads consistently return structured 400 validation responses
+- Fixed short-password special-character handling so whitespace does not satisfy the symbol requirement
+
+---
+
 ## [0.3.5] - 2026-08-20
 
 ### Added
@@ -18,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
+
 ## [0.3.4] - 2026-08-19
 
 ### Added
@@ -27,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Combines sync-shared-files into a single GitHub workflow file
-- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend
 
 ### Removed
 
