@@ -94,6 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added frontend integration test coverage for password reset requests and protected route access for authenticated and unauthenticated users.
 - Added frontend hook test coverage for dashboard loading, session caching, and refreshing cached data after progress updates.
 
+
 ### Fixed
 
 - Fixed error handler middleware signature to include next parameter
