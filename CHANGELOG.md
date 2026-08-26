@@ -9,6 +9,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+### [Unreleased]
+
+### Added
+
+- Added core rules and tests for XP calculations and lesson unlocking
+- Added user API integration tests for registration, verification, and login
+- Added lesson and dashboard API integration tests
+- Added integration tests for lesson progress and dashboard reconciliation
+- Added integration coverage for completing lessons after all required quizzes are passed
+- Added integration coverage for the hello endpoint, root redirect, and authenticated logout
+- Added integration coverage for retrieving and verifying saved quiz progress
+- Added integration coverage for processing supported dashboard events
+- Added integration test coverage for backend API error handling and negative paths, including missing/invalid/expired authentication, CSRF validation, invalid lesson progress, quiz submission errors, and duplicate submission conflict handling
+- Added backend Jest coverage guardrails with a dedicated coverage script and global thresholds to prevent test-coverage regression
+- Added backend CI enforcement for test coverage thresholds by running the coverage test command in the backend workflow job
+- Added integration test coverage for rejecting logout requests with mismatched CSRF tokens
+- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID
+- Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
+- Added rate-limiter contract coverage for register and login endpoint throttle behavior
+- Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches
+- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs
+- Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy)
+- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites
+- Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup
+- Added frontend hook test coverage for restoring saved authentication, logging in with remembered sessions, and clearing auth state on logout
+- Added frontend integration test coverage for login redirects, login errors, successful registration, and registration conflict errors
+- Added frontend integration test coverage for password reset requests and protected route access for authenticated and unauthenticated users
+- Added frontend hook test coverage for dashboard loading, session caching, and refreshing cached data after progress updates
+- Added frontend component test coverage for rendering dashboard content and showing the empty state for new learners
+- Added frontend integration test coverage for last-lesson redirects using API results and cached fallback paths
+- Added frontend integration test coverage for sample lesson previews and redirecting unauthenticated learners to login
+- Added frontend integration test coverage for lesson navigation and immediate quiz answer feedback
+- Added frontend integration test coverage for passing preview quiz results and the registration call-to-action
+- Added frontend integration test coverage for syncing lesson progress and submitting quizzes for authenticated learners
+- Added .prettierignore to exclude coverage, node_modules, and dist directories
+- Added frontend reducer, lesson normalization, consent utility, lesson renderer, and quiz interaction test coverage
+- Added frontend shared-component accessibility coverage for fields, buttons, cards, modals, toasts, spinners, and empty states
+- Added frontend learning-path and keyboard navigation coverage for progress states, locked nodes, lesson navigation, and mobile menus
+- Added frontend lesson-content hook coverage for success, disabled, and error states
+- Added skip to content link and update main element ID for accessibility
+
+### Fixed
+
+- Fixed error handler middleware signature to include next parameter
+
+---
+
 ## [0.3.4] - 2026-08-19
 
 ### Added
