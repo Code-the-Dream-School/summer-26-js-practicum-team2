@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a shared backend auth test helper to reduce repeated authenticated-user setup across integration suites.
 - Added backend coverage guardrails via `test:coverage` and Jest global thresholds (statements: 85, branches: 60, functions: 90, lines: 85).
 - Added CI artifacts for frontend tests, frontend build output, and backend coverage to improve diagnostics in pull-request runs.
+- Added shared backend request test helpers for Authorization and session-plus-CSRF headers to reduce repeated API request setup.
+- Added frontend test coverage for auth restoration, remembered-session login, logout, registration, password reset, and protected-route access.
+- Added frontend regression coverage for dashboard loading, caching, and refresh; last-lesson redirects; sample lesson previews and navigation; and quiz feedback, progress synchronization, completion, and submission.
 
 ### Changed
 
