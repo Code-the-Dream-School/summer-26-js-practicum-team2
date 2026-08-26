@@ -55,6 +55,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installed Playwright
 - Added Playwright smoke coverage for protected-route redirects and keyboard-accessible mobile navigation
 - Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
+- Added `backend/src/utils/coreRules.js` with coverage for XP caps and award rules, streak/freeze status, and lesson-unlock gating.
+- Added end-to-end backend API coverage for user auth flows (register, verify email, login/logout, forgot/reset password), lesson/dashboard progress flows, and quiz-progress persistence.
+- Added negative-path API coverage for missing, malformed, and expired auth; CSRF mismatches; invalid lesson progress payloads; missing lesson/module resources; and duplicate quiz submissions.
+- Added middleware and error-contract test coverage for 404 and malformed JSON responses, Helmet headers (including CSP and referrer-policy), rate-limiter behavior for register/login, and stable error payload mappings.
+- Added a shared backend auth test helper to reduce repeated authenticated-user setup across integration suites.
+- Added backend coverage guardrails via `test:coverage` and Jest global thresholds (statements: 85, branches: 60, functions: 90, lines: 85).
+- Added CI artifacts for frontend tests, frontend build output, and backend coverage to improve diagnostics in pull-request runs.
+- Added shared backend request test helpers for Authorization and session-plus-CSRF headers to reduce repeated API request setup.
+- Added frontend test coverage for auth restoration, remembered-session login, logout, registration, password reset, and protected-route access.
+- Added frontend regression coverage for dashboard loading, caching, and refresh; last-lesson redirects; sample lesson previews and navigation; and quiz feedback, progress synchronization, completion, and submission.
+
+### Changed
+
+- Updated CI pull-request trigger branches from `docs` to `main`.
+- Switched backend CI test execution to the coverage-enforced command (`npm --prefix backend run test:coverage`).
 
 ### Fixed
 
