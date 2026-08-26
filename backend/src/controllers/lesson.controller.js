@@ -84,7 +84,7 @@ exports.getLessonProgress = async (req, res, next) => {
 };
 
 // PATCH /api/v1/lessons/progress
-// Body: { moduleId, lessonId, microLessonId }
+// Body: { moduleId, lessonId, microLessonId, currentChunkIndex }
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
 exports.updateLessonProgress = async (req, res, next) => {
   try {
