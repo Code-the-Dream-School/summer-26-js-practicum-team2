@@ -18,7 +18,7 @@ import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
 
 export default function LearnPage() {
-  const { isAuthenticated, csrfToken } = useAuthContext();
+  const { isAuthenticated, isHydrating, csrfToken } = useAuthContext();
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -53,6 +53,15 @@ export default function LearnPage() {
     ramona: ramonaImg,
     beaver: dabbingBeaverImg,
   };
+
+  // Wait for storage hydration before deciding to redirect
+  if (isHydrating) {
+    return (
+      <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
+        <Skeleton />
+      </section>
+    );
+  }
 
   if (!isAuthenticated) {
     if (isSamplePreview && learnData) {
