@@ -1,7 +1,9 @@
 import { z } from "zod";
 
-// Strong password requirement: must contain lowercase, uppercase, a number, and a symbol.
-const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/;
+const LONG_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+const SHORT_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9\s]).+$/;
+const PASSWORD_POLICY_MESSAGE =
+  "Password must be at least 16 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.";
 
 // Shared email validation used across sign-in and account recovery flows.
 const emailField = z
@@ -13,11 +15,12 @@ const emailField = z
 const passwordField = z
   .string()
   .trim()
-  .min(8, "Password must be at least 8 characters long.")
-  .regex(
-    PASSWORD_PATTERN,
-    "Password must include upper and lower case letters, a number, and a special character.",
-  );
+  .min(1, "Password is required.")
+  .refine((value) => {
+    const isLongPassword = value.length >= 16 && LONG_PASSWORD_PATTERN.test(value);
+    const isShortPassword = value.length >= 8 && SHORT_PASSWORD_PATTERN.test(value);
+    return isLongPassword || isShortPassword;
+  }, PASSWORD_POLICY_MESSAGE);
 
 export const loginSchema = z.object({
   email: emailField,
