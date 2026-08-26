@@ -84,13 +84,24 @@ exports.getLessonProgress = async (req, res, next) => {
 };
 
 // PATCH /api/v1/lessons/progress
-// Body: { moduleId, lessonId, microLessonId }
+// Body: { moduleId, lessonId, microLessonId, currentChunkIndex }
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
 exports.updateLessonProgress = async (req, res, next) => {
   try {
+    const requestBody = req.body ?? {};
+    if (
+      Object.hasOwn(requestBody, "currentChunkIndex") &&
+      typeof requestBody.lessonId === "undefined" &&
+      typeof requestBody.microLessonId === "undefined"
+    ) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "lessonId or microLessonId is required.",
+      });
+    }
+
     const validatedBody = validateRequest(res, lessonProgressSchema, req.body);
     if (!validatedBody) return;
-    const { moduleId, lessonId, microLessonId } = validatedBody;
+    const { moduleId, lessonId, microLessonId, currentChunkIndex } = validatedBody;
 
     if (!getModule(moduleId)) {
       return res.status(StatusCodes.NOT_FOUND).json({
