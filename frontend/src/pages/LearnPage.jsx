@@ -23,6 +23,8 @@ export default function LearnPage() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
 
+  const selectedMicroLessonId = location.state?.microLessonId;
+
   const isSamplePreview = searchParams.get("sample") === "true";
 
   const {
@@ -121,11 +123,12 @@ export default function LearnPage() {
 
   return (
     <LearnFlow
-      key={`${learnData.moduleId}:${learnData.id}`}
+      key={`${learnData.moduleId}:${learnData.id}:${selectedMicroLessonId ?? "resume"}`}
       learnData={learnData}
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
+      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
     />
   );
