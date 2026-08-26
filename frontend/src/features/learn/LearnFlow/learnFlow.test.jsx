@@ -1,8 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import LearnFlow from "./LearnFlow.component";
+import * as api from "../../../services/api";
+
+// Mock the quiz and progress API functions so the tests do not make real requests.
+vi.mock("../../../services/api", () => ({
+  startQuiz: vi.fn(),
+  submitQuiz: vi.fn(),
+  updateLessonProgress: vi.fn(),
+}));
 
 // Use a small lesson with one step and one question so the test can focus on the basic learn flow.
 const learnData = {
@@ -41,8 +49,9 @@ const learnData = {
 
 describe("learn flow", () => {
   beforeEach(() => {
-    // Clear any saved lesson state so each test starts from the beginning.
+    // Start each test with no saved lesson state or previous mock calls.
     window.localStorage.clear();
+    vi.clearAllMocks();
   });
 
   it("advances from lesson content into a quiz and gives immediate answer feedback", async () => {
@@ -91,5 +100,56 @@ describe("learn flow", () => {
       "href",
       "/register",
     );
+  });
+
+  it("syncs progress and submits the quiz for an authenticated learner", async () => {
+    const user = userEvent.setup();
+
+    // Mock the lesson progress and quiz requests so the test can focus on the full learner flow.
+    api.updateLessonProgress.mockResolvedValue({});
+    api.startQuiz.mockResolvedValue({ attemptId: "attempt-1" });
+    api.submitQuiz.mockResolvedValue({ score: 100, passed: true, missed: [] });
+
+    render(
+      <MemoryRouter>
+        <LearnFlow
+          learnData={learnData}
+          characterImages={{}}
+          guideImage="guide.png"
+          csrfToken="csrf-1"
+        />
+      </MemoryRouter>,
+    );
+
+    // Complete the quick check with the correct answer and open the results.
+    await user.click(screen.getByRole("button", { name: "Quick check" }));
+    await user.click(screen.getByRole("radio", { name: /Money moving in and out/i }));
+    await user.click(screen.getByRole("button", { name: "Check answer" }));
+    await user.click(screen.getByRole("button", { name: "View results" }));
+
+    // The learner's lesson progress should be saved before finishing the quiz flow.
+    expect(api.updateLessonProgress).toHaveBeenCalledWith({
+      moduleId: "cashFlow",
+      lessonId: "1.1",
+      microLessonId: "1.1.1",
+      csrfToken: "csrf-1",
+    });
+
+    // Starting the quiz should create the attempt used when the answers are submitted.
+    expect(api.startQuiz).toHaveBeenCalledWith({
+      moduleId: "cashFlow",
+      microLessonId: "1.1.1",
+      csrfToken: "csrf-1",
+    });
+
+    // Submit the selected answer with the attempt ID returned when the quiz started.
+    expect(api.submitQuiz).toHaveBeenCalledWith("1.1.1", {
+      attemptId: "attempt-1",
+      moduleId: "cashFlow",
+      answers: { "question-1": ["a"] },
+      csrfToken: "csrf-1",
+    });
+
+    expect(screen.getByText(/Score: 100% — Pass/)).toBeInTheDocument();
   });
 });
