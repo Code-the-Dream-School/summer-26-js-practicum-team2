@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
 const { sendVerificationEmail } = require("../utils/sendEmail");
 //User is capitalized because it represents a model which is a collection of items for the database
-const { User, ArchivedUser } = require("../models/User.model.js");
+const User  = require("../models/User.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const {
   registerSchema,
@@ -133,10 +133,10 @@ const reactivate = async (req, res, next) => {
     user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
-    //remove ArchivedUser information
+    /*//remove ArchivedUser information
     if (ArchivedUser) {
       await ArchivedUser.deleteOne({ original_user_id: user._id });
-    }
+    }*/
     return res.status(StatusCodes.OK).json({ message: "Account is reactivated. Please log in." });
   } catch (error) {
     return next(error);

@@ -6,6 +6,8 @@ const getPendingDeleteAccount = async (req, res, next) => {
   try {
     const pendingDelRequests = await User.find({
       deletion_status: "pending",
+     // is_deleted: true,
+     is_deleted: { $in: [true,false]},
     }).select("name email deletion_status deletion_requested_at created_at"); //select the fields from the user table
     return res.status(StatusCodes.OK).json({
       count: pendingDelRequests.length,
@@ -19,8 +21,9 @@ const getPendingDeleteAccount = async (req, res, next) => {
 const approveDeleteAccount = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
+    //must use find
+    const updatedUser = await User.findOneAndUpdate(
+      {_id:userId, is_deleted:{$in:[true, false]}},
       {
         deletion_status: "approved",
         deleted_at: new Date(),
@@ -43,8 +46,10 @@ const approveDeleteAccount = async (req, res, next) => {
 const rejectDeleteAccount = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
+    //const updatedUser = await User.findByIdAndUpdate(
+    const updatedUser = await User.findOneAndUpdate(
+
+      {_id: userId, is_deleted: { $in: [true,false]}},
       {
         deletion_status: "denied",
         is_deleted: false,
