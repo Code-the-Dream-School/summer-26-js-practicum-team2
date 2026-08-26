@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added frontend learning-path and keyboard navigation coverage for progress states, locked nodes, lesson navigation, and mobile menus
 - Added frontend lesson-content hook coverage for success, disabled, and error states
 - Added skip to content link and update main element ID for accessibility
+- Added role attribute to error message for accessibility
 
 ### Fixed
 
