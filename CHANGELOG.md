@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added frontend integration test coverage for lesson navigation and immediate quiz answer feedback
 - Added frontend integration test coverage for passing preview quiz results and the registration call-to-action
 - Added frontend integration test coverage for syncing lesson progress and submitting quizzes for authenticated learners
+- Added .prettierignore to exclude coverage, node_modules, and dist directories
 
 ### Fixed
 
