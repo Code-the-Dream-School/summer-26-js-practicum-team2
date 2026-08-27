@@ -23,10 +23,10 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      lowercase: true,
+      type:String,
+      required:[true, "Email is required"],
+      unique:true,
+      lowercase:true,
       trim: true,
     },
     password_hash: {
@@ -46,30 +46,30 @@ const userSchema = new mongoose.Schema(
     },
     email_verified_at: {
       type: Date,
-      default: null,
+      default:null,
     },
     verification_token: {
       type: String,
-      default: null,
-      select: false,
+      default:null,
+      select:false,
     },
     verification_token_expires_at: {
-      type: Date,
-      default: null,
+      type:Date,
+      default:null,
     },
     password_reset_token: {
       type: String,
-      default: null,
-      select: false,
+      default:null,
+      select:false,
     },
     password_reset_expires_at: {
       type: Date,
       default: null,
     },
     role: {
-      type: String,
-      enum: ["learner", "admin"],
-      default: "learner",
+      type:String,
+      enum:["learner", "admin"],
+      default:"learner",
     },
     is_disabled: {
       type: Boolean,
@@ -88,12 +88,12 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     tos_agreement: {
-      type: Boolean,
-      required: true,
+      type:Boolean,
+      required:true,
     },
     tos_agreement_at: {
-      type: Date,
-      default: null,
+      type:Date,
+      default:null,
     },
     onboarding: {
       is_completed: { type: Boolean, default: false },
