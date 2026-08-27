@@ -2,6 +2,8 @@ import { Route, Routes } from "react-router";
 import { ROUTES } from "./routes";
 import MainLayout from "../../shared/MainLayout/MainLayout.component";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
+import AdminDashboard from "../../pages/AdminDashboard";
 
 import HomePage from "../../pages/HomePage";
 import LoginPage from "../../pages/LoginPage";
@@ -34,6 +36,15 @@ export default function AppRouter() {
             <ProtectedRoute>
               <ProfilePage />
             </ProtectedRoute>
+          }
+        />
+        {/*Admin Route */}
+        <Route
+          path={ROUTES.ADMIN_DASHBOARD}
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
           }
         />
         <Route

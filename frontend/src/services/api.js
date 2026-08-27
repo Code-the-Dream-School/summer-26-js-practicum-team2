@@ -6,6 +6,7 @@ const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
+const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 
 // Helper function to make API requests to the backend.
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
@@ -83,7 +84,7 @@ export const getDashboard = () =>
 export const getProfile = () =>
   apiRequest("", {
     basePath: PROFILE_BASE_PATH,
-    method: "GET"
+    method: "GET",
   });
 
 export const updateProfile = ({ csrfToken, ...profile }) =>
@@ -108,6 +109,34 @@ export const deleteProfile = ({ email, csrfToken }) =>
     body: { email },
     csrfToken,
     basePath: PROFILE_BASE_PATH,
+  });
+export const getAdminUsers = () =>
+  apiRequest("/users", {
+    method: "GET",
+    basePath: ADMIN_BASE_PATH,
+  });
+export const getPendingDeleteAccount = () =>
+  apiRequest("/deletions/pending", {
+    method: "GET",
+    basePath: ADMIN_BASE_PATH,
+  });
+export const approveDeleteAccount = (userId, csrfToken) =>
+  apiRequest(`/deletions/approve/${userId}`, {
+    method: "PATCH",
+    csrfToken,
+    basePath: ADMIN_BASE_PATH,
+  });
+export const rejectDeleteAccount = (userId, csrfToken) =>
+  apiRequest(`/deletions/deny/${userId}`, {
+    method: "PATCH",
+    csrfToken,
+    basePath: ADMIN_BASE_PATH,
+  });
+export const reactivateUserAcct = (userId, csrfToken) =>
+  apiRequest(`/deletions/reactivate/${userId}`, {
+    method: "PATCH",
+    csrfToken,
+    basePath: ADMIN_BASE_PATH,
   });
 
 // Dispatches a custom event to notify the application that dashboard progress has been updated

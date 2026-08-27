@@ -68,11 +68,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    /* REMOVE OPTION FOR LIGHT AND DARK theme: {
-      type: String,
-      enum: ["Light", "Dark"],
-      default: "Light",
-    },*/
     notifications: {
       type: Boolean,
       default: true,

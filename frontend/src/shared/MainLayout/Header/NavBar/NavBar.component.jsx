@@ -6,6 +6,7 @@ const primaryNavLinks = [{ label: "Home", href: "/" }];
 
 export default function NavBar({
   signedIn = false,
+  isAdmin = false, 
   avatarLabel = "A",
   xp = 0,
   streak = 0,
@@ -18,6 +19,7 @@ export default function NavBar({
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Learn", href: "/learn" },
+        ...(isAdmin ? [{label: "Admin Dashboard", href: "/admin/dashboard"}] : []),
       ]
     : [];
 
