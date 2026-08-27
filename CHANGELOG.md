@@ -50,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added frontend lesson-content hook coverage for success, disabled, and error states
 - Added skip to content link and update main element ID for accessibility
 - Added role attribute to error message for accessibility
+- Added frontend verification-page coverage for pending, success, missing-token, and failure states
+- Added dashboard cache coverage for malformed and expired entries
 
 ### Fixed
 
