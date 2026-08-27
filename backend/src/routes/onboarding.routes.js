@@ -9,8 +9,7 @@ const {
 
 const jwtMiddleware = require("../middleware/jsonWebToken");
 
-router.use (jwtMiddleware);
-
+router.use(jwtMiddleware);
 
 //GET /api/v1/onboarding
 router.get("/", getOnboardingState);
@@ -22,6 +21,5 @@ router.patch("/step", updateOnboardingProgress);
 
 //POST /api/v1/onboarding/reset
 router.post("/reset", resetOnboardingProgress);
-
 
 module.exports = router;

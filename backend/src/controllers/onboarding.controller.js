@@ -2,7 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const { updateOnboardingProgressSchema } = require("../validation/userValidation.js");
 const User = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
-const { STATES } = require("mongoose");
+//const { STATES } = require("mongoose");
 
 //Configure XP reward per completed page tour
 const TOUR_XP_REWARD = 50;
@@ -79,7 +79,7 @@ const getOnboardingState = async (req, res, next) => {
   }
 };
 
-//PATCH /api/v1/onboarding (receives updates from frontend when a user moves to next step or new step or dismisses a tour or completes all tours)
+//PATCH /api/v1/onboarding/step (receives updates from frontend when a user moves to next step or new step or dismisses a tour or completes all tours)
 
 const updateOnboardingProgress = async (req, res, next) => {
   try {
@@ -146,9 +146,9 @@ const updateOnboardingProgress = async (req, res, next) => {
       if (isFirstTimeCompletion) {
         xpAwarded = TOUR_XP_REWARD;
         await UserProgress.findOneAndUpdate(
-          { userId },
+          { user_id: userId },
           { $inc: { xp: xpAwarded } },
-          { upsert: true, new: true },
+          { upsert: true, returnDocument: 'after'},
         );
       }
     }
