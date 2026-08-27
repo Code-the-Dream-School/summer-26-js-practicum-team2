@@ -52,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added role attribute to error message for accessibility
 - Added frontend verification-page coverage for pending, success, missing-token, and failure states
 - Added dashboard cache coverage for malformed and expired entries
+- Installed Playwright
 
 ### Fixed
 
