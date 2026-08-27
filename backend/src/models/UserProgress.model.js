@@ -7,6 +7,10 @@ const userProgressSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    xp: {
+      type: Number,
+      default: 0,
+    },
     module_id: {
       type: String,
       required: true,
