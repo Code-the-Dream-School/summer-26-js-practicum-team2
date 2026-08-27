@@ -38,7 +38,9 @@ const approveDeleteAccount = async (req, res, next) => {
     const { userId } = req.params;
     //must use find
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId, is_deleted: { $in: [true, false] } },
+      //{ _id: userId, is_deleted: { $in: [true, false] } },
+      { _id: userId },
+
       {
         deletion_status: "approved",
         deleted_at: new Date(),
@@ -63,7 +65,9 @@ const rejectDeleteAccount = async (req, res, next) => {
     const { userId } = req.params;
     //const updatedUser = await User.findByIdAndUpdate(
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId, is_deleted: { $in: [true, false] } },
+      // { _id: userId, is_deleted: { $in: [true, false] } },
+      { _id: userId },
+
       {
         deletion_status: "denied",
         is_deleted: false,

@@ -239,7 +239,7 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-//DELETE /api/v1/profile for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
+//POST /api/v1/profile/request-deletion for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
     const { error, value } = deleteAccountSchema.validate(req.body);

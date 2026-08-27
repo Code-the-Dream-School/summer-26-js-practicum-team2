@@ -96,9 +96,9 @@ export default function AdminDashboard() {
                 <table className="w-full text-left text-sm">
                   <thead className="border-b border-neutral-200 bg-surface-inset text-xs font-semibold uppercase text-neutral-600">
                     <tr>
-                      <th className="px-6 py-3">User ID</th>
-                      <th className="px-6 py-3">Email</th>
-                      <th className="px-6 py-3">Actions</th>
+                      <th className="px-4 sm:px-6 py-3">User ID</th>
+                      <th className="px-4 sm:px-6 py-3">Email</th>
+                      <th className="px-4 sm:px-6 py-3 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-200">

@@ -25,7 +25,8 @@ export default function NavBar({
 
   const combinedNavLinks = [...primaryNavLinks, ...authNavLinks];
 
-  const mobileNavLinks = signedIn
+  const mobileNavLinks =
+    signedIn
     ? [...combinedNavLinks, { label: "Profile", href: "/profile" }]
     : [
         ...combinedNavLinks,
@@ -118,7 +119,8 @@ export default function NavBar({
       </Button>
 
       {isOpen ? (
-        <div className="border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden">
+         <div className="border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden">
+        {/* // <div className="max-h-[calc(100vh-5rem)] overflow-y-auto border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden shadow-lg"> */}
           <ul className="space-y-2">
             {mobileNavLinks.map((link) => (
               <li key={link.label}>

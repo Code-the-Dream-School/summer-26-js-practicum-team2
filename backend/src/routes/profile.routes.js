@@ -14,6 +14,6 @@ router.patch("/", profileController.updateProfile);
 router.post("/avatar", profileController.uploadAvatar);
 // POST /api/v1/profile/password
 router.post("/password", profileController.changePassword);
-// DELETE  /api/v1/profile Soft delete account
-router.delete("/", profileController.deleteAccount);
+// POST  /api/v1/profile/request-deletion Soft delete account
+router.post("/request-deletion", profileController.deleteAccount);
 module.exports = router;
