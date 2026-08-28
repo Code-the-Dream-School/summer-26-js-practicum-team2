@@ -1,5 +1,6 @@
 const XP_CAP = 500;
 
+//Determins how much XP can be awarded when user wins XP based on daily cap and total already awarded for the day
 function clampXpAmount(amount, currentTotal = 0) {
   const spaceRemaining = Math.max(0, XP_CAP - currentTotal);
   const clamped = Math.max(0, Math.min(amount, spaceRemaining));
@@ -11,11 +12,14 @@ function clampXpAmount(amount, currentTotal = 0) {
   };
 }
 
+//What count as XP award events, how much to award, and when
+//Added isFirstPerfect for quiz_perfect, and commented out review_complete and daily_goal_met
 function calculateXpDelta({
   eventType,
   currentTotal = 0,
   isFirstTime = false,
   isFirstPass = false,
+  isFirstPerfect = false,
   isPerfect = false,
   score = 0,
 } = {}) {
@@ -23,8 +27,6 @@ function calculateXpDelta({
     lesson_complete: { amount: 20 },
     quiz_pass: { amount: 10 },
     quiz_perfect: { amount: 5 },
-    review_complete: { amount: 15 },
-    daily_goal_met: { amount: 5 },
   };
 
   const rule = rules[eventType];
@@ -40,7 +42,7 @@ function calculateXpDelta({
     return { amount: 0, capped: false, remaining: Math.max(0, XP_CAP - currentTotal) };
   }
 
-  if (eventType === "quiz_perfect" && (!isPerfect || score < 100)) {
+  if (eventType === "quiz_perfect" && (!isPerfect || !isFirstPerfect || score < 100)) {
     return { amount: 0, capped: false, remaining: Math.max(0, XP_CAP - currentTotal) };
   }
 
@@ -52,70 +54,92 @@ function calculateXpDelta({
   };
 }
 
-function toDateKey(dateValue) {
+//Calculates local dates for the user for streaks
+function toDateKey(dateValue, timezone = "UTC") {
   const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
   if (Number.isNaN(date.getTime())) return null;
 
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
+  const parts = new Intl.DateTimeFormat("en", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const year = parts.find((p) => p.type === "year").value;
+  const month = parts.find((p) => p.type === "month").value;
+  const day = parts.find((p) => p.type === "day").value;
+
   return `${year}-${month}-${day}`;
 }
 
+//Helper function to replace cursor so that we can stick to local times
+// Date keys already normalized to user local time, so using UTC here is only to safely move full days backward/forward
+function shiftDateKey(dateKey, days) {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+
+  date.setUTCDate(date.getUTCDate() + days);
+
+  return date.toISOString().slice(0, 10);
+}
+
+//Calculating Streak
 function getConsecutiveRunLength(activeSet, endKey) {
   let streak = 0;
-  let cursor = new Date(`${endKey}T00:00:00Z`);
+  let currentKey = endKey;
 
-  while (true) {
-    const key = toDateKey(cursor);
-    if (!activeSet.has(key)) break;
+  while (activeSet.has(currentKey)) {
     streak += 1;
-    cursor.setUTCDate(cursor.getUTCDate() - 1);
+    currentKey = shiftDateKey(currentKey, -1);
   }
 
   return streak;
 }
 
-function calculateStreakStatus({ activeDates = [], today = new Date(), freezeBalance = 0 } = {}) {
+//Calculating Streaks removed freeze capabilities
+function calculateStreakStatus({ activeDates = [], today = new Date(), timezone = "UTC" } = {}) {
   const activeSet = new Set(
-    activeDates.map((value) => toDateKey(value)).filter((value) => value !== null),
+    activeDates.map((value) => toDateKey(value, timezone)).filter((value) => value !== null),
   );
-  const todayKey = toDateKey(today);
-  const yesterday = new Date(`${todayKey}T00:00:00Z`);
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const yesterdayKey = toDateKey(yesterday);
+
+  const todayKey = toDateKey(today, timezone);
 
   const sortedDates = [...activeSet].sort();
   const lastActiveDate = sortedDates.filter((dateKey) => dateKey <= todayKey).at(-1) || null;
 
-  const currentStreak = lastActiveDate ? getConsecutiveRunLength(activeSet, lastActiveDate) : 0;
+  let currentStreak = lastActiveDate ? getConsecutiveRunLength(activeSet, lastActiveDate) : 0;
+
+  //To make sure current streak is not most recent streak
+  if (lastActiveDate !== todayKey && lastActiveDate !== shiftDateKey(todayKey, -1)) {
+    currentStreak = 0;
+  }
+
   const longestStreak = sortedDates.reduce((max, dateKey) => {
     let streak = 1;
-    let cursor = new Date(`${dateKey}T00:00:00Z`);
+    let currentKey = dateKey;
+
     while (true) {
-      cursor.setUTCDate(cursor.getUTCDate() + 1);
-      const nextKey = toDateKey(cursor);
-      if (!activeSet.has(nextKey)) break;
+      const nextKey = shiftDateKey(currentKey, 1);
+
+      if (!activeSet.has(nextKey)) {
+        break;
+      }
       streak += 1;
+      currentKey = nextKey;
     }
     return Math.max(max, streak);
   }, 0);
 
-  const freezeUsed =
-    freezeBalance > 0 &&
-    !activeSet.has(todayKey) &&
-    !!lastActiveDate &&
-    lastActiveDate !== yesterdayKey;
-  const freezesRemaining = Math.max(0, freezeBalance - (freezeUsed ? 1 : 0));
-
-  return {
-    currentStreak,
-    longestStreak,
-    freezeUsed,
-    freezesRemaining,
-  };
+  return { currentStreak, longestStreak };
 }
 
+//Calculating total learning days
+function calculateLearningDays(activeDates = [], timezone = "UTC") {
+  const activeSet = new Set(activeDates.map((value) => toDateKey(value, timezone)).filter(Boolean));
+  return activeSet.size;
+}
+
+//Calculating whether lesson is unlocked
 function isLessonUnlocked({ lessonId, lessonSequence = [], completedLessons = [] } = {}) {
   if (!lessonId || !Array.isArray(lessonSequence) || lessonSequence.length === 0) {
     return true;
@@ -134,5 +158,6 @@ module.exports = {
   XP_CAP,
   calculateXpDelta,
   calculateStreakStatus,
+  calculateLearningDays,
   isLessonUnlocked,
 };
