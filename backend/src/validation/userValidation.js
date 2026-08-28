@@ -126,7 +126,7 @@ const quizSubmissionSchema = Joi.object({
 });
 
 const forgotPasswordSchema = Joi.object({
-  email: emailSchema.required(),
+  //email: emailSchema.required(),
 });
 
 const resetPasswordSchema = Joi.object({
@@ -136,7 +136,7 @@ const resetPasswordSchema = Joi.object({
     "string.length": "Reset token must be valid.",
     "any.required": "Reset token is required.",
   }),
-  newPassword: passwordSchema,
+  //newPassword: passwordSchema,
 });
 
 const dashboardEventSchema = Joi.object({
@@ -217,7 +217,7 @@ function validateRequest(res, schema, payload) {
 module.exports = {
   registerSchema,
   loginSchema,
-  passwordSchema,
+  //passwordSchema,
   lessonProgressSchema,
   lessonCompletionSchema,
   quizStartSchema,

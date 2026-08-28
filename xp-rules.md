@@ -1,8 +1,8 @@
-# XP, Streak, and Progression Rules
+# XP, Streak, Learning Day, and Progression Rules
 
 ## Purpose
 
-This document serves as the source of truth for learner XP, streaks, learning day statistics, and lesson progression rules.
+This document serves as the source of truth for learner XP, streaks, learning-day statistics, onboarding rewards, and lesson progression rules.
 
 ---
 
@@ -12,20 +12,61 @@ This document serves as the source of truth for learner XP, streaks, learning da
 
 Learners may earn a maximum of **500 XP per day**.
 
-- XP cannot exceed the daily cap.
-- Partial XP awards are allowed if only part of an award fits within the remaining cap.
+- XP rewards cannot exceed the daily cap.
+- Partial rewards may be granted if only part of an XP award fits within the remaining daily allowance.
 
 ### Example
 
-Current XP Today: 490
+Current XP Earned Today:
 
-Incoming Award: +20 XP
+```text
+490 XP
+```
+
+Incoming Award:
+
+```text
++20 XP
+```
 
 Result:
 
-- Awarded XP = 10
-- Daily Total = 500
-- Remaining XP = 0
+```text
+Awarded XP = 10
+Daily Total = 500
+Remaining XP = 0
+```
+
+---
+
+## Onboarding Completion XP
+
+**Event:** `onboarding_complete`
+
+**Reward:** +50 XP
+
+### Conditions
+
+- Awarded when a learner completes all onboarding tours.
+- Intended to be awarded only on onboarding completion.
+- Individual page tours do not award XP.
+
+### Example
+
+Completed Tours:
+
+```text
+Dashboard
+Learning Path
+Lesson Page
+Profile Page
+```
+
+Result:
+
+```text
++50 XP
+```
 
 ---
 
@@ -37,18 +78,22 @@ Result:
 
 ### Conditions
 
-- XP is awarded only the first time a lesson is completed.
+- Awarded only the first time a lesson is completed.
 - Repeating a lesson does not grant additional XP.
 
 ### Example
 
 First completion:
 
-- Award: +20 XP
+```text
++20 XP
+```
 
 Repeat completion:
 
-- Award: +0 XP
+```text
++0 XP
+```
 
 ---
 
@@ -61,17 +106,27 @@ Repeat completion:
 ### Conditions
 
 - Quiz score must be at least 70%.
-- XP is awarded only on the learner's first successful pass.
+- XP is awarded only on the first successful pass.
 
 ### Example
 
-85% score on first passing attempt:
+First passing score:
 
-- Award: +10 XP
+```text
+85%
+```
 
-Passing again later:
+Result:
 
-- Award: +0 XP
+```text
++10 XP
+```
+
+Retaking and passing again:
+
+```text
++0 XP
+```
 
 ---
 
@@ -84,21 +139,27 @@ Passing again later:
 ### Conditions
 
 - Quiz score must equal 100%.
-- XP is only awarded the first time a learner achieves a perfect score on a specific quiz.
+- XP is awarded only the first time a learner achieves a perfect score on that quiz.
 
 ### Example
 
-First perfect score on Quiz A:
+First perfect score:
 
-- Award: +5 XP
+```text
+100%
+```
 
-Second perfect score on Quiz A:
+Result:
 
-- Award: +0 XP
+```text
++5 XP
+```
 
-First perfect score on Quiz B:
+Second perfect score on the same quiz:
 
-- Award: +5 XP
+```text
++0 XP
+```
 
 ---
 
@@ -106,15 +167,15 @@ First perfect score on Quiz B:
 
 ## Learning Days
 
-A learning day represents a unique calendar day on which the learner completed at least one learning activity.
+A learning day is a unique calendar day on which a learner performs one or more learning activities.
 
 Multiple activities completed on the same day count as a single learning day.
 
-Learning days are calculated using the learner's configured timezone.
+Learning Days are calculated using the learner's configured timezone.
 
 ### Example
 
-Activity timestamps:
+Activity Timestamps:
 
 ```text
 2026-08-20 09:00
@@ -137,7 +198,7 @@ because activity occurred on:
 
 ### Purpose
 
-This metric measures long-term learning consistency regardless of streak interruptions.
+Learning Days provide a lifetime measure of engagement independent of streaks.
 
 ---
 
@@ -145,9 +206,9 @@ This metric measures long-term learning consistency regardless of streak interru
 
 ## Streak Definition
 
-A streak represents consecutive calendar days on which the learner was active.
+A streak represents consecutive calendar days on which a learner was active.
 
-Streak calculations are based on the learner's configured timezone.
+Streak calculations use the learner's configured timezone.
 
 ---
 
@@ -158,11 +219,11 @@ The current streak is the number of consecutive active days ending:
 - Today, or
 - Yesterday
 
-If the learner misses an entire day, the current streak resets to 0.
+If the learner misses a complete day, the current streak resets to zero.
 
 ### Example
 
-Active Days:
+Activity Dates:
 
 ```text
 Aug 22
@@ -184,9 +245,9 @@ Current Streak = 3
 
 ---
 
-### Example: Streak Reset
+### Example: Missed Day
 
-Active Days:
+Activity Dates:
 
 ```text
 Aug 22
@@ -206,17 +267,17 @@ Result:
 Current Streak = 0
 ```
 
-because a learning day was missed.
+because one or more active days were missed.
 
 ---
 
 ## Longest Streak
 
-The longest streak is the largest run of consecutive active days in the learner's history.
+The longest streak is the largest run of consecutive active days in learner history.
 
 ### Example
 
-Active Days:
+Activity Dates:
 
 ```text
 Aug 1
@@ -237,9 +298,9 @@ Longest Streak = 3
 
 # Timezone Handling
 
-All streak and learning-day calculations use the learner's configured timezone.
+Learning Days and Streaks use the learner's configured timezone.
 
-Activity timestamps are normalized into local calendar day keys using the format:
+Activity timestamps are normalized into local calendar-day keys using:
 
 ```text
 YYYY-MM-DD
@@ -259,7 +320,7 @@ Timezone:
 America/New_York
 ```
 
-Local Date Key:
+Result:
 
 ```text
 2026-08-24
@@ -273,9 +334,9 @@ Local Date Key:
 
 Lessons unlock sequentially.
 
-A learner may access a lesson if:
+A lesson is accessible when:
 
-1. It is the first lesson in the sequence.
+1. It is the first lesson in a sequence, or
 2. The immediately preceding lesson has been completed.
 
 ### Example
@@ -303,24 +364,4 @@ Result:
 
 ## First Lesson Rule
 
-The first lesson in a sequence is always unlocked.
-
-### Example
-
-Sequence:
-
-```text
-1.1 → 1.2 → 1.3
-```
-
-Lesson:
-
-```text
-1.1
-```
-
-Result:
-
-```text
-Unlocked
-```
+The first lesson in a sequence is always
