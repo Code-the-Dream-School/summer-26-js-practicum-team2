@@ -208,7 +208,11 @@ export default function LearningPathPage({onboarding}) {
       return;
     }
     // Navigate to the lesson page using the moduleId and lessonId from the selected node
-    navigate(`/learn/${node.moduleId}/${node.lessonId}`);
+    navigate(`/learn/${node.moduleId}/${node.lessonId}`, {
+      state: {
+        microLessonId: node.microLessonId,
+      },
+    });
   }
 
   if (error) {
@@ -393,7 +397,7 @@ export default function LearningPathPage({onboarding}) {
               }
               onClick={() => openLesson(currentNode)}
             >
-              Next
+              Resume
             </Button>
           )}
         </div>
