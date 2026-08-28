@@ -10,7 +10,6 @@ import Skeleton from "../shared/Skeleton/Skeleton.component";
 // Import onboarding overlay component
 import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
 
-
 function getMicroLessonPreview(content = []) {
   return content
     .filter(
@@ -22,7 +21,7 @@ function getMicroLessonPreview(content = []) {
     .join(" ");
 }
 
-export default function LearningPathPage({onboarding}) {
+function LearningPathPage({ onboarding }) {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
@@ -404,13 +403,13 @@ export default function LearningPathPage({onboarding}) {
 
         {/* onboarding Path */}
         {onboarding && !onboarding.hasCompleted && (
-        <OnboardingOverlay
-          currentStep={onboarding.currentStep}
-          activePage={onboarding.activePage}
-          pageName="lessonPath"
-          onNext={onboarding.handleNextStep}
-        />
-      )}
+          <OnboardingOverlay
+            currentStep={onboarding.currentStep}
+            activePage={onboarding.activePage}
+            pageName="lessonPath"
+            onNext={onboarding.handleNextStep}
+          />
+        )}
       </footer>
     </div>
   );
