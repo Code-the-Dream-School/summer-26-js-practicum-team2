@@ -67,9 +67,7 @@ jobs:
   e2e:
     name: Browser journey checks
     runs-on: ubuntu-latest
-    needs:
-      - frontend
-      - backend
+    needs: frontend
 
     steps:
       - name: Checkout
