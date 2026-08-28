@@ -23,6 +23,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrated limiter function is backend/src/app to an exported apiRateLimiter middleware function
 - Refactored User model with frontend fields
 - Enhanced Postman testing documentation for improved end-to-end coverage
+## [0.3.5] - 2026-08-20
+
+### Added
+
+- Added a failing test reproducing the refresh-redirect bug where an authenticated user on the Learn page was sent to login before auth storage finished hydrating
+
+### Fixed
+
+- Fixed LearnPage redirecting authenticated users to login on refresh by waiting for auth hydration before checking authentication state
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Added setup script for environment configuration and update package.json
+
+### Changed
+
+- Combines sync-shared-files into a single GitHub workflow file
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+
+### Removed
+
+- Removed kill-port as devDependency and removes the predev script
+
+---
+
+## [0.3.3] - 2026-08-19
+
+### Added
+
+- Added function to generate random encouraging phrases and words for quiz feedback
+- Added ExpandableWhy component for quiz explanation display when the explanation is greater than 30 words
+- Added a step-by-step quiz review flow after lesson completion.
+- Preserved submitted quiz answers for later review.
+- Added read-only answer feedback with correct and incorrect choice indicators.
+- Added Previous, Next, and Back to Results navigation during quiz review.
+- Added a quiz feedback preference (instant vs. at-the-end) with a toggle on the Profile page.
+- Wired the quiz feedback preference into the lesson flow so it controls whether answers are revealed per question or only after quiz submission.
+- Added character introductions for Abigail and Ramona in budgeting lessons
+- Added additional randomized phrases and words for quiz completion, and catching up on lessons
+
+### Changed
+
+- Extracted the lesson/quiz flow out of LearnPage into a new LearnFlow component, reducing LearnPage's size.
+- Refactored CharacterIntro component to only render text
+- Refactored Table component for better accessibility and prevent crashes with optional chaining
+- Changed the review quiz to only show explanations, not the encouraging text that shows up while taking a quiz
+
+### Fixed
+
+- Resolved a Mongoose deprecation warning by replacing the obsolete `new: true` option with `returnDocument: "after"` in the lesson progress and quiz submission controllers.
+- Added `aggregateLessonScore` helper for calculating lesson quiz scores based on the total number of questions
+- Added `quizScoring.test.js` tests for weighted scoring, passing and failing scores, and empty submissions
+- Added `quiz.scoring.test.js` backend tests to make sure each micro-lesson quiz is still graded on its own
+
+### Fixed
+
+- Fixed lesson quiz scoring to use the total number of questions across all quizzes, preventing incorrect percentages and false "Fail" results
+
+## [0.3.2] - 2026-08-18
+
+### Added
+
+- Added content accuracy review policy document
+- Added accuracy review fields to budgeting lessons
+- Added lesson accuracy metadata test
+- Added content sign-off section to PR template for accuracy review
+- Added content accuracy checklist for review process
+- Added Content Accuracy section to README files
+- Backfilled lesson content with passing metadata when it was completed
+
+## [0.3.1] - 2026-08-18
+
+### Fixed
+
+- Fixed cross-site authentication between the Netlify frontend and Render backend by making session cookie security and `SameSite` settings configurable through environment variables.
 
 ---
 
@@ -54,7 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed login rate limiter IP key generation
 - In backend/server.js, conditionally sets DNS override only outside of production to prevent the app from crashing in some environments
 - Allowed Vite to access shared lesson content by updating the vite.config.js file
-- Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined 
+- Prevented invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined
 - Fixed Tailwind breakpoint class typo in CharacterIntro component
 - Fixed typo with duplicate JWT_SECRET is backend/.env.example
 - Improved lesson table rendering by safely handling missing module, table, and budget data, and by selecting the correct budget when a `budgetId` is provided instead of always defaulting to the first budget.
