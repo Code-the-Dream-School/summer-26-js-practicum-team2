@@ -2,10 +2,8 @@ const { StatusCodes } = require("http-status-codes");
 const { updateOnboardingProgressSchema } = require("../validation/userValidation.js");
 const User = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
+const { calculateXpDelta } = require("../utils/coreRules.js");
 //const { STATES } = require("mongoose");
-
-//Configure XP reward per completed page tour
-const TOUR_XP_REWARD = 50;
 
 const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
 //POST /api/v1/onboarding/toggle
@@ -132,9 +130,6 @@ const updateOnboardingProgress = async (req, res, next) => {
         dismissed: false,
       };
 
-      //check for first-time completion to award XP
-      const isFirstTimeCompletion = dismissed === true && !currentTour.dismissed;
-
       if (typeof step === "number") {
         currentTour.step = step;
       }
@@ -142,16 +137,8 @@ const updateOnboardingProgress = async (req, res, next) => {
         currentTour.dismissed = dismissed;
       }
       user.onboarding.tours[tourKey] = currentTour;
-
-      if (isFirstTimeCompletion) {
-        xpAwarded = TOUR_XP_REWARD;
-        await UserProgress.findOneAndUpdate(
-          { user_id: userId },
-          { $inc: { xp: xpAwarded } },
-          { upsert: true, returnDocument: 'after'},
-        );
-      }
     }
+
     //check if all single page tours are dismissed
     const tours = user.onboarding.tours || {};
     const allDismissed =
@@ -162,12 +149,37 @@ const updateOnboardingProgress = async (req, res, next) => {
       TOUR_KEYS.every((key) => tours[key]?.dismissed === true);
     //update all completed
 
+    //Award xp for completing all of onboarding
     if ((markAllComplete || allDismissed) && !user.onboarding.is_completed) {
       user.onboarding.is_completed = true;
       user.onboarding.completed_at = new Date();
+
+      //Grabbing users current xp
+      const progress = await UserProgress.findOne({
+        user_id: userId,
+      });
+
+      const currentTotal = progress?.xp || 0;
+
+      //Award xp for first time onboarding completion
+      const xpResult = calculateXpDelta({
+        eventType: "onboarding_complete",
+        isFirstTime: true,
+        currentTotal,
+      });
+
+      xpAwarded = xpResult.amount;
     }
     user.markModified("onboarding");
     await user.save();
+
+    if (xpAwarded > 0) {
+      await UserProgress.findOneAndUpdate(
+        { user_id: userId },
+        { $inc: { xp: xpAwarded } },
+        { upsert: true, returnDocument: "after" },
+      );
+    }
 
     return res.status(StatusCodes.OK).json({
       success: true,

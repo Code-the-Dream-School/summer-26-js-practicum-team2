@@ -2,6 +2,7 @@ const { describe, it, expect } = require("@jest/globals");
 const {
   calculateXpDelta,
   calculateStreakStatus,
+  calculateLearningDays,
   isLessonUnlocked,
 } = require("../src/utils/coreRules");
 
@@ -30,6 +31,7 @@ describe("core rules", () => {
       calculateXpDelta({
         eventType: "quiz_perfect",
         score: 100,
+        isFirstPerfect: true,
         isPerfect: true,
         currentTotal: 495,
       }),
@@ -38,20 +40,37 @@ describe("core rules", () => {
       capped: false,
       remaining: 0,
     });
+  });
 
+  it("requires first perfect score", () => {
     expect(
       calculateXpDelta({
-        eventType: "daily_goal_met",
-        currentTotal: 499,
+        eventType: "quiz_perfect",
+        score: 100,
+        isPerfect: true,
+        isFirstPerfect: false,
       }),
     ).toEqual({
-      amount: 1,
-      capped: true,
-      remaining: 0,
+      amount: 0,
+      capped: false,
+      remaining: 500,
     });
   });
 
-  it("tracks streaks and freeze consumption for missed days", () => {
+  it("does not award lesson XP twice", () => {
+    expect(
+      calculateXpDelta({
+        eventType: "lesson_complete",
+        isFirstTime: false,
+      }),
+    ).toEqual({
+      amount: 0,
+      capped: false,
+      remaining: 500,
+    });
+  });
+
+  it("tracks streaks", () => {
     const today = new Date("2026-08-19T12:00:00Z");
 
     expect(
@@ -62,21 +81,37 @@ describe("core rules", () => {
     ).toMatchObject({
       currentStreak: 3,
       longestStreak: 3,
-      freezeUsed: false,
-      freezesRemaining: 0,
     });
 
     expect(
       calculateStreakStatus({
         activeDates: ["2026-08-17", "2026-08-18"],
         today: new Date("2026-08-20T12:00:00Z"),
-        freezeBalance: 1,
       }),
     ).toMatchObject({
-      currentStreak: 2,
-      freezeUsed: true,
-      freezesRemaining: 0,
+      currentStreak: 0,
+      longestStreak: 2,
     });
+  });
+
+  it("calculates streaks using local timezone", () => {
+    const result = calculateStreakStatus({
+      activeDates: ["2026-08-25T03:00:00Z"],
+      today: new Date("2026-08-25T03:00:00Z"),
+      timezone: "America/New_York",
+    });
+
+    expect(result.currentStreak).toBe(1);
+  });
+
+  it("counts unique learning days", () => {
+    expect(
+      calculateLearningDays([
+        "2026-08-20T09:00:00Z",
+        "2026-08-20T18:00:00Z",
+        "2026-08-21T12:00:00Z",
+      ]),
+    ).toBe(2);
   });
 
   it("locks lessons until the previous lesson is complete", () => {

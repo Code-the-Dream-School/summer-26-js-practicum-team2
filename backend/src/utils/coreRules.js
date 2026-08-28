@@ -27,6 +27,7 @@ function calculateXpDelta({
     lesson_complete: { amount: 20 },
     quiz_pass: { amount: 10 },
     quiz_perfect: { amount: 5 },
+    onboarding_complete: { amount: 50 },
   };
 
   const rule = rules[eventType];
@@ -43,6 +44,10 @@ function calculateXpDelta({
   }
 
   if (eventType === "quiz_perfect" && (!isPerfect || !isFirstPerfect || score < 100)) {
+    return { amount: 0, capped: false, remaining: Math.max(0, XP_CAP - currentTotal) };
+  }
+
+  if (eventType === "onboarding_complete" && (!isFirstTime)) {
     return { amount: 0, capped: false, remaining: Math.max(0, XP_CAP - currentTotal) };
   }
 
