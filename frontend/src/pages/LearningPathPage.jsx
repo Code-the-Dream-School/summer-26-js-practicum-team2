@@ -22,7 +22,7 @@ function getMicroLessonPreview(content = []) {
     .join(" ");
 }
 
-export default function LearningPathPage({onboarding}) {
+function LearningPathPage({onboarding}) {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
