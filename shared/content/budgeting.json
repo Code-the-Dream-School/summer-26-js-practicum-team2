@@ -920,7 +920,7 @@
               "questionType": "multipleChoice",
               "question": "Given Abigail's net income of $5,850 from nursing and $1,230 from child support, how much is Abigail's total monthly net income?",
               "answerChoices": [
-                { "key": "a", "text": "$4,620" },
+                { "key": "a", "text": "$4,570" },
                 { "key": "b", "text": "$7,080" },
                 {
                   "key": "c",
@@ -1139,7 +1139,7 @@
                 { "key": "d", "text": "-$9,234" }
               ],
               "correctResponse": "b",
-              "explanation": "Abigail's cash flow is $4,926 because $7,080 (income) - $2,154 (expenses) = $4,926."
+              "explanation": "Abigail's cash flow is $4,876 because $7,080 (income) - $2,154 (expenses) = $4,926."
             },
             {
               "type": "paragraph",
@@ -1378,6 +1378,69 @@
           ]
         }
       ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "APR (Annual Percentage Rate)",
+      "definition": "The cost of borrowing money on a yearly basis, expressed as a percentage rate."
+    },
+    {
+      "term": "Budget",
+      "definition": "A plan that outlines what money you expect to earn or receive (your income) and how you will save it or spend it (your expenses) for a given period of time; also called a spending plan."
+    },
+    {
+      "term": "Compound interest",
+      "definition": "When you earn interest on both the money you save and the interest you earn."
+    },
+    {
+      "term": "Credit",
+      "definition": "Borrowing money, or having the right to borrow money, to buy something. Usually it means you're using a credit card, but it might also mean that you got a loan"
+    },
+    {
+      "term": "Debt",
+      "definition": "Money you owe another person or a business."
+    },
+    {
+      "term": "Earned income",
+      "definition": "Money made from working for someone who pays you or from running a business or farm. This includes all the income, wages, and tips you get from working."
+    },
+    {
+      "term": "Fixed expenses",
+      "definition": "Expenses, like bills, that must be paid each month and generally cost the same amount. Some fixed expenses, like a utility bill, may also be variable because the amount changes each month depending on usage."
+    },
+    {
+      "term": "Income",
+      "definition": "Money earned or received such as wages or salaries, tips, commissions, contracted pay, government transfer payments, dividends on investments, tax refunds, gifts, and inheritances."
+    },
+    {
+      "term": "Needs",
+      "definition": "Basic things people must have to survive (such as food, clothing, and shelter), resources they may need to do their jobs (such as reliable transportation and the tools of the trade), and resources to help build and protect their money and property so they can meet future needs (such as emergency savings and insurance)."
+    },
+    {
+      "term": "Principal",
+      "definition": "In the lending context, principal is the amount of money that you originally received from the lender and agreed to pay back on the loan with interest. In the investment context, it is the amount of money you contribute with the expectation of receiving income."
+    },
+    {
+      "term": "Savings",
+      "definition": "Money you have set aside in a secure place, such as in a bank account, that you can use for future emergencies or to make specific purchases."
+    },
+    {
+      "term": "Variable expenses",
+      "definition": "Expenses that change in amount from month to month."
+    },
+    {
+      "term": "Wants",
+      "definition": "Upgrades and other things that would be nice to have but aren't necessary for living, income, or protecting what you have."
+    }
+  ],
+  "worksCited": [
+    {
+      "id": "cfpb-youth-glossary",
+      "title": "Youth Financial Education Glossary",
+      "author": "Consumer Financial Protection Bureau (CFPB)",
+      "citation": "Consumer Financial Protection Bureau. \"Youth Financial Education Glossary.\"",
+      "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/glossary/#b"
     }
   ]
 }
