@@ -27,6 +27,11 @@ const userProgressSchema = new mongoose.Schema(
       required: true,
       default: "1.1.1",
     },
+    current_chunk_index: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
     completed_lessons: [
       {
         type: String,
