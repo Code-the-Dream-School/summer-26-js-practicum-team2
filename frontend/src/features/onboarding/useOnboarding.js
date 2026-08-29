@@ -1,51 +1,55 @@
-// src/features/onboarding/useOnboarding.js
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router'; 
+import { getOnboardingState, updateOnboardingProgress,toggleOnboardingAPI } from '../../services/api';
 
-// State machine configuration mapping steps to pages and paths
-export const ONBOARDING_STEPS = {
-  0: { page: 'dashboard', route: '/dashboard' },
-  1: { page: 'profile', route: '/profile' },
-  2: { page: 'lesson', route: '/lesson/sample-lesson' } 
-};
-
-export function useOnboarding() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [hasCompleted, setHasCompleted] = useState(true);
-  const navigate = useNavigate();
+export function useOnboarding(isAuthenticated, csrfToken) {
+  const [onboardingData, setOnboardingData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if the user has a "completed" flag saved in their browser
-    const status = localStorage.getItem('sprout_onboarding_complete');
+    if (!isAuthenticated) return;
     
-    if (status === null) {
-      // First time landing from verification link -> Initialize onboarding
-      localStorage.setItem('sprout_onboarding_complete', 'false');
-      setHasCompleted(false);
-    } else {
-      setHasCompleted(status === 'true');
-    }
-  }, []);
+    getOnboardingState(csrfToken)
+      .then((data) => {
+        if (data.success) setOnboardingData(data.onboarding);
+      })
+      .catch((err) => console.error("Error loading onboarding state:", err))
+      .finally(() => setLoading(false));
+  }, [isAuthenticated, csrfToken]);
 
-  const handleNextStep = () => {
-    const nextStepIndex = currentStep + 1;
-    
-    if (ONBOARDING_STEPS[nextStepIndex]) {
-      setCurrentStep(nextStepIndex);
-      // Sequentially shifts page routes just like advancing local views
-      navigate(ONBOARDING_STEPS[nextStepIndex].route);
-    } else {
-      // Final walkthrough target cleared -> Mark complete permanently
-      localStorage.setItem('sprout_onboarding_complete', 'true');
-      setHasCompleted(true);
-      navigate('/dashboard'); 
+  const saveTourProgress = async ({ tourKey, step, dismissed }) => {
+    try {
+      const result = await updateOnboardingProgress({
+        tourKey,
+        step,
+        dismissed,
+        csrfToken,
+      });
+      
+      if (result.onboarding) {
+        setOnboardingData(result.onboarding); 
+      }
+    } catch (err) {
+      console.error(`Failed to patch onboarding data for ${tourKey}:`, err);
     }
   };
 
-  return {
-    currentStep,
-    hasCompleted,
-    activePage: ONBOARDING_STEPS[currentStep]?.page,
-    handleNextStep
-  };
+  // Inside your useOnboarding hook function block, add this method:
+const toggleOnboarding = async (enabled) => {
+  try {
+    const result = await toggleOnboardingAPI(enabled, csrfToken);
+    if (result.success) {
+      setOnboardingData(result.onboarding);
+    }
+  } catch (err) {
+    console.error("Failed to toggle onboarding:", err);
+  }
+};
+
+return {
+  onboardingData,
+  loading,
+  saveTourProgress,
+  toggleOnboarding, // <-- Exposed to frontend components
+  isCompleted: onboardingData?.is_completed ?? false,
+};
 }

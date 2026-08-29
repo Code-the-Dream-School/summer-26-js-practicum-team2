@@ -10,8 +10,8 @@ import Skeleton from "../shared/Skeleton/Skeleton.component";
 import { ROUTES } from "../app/router/routes";
 
 import useDashboardData from "../hooks/useDashboardData";
-import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component"; 
-// i imported the onboard overlay
+import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
+import { toggleOnboardingAPI } from "../services/api";
 
 function DashboardSkeleton() {
   return (
@@ -26,8 +26,8 @@ function DashboardSkeleton() {
     </section>
   );
 }
-// i passed in the onboarding in the dashboardpage
-export default function DashboardPage({onboarding}) {
+
+export default function DashboardPage() {
   const { user, isAuthenticated } = useAuthContext();
   const { dashboard, isLoading, error } = useDashboardData({
     userId: user?.id,
@@ -109,15 +109,14 @@ export default function DashboardPage({onboarding}) {
           <RecentActivityCard activity={recentActivity} />
         </div>
       )}
-        {/* berenice onboarding code */}
-       {!isLoading && onboarding && !onboarding.hasCompleted && (
-        <OnboardingOverlay
-          currentStep={onboarding.currentStep}
-          activePage={onboarding.activePage}
-          pageName="dashboard"
-          onNext={onboarding.handleNextStep}
-        />
-      )}
+
+  {!isLoading && toggleOnboardingAPI && !toggleOnboardingAPI.loading && (
+  <OnboardingOverlay
+    tourKey="dashboardPage"
+    onboarding={toggleOnboardingAPI.onboardingData}
+    onSaveProgress={toggleOnboardingAPI.saveTourProgress}
+    />
+    )}
     </section>
   );
 }

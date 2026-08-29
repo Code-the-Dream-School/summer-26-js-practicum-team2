@@ -62,6 +62,19 @@ export const logoutUser = (csrfToken) =>
 
 export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);
 
+export const toggleOnboardingAPI = async (enabled, csrfToken) => {
+  const response = await fetch("/api/v1/onboarding/toggle", {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken 
+    },
+    body: JSON.stringify({ enabled }),
+  });
+  if (!response.ok) throw new Error("Could not toggle onboarding configuration");
+  return response.json();
+  };
+
 export const forgotPasswordRequest = (email) =>
   apiRequest("/forgot-password", {
     method: "POST",

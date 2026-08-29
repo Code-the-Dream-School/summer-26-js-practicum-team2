@@ -23,6 +23,8 @@ import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
 import rightAnswerIcon from "../assets/right_answer.svg";
 import wrongAnswerIcon from "../assets/wrong_answer.svg";
+import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
+
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
@@ -52,6 +54,7 @@ function LearnFlow({
   savedProgress = null,
   csrfToken,
   isReadOnly = false,
+  onboarding,
 }) {
   const { lessonSteps } = learnData;
 
@@ -249,6 +252,13 @@ function LearnFlow({
             )}
           </div>
         </Card>
+          {onboarding && !onboarding.loading && (
+          <OnboardingOverlay
+            tourKey="lessonPage" // Valid tour key matching your express controllers checks
+            onboarding={onboarding.onboardingData}
+            onSaveProgress={onboarding.saveTourProgress}
+          />
+        )}
       </section>
     );
   }
@@ -365,11 +375,12 @@ function LearnFlow({
   );
 }
 
-export default function LearnPage() {
+export default function LearnPage({onboarding}) {
   const { isAuthenticated, csrfToken } = useAuthContext();
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+
 
   const isSamplePreview = searchParams.get("sample") === "true";
 
@@ -466,6 +477,7 @@ export default function LearnPage() {
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
       csrfToken={csrfToken}
+      onboarding={onboarding}
     />
   );
 }

@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-
 import { useAuthContext } from "../context/AuthContext";
 import {
   changeProfilePassword,
@@ -14,8 +13,6 @@ import Input from "../shared/Input/Input.component";
 import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-
-// I imported the onboarding overlay
 import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
 
 const errorMessage = (error) =>
@@ -30,8 +27,7 @@ const Stat = ({label, value}) => {
   );
 };
 
-// i passed in the onboarding 
-export default function ProfilePage({onboarding}) {
+export default function ProfilePage({ onboarding }) {
   const { csrfToken } = useAuthContext();
   const [profile, setProfile] = useState(null);
 
@@ -101,31 +97,12 @@ export default function ProfilePage({onboarding}) {
       setPending("");
     }
   };
-   
-  // Please create a simple frontend action for "Goals" like a radio dial option for
-  // users to choose from. Once a week, twice, three times max.
-
-  // const deleteAccount = async(event) => {
-  //   event.preventDefault();
-  //   setPending("Delete");
-  //   try{
-  //     await deleteProfile({email:deleteEmail, csrfToken})
-  //     try{
-  //       await logout()
-  //     }catch{}  
-  //   }catch(error) {
-  //     showToast(result.message, "success");
-  //   } finally{
-  //     setPending("");
-  //   }
-  // };
 
   if(loading){
     return <Skeleton />
   }
 
-  const savedDisplayName = profile?.name || "username"
-
+  const savedDisplayName = profile?.name || "username";
 
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -153,20 +130,42 @@ export default function ProfilePage({onboarding}) {
       <Card className="space-y-4">
         <h2 className="font-heading text-h4 font-bold text-heading">
           Identity & Goals
-          </h2>
+        </h2>
         <form onSubmit={saveProfile} className="space-y-4 max-w-md">
           <Input id="profile-name" label="Display Name" required minLength={2} maxLength={30} value={name} onChange={e => setName(e.target.value)}/>
           <Button type="submit">
             Save Changes 
           </Button>
         </form>
+
+        {/* Onboarding Toggle Switch inside the Card */}
+        {onboarding && !onboarding.loading && (
+          <div className="mt-6 border-t border-neutral-100 pt-4 max-w-md">
+            <label className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-surface-app p-4 shadow-sm cursor-pointer hover:bg-neutral-50 transition-colors">
+              <div>
+                <p className="text-sm font-semibold text-heading">Enable Onboarding Walkthroughs</p>
+                <p className="text-xs text-neutral-500 leading-tight mt-0.5">
+                  {onboarding.isCompleted 
+                    ? "Tours are hidden. Check this box to re-run the layout guide tutorials." 
+                    : "Tours are currently active. Uncheck this box to skip all helpful tips."}
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                className="h-5 w-5 rounded border-neutral-300 accent-primary cursor-pointer"
+                checked={!onboarding.isCompleted}
+                onChange={() => onboarding.toggleOnboarding(onboarding.isCompleted)}
+              />
+            </label>
+          </div>
+        )}
       </Card>
 
-    {/* Security & Credentials */}
+      {/* Security & Credentials */}
       <Card className="space-y-4">
         <h2 className="font-heading text-h4 font-bold text-heading">
           Security & Credentials
-          </h2>
+        </h2>
         <form onSubmit={changePassword} className="space-y-4 max-w-md">
             <label className="text-small font-semibold text-heading block"> Current Password</label>
             <Input
@@ -188,14 +187,24 @@ export default function ProfilePage({onboarding}) {
             />
           <Button
             type="submit"
-            disable={pending==="password"}
+            disabled={pending === "Password"}
           >
-            {pending==="password"?"Updating...":"Update Password"}
+            {pending === "Password" ? "Updating..." : "Update Password"}
           </Button>
         </form>
       </Card>
+ 
+      {/* Onboarding Overlay */}
+      {!loading && onboarding && !onboarding.loading && (
+        <OnboardingOverlay
+          tourKey="profilePage"
+          onboarding={onboarding.onboardingData}
+          onSaveProgress={onboarding.saveTourProgress}
+        />
+      )}
 
-      {/* Danger Zone - Don't comment in we are no longer using this
+      {/* Danger Zone - Kept completely commented out as requested */}
+      {/* 
       <div className="space-y-4 rounded-2xl border-2 border-dashed border-danger/40 bg-danger/5 p-6">
         <header className="space-y-1">
           <h2 className="font-heading text-h4 font-bold text-danger">
@@ -223,18 +232,10 @@ export default function ProfilePage({onboarding}) {
             className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
           >
             {pending === "delete" ? "Deleting..." : "Delete Account"}
-       </Button>
-    </form>
-    </div> */}
-
-          {!loading && onboarding && !onboarding.hasCompleted && (
-        <OnboardingOverlay
-          currentStep={onboarding.currentStep}
-          activePage={onboarding.activePage}
-          pageName="profile"
-          onNext={onboarding.handleNextStep}
-        />
-      )}
+          </Button>
+        </form>
+      </div> 
+      */}
     </section>
   );
 }

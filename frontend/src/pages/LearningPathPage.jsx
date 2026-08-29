@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from "../hooks/useLessonContent";
-import { getLesson, getLessonProgress } from "../services/api";
+import { getLesson, getLessonProgress,toggleOnboardingAPI } from "../services/api";
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
@@ -22,7 +22,7 @@ function getMicroLessonPreview(content = []) {
     .join(" ");
 }
 
-export default function LearningPathPage({onboarding}) {
+function LearningPathPage() {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
@@ -257,7 +257,7 @@ export default function LearningPathPage({onboarding}) {
           className="relative mx-auto mt-5 w-full max-w-[18rem] md:max-w-[34rem] lg:max-w-[44rem]"
           style={{ height: `${pathHeight}rem` }}
         >
-          {/* Lines connecting the learning path nodes */}
+  
           <svg
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
@@ -306,7 +306,6 @@ export default function LearningPathPage({onboarding}) {
             })}
           </svg>
 
-          {/* Rendering the learning path */}
           {learningPath.map((node, index) => {
             let status = "locked";
 
@@ -397,14 +396,12 @@ export default function LearningPathPage({onboarding}) {
             </Button>
           )}
         </div>
-
-        {/* onboarding Path */}
-        {onboarding && !onboarding.hasCompleted && (
+        {toggleOnboardingAPI && !toggleOnboardingAPI.hasCompleted && (
         <OnboardingOverlay
-          currentStep={onboarding.currentStep}
-          activePage={onboarding.activePage}
+          currentStep={toggleOnboardingAPI.currentStep}
+          activePage={toggleOnboardingAPI.activePage}
           pageName="lessonPath"
-          onNext={onboarding.handleNextStep}
+          onNext={toggleOnboardingAPI.handleNextStep}
         />
       )}
       </footer>
