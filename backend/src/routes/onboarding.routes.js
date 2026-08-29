@@ -13,8 +13,8 @@ router.use(jwtMiddleware);
 
 //GET /api/v1/onboarding
 router.get("/", getOnboardingState);
-//POST /api/v1/onboarding/toggle
-router.post("/toggle", toggleOnboardingWorkflow);
+//PATCH /api/v1/onboarding/toggle
+router.patch("/toggle", toggleOnboardingWorkflow);
 
 //PATCH /api/v1/onboarding/step
 router.patch("/step", updateOnboardingProgress);
