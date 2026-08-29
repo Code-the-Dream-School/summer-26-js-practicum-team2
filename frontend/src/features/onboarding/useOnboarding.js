@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getOnboardingState, updateOnboardingProgress,toggleOnboardingAPI } from '../../services/api';
 
+export const ONBOARDING_STEPS = {
+  0: { page: 'dashboardPage', route: '/dashboard' },
+  1: { page: 'profilePage', route: '/profile' },
+  2: { page: 'learningPath', route: '/learning-path' },
+  3: { page: 'lessonPage', route: '/learn/cashFlow/1.1' }
+}
+
 export function useOnboarding(isAuthenticated, csrfToken) {
   const [onboardingData, setOnboardingData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +56,7 @@ return {
   onboardingData,
   loading,
   saveTourProgress,
-  toggleOnboarding, // <-- Exposed to frontend components
+  toggleOnboarding, 
   isCompleted: onboardingData?.is_completed ?? false,
 };
 }

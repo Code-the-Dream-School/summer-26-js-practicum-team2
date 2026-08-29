@@ -6,6 +6,7 @@ const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
+const ONBOARDING_BASE_PATH = `${API_BASE_URL}/api/v1/onboarding`;
 
 // Helper function to make API requests to the backend.
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
