@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import Button from "../../../Button/Button.component";
 
@@ -13,6 +13,27 @@ export default function NavBar({
   isSigningOut = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const [currentAvatarLabel, setCurrentAvatarLabel] = useState(avatarLabel);
+
+  useEffect(()=>{
+    const handleProfileUpdate = (event) => {
+      const user = event.detail?.user;
+      const name = user?.name || event.detail?.avatarLabel;
+
+      if (name && typeof name === "string"){
+        setCurrentAvatarLabel(name.trim().charAt(0).toUpperCase());
+      }
+    };
+
+    window.addEventListener("sprout:profile-updated", handleProfileUpdate);
+    window.addEventListener("sprout:progress-updated", handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener("sprout:profile-updated", handleProfileUpdate);
+      window.removeEventListener("sprout:progress-updated", handleProfileUpdate);
+    };
+  },[]);
 
   const authNavLinks = signedIn
     ? [
@@ -30,7 +51,8 @@ export default function NavBar({
         { label: "Login", href: "/login" },
         { label: "Signup", href: "/register" },
       ];
-
+       //add logic to listen to profile change event 
+       //wrap in use effect to update avatar label
   return (
     <nav aria-label="Primary navigation">
       <menu className="hidden items-center gap-1 md:flex">
@@ -49,7 +71,7 @@ export default function NavBar({
               <NavLink
                 to={link.href}
                 className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset"
-              >
+              > 
                 {link.label}
               </NavLink>
             )}
@@ -74,7 +96,7 @@ export default function NavBar({
             <li>
               <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
-                  <NavLink to="/profile">{avatarLabel}</NavLink>
+                  <NavLink to="/profile">{currentAvatarLabel}</NavLink>
                 </span>
                 <span className="text-sm font-semibold text-heading">{xp} XP</span>
                 <span className="text-sm text-neutral-600">{streak} day streak</span>
