@@ -163,7 +163,7 @@ exports.startQuiz = async (req, res, next) => {
 
 exports.submitQuiz = async (req, res, next) => {
   try {
-    let microLessonId = req.params.id;
+    const microLessonId = req.params.id;
     const userId = req.user.id; //due to middleware from jwt
     const { attemptId, moduleId = "cashFlow", answers = {} } = req.body || {};
 
@@ -239,6 +239,13 @@ exports.submitQuiz = async (req, res, next) => {
       passed: true,
     });
 
+    //Check if they've gotten a perfect score previously on this quiz
+    const previousPerfect = await QuizAttempt.findOne({
+      user_id: userId,
+      micro_lesson_id: microLessonId,
+      score: 100,
+    });
+
     // ****************** TODO: Replace with XP earned today once XP event tracking exists ***************
 
     //Change to grab user's xp for today
@@ -254,6 +261,15 @@ exports.submitQuiz = async (req, res, next) => {
       currentTotal,
       score,
       isFirstPass: passed && !previousPass,
+    });
+
+    //Add xp for first perfect score on each quiz
+    const perfectXp = calculateXpDelta({
+      eventType: "quiz_perfect",
+      currentTotal,
+      score,
+      isPerfect: score === 100,
+      isFirstPerfect: !previousPerfect,
     });
 
     //Emit events
@@ -299,6 +315,13 @@ exports.submitQuiz = async (req, res, next) => {
         };
       }
 
+      if (perfectXp.amount > 0) {
+        update.$inc = {
+          ...(update.$inc || {}),
+          xp: (update.$inc?.xp || 0) + perfectXp.amount,
+        };
+      }
+
       const updatedProgress = await UserProgress.findOneAndUpdate(
         { user_id: userId, module_id: moduleId },
         update,
@@ -312,11 +335,22 @@ exports.submitQuiz = async (req, res, next) => {
 
       // parent lesson will be considered complete only if all micro lessons are finished
       if (isLessonFullyCompleted) {
+        const alreadyCompleted = updatedProgress.completed_lessons?.includes(lessonId) || false;
+
+        const lessonXp = calculateXpDelta({
+          eventType: "lesson_complete",
+          currentTotal,
+          isFirstTime: !alreadyCompleted,
+        });
+
         await UserProgress.findOneAndUpdate(
           { user_id: userId, module_id: moduleId },
           {
             $addToSet: {
               completed_lessons: lessonId,
+            },
+            $inc: {
+              xp: lessonXp.amount,
             },
           },
         );
