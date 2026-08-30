@@ -186,7 +186,6 @@
               "text": "A budget is simply a plan for your money. It's a tool you can use to help make financial decisions."
             },
             {
-   
               "type": "paragraph",
               "text": "Budgets involve two main categories: income and expenses."
             },
@@ -1436,11 +1435,46 @@
   ],
   "worksCited": [
     {
+      "id": "adp-nc-paycheck-calculator",
+      "title": "North Carolina Paycheck Calculator",
+      "author": "ADP",
+      "citation": "ADP. \"North Carolina Paycheck Calculator.\"",
+      "url": "https://www.adp.com/resources/tools/calculators/states/north-carolina-salary-paycheck-calculator.aspx"
+    },
+    {
+      "id": "ivey-glen-apartment-community",
+      "title": "Ivey Glen Apartment Community",
+      "author": "Apartments.com",
+      "citation": "Apartments.com. \"Ivey Glen Apartment Community.\"",
+      "url": "https://www.apartments.com/ivey-glen-apartment-community-graham-nc/n1fre0m/"
+    },
+    {
       "id": "cfpb-youth-glossary",
       "title": "Youth Financial Education Glossary",
       "author": "Consumer Financial Protection Bureau (CFPB)",
       "citation": "Consumer Financial Protection Bureau. \"Youth Financial Education Glossary.\"",
       "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/glossary/#b"
+    },
+    {
+      "id": "fnb-financial-literacy",
+      "title": "Financial Literacy",
+      "author": "First National Bank (FNB)",
+      "citation": "First National Bank (FNB). \"Financial Literacy.\" Udemy.",
+      "url": "https://www.udemy.com/course/fnb-financial-literacy/"
+    },
+    {
+      "id": "mit-living-wage-calculator",
+      "title": "Living Wage Calculator",
+      "author": "Massachusetts Institute of Technology (MIT)",
+      "citation": "Massachusetts Institute of Technology. \"Living Wage Calculator.\"",
+      "url": "https://livingwage.mit.edu/"
+    },
+    {
+      "id": "nc-child-support-calculator",
+      "title": "North Carolina Child Support Guidelines",
+      "author": "North Carolina Department of Health and Human Services (NCDHHS)",
+      "citation": "North Carolina Department of Health and Human Services. \"North Carolina Child Support Guidelines.\"",
+      "url": "https://ncchildsupport.ncdhhs.gov/ecoa/index.jsp?timeout=true"
     }
   ]
 }
