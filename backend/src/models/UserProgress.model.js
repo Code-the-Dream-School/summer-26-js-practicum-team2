@@ -45,10 +45,6 @@ const userProgressSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    onboardingXpAwarded: {
-      type: Boolean,
-      default: false,
-    },
     earned_badges: [
       {
         badge_name: String,

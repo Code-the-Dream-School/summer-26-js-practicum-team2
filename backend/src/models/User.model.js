@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema(
     },
     onboarding: {
       is_completed: { type: Boolean, default: false },
+      xp_awarded: { type: Boolean, default: false },
       started_at: {
         type: Date,
         default: null,

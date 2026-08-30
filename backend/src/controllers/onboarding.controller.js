@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const { updateOnboardingProgressSchema } = require("../validation/userValidation.js");
-const User = require("../models/User.model.js");
+const { User } = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
 const { calculateXpDelta } = require("../utils/coreRules.js");
 //const { STATES } = require("mongoose");
@@ -104,7 +104,11 @@ const updateOnboardingProgress = async (req, res, next) => {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "No user found." });
     }
     if (!user.onboarding) {
-      user.onboarding = { is_completed: false, tours: {} };
+      user.onboarding = {
+        is_completed: false,
+        xp_awarded: false,
+        tours: {},
+      };
     }
     if (!user.onboarding.started_at) {
       user.onboarding.started_at = new Date();
@@ -154,21 +158,27 @@ const updateOnboardingProgress = async (req, res, next) => {
       user.onboarding.is_completed = true;
       user.onboarding.completed_at = new Date();
 
-      //Grabbing users current xp
-      const progress = await UserProgress.findOne({
-        user_id: userId,
-      });
+      // ****************** TODO: Replace with XP earned today once XP event tracking exists ***************
 
-      const currentTotal = progress?.xp || 0;
+      //Change to grab user's xp for today
+      // const progress = await UserProgress.findOne({
+      //   user_id: userId,
+      // });
+
+      const currentTotal = 0;
 
       //Award xp for first time onboarding completion
       const xpResult = calculateXpDelta({
         eventType: "onboarding_complete",
-        isFirstTime: true,
+        isFirstTime: !user.onboarding.xp_awarded,
         currentTotal,
       });
 
       xpAwarded = xpResult.amount;
+
+      if (xpAwarded > 0) {
+        user.onboarding.xp_awarded = true;
+      }
     }
     user.markModified("onboarding");
     await user.save();
@@ -176,7 +186,9 @@ const updateOnboardingProgress = async (req, res, next) => {
     if (xpAwarded > 0) {
       await UserProgress.findOneAndUpdate(
         { user_id: userId },
-        { $inc: { xp: xpAwarded } },
+        {
+          $inc: { xp: xpAwarded },
+        },
         { upsert: true, returnDocument: "after" },
       );
     }
