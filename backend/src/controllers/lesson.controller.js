@@ -110,7 +110,9 @@ exports.updateLessonProgress = async (req, res, next) => {
 
     const progressRecord = await UserProgress.findOneAndUpdate(
       { user_id: req.user.id, module_id: moduleId },
-      { $set: update },
+      {
+        $set: update,
+      },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     );
 

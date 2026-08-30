@@ -5,6 +5,8 @@ const EventEmitter = require("events");
 const quizEvents = new EventEmitter();
 //Event listeners for Quiz Cycle
 
+const { calculateXpDelta } = require("../utils/coreRules");
+
 quizEvents.on("quiz_submit", ({ userId, microLessonId, score, attemptNumber }) => {
   console.log(
     `[Event: quiz_submit] User ${userId} submitted ${microLessonId} (Attempt #${attemptNumber}, Score: ${score}%)`,
@@ -230,6 +232,30 @@ exports.submitQuiz = async (req, res, next) => {
     const passThreshold = 70;
     const passed = score >= passThreshold;
 
+    //Check if they've passed previously to award xp for only first pass
+    const previousPass = await QuizAttempt.findOne({
+      user_id: userId,
+      micro_lesson_id: microLessonId,
+      passed: true,
+    });
+
+    // ****************** TODO: Replace with XP earned today once XP event tracking exists ***************
+
+    //Change to grab user's xp for today
+    // const progress = await UserProgress.findOne({
+    //   user_id: userId,
+    // });
+
+    //Add xp for passing quiz
+    const currentTotal = 0;
+
+    const quizPassXp = calculateXpDelta({
+      eventType: "quiz_pass",
+      currentTotal,
+      score,
+      isFirstPass: passed && !previousPass,
+    });
+
     //Emit events
     quizEvents.emit("quiz_submit", {
       userId,
@@ -251,22 +277,31 @@ exports.submitQuiz = async (req, res, next) => {
     attempt.answers = evaluatedAnswers;
     await attempt.save();
 
-    // save attempt record
+    // save attempt record & update xp for passing quiz for first time
     if (passed) {
       /*REMOVE AUGUST 10console.log(
         `[Event: quiz_pass] User ${userId} passed quiz ${microLessonId}`,
       );*/
+
+      const update = {
+        $addToSet: {
+          completed_micro_lessons: microLessonId,
+        },
+        // used by next action in dashboard to point Resume Course button to  user's latest lesson
+        $set: {
+          current_micro_lesson_id: microLessonId,
+        },
+      };
+
+      if (quizPassXp.amount > 0) {
+        update.$inc = {
+          xp: quizPassXp.amount,
+        };
+      }
+
       const updatedProgress = await UserProgress.findOneAndUpdate(
         { user_id: userId, module_id: moduleId },
-        {
-          $addToSet: {
-            completed_micro_lessons: microLessonId,
-          },
-          // used by next action in dashboard to point Resume Course button to  user's latest lesson
-          $set: {
-            current_micro_lesson_id: microLessonId,
-          },
-        },
+        update,
         { upsert: true, new: true },
       );
       const allMicroLessonsIds = getMicroLessonIdsForLesson(moduleId, lessonId);
