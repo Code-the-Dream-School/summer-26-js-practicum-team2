@@ -3,6 +3,7 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const { createAuthedUser } = require("./helpers/authTestHelpers");
+const { withAuth, withSessionCsrf } = require("./helpers/requestTestHelpers");
 
 useTestDb();
 
@@ -38,9 +39,10 @@ describe("backend API negative paths", () => {
     );
 
     // Even though the token is formatted correctly, an expired token should not authenticate the user.
-    const lessonRes = await request(app)
-      .get("/api/v1/lessons/progress")
-      .set("Authorization", `Bearer ${expiredToken}`);
+    const lessonRes = await withAuth(
+      request(app).get("/api/v1/lessons/progress"),
+      `Bearer ${expiredToken}`,
+    );
 
     expect(lessonRes.status).toBe(401);
     expect(lessonRes.body.message).toContain("No user is authenticated");
@@ -62,10 +64,11 @@ describe("backend API negative paths", () => {
     const { token } = await createAuthedUser("Mismatched Csrf User", "mismatched-csrf@example.com");
 
     // Send a valid session cookie, but use a CSRF token that does not match the one in the JWT.
-    const logoutRes = await request(app)
-      .post("/api/v1/users/logout")
-      .set("Cookie", [`session_token=${token}`])
-      .set("x-csrf-token", "different-csrf-token");
+    const logoutRes = await withSessionCsrf(
+      request(app).post("/api/v1/users/logout"),
+      token,
+      "different-csrf-token",
+    );
 
     expect(logoutRes.status).toBe(403);
     expect(logoutRes.body.message).toContain("Invalid CSRF token");
@@ -78,10 +81,12 @@ describe("backend API negative paths", () => {
     );
 
     // Use a module ID that does not exist in the lesson content.
-    const progressRes = await request(app)
-      .get("/api/v1/lessons/progress")
-      .set("Authorization", authHeader)
-      .query({ moduleId: "missingModule" });
+    const progressRes = await withAuth(
+      request(app).get("/api/v1/lessons/progress"),
+      authHeader,
+    ).query({
+      moduleId: "missingModule",
+    });
 
     expect(progressRes.status).toBe(404);
     expect(progressRes.body.message).toContain("was not found");
@@ -91,10 +96,12 @@ describe("backend API negative paths", () => {
     const { authHeader } = await createAuthedUser("Empty Cursor User", "empty-cursor@example.com");
 
     // Send the module ID without telling the API which lesson or micro-lesson to update.
-    const updateRes = await request(app)
-      .patch("/api/v1/lessons/progress")
-      .set("Authorization", authHeader)
-      .send({ moduleId: "cashFlow" });
+    const updateRes = await withAuth(
+      request(app).patch("/api/v1/lessons/progress"),
+      authHeader,
+    ).send({
+      moduleId: "cashFlow",
+    });
 
     expect(updateRes.status).toBe(400);
     expect(updateRes.body.message).toContain("lessonId or microLessonId is required");
@@ -107,9 +114,10 @@ describe("backend API negative paths", () => {
     );
 
     // Request lesson content from a module that does not exist.
-    const lessonRes = await request(app)
-      .get("/api/v1/lessons/missingModule/1.1")
-      .set("Authorization", authHeader);
+    const lessonRes = await withAuth(
+      request(app).get("/api/v1/lessons/missingModule/1.1"),
+      authHeader,
+    );
 
     expect(lessonRes.status).toBe(404);
     expect(lessonRes.body.message).toContain("Module 'missingModule' was not found");
@@ -122,9 +130,7 @@ describe("backend API negative paths", () => {
     );
 
     // Use a real module, but request a lesson ID that does not exist in it.
-    const lessonRes = await request(app)
-      .get("/api/v1/lessons/cashFlow/9.9")
-      .set("Authorization", authHeader);
+    const lessonRes = await withAuth(request(app).get("/api/v1/lessons/cashFlow/9.9"), authHeader);
 
     expect(lessonRes.status).toBe(404);
     expect(lessonRes.body.message).toContain("Lesson '9.9' was not found in module 'cashFlow'");
@@ -137,10 +143,9 @@ describe("backend API negative paths", () => {
     );
 
     // Starting a quiz requires both the module and the micro-lesson being attempted.
-    const startRes = await request(app)
-      .post("/api/v1/quizzes/start")
-      .set("Authorization", authHeader)
-      .send({ moduleId: "cashFlow" });
+    const startRes = await withAuth(request(app).post("/api/v1/quizzes/start"), authHeader).send({
+      moduleId: "cashFlow",
+    });
 
     expect(startRes.status).toBe(400);
     expect(startRes.body.message).toContain("microLessonId is required");
@@ -153,10 +158,13 @@ describe("backend API negative paths", () => {
     );
 
     // Use a micro-lesson ID that does not have any quiz questions tied to it.
-    const submitRes = await request(app)
-      .post("/api/v1/quizzes/9.9.9/submit")
-      .set("Authorization", authHeader)
-      .send({ moduleId: "cashFlow", answers: {} });
+    const submitRes = await withAuth(
+      request(app).post("/api/v1/quizzes/9.9.9/submit"),
+      authHeader,
+    ).send({
+      moduleId: "cashFlow",
+      answers: {},
+    });
 
     expect(submitRes.status).toBe(404);
     expect(submitRes.body.message).toContain("No quiz questions found");
@@ -166,10 +174,13 @@ describe("backend API negative paths", () => {
     const { authHeader } = await createAuthedUser("No Attempt User", "no-attempt@example.com");
 
     // Use a real quiz, but skip the quiz start request so no attempt exists yet.
-    const submitRes = await request(app)
-      .post("/api/v1/quizzes/1.1.2/submit")
-      .set("Authorization", authHeader)
-      .send({ moduleId: "cashFlow", answers: {} });
+    const submitRes = await withAuth(
+      request(app).post("/api/v1/quizzes/1.1.2/submit"),
+      authHeader,
+    ).send({
+      moduleId: "cashFlow",
+      answers: {},
+    });
 
     expect(submitRes.status).toBe(404);
     expect(submitRes.body.message).toContain("No record of any quiz attempt");
@@ -181,40 +192,40 @@ describe("backend API negative paths", () => {
       "duplicate-submit@example.com",
     );
 
-    const startRes = await request(app)
-      .post("/api/v1/quizzes/start")
-      .set("Authorization", authHeader)
-      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+    const startRes = await withAuth(request(app).post("/api/v1/quizzes/start"), authHeader).send({
+      microLessonId: "1.1.2",
+      moduleId: "cashFlow",
+    });
 
     expect(startRes.status).toBe(201);
 
-    const firstSubmitRes = await request(app)
-      .post("/api/v1/quizzes/1.1.2/submit")
-      .set("Authorization", authHeader)
-      .send({
-        attemptId: startRes.body.attemptId,
-        moduleId: "cashFlow",
-        answers: {
-          "1.1.2-q2": ["d"],
-          "1.1.2-q3": ["a"],
-          "1.1.2-q4": ["a"],
-        },
-      });
+    const firstSubmitRes = await withAuth(
+      request(app).post("/api/v1/quizzes/1.1.2/submit"),
+      authHeader,
+    ).send({
+      attemptId: startRes.body.attemptId,
+      moduleId: "cashFlow",
+      answers: {
+        "1.1.2-q2": ["d"],
+        "1.1.2-q3": ["a"],
+        "1.1.2-q4": ["a"],
+      },
+    });
 
     expect(firstSubmitRes.status).toBe(200);
 
-    const duplicateSubmitRes = await request(app)
-      .post("/api/v1/quizzes/1.1.2/submit")
-      .set("Authorization", authHeader)
-      .send({
-        attemptId: startRes.body.attemptId,
-        moduleId: "cashFlow",
-        answers: {
-          "1.1.2-q2": ["d"],
-          "1.1.2-q3": ["a"],
-          "1.1.2-q4": ["a"],
-        },
-      });
+    const duplicateSubmitRes = await withAuth(
+      request(app).post("/api/v1/quizzes/1.1.2/submit"),
+      authHeader,
+    ).send({
+      attemptId: startRes.body.attemptId,
+      moduleId: "cashFlow",
+      answers: {
+        "1.1.2-q2": ["d"],
+        "1.1.2-q3": ["a"],
+        "1.1.2-q4": ["a"],
+      },
+    });
 
     expect(duplicateSubmitRes.status).toBe(409);
     expect(duplicateSubmitRes.body.message).toContain("already been submitted");
