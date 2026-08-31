@@ -8,7 +8,8 @@ const send401 = (res) => {
   return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
 };
 
-module.exports = (req, res, next) => {
+//module.exports = (req, res, next) => {
+  const authenticateUser = (req, res, next) =>{
   const cookieToken = req?.cookies?.session_token;
   const authorization = req.get("authorization") || "";
   const headerToken = authorization.startsWith("Bearer ") ? authorization.slice(7) : null;
@@ -37,3 +38,19 @@ module.exports = (req, res, next) => {
     return send401(res);
   }
 };
+
+//Authorize Role for Admin use: role authoriation middleware
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    return res.status(StatusCodes.FORBIDDEN).json({message: "Access denied."});
+  } 
+  return next();
+};
+};
+module.exports = {
+  authenticateUser,
+  authorizeRoles,
+};
+
+

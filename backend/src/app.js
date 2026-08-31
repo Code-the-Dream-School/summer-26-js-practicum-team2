@@ -5,7 +5,8 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
 // Middleware imports
-const jwtMiddleware = require("./middleware/jsonWebToken");
+//const jwtMiddleware = require("./middleware/jsonWebToken"); - need to remove with admin update
+const { authenticateUser: jwtMiddleware } = require("./middleware/jsonWebToken");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const notFoundMiddleware = require("./middleware/notFound");
 const { apiLimiter } = require("./middleware/rateLimiter");
@@ -17,6 +18,7 @@ const lessonRoutes = require("./routes/lesson.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 // Create Express app
 const app = express();
@@ -65,6 +67,7 @@ app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
 app.use("/api/v1/profile", jwtMiddleware, profileRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
+app.use("/api/v1/admin", adminRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application

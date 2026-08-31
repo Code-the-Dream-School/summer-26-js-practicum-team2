@@ -1,5 +1,6 @@
 const express = require("express");
-const jwtMiddleware = require("../middleware/jsonWebToken");
+const { authenticateUser: jwtMiddleware } = require("../middleware/jsonWebToken");
+//const jwtMiddleware = require("../middleware/jsonWebToken");
 const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 const {
   register,
