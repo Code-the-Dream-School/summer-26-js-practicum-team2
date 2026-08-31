@@ -1,16 +1,17 @@
-// Base URL is determined by the VITE_API_BASE_URL environment variable, which can be set in the .env file.
-// Removes trailing slashes from the URL to ensure consistent path construction
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
-const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
+
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
-const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
-const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
 const ONBOARDING_BASE_PATH = `${API_BASE_URL}/api/v1/onboarding`;
+const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
+const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
+const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 
-// Helper function to make API requests to the backend.
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
 
+/**
+ * Base API request helper
+ */
 async function apiRequest(path, options = {}) {
   const { method = "GET", body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options;
 
@@ -29,19 +30,35 @@ async function apiRequest(path, options = {}) {
     headers: requestHeaders,
     body: body ? JSON.stringify(body) : undefined,
   });
-  // Checks if the response is JSON and parses it if it is, otherwise returns null
+
   const isJson = response.headers.get("content-type")?.includes("application/json");
   const payload = isJson ? await response.json() : null;
 
-  // If the response is not OK, throw an error
   if (!response.ok) {
     const error = new Error(payload?.message || "Request failed. Please try again.");
     error.status = response.status;
     error.errors = Array.isArray(payload?.errors) ? payload.errors : [];
     throw error;
   }
+
   return payload;
 }
+
+/* ==========================================
+   EVENT EMITTERS
+   ========================================== */
+
+export const notifyProfileChange = (detail = {}) => {
+  window.dispatchEvent(new CustomEvent("sprout:profile-updated", { detail }));
+};
+
+export const notifyDashboardProgressChanged = (detail = {}) => {
+  window.dispatchEvent(new CustomEvent("sprout:progress-updated", { detail }));
+};
+
+/* ==========================================
+   AUTH & USERS API
+   ========================================== */
 
 export const registerUser = (formData) =>
   apiRequest("/register", {
@@ -61,20 +78,8 @@ export const logoutUser = (csrfToken) =>
     csrfToken,
   });
 
-export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);
-
-export const toggleOnboardingAPI = async (enabled, csrfToken) => {
-  const response = await fetch("/api/v1/onboarding/toggle", {
-    method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "X-CSRF-Token": csrfToken 
-    },
-    body: JSON.stringify({ enabled }),
-  });
-  if (!response.ok) throw new Error("Could not toggle onboarding configuration");
-  return response.json();
-  };
+export const verifyUserEmail = (token) => 
+  apiRequest(`/verify?token=${encodeURIComponent(token)}`);
 
 export const forgotPasswordRequest = (email) =>
   apiRequest("/forgot-password", {
@@ -88,34 +93,54 @@ export const resetPasswordRequest = (token, newPassword) =>
     body: { token, newPassword },
   });
 
+/* ==========================================
+   DASHBOARD API
+   ========================================== */
+
 export const getDashboard = () =>
   apiRequest("", {
     method: "GET",
     basePath: DASHBOARD_BASE_PATH,
   });
 
-export const getProfile = () =>
-  apiRequest("", {
-    basePath: PROFILE_BASE_PATH,
-    method: "GET"
+export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
+  const response = await apiRequest("/events", {
+    method: "POST",
+    csrfToken,
+    body: { type, ...payload },
+    basePath: DASHBOARD_BASE_PATH,
   });
 
-export const updateProfile = async({ csrfToken, ...profile }) => {
-  try { 
-    const resp = apiRequest("", {
-    method: "PATCH",
-    body: profile,
-    csrfToken,
+  notifyDashboardProgressChanged();
+  return response;
+};
+
+/* ==========================================
+   PROFILE API
+   ========================================== */
+
+export const getProfile = () =>
+  apiRequest("", {
+    method: "GET",
     basePath: PROFILE_BASE_PATH,
-  }) 
-  notifyProfileChange({user: resp?.user || profile });
+  });
 
-  return resp;
-} catch (error) {
-  console.error("failed to update profile", error);
-  throw error;
-}};
-
+export const updateProfile = async ({ csrfToken, ...profile }) => {
+  try {
+    const resp = await apiRequest("", {
+      method: "PATCH",
+      body: profile,
+      csrfToken,
+      basePath: PROFILE_BASE_PATH,
+    });
+    
+    notifyProfileChange({ user: resp?.user || profile });
+    return resp;
+  } catch (error) {
+    console.error("failed to update profile", error);
+    throw error;
+  }
+};
 
 export const changeProfilePassword = ({ currentPassword, newPassword, csrfToken }) =>
   apiRequest("/password", {
@@ -133,35 +158,9 @@ export const deleteProfile = ({ email, csrfToken }) =>
     basePath: PROFILE_BASE_PATH,
   });
 
-  //notifyProfileChange
-  //dispatch event that the profile changed!!
-  export const notifyProfileChange = (detail = {}) => {
-    window.dispatchEvent(new CustomEvent("sprout:profile-updated", {detail}));
-  };
-
-
-// Dispatches a custom event to notify the application that dashboard progress has been updated
-// This allows other components to listen for this event and update their state accordingly
-export const notifyDashboardProgressChanged = (detail = {}) => {
-  window.dispatchEvent(new Event("sprout:progress-updated", { detail }));
-};
-
-// Tracks a dashboard event by sending it to the backend and notifying listeners of progress changes
-// type: the event type to track
-// csrfToken: CSRF token for security
-// payload: additional event data to send to the server (spread into the request body)
-export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
-  const response = await apiRequest("/events", {
-    method: "POST",
-    csrfToken,
-    body: { type, ...payload },
-    basePath: DASHBOARD_BASE_PATH,
-  });
-
-  // Notify listeners that dashboard progress has changed
-  notifyDashboardProgressChanged();
-  return response;
-};
+/* ==========================================
+   LESSONS API
+   ========================================== */
 
 export const getLesson = (moduleId, lessonId) =>
   apiRequest(`/${encodeURIComponent(moduleId)}/${encodeURIComponent(lessonId)}`, {
@@ -189,6 +188,10 @@ export const updateLessonProgress = ({ moduleId, lessonId, microLessonId, csrfTo
     basePath: LESSONS_BASE_PATH,
   });
 
+/* ==========================================
+   QUIZZES API
+   ========================================== */
+
 export const getQuizProgress = () =>
   apiRequest("/progress", {
     method: "GET",
@@ -209,7 +212,6 @@ export const startQuiz = ({ moduleId, microLessonId, csrfToken }) =>
     basePath: QUIZZES_BASE_PATH,
   });
 
-// Submitting a quiz changes lesson progress, so the cached dashboard is invalidated alongside it.
 export const submitQuiz = async (microLessonId, { attemptId, moduleId, answers, csrfToken }) => {
   const response = await apiRequest(`/${encodeURIComponent(microLessonId)}/submit`, {
     method: "POST",
@@ -221,3 +223,50 @@ export const submitQuiz = async (microLessonId, { attemptId, moduleId, answers, 
   notifyDashboardProgressChanged();
   return response;
 };
+
+/* ==========================================
+   ONBOARDING API
+   ========================================== */
+
+export const getOnboardingBegin = () =>
+  apiRequest("/begin", { 
+    method: "GET", 
+    basePath: ONBOARDING_BASE_PATH 
+  });
+
+export const getOnboardingState = () =>
+  apiRequest("", { 
+    method: "GET", 
+    basePath: ONBOARDING_BASE_PATH 
+  });
+
+export const toggleOnboardingAPI = ({ enabled, csrfToken }) =>
+  apiRequest("/toggle", {
+    method: "POST",
+    csrfToken,
+    body: { enabled },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const toggleOnboardingWorkflow = ({ enabled, csrfToken }) =>
+  apiRequest("/toggle", {
+    method: "PATCH",
+    csrfToken,
+    body: { enabled },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const updateOnboardingStep = ({ tourKey, step, status, dismissed, markAllComplete, csrfToken }) =>
+  apiRequest("/step", {
+    method: "PATCH",
+    csrfToken,
+    body: { tourKey, step, status, dismissed, markAllComplete },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const resetOnboardingProgress = (csrfToken) =>
+  apiRequest("/reset", {
+    method: "POST",
+    csrfToken,
+    basePath: ONBOARDING_BASE_PATH,
+  });
