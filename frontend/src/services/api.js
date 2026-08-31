@@ -87,13 +87,22 @@ export const getProfile = () =>
     method: "GET",
   });
 
-export const updateProfile = ({ csrfToken, ...profile }) =>
-  apiRequest("", {
+export const updateProfile = async({ csrfToken, ...profile }) => {
+  try { 
+    const resp = apiRequest("", {
     method: "PATCH",
     body: profile,
     csrfToken,
     basePath: PROFILE_BASE_PATH,
-  });
+  }) 
+  notifyProfileChange({user: resp?.user || profile });
+
+  return resp;
+} catch (error) {
+  console.error("failed to update profile", error);
+  throw error;
+}};
+
 
 export const changeProfilePassword = ({ currentPassword, newPassword, csrfToken }) =>
   apiRequest("/password", {
@@ -139,6 +148,13 @@ export const reactivateUserAcct = (userId, csrfToken) =>
     basePath: ADMIN_BASE_PATH,
   });
 
+  //notifyProfileChange
+  //dispatch event that the profile changed!!
+  export const notifyProfileChange = (detail = {}) => {
+    window.dispatchEvent(new CustomEvent("sprout:profile-updated", {detail}));
+  };
+
+
 // Dispatches a custom event to notify the application that dashboard progress has been updated
 // This allows other components to listen for this event and update their state accordingly
 export const notifyDashboardProgressChanged = (detail = {}) => {
@@ -180,11 +196,25 @@ export const getLessonProgress = (moduleId) =>
     basePath: LESSONS_BASE_PATH,
   });
 
-export const updateLessonProgress = ({ moduleId, lessonId, microLessonId, csrfToken }) =>
+export const updateLessonProgress = ({
+  moduleId,
+  lessonId,
+  microLessonId,
+  currentChunkIndex,
+  csrfToken,
+}) =>
   apiRequest("/progress", {
     method: "PATCH",
     csrfToken,
-    body: { moduleId, lessonId, microLessonId },
+    body: { moduleId, lessonId, microLessonId, currentChunkIndex },
+    basePath: LESSONS_BASE_PATH,
+  });
+
+export const restartLessonProgress = ({ moduleId, csrfToken }) =>
+  apiRequest("/progress/restart", {
+    method: "PATCH",
+    csrfToken,
+    body: { moduleId },
     basePath: LESSONS_BASE_PATH,
   });
 
