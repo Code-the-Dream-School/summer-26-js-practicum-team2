@@ -42,6 +42,59 @@ describe("core rules", () => {
     });
   });
 
+  it("requires a perfect score", () => {
+    expect(
+      calculateXpDelta({
+        eventType: "quiz_perfect",
+        score: 80,
+        isPerfect: false,
+        isFirstPerfect: true,
+      }),
+    ).toEqual({
+      amount: 0,
+      capped: false,
+      remaining: 500,
+    });
+  });
+
+  it("clamps rewards when approaching the daily cap", () => {
+    expect(
+      calculateXpDelta({
+        eventType: "lesson_complete",
+        isFirstTime: true,
+        currentTotal: 495,
+      }),
+    ).toEqual({
+      amount: 5,
+      capped: true,
+      remaining: 0,
+    });
+  });
+
+  it("awards onboarding XP only once", () => {
+    expect(
+      calculateXpDelta({
+        eventType: "onboarding_complete",
+        isFirstTime: true,
+      }),
+    ).toEqual({
+      amount: 50,
+      capped: false,
+      remaining: 450,
+    });
+
+    expect(
+      calculateXpDelta({
+        eventType: "onboarding_complete",
+        isFirstTime: false,
+      }),
+    ).toEqual({
+      amount: 0,
+      capped: false,
+      remaining: 500,
+    });
+  });
+
   it("requires first perfect score", () => {
     expect(
       calculateXpDelta({
