@@ -21,6 +21,11 @@ feel in control of their money — without a lecture.
 - [Security Policy](.github/SECURITY.md)
 - [Support](SUPPORT.md)
 
+## ✅ Content Standards
+
+- [Content Accuracy Policy](docs/content-accuracy-policy.md)
+- [Content Accuracy Checklist](docs/content-accuracy-checklist.md)
+
 ## 🧠 Problem Statement
 
 Most young adults handle their first checking account, paycheck, and rent
@@ -48,7 +53,7 @@ first-paycheck recent grad.
 <!--
 ## 📸 Screenshots
 
-Add screenshots or GIFs of key features here. -->
+<!-- Add screenshots or GIFs of key features here. -->
 
 ## 🛠 Tech Stack
 

@@ -20,6 +20,12 @@ quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
 const QuizAttempt = require("../models/QuizAttempt.model");
 const UserProgress = require("../models/UserProgress.model");
 const { invalidateDashboardCache } = require("./dashboard.controller");
+const {
+  quizStartSchema,
+  quizSubmissionParamsSchema,
+  quizSubmissionSchema,
+  validateRequest,
+} = require("../validation/userValidation");
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
@@ -112,12 +118,9 @@ exports.getUserAttempts = async (req, res, next) => {
 //Route: POST /api/v1/quizzes/start
 exports.startQuiz = async (req, res, next) => {
   try {
-    const { microLessonId, moduleId = "cashFlow" } = req.body || {};
-    if (typeof microLessonId !== "string" || !microLessonId.trim()) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "microLessonId is required.",
-      });
-    }
+    const validatedBody = validateRequest(res, quizStartSchema, req.body);
+    if (!validatedBody) return;
+    const { microLessonId, moduleId } = validatedBody;
     const userId = req.user.id;
     const lessonId = microLessonId.split(".").slice(0, 2).join(".");
 
@@ -161,9 +164,13 @@ exports.startQuiz = async (req, res, next) => {
 
 exports.submitQuiz = async (req, res, next) => {
   try {
-    let microLessonId = req.params.id;
+    const validatedParams = validateRequest(res, quizSubmissionParamsSchema, req.params);
+    if (!validatedParams) return;
+    const validatedBody = validateRequest(res, quizSubmissionSchema, req.body);
+    if (!validatedBody) return;
+    const microLessonId = validatedParams.id;
     const userId = req.user.id; //due to middleware from jwt
-    const { attemptId, moduleId = "cashFlow", answers = {} } = req.body || {};
+    const { attemptId, moduleId, answers } = validatedBody;
 
     //Prevent double-submission of answers by comparing attempt to any prior existing attempt
     //if there is a double answer submission, there is a 409 CONFLICT
@@ -267,7 +274,7 @@ exports.submitQuiz = async (req, res, next) => {
             current_micro_lesson_id: microLessonId,
           },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
       const allMicroLessonsIds = getMicroLessonIdsForLesson(moduleId, lessonId);
       const userCompletedMicros = new Set(updatedProgress.completed_micro_lessons || []);

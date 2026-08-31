@@ -7,6 +7,10 @@ const userProgressSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    xp: {
+      type: Number,
+      default: 0,
+    },
     module_id: {
       type: String,
       required: true,
@@ -26,6 +30,11 @@ const userProgressSchema = new mongoose.Schema(
       type: String,
       required: true,
       default: "1.1.1",
+    },
+    current_chunk_index: {
+      type: Number,
+      required: true,
+      default: 0,
     },
     completed_lessons: [
       {
