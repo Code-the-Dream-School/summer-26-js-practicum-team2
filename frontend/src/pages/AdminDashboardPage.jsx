@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuthContext } from "../context/AuthContext";
 import {
+  approveDeleteAccount,
   createAdminLesson,
   createAdminModule,
   deleteAdminLesson,
   deleteAdminModule,
   getAdminModules,
   getAdminUsers,
+  getPendingDeleteAccount,
   hardDeleteAdminUser,
   importAdminLessonModule,
+  rejectDeleteAccount,
   resetAdminUserProgress,
   seedAdminBudgetingModule,
+  seedAdminRandomUsers,
   setAdminUserDisabled,
   setAdminUserDeleted,
   updateAdminModule,
@@ -36,19 +40,26 @@ const lessonBlockTypes = [
 export default function AdminDashboardPage() {
   const { csrfToken, user: currentUser } = useAuthContext();
   const [users, setUsers] = useState([]);
+  const [pendingDeletions, setPendingDeletions] = useState([]);
   const [modules, setModules] = useState([]);
   const [selectedModuleId, setSelectedModuleId] = useState("");
   const [moduleForm, setModuleForm] = useState(emptyModule);
   const [lessonTitle, setLessonTitle] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState("");
   const [lessonJson, setLessonJson] = useState("");
+  const [pendingAction, setPendingAction] = useState(null);
   const [state, setState] = useState({ isLoading: true, error: "", message: "" });
 
   const loadData = useCallback(async () => {
     setState((current) => ({ ...current, isLoading: true, error: "" }));
     try {
-      const [userPayload, modulePayload] = await Promise.all([getAdminUsers(), getAdminModules()]);
+      const [userPayload, modulePayload, deletionPayload] = await Promise.all([
+        getAdminUsers(),
+        getAdminModules(),
+        getPendingDeleteAccount(),
+      ]);
       setUsers(userPayload.users ?? []);
+      setPendingDeletions(deletionPayload.users ?? []);
       setModules(modulePayload.modules ?? []);
       setSelectedModuleId((current) => current || modulePayload.modules?.[0]?.id || "");
       setState((current) => ({ ...current, isLoading: false }));
@@ -70,6 +81,15 @@ export default function AdminDashboardPage() {
       await loadData();
     } catch (error) {
       setState((current) => ({ ...current, error: error.message }));
+    }
+  }
+
+  async function runPendingDeletionAction(action, userId, actionName, successMessage) {
+    setPendingAction({ userId, actionName });
+    try {
+      await runAction(() => action(userId, csrfToken), successMessage);
+    } finally {
+      setPendingAction(null);
     }
   }
 
@@ -253,9 +273,103 @@ export default function AdminDashboardPage() {
       ) : null}
 
       <Card className="overflow-hidden p-0">
-        <div className="flex items-center justify-between border-b border-primary/10 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-primary/10 px-5 py-4">
+          <h2 className="font-heading text-h3 font-bold text-heading">Pending deletions</h2>
+          <span className="text-sm text-foreground">{pendingDeletions.length} pending</span>
+        </div>
+        {state.isLoading ? <p className="p-5 text-foreground">Loading...</p> : null}
+        {!state.isLoading && pendingDeletions.length === 0 ? (
+          <p className="p-5 text-foreground">No deletion requests are awaiting review.</p>
+        ) : null}
+        {!state.isLoading && pendingDeletions.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-primary/5 text-heading">
+                <tr>
+                  <th className="px-5 py-3">Name</th>
+                  <th className="px-5 py-3">Email</th>
+                  <th className="px-5 py-3">Requested</th>
+                  <th className="px-5 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingDeletions.map((user) => {
+                  const userId = user._id || user.id;
+                  const isApproving =
+                    pendingAction?.userId === userId && pendingAction.actionName === "approve";
+                  const isRejecting =
+                    pendingAction?.userId === userId && pendingAction.actionName === "reject";
+                  return (
+                    <tr key={userId} className="border-t border-primary/10">
+                      <td className="px-5 py-4 font-medium text-heading">{user.name}</td>
+                      <td className="px-5 py-4 text-foreground">{user.email}</td>
+                      <td className="px-5 py-4 text-foreground">
+                        {user.deletion_requested_at
+                          ? new Date(user.deletion_requested_at).toLocaleDateString()
+                          : "-"}
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="min-h-8 px-2 py-1 text-xs text-danger underline"
+                            disabled={Boolean(pendingAction)}
+                            loading={isApproving}
+                            onClick={() =>
+                              void runPendingDeletionAction(
+                                approveDeleteAccount,
+                                userId,
+                                "approve",
+                                "Deletion approved.",
+                              )
+                            }
+                          >
+                            Approve deletion
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="min-h-8 px-2 py-1 text-xs underline"
+                            disabled={Boolean(pendingAction)}
+                            loading={isRejecting}
+                            onClick={() =>
+                              void runPendingDeletionAction(
+                                rejectDeleteAccount,
+                                userId,
+                                "reject",
+                                "Deletion rejected.",
+                              )
+                            }
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+      </Card>
+
+      <Card className="overflow-hidden p-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-primary/10 px-5 py-4">
           <h2 className="font-heading text-h3 font-bold text-heading">Users</h2>
-          <span className="text-sm text-foreground">{users.length} loaded</span>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                void runAction(() => seedAdminRandomUsers(csrfToken), "10 random users seeded.")
+              }
+            >
+              Seed 10 users
+            </Button>
+            <span className="text-sm text-foreground">{users.length} loaded</span>
+          </div>
         </div>
         {state.isLoading ? <p className="p-5 text-foreground">Loading...</p> : null}
         {!state.isLoading ? (
@@ -366,11 +480,11 @@ export default function AdminDashboardPage() {
                                 deleted: !adminUser.deleted_at,
                                 csrfToken,
                               }),
-                            adminUser.deleted_at ? "User restored." : "User deleted.",
+                            adminUser.deleted_at ? "User restored." : "Deletion scheduled.",
                           )
                         }
                       >
-                        {adminUser.deleted_at ? "Restore" : "Delete"}
+                        {adminUser.deleted_at ? "Restore" : "Schedule deletion"}
                       </Button>
                       {adminUser.deleted_at ? (
                         <Button
@@ -392,7 +506,7 @@ export default function AdminDashboardPage() {
                             }
                           }}
                         >
-                          Hard delete
+                          Permanently delete
                         </Button>
                       ) : null}
                     </td>

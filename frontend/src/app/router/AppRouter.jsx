@@ -4,7 +4,6 @@ import { useAuthContext } from "../../context/AuthContext";
 import MainLayout from "../../shared/MainLayout/MainLayout.component";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
-import AdminDashboard from "../../pages/AdminDashboard";
 
 import HomePage from "../../pages/HomePage";
 import LoginPage from "../../pages/LoginPage";
@@ -56,7 +55,7 @@ export default function AppRouter() {
           path={ROUTES.ADMIN_DASHBOARD}
           element={
             <AdminRoute>
-              <AdminDashboard />
+              <AdminDashboardPage />
             </AdminRoute>
           }
         />
@@ -66,14 +65,6 @@ export default function AppRouter() {
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN}
-          element={
-            <AdminRoute>
-              <AdminDashboardPage />
-            </AdminRoute>
           }
         />
         <Route
