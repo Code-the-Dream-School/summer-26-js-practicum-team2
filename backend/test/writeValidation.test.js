@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
+const User = require("../src/models/User.model");
 const {
   registerSchema,
   passwordSchema,
@@ -13,9 +14,14 @@ const {
 useTestDb();
 
 // Create a valid bearer token so validation tests can reach protected endpoints.
+let authUser;
 const authHeader = () => ({
   Authorization: `Bearer ${jwt.sign(
-    { id: new mongoose.Types.ObjectId().toString(), role: "learner" },
+    {
+      id: authUser._id.toString(),
+      role: authUser.role,
+      token_version: authUser.token_version,
+    },
     process.env.JWT_SECRET,
   )}`,
 });
@@ -29,6 +35,15 @@ const expectValidationError = (response) => {
 };
 
 describe("write endpoint input validation", () => {
+  beforeEach(async () => {
+    authUser = await User.create({
+      name: "Validation Learner",
+      email: "validation-learner@example.com",
+      password_hash: "not-a-real-hash",
+      tos_agreement: true,
+    });
+  });
+
   test("accepts supported password policy variants while rejecting weak passwords", () => {
     expect(passwordSchema.validate("YxNqSSe9uqCCVAEx").error).toBeUndefined();
     expect(passwordSchema.validate("StrongPass1!").error).toBeUndefined();
