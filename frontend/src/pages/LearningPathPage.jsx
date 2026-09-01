@@ -10,7 +10,6 @@ import Skeleton from "../shared/Skeleton/Skeleton.component";
 // Import onboarding overlay component
 import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
 
-
 function getMicroLessonPreview(content = []) {
   return content
     .filter(
@@ -22,7 +21,7 @@ function getMicroLessonPreview(content = []) {
     .join(" ");
 }
 
-function LearningPathPage() {
+function LearningPathPage({ onboarding }) {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
@@ -208,7 +207,11 @@ function LearningPathPage() {
       return;
     }
     // Navigate to the lesson page using the moduleId and lessonId from the selected node
-    navigate(`/learn/${node.moduleId}/${node.lessonId}`);
+    navigate(`/learn/${node.moduleId}/${node.lessonId}`, {
+      state: {
+        microLessonId: node.microLessonId,
+      },
+    });
   }
 
   if (error) {
@@ -392,7 +395,7 @@ function LearningPathPage() {
               }
               onClick={() => openLesson(currentNode)}
             >
-              Next
+              Resume
             </Button>
           )}
         </div>

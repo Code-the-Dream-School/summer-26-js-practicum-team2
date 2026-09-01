@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
-    "name": "Local Backend API",
-    "description": "Requests for testing the local Express backend during development.",
+    "name": "Sprout API",
+    "description": "Requests for testing the Sprout API.",
     "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -1025,6 +1025,63 @@
               "raw": "{{baseUrl}}/api/v1/lessons/progress",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "lessons", "progress"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restart Lesson Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('PATCH /lessons/progress/restart returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = pm.response.json();",
+                  "pm.test('Restart resets lesson progress to the first lesson position', function () {",
+                  "  pm.expect(responseJson.currentLessonId).to.eql('1.1');",
+                  "  pm.expect(responseJson.currentMicroLessonId).to.eql('1.1.1');",
+                  "  pm.expect(responseJson.currentChunkIndex).to.eql(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"moduleId\": \"cashFlow\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/progress/restart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "progress", "restart"]
             }
           },
           "response": []

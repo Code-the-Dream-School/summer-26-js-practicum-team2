@@ -1,22 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
-import { updateLessonProgress } from "../services/api";
+
 import {
-  getResumeIndex,
   getSampleLesson,
   normalizeLearnData,
   selectRandomLesson,
-  titlesOverlap,
 } from "../features/learn/normalizeLesson";
-import LessonComponent from "../features/learn/Lesson/Lesson.component";
-import QuizComponent from "../features/learn/Quiz/Quiz.component";
-import { useQuiz } from "../hooks/useQuiz";
-import Button from "../shared/Button/Button.component";
+import LearnFlow from "../features/learn/LearnFlow/LearnFlow.component";
+
 import Card from "../shared/Card/Card.component";
-import ProgressBar from "../shared/ProgressBar/ProgressBar.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 import abigailImg from "../assets/abigail.webp";
@@ -381,6 +376,7 @@ export default function LearnPage({onboarding}) {
   const [searchParams] = useSearchParams();
   const location = useLocation();
 
+  const selectedMicroLessonId = location.state?.microLessonId;
 
   const isSamplePreview = searchParams.get("sample") === "true";
 
@@ -412,6 +408,15 @@ export default function LearnPage({onboarding}) {
     ramona: ramonaImg,
     beaver: dabbingBeaverImg,
   };
+
+  // Wait for storage hydration before deciding to redirect
+  if (isHydrating) {
+    return (
+      <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
+        <Skeleton />
+      </section>
+    );
+  }
 
   if (!isAuthenticated) {
     if (isSamplePreview && learnData) {
@@ -471,11 +476,12 @@ export default function LearnPage({onboarding}) {
 
   return (
     <LearnFlow
-      key={`${learnData.moduleId}:${learnData.id}`}
+      key={`${learnData.moduleId}:${learnData.id}:${selectedMicroLessonId ?? "resume"}`}
       learnData={learnData}
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
+      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
       onboarding={onboarding}
     />
