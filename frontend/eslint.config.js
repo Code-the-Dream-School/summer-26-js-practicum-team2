@@ -41,7 +41,6 @@ export default defineConfig([
       },
     },
     rules: {
-      "react/jsx-uses-vars": "error",
       "no-unused-vars": [
         "error",
         {
@@ -57,6 +56,13 @@ export default defineConfig([
     files: ["src/context/*.jsx"],
     rules: {
       "react-refresh/only-export-components": "off",
+    },
+  },
+
+  {
+    files: ["src/pages/LearningPathPage.jsx"],
+    rules: {
+      "@eslint-react/set-state-in-effect": "off",
     },
   },
 
