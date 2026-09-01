@@ -132,6 +132,7 @@ describe("learn flow", () => {
       moduleId: "cashFlow",
       lessonId: "1.1",
       microLessonId: "1.1.1",
+      currentChunkIndex: 0,
       csrfToken: "csrf-1",
     });
 
