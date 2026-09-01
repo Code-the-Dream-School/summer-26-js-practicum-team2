@@ -1,8 +1,8 @@
 import js from "@eslint/js";
 import globals from "globals";
-import react from "eslint-plugin-react";
+import eslintReact from "@eslint-react/eslint-plugin";
 import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
+import { reactRefresh } from "eslint-plugin-react-refresh";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import { defineConfig, globalIgnores } from "eslint/config";
 
@@ -21,19 +21,15 @@ const vitestGlobals = {
 export default defineConfig([
   globalIgnores(["dist", "coverage"]),
 
+  // Core configuration block for JS and JSX files
   {
     files: ["**/*.{js,jsx}"],
-
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
+      reactRefresh.configs.vite(), // Modern object config format
+      eslintReact.configs.recommended, // Modern ESLint 10 React rules
     ],
-
-    plugins: {
-      react,
-    },
-
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -44,7 +40,6 @@ export default defineConfig([
         },
       },
     },
-
     rules: {
       "react/jsx-uses-vars": "error",
       "no-unused-vars": [
@@ -56,17 +51,26 @@ export default defineConfig([
       ],
     },
   },
+
+  // Target context overrides
   {
     files: ["src/context/*.jsx"],
     rules: {
       "react-refresh/only-export-components": "off",
     },
   },
+
+  // Test environment configuration
   {
     files: ["**/*.{test,spec}.{js,jsx}", "src/setupTests.js"],
     languageOptions: {
-      globals: { ...globals.browser, ...globals.node, ...vitestGlobals },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...vitestGlobals,
+      },
     },
   },
+
   eslintConfigPrettier,
 ]);
