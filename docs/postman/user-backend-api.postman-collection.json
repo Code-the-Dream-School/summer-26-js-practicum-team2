@@ -190,17 +190,19 @@
                   "  pm.expect(responseJson.csrfToken).to.be.a('string').and.not.empty;",
                   "});",
                   "if (responseJson.csrfToken) {",
+                  "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
                   "const sessionToken = pm.cookies.get('session_token');",
                   "if (sessionToken) {",
                   "  const sessionCookie = `session_token=${sessionToken}`;",
+                  "  pm.environment.set('sessionCookie', sessionCookie);",
                   "  pm.collectionVariables.set('sessionCookie', sessionCookie);",
                   "  pm.variables.set('sessionCookie', sessionCookie);",
                   "}",
                   "pm.test('Verify email establishes a session', function () {",
-                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
+                  "  pm.expect(pm.environment.get('sessionCookie')).to.be.a('string').and.not.empty;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -260,11 +262,13 @@
                   "});",
                   "if (responseJson && responseJson.csrfToken) {",
                   "  pm.environment.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
                   "const sessionCookie = pm.cookies.get('session_token') || '';",
                   "if (sessionCookie) {",
                   "  pm.environment.set('sessionCookie', `session_token=${sessionCookie}`);",
+                  "  pm.collectionVariables.set('sessionCookie', `session_token=${sessionCookie}`);",
                   "  pm.variables.set('sessionCookie', `session_token=${sessionCookie}`);",
                   "  console.log('Session cookie saved from Postman cookie jar.');",
                   "}",
@@ -310,10 +314,18 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "const savedCookie = pm.collectionVariables.get('sessionCookie') || pm.variables.get('sessionCookie') || '';",
+                  "const savedCookie = pm.environment.get('sessionCookie') || pm.collectionVariables.get('sessionCookie') || pm.variables.get('sessionCookie') || '';",
+                  "const savedCsrfToken = pm.environment.get('csrfToken') || pm.collectionVariables.get('csrfToken') || pm.variables.get('csrfToken') || '';",
                   "if (savedCookie) {",
-                  "  pm.variables.set('sessionCookie', savedCookie);",
+                  "  pm.request.headers.upsert({ key: 'Cookie', value: savedCookie });",
                   "  console.log('Using session cookie:', savedCookie);",
+                  "} else {",
+                  "  pm.request.headers.remove('Cookie');",
+                  "}",
+                  "if (savedCsrfToken) {",
+                  "  pm.request.headers.upsert({ key: 'X-CSRF-TOKEN', value: savedCsrfToken });",
+                  "} else {",
+                  "  pm.request.headers.remove('X-CSRF-TOKEN');",
                   "}",
                   "if (!savedCookie) {",
                   "  console.warn('No session cookie is currently stored. Login first to set one.');",
@@ -334,9 +346,15 @@
                   "pm.test('First logout confirms success message', function () {",
                   "  pm.expect(responseJson.message).to.eql('Logout successful.');",
                   "});",
-                  "    pm.environment.set('sessionCookie', sessionCookie);",
-                  "pm.variables.set('sessionCookie', '');",
-                  "console.log('Session cookie cleared after logout.');"
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.unset('sessionCookie');",
+                  "  pm.collectionVariables.unset('sessionCookie');",
+                  "  pm.variables.unset('sessionCookie');",
+                  "  pm.environment.unset('csrfToken');",
+                  "  pm.collectionVariables.unset('csrfToken');",
+                  "  pm.variables.unset('csrfToken');",
+                  "  console.log('Session cookie cleared after logout.');",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
@@ -389,18 +407,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "X-CSRF-TOKEN",
-                "value": "{{csrfToken}}",
-                "type": "text"
-              },
-              {
-                "key": "Cookie",
-                "value": "{{sessionCookie}}",
-                "type": "text"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/logout",
               "host": ["{{baseUrl}}"],
@@ -1139,7 +1146,6 @@
                   "pm.test('Profile update returns submitted values', function () {",
                   "  pm.expect(responseJson.message).to.eql('You have successfully updated your profile.');",
                   "  pm.expect(responseJson.user.goals).to.eql('Build a reliable monthly budget');",
-                  "  pm.expect(responseJson.user.theme).to.eql('Dark');",
                   "  pm.expect(responseJson.user.notifications).to.eql(false);",
                   "});"
                 ],
@@ -1168,7 +1174,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"goals\": \"Build a reliable monthly budget\",\n  \"theme\": \"Dark\",\n  \"notifications\": false\n}",
+              "raw": "{\n  \"goals\": \"Build a reliable monthly budget\",\n  \"notifications\": false\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1314,18 +1320,20 @@
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
                   "if (responseJson.csrfToken) {",
+                  "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
                   "const sessionToken = pm.cookies.get('session_token');",
                   "if (sessionToken) {",
                   "  const sessionCookie = `session_token=${sessionToken}`;",
+                  "  pm.environment.set('sessionCookie', sessionCookie);",
                   "  pm.collectionVariables.set('sessionCookie', sessionCookie);",
                   "  pm.variables.set('sessionCookie', sessionCookie);",
                   "}",
                   "pm.test('Changed-password login refreshes auth state', function () {",
-                  "  pm.expect(pm.collectionVariables.get('csrfToken')).to.be.a('string').and.not.empty;",
-                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
+                  "  pm.expect(pm.environment.get('csrfToken')).to.be.a('string').and.not.empty;",
+                  "  pm.expect(pm.environment.get('sessionCookie')).to.be.a('string').and.not.empty;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1415,19 +1423,19 @@
           "response": []
         },
         {
-          "name": "Reactivate Account",
+          "name": "Reactivate Active Account (Expected 400)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('POST /users/reactivate returns 200', function () {",
-                  "  pm.response.to.have.status(200);",
+                  "pm.test('POST /users/reactivate rejects an active account', function () {",
+                  "  pm.response.to.have.status(400);",
                   "});",
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
-                  "pm.test('Reactivation confirms the account is active', function () {",
-                  "  pm.expect(responseJson.message).to.eql('Account is reactivated. Please log in.');",
+                  "pm.test('Reactivation explains that the account is active', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Account is active.');",
                   "});"
                 ],
                 "type": "text/javascript"

@@ -35,6 +35,31 @@ function authHeader(user) {
 }
 
 describe("account deletion workflow", () => {
+  it("updates supported profile fields and rejects unsupported theme fields", async () => {
+    const user = await createUser({ email: "profile-update@example.com" });
+    const authorization = authHeader(user);
+
+    const updateResponse = await request(app)
+      .patch("/api/v1/profile")
+      .set("Authorization", authorization)
+      .send({ goals: "Build a reliable monthly budget", notifications: false });
+
+    expect(updateResponse.status).toBe(200);
+    expect(updateResponse.body.user).toEqual(
+      expect.objectContaining({
+        goals: "Build a reliable monthly budget",
+        notifications: false,
+      }),
+    );
+
+    const unsupportedFieldResponse = await request(app)
+      .patch("/api/v1/profile")
+      .set("Authorization", authorization)
+      .send({ theme: "Dark" });
+
+    expect(unsupportedFieldResponse.status).toBe(400);
+  });
+
   it("serves a profile and prevents duplicate deletion requests", async () => {
     const user = await createUser({ email: "profile-delete@example.com" });
     const authorization = authHeader(user);
@@ -161,6 +186,22 @@ describe("account deletion workflow", () => {
     const reactivatedUser = await User.findById(deletedUser._id);
     expect(reactivatedUser.is_deleted).toBe(false);
     expect(reactivatedUser.deletion_status).toBe("none");
+  });
+
+  it("rejects reactivation for an active account", async () => {
+    const password = "correct-password";
+    const activeUser = await createUser({
+      email: "active-reactivate@example.com",
+      password_hash: await hashPassword(password),
+    });
+
+    const response = await request(app).post("/api/v1/users/reactivate").send({
+      email: activeUser.email,
+      password,
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ message: "Account is active." });
   });
 
   it("only rejects pending deletion requests", async () => {
