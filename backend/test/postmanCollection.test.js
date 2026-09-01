@@ -1,7 +1,7 @@
 const path = require("path");
 
 const collection = require(
-  path.resolve(__dirname, "../../docs/postman/local-backend-api.postman-collection.json"),
+  path.resolve(__dirname, "../../docs/postman/sprout-api.postman-collection.json"),
 );
 const helloRoutes = require("../src/routes/hello.routes");
 const userRoutes = require("../src/routes/user.routes");

@@ -1365,31 +1365,27 @@
           "response": []
         },
         {
-          "name": "Delete Account",
+          "name": "Request Account Deletion",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('DELETE /profile returns 200', function () {",
+                  "pm.test('POST /profile/request-deletion returns 200', function () {",
                   "  pm.response.to.have.status(200);",
                   "});",
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
-                  "pm.test('Delete account confirms soft deletion', function () {",
-                  "  pm.expect(responseJson.message).to.eql('Account has been deleted successfully.');",
-                  "});",
-                  "if (pm.response.code === 200) {",
-                  "  pm.collectionVariables.set('sessionCookie', '');",
-                  "  pm.variables.set('sessionCookie', '');",
-                  "}"
+                  "pm.test('Deletion request confirms pending review', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Deletion of user account request sent. Our admin will review your request.');",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
             }
           ],
           "request": {
-            "method": "DELETE",
+            "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
@@ -1417,9 +1413,9 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/profile",
+              "raw": "{{baseUrl}}/api/v1/profile/request-deletion",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "profile"]
+              "path": ["api", "v1", "profile", "request-deletion"]
             }
           },
           "response": []
