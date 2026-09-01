@@ -1,12 +1,9 @@
 const { StatusCodes } = require("http-status-codes");
 const User = require("../models/User.model");
 
-//get all users that are admin
 const getAllAdminUsers = async (req, res, next) => {
   try {
-    const users = await User.find({ role: "admin" }).select(
-      "-password -resetPasswordToken -csrfToken",
-    );
+    const users = await User.find({ role: "admin" }).select("_id name email role created_at");
     return res.status(StatusCodes.OK).json({
       success: true,
       count: users.length,
@@ -36,25 +33,26 @@ const getPendingDeleteAccount = async (req, res, next) => {
 const approveDeleteAccount = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    //must use find
     const updatedUser = await User.findOneAndUpdate(
-      //{ _id: userId, is_deleted: { $in: [true, false] } },
-      { _id: userId },
-
+      { _id: userId, deletion_status: "pending", is_deleted: false },
       {
-        deletion_status: "approved",
-        deleted_at: new Date(),
-        is_deleted: true,
-        deletion_approved_by: req.user.id || req.user._id,
+        $set: {
+          deletion_status: "approved",
+          deleted_at: new Date(),
+          is_deleted: true,
+          deletion_approved_by: req.user.id,
+        },
+        $inc: { token_version: 1 },
       },
       { new: true },
     );
     if (!updatedUser) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "No user found." });
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "Deletion request is not pending.",
+      });
     }
     return res.status(StatusCodes.OK).json({
       message: "Account has been approved for deletion.",
-      user: updatedUser,
     });
   } catch (error) {
     return next(error);
@@ -63,24 +61,23 @@ const approveDeleteAccount = async (req, res, next) => {
 const rejectDeleteAccount = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    //const updatedUser = await User.findByIdAndUpdate(
     const updatedUser = await User.findOneAndUpdate(
-      // { _id: userId, is_deleted: { $in: [true, false] } },
-      { _id: userId },
-
+      { _id: userId, deletion_status: "pending", is_deleted: false },
       {
-        deletion_status: "denied",
-        is_deleted: false,
-        deletion_requested_at: null,
+        $set: {
+          deletion_status: "denied",
+          is_deleted: false,
+          deletion_requested_at: null,
+        },
       },
       { new: true },
     );
     if (!updatedUser) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "No user found." });
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "Deletion request is not pending.",
+      });
     }
-    return res
-      .status(StatusCodes.OK)
-      .json({ message: " Account request for deletion rejected.", user: updatedUser });
+    return res.status(StatusCodes.OK).json({ message: "Account request for deletion rejected." });
   } catch (err) {
     return next(err);
   }
@@ -90,13 +87,17 @@ const rejectDeleteAccount = async (req, res, next) => {
 const reactivateUserAcct = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const user = await User.findById(userId);
+    const user = await User.findOne({
+      _id: userId,
+      is_deleted: true,
+      is_archived: { $in: [true, false] },
+    });
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "No User is found." });
     }
-    if (!user.is_archived || !user.deleted_at) {
+    if (!user.deleted_at) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "This user account is not archived.",
+        message: "This user account is not eligible for reactivation.",
       });
     }
     //30 day grace period
@@ -113,6 +114,7 @@ const reactivateUserAcct = async (req, res, next) => {
     user.is_deleted = false;
     user.deletion_requested_at = null;
     user.deleted_at = null;
+    user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
     return res.status(StatusCodes.OK).json({
