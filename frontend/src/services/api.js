@@ -6,6 +6,7 @@ const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
 const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
+export const AUTH_EXPIRED_EVENT = "sprout:auth-expired";
 
 async function apiRequest(path, options = {}) {
   const { method = "GET", body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options;
@@ -33,6 +34,9 @@ async function apiRequest(path, options = {}) {
     const error = new Error(payload?.message || "Request failed. Please try again.");
     error.status = response.status;
     error.errors = Array.isArray(payload?.errors) ? payload.errors : [];
+    if (response.status === 401 && typeof window !== "undefined") {
+      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+    }
     throw error;
   }
   return payload;
