@@ -3,7 +3,6 @@ import { useState, useCallback, useEffect } from "react";
 import { useAuthContext } from "../context/AuthContext";
 import {
   changeProfilePassword,
-  //uncomment line 7 for use with admin deletion and user request acct deletion
   deleteProfile,
   getProfile,
   notifyDashboardProgressChanged,
@@ -19,7 +18,7 @@ import Skeleton from "../shared/Skeleton/Skeleton.component";
 const errorMessage = (error) =>
   error.errors?.length ? error.errors.join(" ") : error.message || "uh oh spaghetti-o";
 
-const Stat = ({label, value}) => {
+const Stat = ({ label, value }) => {
   return (
     <p className="text-center">
       <span>{label}</span>
@@ -37,7 +36,6 @@ export default function ProfilePage() {
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  //uncomment line 41 for use with admin direct acct deletion and user request
   const [deleteEmail, setDeleteEmail] = useState("");
 
   const [toastMessage, setToastMessage] = useState("");
@@ -103,31 +101,16 @@ export default function ProfilePage() {
     }
   };
 
-  // const deleteAccount = async(event) => {
-  //   event.preventDefault();
-  //   setPending("Delete");
-  //   try{
-  //     await deleteProfile({email:deleteEmail, csrfToken})
-  //     try{
-  //       await logout()
-  //     }catch{}
-  //   }catch(error) {
-  //     showToast(result.message, "success");
-  //   } finally{
-  //     setPending("");
-  //   }
-  // };
-  
-  const requestDeleteAccount = async(event) => {
+  const requestDeleteAccount = async (event) => {
     event.preventDefault();
     setPending("delete");
-    try{
-      const result= await deleteProfile({email:deleteEmail, csrfToken})
+    try {
+      const result = await deleteProfile({ email: deleteEmail, csrfToken });
       showToast(result.message || "Request for account deletion sent to admin.", "success");
-      setDeleteEmail("")
-    } catch(error){
+      setDeleteEmail("");
+    } catch (error) {
       showToast(errorMessage(error));
-    }finally{
+    } finally {
       setPending("");
     }
   };
@@ -200,15 +183,12 @@ export default function ProfilePage() {
         </form>
       </Card>
 
-      {/* Danger Zone-uncommented out Aug 27 for admin del and user request delete account */} 
       <div className="space-y-4 rounded-2xl border-2 border-dashed border-danger/40 bg-danger/5 p-6">
         <header className="space-y-1">
-          <h2 className="font-heading text-h4 font-bold text-danger">
-            Danger Zone
-          </h2>
+          <h2 className="font-heading text-h4 font-bold text-danger">Danger Zone</h2>
           <p className="text-small text-neutral-600">
-            Requesting account deletion will send a ticket to be reviewed by our admin. Your account will remain active until an admin approves the request. Just a reminder: Deleting your account triggers an irreversible data purge. You will immediately lose
-            platform streaks, course rewards, and accumulated lesson progress records once your account deletion is approved by administration.
+            Requesting account deletion sends a ticket to our administrators for review. Your
+            account remains active until a request is approved, at which point it is deactivated.
           </p>
         </header>
 
@@ -216,7 +196,7 @@ export default function ProfilePage() {
           <Input
             id="delete-account-email"
             type="email"
-            label="Type account email to verify permanent deletion:"
+            label="Type account email to verify deletion request:"
             required
             value={deleteEmail}
             onChange={(e) => setDeleteEmail(e.target.value)}
@@ -228,9 +208,9 @@ export default function ProfilePage() {
             className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
           >
             {pending === "delete" ? "Submitting request.." : "Request Account Deletion"}
-           </Button>
-           </form>
-         </div>
+          </Button>
+        </form>
+      </div>
     </section>
   );
 }
