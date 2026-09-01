@@ -69,18 +69,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
 - Expanded frontend regression coverage for lesson rendering and normalization, quiz interactions and review states, lesson-content loading, learning-path progress and navigation, dashboard cache recovery, and email verification flows.
 - Added unit coverage for authentication and quiz reducers, navigation behavior, shared UI components, modal focus management, form accessibility, loading and status states, and legal-consent analytics handling.
+## [0.3.8] - 2026-09-01
+
+### Added
+
+- Added core rule utilities and corresponding tests for XP awards and caps, streak/freeze status, and lesson-unlock gating.
+- Added backend API integration, contract, and negative-path coverage for authentication, password reset, logout/CSRF protection, lesson and dashboard progress, quiz persistence and submission, middleware/error responses, security headers, and rate limiting.
+- Added shared backend authentication and request helpers to reduce repeated Authorization and session-plus-CSRF setup across integration tests.
+- Added backend coverage enforcement through `test:coverage` with global Jest coverage thresholds.
+- Added frontend regression and unit coverage for authentication, dashboard caching and refresh, lesson loading and navigation, learning-path state, quiz interactions and review flows, reducers, shared components, accessibility behavior, consent analytics, and email verification.
+- Added Playwright end-to-end testing with Chromium, including browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
+- Added CI artifacts for frontend test output, frontend builds, backend coverage, and Playwright reports/results to improve failure diagnostics.
 - Added a keyboard-accessible "Skip to content" link and main-content target to the shared application layout.
 
 ### Changed
 
-- Updated CI pull-request trigger branches from `docs` to `main`.
-- Switched backend CI test execution to the coverage-enforced command (`npm --prefix backend run test:coverage`).
+- Updated CI pull-request triggers from `docs` to `main`.
+- Updated backend CI to enforce coverage thresholds and added browser journey checks to the CI pipeline.
 - Updated email-verification errors to use alert semantics so they are announced by assistive technology.
-- Updated CI and repository testing configuration to run browser journey checks and ignore generated Playwright test-result artifacts.
+- Updated formatting and test-result ignore configuration for generated coverage, build, and Playwright artifacts.
 
 ### Fixed
 
 - Fixed error handler middleware signature to include next parameter
+- Fixed the Express error-handler middleware contract to accept `next` and forward errors when response headers have already been sent.
+
+---
+
+## [0.3.7] - 2026-08-25
+
+### Added
+
+- Added chunk-level lesson progress tracking so learners can resume at the exact lesson, micro-lesson, and chunk they left off on
+- Added a lesson progress restart endpoint and frontend API helper for restarting saved progress
+- Added `LessonControlPanel` with a welcome-back message and --Start Over-- option when resuming saved lesson progress
+- Added backend regression and validation tests for lesson progress creation, updates, restarting, and invalid requests
+- Added frontend regression tests for lesson resume, restart, progress syncing, and `LessonControlPanel` behavior
+- Added the lesson progress restart endpoint to the API documentation and Postman collection
+
+### Changed
+
+- Updated Learning Path navigation to pass the selected micro-lesson into the lesson flow and changed the current lesson action from --Next-- to --Resume--
+- Updated lesson progress syncing to save the learner's current chunk along with the lesson and micro-lesson
+- Updated global API rate limiting to allow 200 requests per 15 minutes in production and use a higher limit during development
+
+### Fixed
+
+- Fixed lesson resume behavior so saved progress returns learners to the correct micro-lesson and chunk instead of restarting at the beginning of the micro-lesson
+- Fixed learning path resume navigation to open the learner's current micro-lesson instead of only opening the containing lesson
+
+---
+
+## [0.3.6] - 2026-08-25
+
+### Added
+
 - Added focused backend integration tests for invalid lesson progress, quiz, password recovery, and dashboard event requests
 - Added backend write-endpoint validation tests covering body-less requests and valid schema regression cases
 - Added reusable Joi schemas and request validation helpers for backend write endpoint validation
