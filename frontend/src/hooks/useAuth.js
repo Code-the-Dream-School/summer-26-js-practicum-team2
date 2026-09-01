@@ -34,12 +34,41 @@ export function useAuth() {
 
   // Restore the current auth state from browser storage on first mount.
   useEffect(() => {
-    const stored = readStoredAuth();
-    dispatch({
-      type: actions.hydrateComplete,
-      user: stored?.user ?? null,
-      csrfToken: stored?.csrfToken ?? null,
-    });
+    let isActive = true;
+
+    const hydrateAuth = async () => {
+      const stored = readStoredAuth();
+      const isRemembered =
+        !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+      let user = stored?.user ?? null;
+
+      if (user) {
+        try {
+          const profile = await api.getProfile();
+          if (profile?.user) {
+            user = { ...user, ...profile.user };
+            writeStoredAuth({ user, csrfToken: stored?.csrfToken ?? null }, isRemembered);
+          }
+        } catch (error) {
+          if (error.status === 401) {
+            clearStoredAuth();
+            user = null;
+          }
+        }
+      }
+
+      if (!isActive) return;
+      dispatch({
+        type: actions.hydrateComplete,
+        user,
+        csrfToken: stored?.csrfToken ?? null,
+      });
+    };
+
+    hydrateAuth();
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   // Keep the reducer and browser storage in sync whenever auth data changes.
