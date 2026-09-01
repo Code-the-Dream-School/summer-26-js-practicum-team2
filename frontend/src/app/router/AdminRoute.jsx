@@ -20,7 +20,7 @@ export default function AdminRoute({ children }) {
     return <Navigate to={`${ROUTES.LOGIN}?next=${next}`} replace />;
   }
   if (user?.role !== "admin") {
-    return <Navigate to={ROUTES.ADMIN_DASHBOARD} replace />;
+    return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
 
   return children;
