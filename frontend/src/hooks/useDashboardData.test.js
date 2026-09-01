@@ -89,4 +89,33 @@ describe("useDashboardData", () => {
       expect(api.getDashboard).toHaveBeenCalledTimes(1);
     });
   });
+
+  it("ignores malformed and expired cache entries", async () => {
+    const freshPayload = { hero: { title: "Fresh" }, units: [], recentActivity: [] };
+    api.getDashboard.mockResolvedValue(freshPayload);
+
+    // Save an invalid cache value so the hook has to ignore it and load fresh data.
+    sessionStorage.setItem("sprout.dashboard.user-123", "not-json");
+
+    const malformed = renderHook(() =>
+      useDashboardData({ userId: "user-123", isAuthenticated: true }),
+    );
+
+    await waitFor(() => expect(malformed.result.current.dashboard).toEqual(freshPayload));
+
+    // Save a valid cache entry that has already expired so it should also be ignored.
+    sessionStorage.setItem(
+      "sprout.dashboard.user-456",
+      JSON.stringify({ payload: { hero: { title: "Expired" } }, expiresAt: Date.now() - 1 }),
+    );
+
+    const expired = renderHook(() =>
+      useDashboardData({ userId: "user-456", isAuthenticated: true }),
+    );
+
+    await waitFor(() => expect(expired.result.current.dashboard).toEqual(freshPayload));
+
+    // Both bad cache entries should cause the dashboard to reload from the API.
+    expect(api.getDashboard).toHaveBeenCalledTimes(2);
+  });
 });

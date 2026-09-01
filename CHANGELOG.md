@@ -23,11 +23,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added shared backend request test helpers for Authorization and session-plus-CSRF headers to reduce repeated API request setup.
 - Added frontend test coverage for auth restoration, remembered-session login, logout, registration, password reset, and protected-route access.
 - Added frontend regression coverage for dashboard loading, caching, and refresh; last-lesson redirects; sample lesson previews and navigation; and quiz feedback, progress synchronization, completion, and submission.
+- Added Playwright end-to-end testing with Chromium, including local `test:e2e` support, CI retries and tracing, and generated test reports.
+- Added browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
+- Expanded frontend regression coverage for lesson rendering and normalization, quiz interactions and review states, lesson-content loading, learning-path progress and navigation, dashboard cache recovery, and email verification flows.
+- Added unit coverage for authentication and quiz reducers, navigation behavior, shared UI components, modal focus management, form accessibility, loading and status states, and legal-consent analytics handling.
+- Added a keyboard-accessible "Skip to content" link and main-content target to the shared application layout.
 
 ### Changed
 
 - Updated CI pull-request trigger branches from `docs` to `main`.
 - Switched backend CI test execution to the coverage-enforced command (`npm --prefix backend run test:coverage`).
+- Updated email-verification errors to use alert semantics so they are announced by assistive technology.
+- Updated CI and repository testing configuration to run browser journey checks and ignore generated Playwright test-result artifacts.
 
 ### Fixed
 

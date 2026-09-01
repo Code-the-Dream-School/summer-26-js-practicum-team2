@@ -51,6 +51,7 @@ Thumbs.db
 # Coverage / Testing
 # =========================
 coverage/
+test-results/
 
 # =========================
 # Temporary / Cache
