@@ -1,19 +1,14 @@
 {
   "info": {
     "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
-    "name": "Sprout API",
-    "description": "Requests for testing the Sprout API.",
+    "name": "Sprout User API",
+    "description": "Authenticated user workflows for accounts, dashboard, lessons, and quizzes.",
     "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8080",
-      "type": "string"
-    },
-    {
-      "key": "csrfToken",
-      "value": "",
       "type": "string"
     },
     {
@@ -37,11 +32,6 @@
       "type": "string"
     },
     {
-      "key": "sessionCookie",
-      "value": "",
-      "type": "string"
-    },
-    {
       "key": "testUserEmail",
       "value": "",
       "type": "string"
@@ -60,45 +50,19 @@
       "key": "finalTestUserPassword",
       "value": "F1nalP@ssword!",
       "type": "string"
+    },
+    {
+      "key": "adminModuleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminLessonId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
-    {
-      "name": "Hello",
-      "item": [
-        {
-          "name": "GET Hello",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('GET /api/hello returns 200', function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "let responseJson = {};",
-                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
-                  "pm.test('GET /api/hello returns expected message', function () {",
-                  "  pm.expect(responseJson.message).to.eql('Hello World');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/hello",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "hello"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
     {
       "name": "Users",
       "item": [
@@ -295,26 +259,17 @@
                   "  pm.expect(responseJson.csrfToken).to.be.a('string').and.not.empty;",
                   "});",
                   "if (responseJson && responseJson.csrfToken) {",
-                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
-                  "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
-                  "if (setCookieHeaders.length) {",
-                  "  const cookiePairs = setCookieHeaders",
-                  "    .map((header) => header.value || '')",
-                  "    .flatMap((value) => value.split(',').map((part) => part.trim()).filter(Boolean))",
-                  "    .filter((part) => part.includes('='))",
-                  "    .map((part) => part.split(';')[0].trim())",
-                  "    .filter(Boolean);",
-                  "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
-                  "  if (sessionCookie) {",
-                  "    pm.collectionVariables.set('sessionCookie', sessionCookie);",
-                  "    pm.variables.set('sessionCookie', sessionCookie);",
-                  "    console.log('Session cookie saved:', sessionCookie);",
-                  "  }",
+                  "const sessionCookie = pm.cookies.get('session_token') || '';",
+                  "if (sessionCookie) {",
+                  "  pm.environment.set('sessionCookie', `session_token=${sessionCookie}`);",
+                  "  pm.variables.set('sessionCookie', `session_token=${sessionCookie}`);",
+                  "  console.log('Session cookie saved from Postman cookie jar.');",
                   "}",
                   "pm.test('Login response captures session cookie', function () {",
-                  "  pm.expect(pm.collectionVariables.get('sessionCookie')).to.be.a('string').and.not.empty;",
+                  "  pm.expect(pm.environment.get('sessionCookie')).to.be.a('string').and.not.empty;",
                   "});",
                   "console.log('CSRF token saved:', responseJson.csrfToken);"
                 ],
@@ -379,7 +334,7 @@
                   "pm.test('First logout confirms success message', function () {",
                   "  pm.expect(responseJson.message).to.eql('Logout successful.');",
                   "});",
-                  "pm.collectionVariables.set('sessionCookie', '');",
+                  "    pm.environment.set('sessionCookie', sessionCookie);",
                   "pm.variables.set('sessionCookie', '');",
                   "console.log('Session cookie cleared after logout.');"
                 ],
@@ -411,6 +366,9 @@
         },
         {
           "name": "Logout Again (Expect No Auth)",
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
           "event": [
             {
               "listen": "test",
@@ -549,7 +507,7 @@
                   "pm.collectionVariables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
                   "pm.variables.set('testUserPassword', pm.collectionVariables.get('newTestUserPassword'));",
                   "if (responseJson && responseJson.csrfToken) {",
-                  "  pm.collectionVariables.set('csrfToken', responseJson.csrfToken);",
+                  "  pm.environment.set('csrfToken', responseJson.csrfToken);",
                   "  pm.variables.set('csrfToken', responseJson.csrfToken);",
                   "}",
                   "const setCookieHeaders = pm.response.headers.all().filter((header) => header.key && header.key.toLowerCase() === 'set-cookie');",
@@ -562,7 +520,7 @@
                   "    .filter(Boolean);",
                   "  const sessionCookie = cookiePairs.find((part) => part.startsWith('session_token=')) || cookiePairs[0] || '';",
                   "  if (sessionCookie) {",
-                  "    pm.collectionVariables.set('sessionCookie', sessionCookie);",
+                  "    pm.environment.set('sessionCookie', sessionCookie);",
                   "    pm.variables.set('sessionCookie', sessionCookie);",
                   "  }",
                   "}"
@@ -925,6 +883,42 @@
               "raw": "{{baseUrl}}/api/v1/lessons/cashFlow/1.1",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "lessons", "cashFlow", "1.1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Lesson Modules",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /lessons/modules returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Lesson modules response is an array', function () {",
+                  "  pm.expect(responseJson.modules).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/modules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "modules"]
             }
           },
           "response": []

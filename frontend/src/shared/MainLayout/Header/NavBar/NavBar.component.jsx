@@ -45,7 +45,7 @@ export default function NavBar({
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Learn", href: "/learn" },
-        ...(isAdmin ? [{ label: "Admin Dashboard", href: "/admin/dashboard" }] : []),
+        ...(isAdmin ? [{ label: "Admin", href: "/admin" }] : []),
       ]
     : [];
 

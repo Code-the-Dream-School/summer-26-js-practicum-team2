@@ -9,6 +9,121 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased Patch 5]
+
+### Added
+
+- Added the backend admin authorization boundary and protected admin status endpoint
+- Assigned the first successfully registered user the admin role through an atomic bootstrap claim
+- Added admin user listing, progress reset, account disable/enable, and role management APIs
+- Added admin email verification and reversible user deletion actions
+- Added 30-day scheduled deletion metadata and banned-session enforcement
+- Added a role-protected admin route with an initial user control panel
+- Added admin module and nested lesson CRUD APIs with budgeting seed support
+- Added duplicate module and lesson protection with cache invalidation
+- Added explicit admin-only budgeting seed behavior for runtime lesson availability
+- Shared Postman CSRF and session variables across User and Admin collections
+- Fixed User Login cookie capture and routed Admin file imports through admin-session authorization
+
+### Changed
+
+- Added explicit admin-role checks for admin API routes
+- Prevented disabled or deleted users from signing in
+- Disabled self-targeting admin account actions and repeated email verification
+- Labeled account blocking controls as Ban/Unban in the admin panel
+- Fixed soft-delete validation to accept the admin panel's delete state payload
+- Showed banned users an explicit banned-account message during login
+- Added an admin-only Admin link to the shared desktop and mobile navigation
+- Replaced admin panel action buttons with the shared Button component
+- Removed automatic runtime loading of lesson JSON files
+- Fixed Postman logout cookie handling, dashboard event compatibility, and multipart import headers
+- Made learning-path module discovery database-driven instead of defaulting to `cashFlow`
+- Styled the empty learning-path state with the shared EmptyState component and lesson artwork
+- Made dashboard next actions and empty states database-driven for unseeded applications
+- Added a full lesson JSON editor for lesson metadata, micro-lessons, quizzes, and content blocks
+- Added renderer block-type controls for switching paragraph, callout, formula, list, quiz, table, and budget blocks
+- Added structured editing for lists, character intros, knowledge checks, tables, and budget summaries
+- Added Postman coverage for admin status, user listing, module seed/detail/CRUD, and nested lesson CRUD
+- Split Postman workflows into public, user, and admin collections with shared environment guidance
+
+---
+
+## [Unreleased Patch 4]
+
+### Added
+
+- Added frontend API support for fetching public lesson content
+
+### Changed
+
+- Updated signed-out lesson previews to use the public lesson API through `useLessonContent`
+
+### Removed
+
+- Removed the frontend preview dependency on bundled lesson content and `getSampleLesson`
+
+---
+
+## [Unreleased Patch 3]
+
+### Added
+
+- Added a MongoDB lesson-module model for storing imported lesson content
+- Added a shared-secret lesson module import endpoint with Joi validation
+- Added cache invalidation after lesson module imports
+- Added integration coverage for refreshed content after module re-imports
+- Added Postman requests for public lessons, quiz answer checks, and lesson imports
+- Added the lesson import secret to the local Postman environment configuration
+- Added multipart `.json` file uploads for complete lesson module imports
+- Documented the budgeting lesson JSON fixture for selection in the Postman import request
+- Accepted additional top-level lesson content fields during imports
+
+### Changed
+
+- Updated content loading to prefer MongoDB while retaining JSON fallback support
+
+---
+
+## [Unreleased Patch 2]
+
+### Added
+
+- Added sanitized public and authenticated lesson responses that hide quiz answers
+- Added server-side correctness checks for individual quiz answers
+
+### Changed
+
+- Prevented lesson content APIs from exposing `correctResponse` and `explanation`
+- Added a stateless public quiz answer-check endpoint
+- Sanitized all lessons nested in the module payload, not just the requested lesson
+- Updated quiz state to store server-provided correctness metadata
+
+### Removed
+
+- Removed client-side quiz correctness and explanation data from normalized questions
+
+---
+
+## [Unreleased Patch 1]
+
+### Added
+
+- Added a public lesson content endpoint for signed-out lesson previews
+- Added backend integration tests for public lesson loading and unknown lessons
+
+### Changed
+
+- Added the unauthenticated lesson route before the protected lesson routes
+- Updated the lesson content hook and API client to support public lesson requests
+- Updated lesson normalization to consume API-provided lesson payloads
+- Updated signed-out sample previews to use the public lesson API
+
+### Removed
+
+- Removed the bundled content import and `getSampleLesson` preview helper
+
+---
+
 ## [Unreleased]
 
 ### Added

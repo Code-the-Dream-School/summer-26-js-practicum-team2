@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getLesson } from "../services/api";
+import { getLesson, getPublicLesson } from "../services/api";
 
 export const DEFAULT_MODULE_ID = "cashFlow";
 export const DEFAULT_LESSON_ID = "1.1";
 
-export default function useLessonContent({ moduleId, lessonId, enabled = true }) {
+export default function useLessonContent({ moduleId, lessonId, enabled = true, isPublic = false }) {
   const [payload, setPayload] = useState(null);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState("");
@@ -22,7 +22,8 @@ export default function useLessonContent({ moduleId, lessonId, enabled = true })
     setError("");
 
     try {
-      const lessonPayload = await getLesson(resolvedModuleId, resolvedLessonId);
+      const fetchLessonContent = isPublic ? getPublicLesson : getLesson;
+      const lessonPayload = await fetchLessonContent(resolvedModuleId, resolvedLessonId);
       setPayload(lessonPayload);
     } catch (requestError) {
       setPayload(null);
@@ -30,7 +31,7 @@ export default function useLessonContent({ moduleId, lessonId, enabled = true })
     } finally {
       setIsLoading(false);
     }
-  }, [enabled, resolvedLessonId, resolvedModuleId]);
+  }, [enabled, isPublic, resolvedLessonId, resolvedModuleId]);
 
   useEffect(() => {
     // If the hook is enabled, fetch the lesson content and progress when the component mounts or when the resolved moduleId or lessonId changes.

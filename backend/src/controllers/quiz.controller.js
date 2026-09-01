@@ -20,8 +20,10 @@ quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
 const QuizAttempt = require("../models/QuizAttempt.model");
 const UserProgress = require("../models/UserProgress.model");
 const { invalidateDashboardCache } = require("./dashboard.controller");
+const { getModule } = require("../utils/content");
 const {
   quizStartSchema,
+  quizCheckSchema,
   quizSubmissionParamsSchema,
   quizSubmissionSchema,
   validateRequest,
@@ -30,24 +32,6 @@ const {
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
 
-//Contnent registery mapping manifest module IDs to JSON content files
-const moduleList = {
-  cashFlow: require("../../../shared/content/budgeting.json"),
-  //savings: require("../../shared/content/savings.json"),
-  //credit: require("../../shared/content/credit.json"),
-  //debt: require("../../shared/content/debt.json"),
-  //investing: require("../../shared/content/investing.json"),
-};
-const getModuleContent = (moduleId) => {
-  const targetModule = moduleId || "cashFlow";
-  const content = moduleList[targetModule];
-  if (!content) {
-    throw new Error(
-      `Module '${targetModule}' does not exist or is not found in the list of modules.`,
-    );
-  }
-  return content;
-};
 //Array comparison helper for single, multi-choice and multi-select questions
 const arraysMatch = (arr1 = [], arr2 = []) => {
   const normal1 = Array.isArray(arr1) ? arr1 : [arr1];
@@ -59,8 +43,9 @@ const arraysMatch = (arr1 = [], arr2 = []) => {
   return sorted1.every((val, idx) => val === sorted2[idx]);
 };
 //search inside modules => lessons ....knowledge check
-const getQuestionsFromLesson = (moduleId, microLessonId) => {
-  const moduleData = getModuleContent(moduleId);
+const getQuestionsFromLesson = async (moduleId, microLessonId) => {
+  const moduleData = await getModule(moduleId || "cashFlow");
+  if (!moduleData) return [];
 
   //search inside the modules to get the lessons and then inside lessons to get microlessons which then include the knowledgechecks
   for (const lesson of moduleData.lessons || []) {
@@ -76,8 +61,9 @@ const getQuestionsFromLesson = (moduleId, microLessonId) => {
 //if no progress record exists yet, it creates a new UserProgress doc immediately before returning a 200 Ok
 
 // get all micro-lesson IDS that belong to a specific lesson ID
-const getMicroLessonIdsForLesson = (moduleId, lessonId) => {
-  const moduleData = getModuleContent(moduleId);
+const getMicroLessonIdsForLesson = async (moduleId, lessonId) => {
+  const moduleData = await getModule(moduleId || "cashFlow");
+  if (!moduleData) return [];
   const lesson = (moduleData.lessons || []).find((l) => l.id === lessonId);
 
   if (!lesson || !lesson.microLessons) return [];
@@ -159,6 +145,38 @@ exports.startQuiz = async (req, res, next) => {
     return next(error);
   }
 };
+
+// Route: POST /api/v1/quizzes/check
+// Checks one answer without creating an attempt or requiring authentication.
+exports.checkAnswer = async (req, res, next) => {
+  try {
+    const validatedBody = validateRequest(res, quizCheckSchema, req.body);
+    if (!validatedBody) return;
+
+    const { moduleId, microLessonId, questionId, choiceIds } = validatedBody;
+    const question = (await getQuestionsFromLesson(moduleId, microLessonId)).find(
+      (item) => item.id === questionId,
+    );
+
+    if (!question) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Question '${questionId}' was not found in micro-lesson '${microLessonId}'.`,
+      });
+    }
+
+    const correctChoiceIds = Array.isArray(question.correctResponse)
+      ? question.correctResponse
+      : [question.correctResponse];
+
+    return res.status(StatusCodes.OK).json({
+      isCorrect: arraysMatch(choiceIds, correctChoiceIds),
+      correctChoiceIds,
+      explanation: question.explanation,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
 // Route: POST /api/v1/quizzes/:id/submit
 //Function: Submit quiz responses based on courseId, grades answers, logs the number of quiz attempts, updates lesson progress.
 
@@ -177,7 +195,7 @@ exports.submitQuiz = async (req, res, next) => {
     //get lesson id from micro_lesson_id
     const lessonId = microLessonId.split(".").slice(0, 2).join(".");
     // 1. Fetch previous attempt to calculate attempt_number and prevent instant duplicate double clicks
-    const contentQuestions = getQuestionsFromLesson(moduleId, microLessonId);
+    const contentQuestions = await getQuestionsFromLesson(moduleId, microLessonId);
     if (!contentQuestions.length) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `No quiz questions found for micro-lesson '${microLessonId}'.`,
@@ -276,7 +294,7 @@ exports.submitQuiz = async (req, res, next) => {
         },
         { upsert: true, returnDocument: "after" },
       );
-      const allMicroLessonsIds = getMicroLessonIdsForLesson(moduleId, lessonId);
+      const allMicroLessonsIds = await getMicroLessonIdsForLesson(moduleId, lessonId);
       const userCompletedMicros = new Set(updatedProgress.completed_micro_lessons || []);
       const isLessonFullyCompleted =
         allMicroLessonsIds.length > 0 &&

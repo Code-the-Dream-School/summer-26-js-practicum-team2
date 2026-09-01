@@ -4,9 +4,12 @@ const {
   getLessonProgress,
   updateLessonProgress,
   restartLessonProgress,
+  getLessonModules,
 } = require("../controllers/lesson.controller");
 
 const router = express.Router();
+
+router.get("/modules", getLessonModules);
 
 // GET /api/v1/lessons/progress?moduleId=...
 router.get("/progress", getLessonProgress);

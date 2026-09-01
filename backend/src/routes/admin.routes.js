@@ -1,26 +1,54 @@
 const express = require("express");
-const router = express.Router();
-const {authenticateUser, authorizeRoles} = require("../middleware/jsonWebToken");
+const multer = require("multer");
+const { importLessonModule } = require("../controllers/lesson.controller");
 const {
+  getAdminStatus,
+  listUsers,
+  resetUserProgress,
+  setUserDisabled,
+  updateUserRole,
+  verifyUserEmail,
+  setUserDeleted,
+  hardDeleteUser,
+  listModules,
+  getModule,
+  createModule,
+  updateModule,
+  deleteModule,
+  seedBudgetingModule,
+  createLesson,
+  updateLesson,
+  deleteLesson,
   getPendingDeleteAccount,
   approveDeleteAccount,
   rejectDeleteAccount,
   reactivateUserAcct,
-  getAllAdminUsers,
 } = require("../controllers/admin.controller");
 
-//Protect routes
-router.use(authenticateUser, authorizeRoles("admin"));
+const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-//Admin endpoints;
-//GET/api/v1/admin/users
-router.get("/users", getAllAdminUsers);
-// GET /api/v1/admin/deletions/pending
+router.get("/status", getAdminStatus);
+router.get("/users", listUsers);
+router.post("/users/:userId/progress/reset", resetUserProgress);
+router.patch("/users/:userId/disabled", setUserDisabled);
+router.patch("/users/:userId/role", updateUserRole);
+router.patch("/users/:userId/verify-email", verifyUserEmail);
+router.patch("/users/:userId/deleted", setUserDeleted);
+router.delete("/users/:userId", hardDeleteUser);
 router.get("/deletions/pending", getPendingDeleteAccount);
-//PATCH /api/v1/admin/deletions/approve/:userId
 router.patch("/deletions/approve/:userId", approveDeleteAccount);
-//PATCH /api/v1/admin/deletions/deny/:userId
 router.patch("/deletions/deny/:userId", rejectDeleteAccount);
-//PATCH /api/v1/admin/deletions/reactivate/:userId
 router.patch("/deletions/reactivate/:userId", reactivateUserAcct);
+router.get("/modules", listModules);
+router.post("/modules/seed-budgeting", seedBudgetingModule);
+router.get("/modules/:moduleId", getModule);
+router.post("/modules", createModule);
+router.patch("/modules/:moduleId", updateModule);
+router.delete("/modules/:moduleId", deleteModule);
+router.post("/modules/:moduleId/lessons", createLesson);
+router.patch("/modules/:moduleId/lessons/:lessonId", updateLesson);
+router.delete("/modules/:moduleId/lessons/:lessonId", deleteLesson);
+router.post("/modules/import", upload.single("file"), importLessonModule);
+
 module.exports = router;

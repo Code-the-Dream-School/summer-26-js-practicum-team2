@@ -52,6 +52,23 @@ export default function DashboardPage() {
   }
 
   const { hero, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  if (units.length === 0) {
+    return (
+      <section className="space-y-6">
+        <DashboardHero hero={hero} />
+        <EmptyState
+          icon="🌱"
+          title="Content coming soon"
+          message="New lessons are being prepared. Check back soon for something new to explore."
+          action={
+            <Button as={Link} to={ROUTES.LEARN} variant="primary" className="px-5 py-2.5">
+              View learning path
+            </Button>
+          }
+        />
+      </section>
+    );
+  }
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;
 

@@ -26,10 +26,26 @@ const authenticateUser = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select(
+      "role is_disabled deleted_at token_version",
+    );
     const tokenVersionInJwt = decoded.token_version ?? 0;
     if (!user || user.token_version !== tokenVersionInJwt) {
       return send401(res);
+    }
+
+    if (user.is_disabled) {
+      res.clearCookie("session_token", { httpOnly: true, sameSite: "lax", path: "/" });
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ message: "This account has been banned or disabled." });
+    }
+
+    if (user.deleted_at) {
+      res.clearCookie("session_token", { httpOnly: true, sameSite: "lax", path: "/" });
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ message: "This account is scheduled for deletion." });
     }
 
     req.user = {

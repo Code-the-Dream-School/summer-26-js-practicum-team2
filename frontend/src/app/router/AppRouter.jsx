@@ -19,17 +19,17 @@ import LastLessonRedirect from "../../pages/LastLessonRedirect";
 import PrivacyPage from "../../pages/PrivacyPage";
 import TermsPage from "../../pages/TermsPage";
 import NotFoundPage from "../../pages/NotFoundPage";
-import Skeleton from "../../shared/Skeleton/Skeleton.component";
 import Spinner from "../../shared/Spinner/Spinner.component";
+import AdminDashboardPage from "../../pages/AdminDashboardPage";
 
 export default function AppRouter() {
   const { isHydrating } = useAuthContext();
 
   if (isHydrating) {
     return (
-      <Skeleton>
+      <div className="flex min-h-[50vh] items-center justify-center">
         <Spinner label="Loading" />
-      </Skeleton>
+      </div>
     );
   }
 
@@ -66,6 +66,14 @@ export default function AppRouter() {
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN}
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
           }
         />
         <Route

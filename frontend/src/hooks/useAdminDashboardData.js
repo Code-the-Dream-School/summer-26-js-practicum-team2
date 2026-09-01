@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback, useMemo} from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getPendingDeleteAccount, getAdminUsers } from "../services/api";
 
 // Sets default cache Time to Live to 30 seconds.
@@ -35,43 +35,40 @@ const cacheAdminData = (payload) => {
 };
 
 export default function useAdminDashboardData() {
-  const [adminData, setAdminData] = useState({pendingDeletions: [], users: []});
+  const [adminData, setAdminData] = useState({ pendingDeletions: [], users: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fetchAdminDashboard= useCallback(
-    async ({ force = false } = {}) => {
-      if (!force) {
-        const cached = readCachedAdminData();
-        if (cached) {
-          setAdminData(cached);
-          setIsLoading(false);
-          setError("");
-          return cached;
-        }   
+  const fetchAdminDashboard = useCallback(async ({ force = false } = {}) => {
+    if (!force) {
+      const cached = readCachedAdminData();
+      if (cached) {
+        setAdminData(cached);
+        setIsLoading(false);
+        setError("");
+        return cached;
       }
-      setIsLoading(true);
-      setError("");
-      try {
-        const [pendingResp, userResp] = await Promise.all([
-          getPendingDeleteAccount(),
-          getAdminUsers(),
-        ]);
-        const payload = {
+    }
+    setIsLoading(true);
+    setError("");
+    try {
+      const [pendingResp, userResp] = await Promise.all([
+        getPendingDeleteAccount(),
+        getAdminUsers({ role: "admin" }),
+      ]);
+      const payload = {
         pendingDeletions: pendingResp?.users || pendingResp || [],
         users: userResp?.users || userResp || [],
-        };
-        setAdminData(payload);
-        cacheAdminData(payload);
-        return payload;
-      } catch (error) {
-        setError(error.message || "Admin dashboard unable to load right now.");
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+      };
+      setAdminData(payload);
+      cacheAdminData(payload);
+      return payload;
+    } catch (error) {
+      setError(error.message || "Admin dashboard unable to load right now.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Refresh the dashboard when the user's pending deletion updated
@@ -79,9 +76,9 @@ export default function useAdminDashboardData() {
   }, [fetchAdminDashboard]);
 
   const refresh = useCallback(() => {
-      window.sessionStorage.removeItem(ADMIN_CACHE_KEY);
-      return fetchAdminDashboard({ force: true });
-    },[fetchAdminDashboard]);
+    window.sessionStorage.removeItem(ADMIN_CACHE_KEY);
+    return fetchAdminDashboard({ force: true });
+  }, [fetchAdminDashboard]);
 
   return useMemo(
     () => ({

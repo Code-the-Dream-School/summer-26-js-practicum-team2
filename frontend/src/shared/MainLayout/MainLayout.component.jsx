@@ -24,7 +24,6 @@ export default function MainLayout() {
     <div className="mx-auto min-h-screen bg-surface-app text-foreground">
       <Header
         signedIn={isAuthenticated}
-        //add line 28 for admin updates for frontend
         isAdmin={isAdmin}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
         onLogout={handleLogout}
