@@ -26,6 +26,7 @@ const { invalidateDashboardCache } = require("./dashboard.controller");
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
 const XpEvent = require("../models/XpEvent.model");
+const { getUserXpTotal } = require("../services/xp.service");
 
 //Contnent registery mapping manifest module IDs to JSON content files
 const moduleList = {
@@ -84,6 +85,8 @@ const getMicroLessonIdsForLesson = (moduleId, lessonId) => {
 //GET /api/v1/quizzes/progress
 exports.getUserProgress = async (req, res, next) => {
   try {
+    const xpTotal = await getUserXpTotal(req.user.id);
+
     let progressRecord = await UserProgress.findOne({ user_id: req.user.id });
     if (!progressRecord) {
       progressRecord = await UserProgress.create({
@@ -91,7 +94,11 @@ exports.getUserProgress = async (req, res, next) => {
         module_id: "cashFlow",
       });
     }
-    return res.status(StatusCodes.OK).json(progressRecord);
+    //return res.status(StatusCodes.OK).json(progressRecord);
+    return res.status(StatusCodes.OK).json({
+      ...progressRecord.toObject(),
+      xp: xpTotal,
+    });
   } catch (error) {
     return next(error);
   }

@@ -7,6 +7,7 @@ const {
   changePasswordSchema,
   deleteAccountSchema,
 } = require("../validation/profileValidation");
+const { getUserXpTotal } = require("../services/xp.service");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -27,6 +28,9 @@ const getProfile = async (req, res, next) => {
     const progress = await UserProgress.findOne({ user_id: req.user.id }).sort({
       updated_at: -1,
     });
+
+    const xpTotal = await getUserXpTotal(req.user.id);
+
     return res.status(StatusCodes.OK).json({
       user: {
         id: user._id,
@@ -35,7 +39,7 @@ const getProfile = async (req, res, next) => {
         goals: user.goals ?? "",
         theme: user.theme ?? "Light",
         notifications: user.notifications ?? true,
-        xp: user.xp ?? 0,
+        xp: xpTotal,
         streak: user.streak ?? 0,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
@@ -89,6 +93,9 @@ const updateProfile = async (req, res, next) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: " User not found or user deleted account. " });
     }
+
+    const xpTotal = await getUserXpTotal(req.user.id);
+    
     let hasUpdates = false;
     if (name !== undefined) {
       user.name = name;
@@ -127,7 +134,7 @@ const updateProfile = async (req, res, next) => {
         goals: user.goals,
         theme: user.theme,
         notifications: user.notifications,
-        xp: user.xp ?? 0,
+        xp: xpTotal,
         streak: user.streak ?? 0,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),

@@ -3,6 +3,7 @@ const { User } = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const QuizAttempt = require("../models/QuizAttempt.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
+const { getUserXpTotal } = require("../services/xp.service");
 
 const contentModules = {
   cashFlow: require("../../../shared/content/budgeting.json"),
@@ -194,6 +195,7 @@ exports.getDashboard = async (req, res, next) => {
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
+    const xpTotal = await getUserXpTotal(userId);
 
     await reconcileProgressFromPassedAttempts(userId);
     const progressRecords = await UserProgress.find({
@@ -206,6 +208,9 @@ exports.getDashboard = async (req, res, next) => {
     const payload = {
       hero: getHero(user.name || "Learner", units, nextAction),
       nextAction,
+      xp: {
+        total: xpTotal,
+      },
       units,
       recentActivity: await getRecentActivity(userId),
       meta: {
