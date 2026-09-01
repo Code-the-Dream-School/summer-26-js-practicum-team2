@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
 const { sendVerificationEmail } = require("../utils/sendEmail");
 //User is capitalized because it represents a model which is a collection of items for the database
-const User  = require("../models/User.model.js");
+const User = require("../models/User.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const {
   registerSchema,
@@ -104,7 +104,11 @@ const reactivate = async (req, res, next) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Email and password are needed." });
     }
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email,
+      is_deleted: { $in: [true, false] },
+      is_archived: { $in: [true, false] },
+    });
     if (!user) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -129,7 +133,10 @@ const reactivate = async (req, res, next) => {
     }
     //Restore user state of not deleted account
     user.is_deleted = false;
+    user.is_archived = false;
     user.deleted_at = null;
+    user.deletion_status = "none";
+    user.deletion_requested_at = null;
     user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
@@ -194,9 +201,13 @@ const login = async (req, res, next) => {
 
     //Sign JWT Token
     const csrfToken = crypto.randomUUID();
-    const token = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-      expiresIn: tokenExpiry,
-    });
+    const token = jwt.sign(
+      { id: user._id, role: user.role, csrfToken, token_version: user.token_version },
+      JWT_SECRET,
+      {
+        expiresIn: tokenExpiry,
+      },
+    );
     // HttpOnly session cookies
     res.cookie("session_token", token, getCookieOptions(req, maxAge));
     req.app.emit?.("login_success", {
@@ -262,9 +273,13 @@ const verifyEmail = async (req, res, next) => {
 
     const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
     const csrfToken = crypto.randomUUID();
-    const sessionToken = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-      expiresIn: "14d",
-    });
+    const sessionToken = jwt.sign(
+      { id: user._id, role: user.role, csrfToken, token_version: user.token_version },
+      JWT_SECRET,
+      {
+        expiresIn: "14d",
+      },
+    );
 
     res.cookie("session_token", sessionToken, getCookieOptions(req, FOURTEEN_DAYS));
 
@@ -349,13 +364,18 @@ const resetPassword = async (req, res, next) => {
     user.password_hash = await hashPassword(newPassword);
     user.password_reset_token = undefined;
     user.password_reset_expires_at = undefined;
+    user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
     const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
     const csrfToken = crypto.randomUUID();
-    const sessionToken = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-      expiresIn: "14d",
-    });
+    const sessionToken = jwt.sign(
+      { id: user._id, role: user.role, csrfToken, token_version: user.token_version },
+      JWT_SECRET,
+      {
+        expiresIn: "14d",
+      },
+    );
 
     res.cookie("session_token", sessionToken, getCookieOptions(req, FOURTEEN_DAYS));
 
