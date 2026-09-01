@@ -87,22 +87,22 @@ export const getProfile = () =>
     method: "GET",
   });
 
-export const updateProfile = async({ csrfToken, ...profile }) => {
-  try { 
+export const updateProfile = async ({ csrfToken, ...profile }) => {
+  try {
     const resp = apiRequest("", {
-    method: "PATCH",
-    body: profile,
-    csrfToken,
-    basePath: PROFILE_BASE_PATH,
-  }) 
-  notifyProfileChange({user: resp?.user || profile });
+      method: "PATCH",
+      body: profile,
+      csrfToken,
+      basePath: PROFILE_BASE_PATH,
+    });
+    notifyProfileChange({ user: resp?.user || profile });
 
-  return resp;
-} catch (error) {
-  console.error("failed to update profile", error);
-  throw error;
-}};
-
+    return resp;
+  } catch (error) {
+    console.error("failed to update profile", error);
+    throw error;
+  }
+};
 
 export const changeProfilePassword = ({ currentPassword, newPassword, csrfToken }) =>
   apiRequest("/password", {
@@ -113,8 +113,8 @@ export const changeProfilePassword = ({ currentPassword, newPassword, csrfToken 
   });
 
 export const deleteProfile = ({ email, csrfToken }) =>
-  apiRequest("", {
-    method: "DELETE",
+  apiRequest("/request-deletion", {
+    method: "POST",
     body: { email },
     csrfToken,
     basePath: PROFILE_BASE_PATH,
@@ -148,12 +148,11 @@ export const reactivateUserAcct = (userId, csrfToken) =>
     basePath: ADMIN_BASE_PATH,
   });
 
-  //notifyProfileChange
-  //dispatch event that the profile changed!!
-  export const notifyProfileChange = (detail = {}) => {
-    window.dispatchEvent(new CustomEvent("sprout:profile-updated", {detail}));
-  };
-
+//notifyProfileChange
+//dispatch event that the profile changed!!
+export const notifyProfileChange = (detail = {}) => {
+  window.dispatchEvent(new CustomEvent("sprout:profile-updated", { detail }));
+};
 
 // Dispatches a custom event to notify the application that dashboard progress has been updated
 // This allows other components to listen for this event and update their state accordingly
