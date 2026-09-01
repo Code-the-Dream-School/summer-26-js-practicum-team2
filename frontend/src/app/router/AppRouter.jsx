@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router";
 import { ROUTES } from "./routes";
+import { useAuthContext } from "../../context/AuthContext";
 import MainLayout from "../../shared/MainLayout/MainLayout.component";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
@@ -18,8 +19,20 @@ import LastLessonRedirect from "../../pages/LastLessonRedirect";
 import PrivacyPage from "../../pages/PrivacyPage";
 import TermsPage from "../../pages/TermsPage";
 import NotFoundPage from "../../pages/NotFoundPage";
+import Skeleton from "../../shared/Skeleton/Skeleton.component";
+import Spinner from "../../shared/Spinner/Spinner.component";
 
 export default function AppRouter() {
+  const { isHydrating } = useAuthContext();
+
+  if (isHydrating) {
+    return (
+      <Skeleton>
+        <Spinner label="Loading" />
+      </Skeleton>
+    );
+  }
+
   return (
     <Routes>
       <Route element={<MainLayout />}>

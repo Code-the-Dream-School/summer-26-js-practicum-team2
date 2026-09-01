@@ -18,7 +18,7 @@ export default function AdminDashboard() {
   const handleApprove = async (userId) => {
     try {
       setActionLoadingId(userId);
-      await approveDeleteAccount({ userId, csrfToken });
+      await approveDeleteAccount(userId, csrfToken);
       await refreshAdminData();
     } catch (error) {
       alert(`Approval failed. ${error.message}`);
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   const handleReject = async (userId) => {
     try {
       setActionLoadingId(userId);
-      await rejectDeleteAccount({ userId, csrfToken });
+      await rejectDeleteAccount(userId, csrfToken);
       await refreshAdminData();
     } catch (err) {
       alert(`Rejection failed: ${err.message}`);
