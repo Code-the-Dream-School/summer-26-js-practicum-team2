@@ -60,6 +60,24 @@ describe("admin access boundary", () => {
     expect(response.body.users[0]).not.toHaveProperty("password_hash");
   });
 
+  test("allows admins to seed random learner accounts", async () => {
+    const admin = await createUser("admin");
+    const response = await request(app)
+      .post("/api/v1/admin/users/seed-random")
+      .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`)
+      .send({ count: 3 });
+
+    expect(response.status).toBe(201);
+    expect(response.body.count).toBe(3);
+    expect(response.body.users).toHaveLength(3);
+    expect(new Set(response.body.users.map((user) => user.email)).size).toBe(3);
+    response.body.users.forEach((user) => {
+      expect(user).toMatchObject({ role: "learner", is_disabled: false });
+      expect(user).not.toHaveProperty("password_hash");
+    });
+    expect(await User.countDocuments({ role: "learner" })).toBe(3);
+  });
+
   test("requires confirmation and prevents the last admin from demotion", async () => {
     const admin = await createUser("admin");
     const response = await request(app)
@@ -68,6 +86,49 @@ describe("admin access boundary", () => {
       .send({ role: "learner", confirmation: "CONFIRM" });
 
     expect(response.status).toBe(409);
+  });
+
+  test("counts legacy admins with unset status fields when deleting an admin", async () => {
+    const admin = await createUser("admin");
+    const legacyAdminId = new mongoose.Types.ObjectId();
+    await User.collection.insertOne({
+      _id: legacyAdminId,
+      name: "Legacy Admin",
+      email: "legacy-admin@example.com",
+      password_hash: "hashed-password",
+      role: "admin",
+      tos_agreement: true,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    const response = await request(app)
+      .patch(`/api/v1/admin/users/${legacyAdminId}/deleted`)
+      .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`)
+      .send({ confirmation: "CONFIRM", deleted: true });
+
+    expect(response.status).toBe(200);
+    expect(response.body.deleted_at).toBeTruthy();
+  });
+
+  test("allows hard deletion of a soft-deleted admin when another active admin remains", async () => {
+    const admin = await createUser("admin");
+    const target = await createUser("admin");
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    const deleted = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", deleted: true });
+    expect(deleted.status).toBe(200);
+
+    const hardDeleted = await request(app)
+      .delete(`/api/v1/admin/users/${target._id}`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", email: target.email });
+
+    expect(hardDeleted.status).toBe(200);
+    expect(await User.exists({ _id: target._id })).toBeNull();
   });
 
   test("makes the first registered user an admin", async () => {

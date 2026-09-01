@@ -158,6 +158,14 @@ export const reactivateUserAcct = (userId, csrfToken) =>
 export const getAdminModules = () =>
   apiRequest("/modules", { method: "GET", basePath: ADMIN_BASE_PATH });
 
+export const seedAdminRandomUsers = (csrfToken, count = 10) =>
+  apiRequest("/users/seed-random", {
+    method: "POST",
+    csrfToken,
+    body: { count },
+    basePath: ADMIN_BASE_PATH,
+  });
+
 export const seedAdminBudgetingModule = (csrfToken) =>
   apiRequest("/modules/seed-budgeting", {
     method: "POST",

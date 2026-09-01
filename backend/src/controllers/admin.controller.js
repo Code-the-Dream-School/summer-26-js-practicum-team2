@@ -1,9 +1,11 @@
 const { StatusCodes } = require("http-status-codes");
 const mongoose = require("mongoose");
+const { randomUUID } = require("node:crypto");
 const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const LessonModule = require("../models/LessonModule.model");
 const { clearModuleCache } = require("../utils/content");
+const { hashPassword } = require("../utils/password");
 const {
   adminActionSchema,
   adminDisableSchema,
@@ -11,6 +13,7 @@ const {
   adminSoftDeleteSchema,
   adminRoleSchema,
   adminUserQuerySchema,
+  adminUserSeedSchema,
   adminModuleSchema,
   adminModuleUpdateSchema,
   adminLessonSchema,
@@ -36,6 +39,16 @@ const getTargetUser = async (userId) => {
   if (!mongoose.isValidObjectId(userId)) return null;
   return User.findById(userId);
 };
+
+const countOtherActiveAdmins = (userId) =>
+  User.countDocuments({
+    _id: { $ne: userId },
+    role: "admin",
+    is_disabled: { $ne: true },
+    deleted_at: null,
+    is_deleted: { $ne: true },
+    is_archived: { $ne: true },
+  });
 
 const getAllAdminUsers = async (req, res, next) => {
   try {
@@ -89,6 +102,34 @@ const listUsers = async (req, res, next) => {
       page: query.page,
       limit: query.limit,
       total,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const seedRandomUsers = async (req, res, next) => {
+  try {
+    const body = validateRequest(res, adminUserSeedSchema, req.body);
+    if (!body) return;
+    const seedUsers = await Promise.all(
+      Array.from({ length: body.count }, async () => {
+        const uniqueId = randomUUID();
+        return {
+          name: `Seeded User ${uniqueId.slice(0, 8)}`,
+          email: `seeded-user-${uniqueId}@example.test`,
+          password_hash: await hashPassword(randomUUID()),
+          email_verified_at: new Date(),
+          role: "learner",
+          tos_agreement: true,
+        };
+      }),
+    );
+    const users = await User.insertMany(seedUsers);
+    return res.status(StatusCodes.CREATED).json({
+      success: true,
+      count: users.length,
+      users: users.map(safeUser),
     });
   } catch (error) {
     return next(error);
@@ -256,13 +297,9 @@ const setUserDeleted = async (req, res, next) => {
         .status(StatusCodes.CONFLICT)
         .json({ message: "You cannot manage your own account." });
     }
-    if (target.role === "admin" && !target.deleted_at) {
-      const activeAdmins = await User.countDocuments({
-        role: "admin",
-        is_disabled: false,
-        deleted_at: null,
-      });
-      if (activeAdmins <= 1) {
+    if (target.role === "admin" && body.deleted && !target.deleted_at) {
+      const otherActiveAdmins = await countOtherActiveAdmins(target._id);
+      if (otherActiveAdmins < 1) {
         return res
           .status(StatusCodes.CONFLICT)
           .json({ message: "The last active admin cannot be deleted." });
@@ -293,12 +330,8 @@ const hardDeleteUser = async (req, res, next) => {
         .json({ message: "You cannot manage your own account." });
     }
     if (target.role === "admin") {
-      const activeAdmins = await User.countDocuments({
-        role: "admin",
-        is_disabled: false,
-        deleted_at: null,
-      });
-      if (activeAdmins <= 1) {
+      const otherActiveAdmins = await countOtherActiveAdmins(target._id);
+      if (otherActiveAdmins < 1) {
         return res
           .status(StatusCodes.CONFLICT)
           .json({ message: "The last active admin cannot be deleted." });
@@ -326,12 +359,8 @@ const setUserDisabled = async (req, res, next) => {
         .json({ message: "You cannot manage your own account." });
     }
     if (target.role === "admin" && body.disabled) {
-      const activeAdmins = await User.countDocuments({
-        role: "admin",
-        is_disabled: false,
-        deleted_at: null,
-      });
-      if (activeAdmins <= 1) {
+      const otherActiveAdmins = await countOtherActiveAdmins(target._id);
+      if (otherActiveAdmins < 1) {
         return res
           .status(StatusCodes.CONFLICT)
           .json({ message: "The last active admin cannot be disabled." });
@@ -358,12 +387,8 @@ const updateUserRole = async (req, res, next) => {
       return res.status(StatusCodes.CONFLICT).json({ message: "You cannot demote yourself." });
     }
     if (target.role === "admin" && body.role !== "admin") {
-      const activeAdmins = await User.countDocuments({
-        role: "admin",
-        is_disabled: false,
-        deleted_at: null,
-      });
-      if (activeAdmins <= 1) {
+      const otherActiveAdmins = await countOtherActiveAdmins(target._id);
+      if (otherActiveAdmins < 1) {
         return res
           .status(StatusCodes.CONFLICT)
           .json({ message: "The last active admin cannot be demoted." });
@@ -529,6 +554,7 @@ module.exports = {
   getAllAdminUsers,
   getAdminStatus,
   listUsers,
+  seedRandomUsers,
   getPendingDeleteAccount,
   approveDeleteAccount,
   rejectDeleteAccount,

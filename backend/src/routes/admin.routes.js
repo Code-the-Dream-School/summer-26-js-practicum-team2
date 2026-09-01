@@ -4,6 +4,7 @@ const { importLessonModule } = require("../controllers/lesson.controller");
 const {
   getAdminStatus,
   listUsers,
+  seedRandomUsers,
   resetUserProgress,
   setUserDisabled,
   updateUserRole,
@@ -30,6 +31,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 
 
 router.get("/status", getAdminStatus);
 router.get("/users", listUsers);
+router.post("/users/seed-random", seedRandomUsers);
 router.post("/users/:userId/progress/reset", resetUserProgress);
 router.patch("/users/:userId/disabled", setUserDisabled);
 router.patch("/users/:userId/role", updateUserRole);

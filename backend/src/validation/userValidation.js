@@ -124,6 +124,10 @@ const adminUserQuerySchema = Joi.object({
   search: Joi.string().trim().max(100),
 });
 
+const adminUserSeedSchema = Joi.object({
+  count: Joi.number().integer().min(1).max(100).default(10),
+});
+
 const adminRoleSchema = Joi.object({
   role: Joi.string().valid("learner", "admin").required(),
   confirmation: Joi.string().valid("CONFIRM").required(),
@@ -188,6 +192,7 @@ module.exports = {
   dashboardEventSchema,
   lessonImportSchema,
   adminUserQuerySchema,
+  adminUserSeedSchema,
   adminRoleSchema,
   adminActionSchema,
   adminDisableSchema,
