@@ -10,6 +10,8 @@ const footerNavLinks = [
   },
 ];
 
+const copyrightYear = new Date().getFullYear();
+
 export default function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-surface-app/90 px-4 py-8 text-sm text-neutral-600 sm:px-6 lg:px-8">
@@ -47,8 +49,8 @@ export default function Footer() {
         </p>
 
         <p className="text-xs text-neutral-400">
-          &copy; {new Date().getFullYear()} Sprout — Code the Dream Summer Practicum 2026 Counting
-          Cents and Making Sense.
+          &copy; {copyrightYear} Sprout — Code the Dream Summer Practicum 2026 Counting Cents and
+          Making Sense.
         </p>
       </div>
     </footer>
