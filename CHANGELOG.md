@@ -9,36 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-### [Unreleased]
+## [0.3.8] - 2026-09-01
 
 ### Added
 
-- Added `backend/src/utils/coreRules.js` with coverage for XP caps and award rules, streak/freeze status, and lesson-unlock gating.
-- Added end-to-end backend API coverage for user auth flows (register, verify email, login/logout, forgot/reset password), lesson/dashboard progress flows, and quiz-progress persistence.
-- Added negative-path API coverage for missing, malformed, and expired auth; CSRF mismatches; invalid lesson progress payloads; missing lesson/module resources; and duplicate quiz submissions.
-- Added middleware and error-contract test coverage for 404 and malformed JSON responses, Helmet headers (including CSP and referrer-policy), rate-limiter behavior for register/login, and stable error payload mappings.
-- Added a shared backend auth test helper to reduce repeated authenticated-user setup across integration suites.
-- Added backend coverage guardrails via `test:coverage` and Jest global thresholds (statements: 85, branches: 60, functions: 90, lines: 85).
-- Added CI artifacts for frontend tests, frontend build output, and backend coverage to improve diagnostics in pull-request runs.
-- Added shared backend request test helpers for Authorization and session-plus-CSRF headers to reduce repeated API request setup.
-- Added frontend test coverage for auth restoration, remembered-session login, logout, registration, password reset, and protected-route access.
-- Added frontend regression coverage for dashboard loading, caching, and refresh; last-lesson redirects; sample lesson previews and navigation; and quiz feedback, progress synchronization, completion, and submission.
-- Added Playwright end-to-end testing with Chromium, including local `test:e2e` support, CI retries and tracing, and generated test reports.
-- Added browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
-- Expanded frontend regression coverage for lesson rendering and normalization, quiz interactions and review states, lesson-content loading, learning-path progress and navigation, dashboard cache recovery, and email verification flows.
-- Added unit coverage for authentication and quiz reducers, navigation behavior, shared UI components, modal focus management, form accessibility, loading and status states, and legal-consent analytics handling.
+- Added core rule utilities and corresponding tests for XP awards and caps, streak/freeze status, and lesson-unlock gating.
+- Added backend API integration, contract, and negative-path coverage for authentication, password reset, logout/CSRF protection, lesson and dashboard progress, quiz persistence and submission, middleware/error responses, security headers, and rate limiting.
+- Added shared backend authentication and request helpers to reduce repeated Authorization and session-plus-CSRF setup across integration tests.
+- Added backend coverage enforcement through `test:coverage` with global Jest coverage thresholds.
+- Added frontend regression and unit coverage for authentication, dashboard caching and refresh, lesson loading and navigation, learning-path state, quiz interactions and review flows, reducers, shared components, accessibility behavior, consent analytics, and email verification.
+- Added Playwright end-to-end testing with Chromium, including browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
+- Added CI artifacts for frontend test output, frontend builds, backend coverage, and Playwright reports/results to improve failure diagnostics.
 - Added a keyboard-accessible "Skip to content" link and main-content target to the shared application layout.
 
 ### Changed
 
-- Updated CI pull-request trigger branches from `docs` to `main`.
-- Switched backend CI test execution to the coverage-enforced command (`npm --prefix backend run test:coverage`).
+- Updated CI pull-request triggers from `docs` to `main`.
+- Updated backend CI to enforce coverage thresholds and added browser journey checks to the CI pipeline.
 - Updated email-verification errors to use alert semantics so they are announced by assistive technology.
-- Updated CI and repository testing configuration to run browser journey checks and ignore generated Playwright test-result artifacts.
+- Updated formatting and test-result ignore configuration for generated coverage, build, and Playwright artifacts.
 
 ### Fixed
 
-- Fixed error-handler middleware signature to include the Express `next` parameter for middleware contract compatibility.
+- Fixed the Express error-handler middleware contract to accept `next` and forward errors when response headers have already been sent.
 
 ---
 
