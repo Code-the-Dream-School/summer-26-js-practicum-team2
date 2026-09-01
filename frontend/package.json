@@ -29,7 +29,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint . --max-warnings 0 && node -e \"console.log('✅ ESLint checks passed successfully')\"",
+    "lint": "eslint . --max-warnings 0 && echo 'Frontend ESLint checks passed successfully'",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
