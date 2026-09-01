@@ -2,9 +2,11 @@ const { describe, it, expect, beforeEach } = require("@jest/globals");
 const { User } = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
 const { updateOnboardingProgress } = require("../src/controllers/onboarding.controller");
+const XpEvent = require("../src/models/XpEvent.model");
 
 jest.mock("../src/models/User.model");
 jest.mock("../src/models/UserProgress.model");
+jest.mock("../src/models/XpEvent.model");
 
 jest.mock("../src/validation/userValidation.js", () => ({
   updateOnboardingProgressSchema: {
@@ -74,7 +76,16 @@ describe("onboarding xp awarded", () => {
       expect.anything(),
     );
 
+    expect(user.onboarding.is_completed).toBe(true);
     expect(user.onboarding.xp_awarded).toBe(true);
+    expect(user.save).toHaveBeenCalled();
+
+    expect(XpEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event_type: "onboarding_complete",
+        amount: 50,
+      }),
+    );
   });
 
   it("does not award onboarding XP if already awarded", async () => {
@@ -99,5 +110,7 @@ describe("onboarding xp awarded", () => {
     await updateOnboardingProgress(req, res, next);
 
     expect(UserProgress.findOneAndUpdate).not.toHaveBeenCalled();
+
+    expect(XpEvent.create).not.toHaveBeenCalled();
   });
 });

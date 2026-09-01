@@ -25,6 +25,7 @@ const { invalidateDashboardCache } = require("./dashboard.controller");
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
+const XpEvent = require("../models/XpEvent.model");
 
 //Contnent registery mapping manifest module IDs to JSON content files
 const moduleList = {
@@ -309,17 +310,39 @@ exports.submitQuiz = async (req, res, next) => {
         },
       };
 
+      //increases UserProgress.xp
       if (quizPassXp.amount > 0) {
         update.$inc = {
           xp: quizPassXp.amount,
         };
       }
 
+      //Add xp to XpEvent database for quiz pass
+      if (quizPassXp.amount > 0) {
+        await XpEvent.create({
+          user_id: userId,
+          event_type: "quiz_pass",
+          amount: quizPassXp.amount,
+          reference_id: microLessonId,
+        });
+      }
+
+      //increases UserProgress.xp
       if (perfectXp.amount > 0) {
         update.$inc = {
           ...(update.$inc || {}),
           xp: (update.$inc?.xp || 0) + perfectXp.amount,
         };
+      }
+
+      //Add xp to XpEvent database for perfect quiz score
+      if (perfectXp.amount > 0) {
+        await XpEvent.create({
+          user_id: userId,
+          event_type: "quiz_perfect",
+          amount: perfectXp.amount,
+          reference_id: microLessonId,
+        });
       }
 
       const updatedProgress = await UserProgress.findOneAndUpdate(
@@ -349,11 +372,22 @@ exports.submitQuiz = async (req, res, next) => {
             $addToSet: {
               completed_lessons: lessonId,
             },
+            //increases UserProgress.xp
             $inc: {
               xp: lessonXp.amount,
             },
           },
         );
+
+        //Update xp for lesson completion in XpEvent database
+        if (lessonXp.amount > 0) {
+          await XpEvent.create({
+            user_id: userId,
+            event_type: "lesson_complete",
+            amount: lessonXp.amount,
+            reference_id: lessonId,
+          });
+        }
       }
     }
     invalidateDashboardCache(userId);

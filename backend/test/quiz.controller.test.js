@@ -2,9 +2,11 @@ const { describe, it, expect, beforeEach } = require("@jest/globals");
 const QuizAttempt = require("../src/models/QuizAttempt.model");
 const UserProgress = require("../src/models/UserProgress.model");
 const { submitQuiz } = require("../src/controllers/quiz.controller");
+const XpEvent = require("../src/models/XpEvent.model");
 
 jest.mock("../src/models/QuizAttempt.model");
 jest.mock("../src/models/UserProgress.model");
+jest.mock("../src/models/XpEvent.model");
 
 describe("quiz XP awards", () => {
   let req;
@@ -68,6 +70,13 @@ describe("quiz XP awards", () => {
     expect(lessonUpdateCall.$inc.xp).toBe(20);
 
     expect(lessonUpdateCall.$addToSet.completed_lessons).toBe("1.2");
+
+    expect(XpEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event_type: "lesson_complete",
+        amount: 20,
+      }),
+    );
   });
 
   it("awards quiz pass XP on first successful pass", async () => {
@@ -92,6 +101,13 @@ describe("quiz XP awards", () => {
     const updateCall = UserProgress.findOneAndUpdate.mock.calls[0][1];
 
     expect(updateCall.$inc.xp).toBe(10);
+
+    expect(XpEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event_type: "quiz_pass",
+        amount: 10,
+      }),
+    );
   });
 
   it("does not award XP on second successful pass", async () => {
@@ -116,6 +132,8 @@ describe("quiz XP awards", () => {
     const updateCall = UserProgress.findOneAndUpdate.mock.calls[0][1];
 
     expect(updateCall.$inc?.xp ?? 0).toBe(0);
+
+    expect(XpEvent.create).not.toHaveBeenCalled();
   });
 
   it("awards only perfect score XP when the user previously passed but has never earned a perfect score", async () => {
@@ -148,6 +166,13 @@ describe("quiz XP awards", () => {
     const updateCall = UserProgress.findOneAndUpdate.mock.calls[0][1];
 
     expect(updateCall.$inc?.xp).toBe(5);
+
+    expect(XpEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event_type: "quiz_perfect",
+        amount: 5,
+      }),
+    );
   });
 
   it("does not award perfect score xp twice", async () => {
@@ -180,5 +205,7 @@ describe("quiz XP awards", () => {
     const updateCall = UserProgress.findOneAndUpdate.mock.calls[0][1];
 
     expect(updateCall.$inc?.xp ?? 0).toBe(0);
+
+    expect(XpEvent.create).not.toHaveBeenCalled();
   });
 });

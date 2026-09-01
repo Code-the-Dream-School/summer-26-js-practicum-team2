@@ -3,6 +3,7 @@ const { updateOnboardingProgressSchema } = require("../validation/userValidation
 const { User } = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
 const { calculateXpDelta } = require("../utils/coreRules.js");
+const XpEvent = require("../models/XpEvent.model.js");
 //const { STATES } = require("mongoose");
 
 const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
@@ -191,6 +192,13 @@ const updateOnboardingProgress = async (req, res, next) => {
         },
         { upsert: true, returnDocument: "after" },
       );
+
+      await XpEvent.create({
+        user_id: userId,
+        event_type: "onboarding_complete",
+        amount: xpAwarded,
+        reference_id: "onboarding",
+      });
     }
 
     return res.status(StatusCodes.OK).json({
