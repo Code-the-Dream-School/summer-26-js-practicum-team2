@@ -3,6 +3,7 @@ const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const QuizAttempt = require("../models/QuizAttempt.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
+const { dashboardEventSchema, validateRequest } = require("../validation/userValidation");
 
 const contentModules = {
   cashFlow: require("../../../shared/content/budgeting.json"),
@@ -225,10 +226,9 @@ exports.getDashboard = async (req, res, next) => {
 
 exports.trackDashboardEvent = async (req, res, next) => {
   try {
-    const { type } = req.body || {};
-    if (["lesson_complete", "quiz_submit"].includes(type)) {
-      invalidateDashboardCache(req.user.id);
-    }
+    const validatedBody = validateRequest(res, dashboardEventSchema, req.body);
+    if (!validatedBody) return;
+    invalidateDashboardCache(req.user.id);
     return res.status(StatusCodes.ACCEPTED).json({ message: "Dashboard event processed." });
   } catch (error) {
     return next(error);
