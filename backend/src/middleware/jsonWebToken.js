@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
+const User = require("../models/User.model");
 
 const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -8,8 +9,7 @@ const send401 = (res) => {
   return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
 };
 
-//module.exports = (req, res, next) => {
-  const authenticateUser = (req, res, next) =>{
+const authenticateUser = async (req, res, next) => {
   const cookieToken = req?.cookies?.session_token;
   const authorization = req.get("authorization") || "";
   const headerToken = authorization.startsWith("Bearer ") ? authorization.slice(7) : null;
@@ -18,11 +18,23 @@ const send401 = (res) => {
   if (!token) {
     return send401(res);
   }
+  let decoded;
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return send401(res);
+  }
+
+  try {
+    const user = await User.findById(decoded.id);
+    const tokenVersionInJwt = decoded.token_version ?? 0;
+    if (!user || user.token_version !== tokenVersionInJwt) {
+      return send401(res);
+    }
+
     req.user = {
-      id: decoded.id,
-      role: decoded.role,
+      id: user._id,
+      role: user.role,
       csrfToken: decoded.csrfToken,
     };
 
@@ -34,23 +46,21 @@ const send401 = (res) => {
     }
 
     return next();
-  } catch {
-    return send401(res);
+  } catch (error) {
+    return next(error);
   }
 };
 
 //Authorize Role for Admin use: role authoriation middleware
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-  if (!req.user || !roles.includes(req.user.role)) {
-    return res.status(StatusCodes.FORBIDDEN).json({message: "Access denied."});
-  } 
-  return next();
-};
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(StatusCodes.FORBIDDEN).json({ message: "Access denied." });
+    }
+    return next();
+  };
 };
 module.exports = {
   authenticateUser,
   authorizeRoles,
 };
-
-

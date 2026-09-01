@@ -9,6 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added profile management APIs and UI for viewing and updating profile details, setting an avatar URL, changing passwords, and submitting email-confirmed account deletion requests.
+- Added an admin dashboard with role-based routing, cached dashboard data, and endpoints to list administrators and review pending account deletion requests.
+- Added soft-deletion lifecycle fields, reactivation endpoints, profile validation, and Postman coverage for profile and account lifecycle routes.
+- Added backend and frontend regression tests for account deletion requests, admin approval and rejection, reactivation, session invalidation, API contracts, route guards, and Postman route coverage.
+
+### Changed
+
+- Updated login and navigation behavior to support administrator access and expose all navigation links from the mobile menu.
+- Updated the Postman collection and testing guide to use `sprout-api.postman-collection.json` and model deletion as an administrator-reviewed request.
+- Updated account-deletion copy to describe account deactivation rather than an unsupported irreversible data purge.
+
+### Fixed
+
+- Fixed the profile model import and aligned profile deletion, admin approval, and admin rejection calls between the frontend and backend.
+- Fixed non-administrator access to the admin dashboard so it redirects to the standard dashboard.
+- Fixed reactivation lookups so recently soft-deleted accounts can be restored during the grace period.
+- Fixed the Postman collection test after the collection was renamed.
+
+### Security
+
+- Allowlisted administrator response fields to prevent password-hash exposure and stopped returning full user documents from deletion-review actions.
+- Restricted deletion approval and rejection to accounts with a pending deletion request.
+- Enforced database-backed JWT version checks so password changes and approved account deletions invalidate existing sessions.
+
+---
+
 ## [0.3.7] - 2026-08-25
 
 ### Added
