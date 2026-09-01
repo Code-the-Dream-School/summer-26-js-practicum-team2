@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 import { useAuth } from "../hooks/useAuth";
 
 const AuthContext = createContext(null);
@@ -10,12 +10,11 @@ export function AuthProvider({ children }) {
     ...auth,
     isAdmin,
   };
-  //return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext value={value}>{children}</AuthContext>;
 }
 
 export function useAuthContext() {
-  const ctx = useContext(AuthContext);
+  const ctx = use(AuthContext);
   if (!ctx) {
     throw new Error("useAuthContext must be used within an AuthProvider.");
   }
