@@ -91,6 +91,24 @@ const userSchema = new mongoose.Schema(
         },
       },
     },
+    streak: {
+      current: {
+        type: Number,
+        default: 0,
+      },
+      longest: {
+        type: Number,
+        default: 0,
+      },
+      last_active_date: {
+        type: Date,
+        default: null,
+      },
+    },
+    timezone: {
+      type: String,
+      default: "UTC",
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

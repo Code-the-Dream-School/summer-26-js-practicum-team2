@@ -1,4 +1,4 @@
-const { User, ArchivedUser } = require("../models/User.model");
+const { User } = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
@@ -40,7 +40,9 @@ const getProfile = async (req, res, next) => {
         theme: user.theme ?? "Light",
         notifications: user.notifications ?? true,
         xp: xpTotal,
-        streak: user.streak ?? 0,
+        current_streak: user.streak?.current ?? 0,
+        longest_streak: user.streak?.longest ?? 0,
+        timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
         current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
@@ -94,8 +96,6 @@ const updateProfile = async (req, res, next) => {
         .json({ message: " User not found or user deleted account. " });
     }
 
-    const xpTotal = await getUserXpTotal(req.user.id);
-    
     let hasUpdates = false;
     if (name !== undefined) {
       user.name = name;
@@ -125,6 +125,7 @@ const updateProfile = async (req, res, next) => {
         .json({ message: "No items requested to be updated." });
     }
     await user.save();
+    const xpTotal = await getUserXpTotal(req.user.id);
     return res.status(StatusCodes.OK).json({
       message: "You have successfully updated your profile.",
       user: {
@@ -135,7 +136,9 @@ const updateProfile = async (req, res, next) => {
         theme: user.theme,
         notifications: user.notifications,
         xp: xpTotal,
-        streak: user.streak ?? 0,
+        current_streak: user.streak?.current ?? 0,
+        longest_streak: user.streak?.longest ?? 0,
+        timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
       },
@@ -269,13 +272,13 @@ const deleteAccount = async (req, res, next) => {
     user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
-    await ArchivedUser.create({
-      original_user_id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      deleted_at: new Date(),
-    });
+    // await ArchivedUser.create({
+    //   original_user_id: user._id,
+    //   name: user.name,
+    //   email: user.email,
+    //   role: user.role,
+    //   deleted_at: new Date(),
+    // });
     res.clearCookie("session_token", {
       path: "/",
       httpOnly: true,
