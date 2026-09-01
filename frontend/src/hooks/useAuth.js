@@ -32,6 +32,17 @@ export function useAuth() {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const { user, csrfToken } = authState;
 
+  const clearAuth = useCallback(() => {
+    clearStoredAuth();
+    dispatch({ type: actions.clearAuth });
+  }, []);
+
+  useEffect(() => {
+    const handleAuthExpired = () => clearAuth();
+    window.addEventListener(api.AUTH_EXPIRED_EVENT, handleAuthExpired);
+    return () => window.removeEventListener(api.AUTH_EXPIRED_EVENT, handleAuthExpired);
+  }, [clearAuth]);
+
   // Restore the current auth state from browser storage on first mount.
   useEffect(() => {
     let isActive = true;
@@ -41,18 +52,20 @@ export function useAuth() {
       const isRemembered =
         !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
       let user = stored?.user ?? null;
+      let csrfToken = stored?.csrfToken ?? null;
 
       if (user) {
         try {
           const profile = await api.getProfile();
           if (profile?.user) {
             user = { ...user, ...profile.user };
-            writeStoredAuth({ user, csrfToken: stored?.csrfToken ?? null }, isRemembered);
+            writeStoredAuth({ user, csrfToken }, isRemembered);
           }
         } catch (error) {
           if (error.status === 401) {
             clearStoredAuth();
             user = null;
+            csrfToken = null;
           }
         }
       }
@@ -61,7 +74,7 @@ export function useAuth() {
       dispatch({
         type: actions.hydrateComplete,
         user,
-        csrfToken: stored?.csrfToken ?? null,
+        csrfToken,
       });
     };
 
@@ -79,11 +92,6 @@ export function useAuth() {
       user: payload.user,
       csrfToken: payload.csrfToken,
     });
-  }, []);
-
-  const clearAuth = useCallback(() => {
-    clearStoredAuth();
-    dispatch({ type: actions.clearAuth });
   }, []);
 
   const clearError = useCallback(() => {
