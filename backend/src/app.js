@@ -17,7 +17,7 @@ const lessonRoutes = require("./routes/lesson.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
-
+const onboardingRoutes = require("./routes/onboarding.routes");
 // Create Express app
 const app = express();
 
@@ -32,6 +32,14 @@ const parseAllowedOrigins = () => {
 
   return [...new Set([...configuredOrigins, ...fallbackOrigins])];
 };
+
+// Rate Limiting Configuration for Production But Not Development
+// Sets a limit of 200 requests per 15 minutes per IP address
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+
+  max: process.env.NODE_ENV === "production" ? 200 : 1000000,
+});
 
 // CORS Configuration
 const allowedOrigins = parseAllowedOrigins();
@@ -65,6 +73,7 @@ app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
 app.use("/api/v1/profile", jwtMiddleware, profileRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
+app.use("/api/v1/onboarding", onboardingRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application

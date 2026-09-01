@@ -9,20 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased]
-
-### Added
-
-- Implemented soft deletion, reactivation, and avatar upload updates
-- Integrated Joi validation for profile route
-- Added profile and account lifecycle tests to Postman collection
-- Added Postman collection tests for Express routes
-
-### Changed
-
-- Migrated limiter function is backend/src/app to an exported apiRateLimiter middleware function
-- Refactored User model with frontend fields
-- Enhanced Postman testing documentation for improved end-to-end coverage
 ## [0.3.7] - 2026-08-25
 
 ---
