@@ -1,0 +1,1 @@
+const updateUserStreak = async (user) => {};

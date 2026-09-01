@@ -87,7 +87,7 @@ const updateProfile = async (req, res, next) => {
         error: error.details.map((detail) => detail.message),
       });
     }
-    const { name, email, goals, theme, notifications } = value;
+    const { name, email, goals, theme, notifications, timezone } = value;
     const user = await User.findById(req.user.id);
 
     if (!user || user.is_deleted) {
@@ -119,11 +119,18 @@ const updateProfile = async (req, res, next) => {
       user.email_verified_at = null;
       hasUpdates = true;
     }
+
+    if (timezone !== undefined) {
+      user.timezone = timezone;
+      hasUpdates = true;
+    }
+
     if (!hasUpdates) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No items requested to be updated." });
     }
+
     await user.save();
     const xpTotal = await getUserXpTotal(req.user.id);
     return res.status(StatusCodes.OK).json({

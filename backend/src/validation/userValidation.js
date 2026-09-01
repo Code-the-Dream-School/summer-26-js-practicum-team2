@@ -34,6 +34,7 @@ const registerSchema = Joi.object({
     "any.only": "Please accept the terms of service.",
     "any.required": "Please accept the terms of service.",
   }),
+  timezone: Joi.string().trim().optional(),
 });
 const loginSchema = Joi.object({
   email: Joi.string().trim().lowercase().email().required().messages({

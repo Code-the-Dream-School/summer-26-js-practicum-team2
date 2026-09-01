@@ -36,7 +36,7 @@ const register = async (req, res, next) => {
     }
     //3. Check if user exists already using JOI userValidation )
 
-    const { name, email, password } = value;
+    const { name, email, password, timezone } = value;
 
     // using Mongoose  to figure out if the user already exists
     const previousUser = await User.findOne({ email });
@@ -56,6 +56,7 @@ const register = async (req, res, next) => {
       role: "learner",
       tos_agreement: true,
       tos_agreement_at: new Date(),
+      timezone: timezone || "UTC",
       email_verified_at: null,
       verification_token: verificationToken,
       verification_token_expires_at: tokenExpiresAt,
