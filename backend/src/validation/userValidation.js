@@ -142,7 +142,10 @@ const adminDisableSchema = adminActionSchema.keys({
 });
 
 const adminDeleteSchema = adminActionSchema.keys({
-  email: Joi.string().trim().email().required(),
+  email: Joi.string()
+    .trim()
+    .email({ tlds: { allow: false } })
+    .required(),
 });
 
 const adminSoftDeleteSchema = adminActionSchema.keys({

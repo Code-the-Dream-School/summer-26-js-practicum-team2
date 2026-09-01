@@ -131,6 +131,24 @@ describe("admin access boundary", () => {
     expect(await User.exists({ _id: target._id })).toBeNull();
   });
 
+  test("allows permanent deletion of a seeded test-domain user", async () => {
+    const admin = await createUser("admin");
+    const target = await User.create({
+      name: "Seeded User",
+      email: "seeded-user@example.test",
+      password_hash: "hashed-password",
+      tos_agreement: true,
+    });
+
+    const response = await request(app)
+      .delete(`/api/v1/admin/users/${target._id}`)
+      .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`)
+      .send({ confirmation: "CONFIRM", email: target.email });
+
+    expect(response.status).toBe(200);
+    expect(await User.exists({ _id: target._id })).toBeNull();
+  });
+
   test("makes the first registered user an admin", async () => {
     const response = await request(app).post("/api/v1/users/register").send({
       name: "First Admin",
