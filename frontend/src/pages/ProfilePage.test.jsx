@@ -56,6 +56,7 @@ describe("ProfilePage", () => {
       profile = { ...profile, avatar_url: avatarUrl };
       return { message: "Avatar URL saved.", avatar_url: avatarUrl };
     });
+    window.localStorage.removeItem("sprout-quiz-feedback-preference");
   });
 
   it("saves identity, goals, and preferences with refreshed values and toasts", async () => {
@@ -146,6 +147,17 @@ describe("ProfilePage", () => {
     });
     expect(await screen.findByRole("status")).toHaveTextContent("Avatar URL saved.");
     expect(screen.getByLabelText("Avatar image URL")).toHaveValue("https://example.com/maya.png");
+  });
+
+  it("switches quiz feedback between instant and end-of-quiz modes", async () => {
+    const user = userEvent.setup();
+    render(<ProfilePage />);
+
+    expect(await screen.findByText("Feedback: Instant")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Toggle" }));
+
+    expect(screen.getByText("Feedback: At the end")).toBeInTheDocument();
+    expect(window.localStorage.getItem("sprout-quiz-feedback-preference")).toBe("end");
   });
 
   it("shows a retryable load error instead of placeholder profile details", async () => {

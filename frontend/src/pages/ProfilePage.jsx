@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 
 import { useAuthContext } from "../context/AuthContext";
+import QuizFeedbackSetting from "../features/learn/Quiz/QuizFeedbackSetting/QuizFeedbackSetting.component";
 import {
   changeProfilePassword,
   deleteProfile,
@@ -297,6 +298,9 @@ export default function ProfilePage() {
               </span>
             </span>
           </label>
+          <div className="border-t border-neutral-200 pt-4">
+            <QuizFeedbackSetting />
+          </div>
           <Button type="submit" loading={pending === "preferences"}>
             Save preferences
           </Button>
