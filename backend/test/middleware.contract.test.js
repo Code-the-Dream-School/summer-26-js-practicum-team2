@@ -26,13 +26,13 @@ describe("middleware contracts", () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it("returns the JSON 404 contract for unknown API routes", async () => {
-    // Request an API route that does not exist so the 404 middleware handles it.
-    const res = await request(app).get("/api/v1/does-not-exist");
+  it("returns the JSON 404 contract for the retired hello route", async () => {
+    // Confirm that the removed route is handled by the API 404 middleware.
+    const res = await request(app).get("/api/hello");
 
     expect(res.status).toBe(404);
     expect(res.body).toEqual({
-      message: "Route GET /api/v1/does-not-exist not found.",
+      message: "Route GET /api/hello not found.",
     });
   });
 
@@ -50,20 +50,20 @@ describe("middleware contracts", () => {
   });
 
   it("applies core helmet security headers on API responses", async () => {
-    // Use a simple successful route to check that Helmet adds the expected security headers to API responses.
-    const res = await request(app).get("/api/hello");
+    // Use the root redirect because it does not require a database connection.
+    const res = await request(app).get("/").redirects(0);
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(302);
     expect(res.headers["x-content-type-options"]).toBe("nosniff");
     expect(res.headers["x-frame-options"]).toBeDefined();
     expect(res.headers["x-dns-prefetch-control"]).toBeDefined();
   });
 
   it("applies policy-oriented helmet headers on API responses", async () => {
-    // Check the headers that control browser content and referrer policies.
-    const res = await request(app).get("/api/hello");
+    // Check the headers that control browser content and referrer policies on a root redirect.
+    const res = await request(app).get("/").redirects(0);
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(302);
     expect(res.headers["content-security-policy"]).toBeDefined();
     expect(res.headers["referrer-policy"]).toBeDefined();
   });

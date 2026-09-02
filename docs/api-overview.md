@@ -3,7 +3,7 @@
 ## Routes Covered By Postman Collection
 
 ```text
-GET    /api/hello
+GET    /api/v1/health
 
 POST   /api/v1/users/register
 GET    /api/v1/users/verify?token=...
@@ -33,6 +33,11 @@ GET    /api/v1/lessons/progress?moduleId=cashFlow
 PATCH  /api/v1/lessons/progress
 PATCH  /api/v1/lessons/progress/restart
 ```
+
+## Deployment Health Check
+
+`GET /health` is a public, unrate-limited process health endpoint for Render. It returns
+`status`, `service`, `uptime`, and `timestamp` without authentication or a database query.
 
 ## Immediate Quiz Feedback
 

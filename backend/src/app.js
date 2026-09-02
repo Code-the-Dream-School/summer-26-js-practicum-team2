@@ -12,7 +12,7 @@ const { apiLimiter } = require("./middleware/rateLimiter");
 const requireAdmin = require("./middleware/requireAdmin");
 
 // Route imports
-const helloRoutes = require("./routes/hello.routes");
+const healthRoutes = require("./routes/health.routes");
 const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
 const lessonPublicRoutes = require("./routes/lessonPublic.routes");
@@ -62,10 +62,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan(morganConfig));
+app.use("/health", healthRoutes);
 app.use(apiLimiter);
 
 // Routes
-app.use("/api/hello", helloRoutes);
+app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", lessonImportRoutes);
 app.use("/api/v1/lessons", lessonPublicRoutes);

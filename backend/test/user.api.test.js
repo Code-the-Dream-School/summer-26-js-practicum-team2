@@ -160,7 +160,7 @@ describe("user API integration", () => {
     expect(loginRes.body.message).toContain("verify your email");
   });
 
-  it("serves the hello endpoint, redirects the root route, and logs a user out", async () => {
+  it("redirects the root route and logs a user out", async () => {
     // Create a verified user directly since this test only needs an authenticated logout request.
     const user = await User.create({
       name: "Logout User",
@@ -177,10 +177,6 @@ describe("user API integration", () => {
       { id: user._id.toString(), role: user.role, csrfToken: "test-csrf" },
       process.env.JWT_SECRET,
     );
-
-    const helloRes = await request(app).get("/api/hello");
-    expect(helloRes.status).toBe(200);
-    expect(helloRes.body.message).toBe("Hello World");
 
     // Disable redirect following so we can check the redirect response itself.
     const rootRes = await request(app).get("/").redirects(0);

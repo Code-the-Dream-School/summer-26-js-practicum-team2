@@ -9,7 +9,6 @@ const publicCollection = require(
 const adminCollection = require(
   path.resolve(__dirname, "../../docs/postman/admin-backend-api.postman-collection.json"),
 );
-const helloRoutes = require("../src/routes/hello.routes");
 const userRoutes = require("../src/routes/user.routes");
 const lessonRoutes = require("../src/routes/lesson.routes");
 const dashboardRoutes = require("../src/routes/dashboard.routes");
@@ -17,7 +16,6 @@ const profileRoutes = require("../src/routes/profile.routes");
 const quizRoutes = require("../src/routes/quiz.routes");
 
 const routeGroups = [
-  ["/api/hello", helloRoutes],
   ["/api/v1/users", userRoutes],
   ["/api/v1/lessons", lessonRoutes],
   ["/api/v1/dashboard", dashboardRoutes],
