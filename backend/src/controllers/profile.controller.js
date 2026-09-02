@@ -2,6 +2,7 @@ const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
+const { issueSession } = require("../utils/session");
 const {
   updateProfileSchema,
   changePasswordSchema,
@@ -168,8 +169,18 @@ const changePassword = async (req, res, next) => {
     user.password_hash = await hashPassword(newPassword);
     user.token_version = (user.token_version || 0) + 1; //invalidates active jwt on other devices
     await user.save();
+
+    const csrfToken = issueSession(res, user);
+
     return res.status(StatusCodes.OK).json({
       message: "Password changed successfully.",
+      csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     return next(error);

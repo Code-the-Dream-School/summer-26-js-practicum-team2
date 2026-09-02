@@ -34,6 +34,20 @@ function authHeader(user) {
   return `Bearer ${token}`;
 }
 
+function cookieSession(user, csrfToken = "current-csrf-token") {
+  const token = jwt.sign(
+    {
+      id: user._id.toString(),
+      role: user.role,
+      csrfToken,
+      token_version: user.token_version,
+    },
+    process.env.JWT_SECRET,
+  );
+
+  return { csrfToken, sessionCookie: `session_token=${token}` };
+}
+
 describe("account deletion workflow", () => {
   it("updates supported profile fields and rejects unsupported theme fields", async () => {
     const user = await createUser({ email: "profile-update@example.com" });
@@ -240,5 +254,53 @@ describe("account deletion workflow", () => {
     const response = await request(app).get("/api/v1/profile").set("Authorization", authorization);
 
     expect(response.status).toBe(401);
+  });
+
+  it("requires the current password and renews only the requesting session", async () => {
+    const currentPassword = "CurrentPass1!";
+    const newPassword = "NewPass2!";
+    const user = await createUser({
+      email: "password-change@example.com",
+      password_hash: await hashPassword(currentPassword),
+    });
+    const otherDeviceAuthorization = authHeader(user);
+    const { csrfToken, sessionCookie } = cookieSession(user);
+
+    const rejected = await request(app)
+      .post("/api/v1/profile/password")
+      .set("Cookie", sessionCookie)
+      .set("X-CSRF-TOKEN", csrfToken)
+      .send({ currentPassword: "WrongPass1!", newPassword });
+
+    expect(rejected.status).toBe(401);
+
+    const changed = await request(app)
+      .post("/api/v1/profile/password")
+      .set("Cookie", sessionCookie)
+      .set("X-CSRF-TOKEN", csrfToken)
+      .send({ currentPassword, newPassword });
+
+    expect(changed.status).toBe(200);
+    expect(changed.body).toEqual(
+      expect.objectContaining({
+        message: "Password changed successfully.",
+        csrfToken: expect.any(String),
+        user: expect.objectContaining({ id: user._id.toString(), email: user.email }),
+      }),
+    );
+    const renewedSessionCookie = changed.headers["set-cookie"]
+      .find((cookie) => cookie.startsWith("session_token="))
+      .split(";")[0];
+    expect(await User.findById(user._id)).toMatchObject({ token_version: 1 });
+
+    const otherDevice = await request(app)
+      .get("/api/v1/profile")
+      .set("Authorization", otherDeviceAuthorization);
+    expect(otherDevice.status).toBe(401);
+
+    const currentDevice = await request(app)
+      .get("/api/v1/profile")
+      .set("Cookie", renewedSessionCookie);
+    expect(currentDevice.status).toBe(200);
   });
 });
