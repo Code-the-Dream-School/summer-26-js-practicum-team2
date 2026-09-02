@@ -117,4 +117,43 @@ describe("ProfilePage", () => {
     expect(screen.getByLabelText("New Password")).toHaveValue("");
     expect(getProfile).toHaveBeenCalledTimes(2);
   });
+
+  it("shows a retryable load error instead of placeholder profile details", async () => {
+    const user = userEvent.setup();
+    getProfile
+      .mockRejectedValueOnce(new Error("Profile service is unavailable."))
+      .mockResolvedValueOnce({ user: { ...profile } });
+
+    render(<ProfilePage />);
+
+    expect(
+      await screen.findByRole("heading", { name: "We could not load your profile" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Profile service is unavailable.")).toHaveLength(2);
+    expect(screen.queryByRole("heading", { name: "username" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Display Name")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+
+    expect(await screen.findByLabelText("Display Name")).toHaveValue("Maya");
+  });
+
+  it("displays detailed profile validation messages returned by the API utility", async () => {
+    const user = userEvent.setup();
+    updateProfile.mockRejectedValueOnce(
+      Object.assign(new Error("Validation error"), {
+        errors: ["Name must be at least 2 characters long."],
+      }),
+    );
+    render(<ProfilePage />);
+
+    const displayName = await screen.findByLabelText("Display Name");
+    await user.clear(displayName);
+    await user.type(displayName, "M");
+    await user.click(screen.getByRole("button", { name: "Save display name" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Name must be at least 2 characters long.",
+    );
+  });
 });

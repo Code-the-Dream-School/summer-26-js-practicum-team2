@@ -8,6 +8,7 @@ import Input from "../shared/Input/Input.component";
 import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
+import EmptyState from "../shared/EmptyState/EmptyState.component";
 
 const errorMessage = (error) =>
   error.errors?.length ? error.errors.join(" ") : error.message || "Something went wrong.";
@@ -40,6 +41,7 @@ export default function ProfilePage() {
   });
   const [pending, setPending] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   const showToast = useCallback((message, variant = "default") => {
     setToastMessage({ isOpen: true, message, variant });
@@ -63,15 +65,35 @@ export default function ProfilePage() {
     return user;
   }, [applyProfile]);
 
+  const retryProfile = useCallback(async () => {
+    setLoading(true);
+    setLoadError("");
+    try {
+      await reloadProfile();
+    } catch (error) {
+      const message = errorMessage(error);
+      setLoadError(message);
+      showToast(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [reloadProfile, showToast]);
+
   useEffect(() => {
     let active = true;
     getProfile()
       .then(({ user }) => {
-        if (!active) return;
-        applyProfile(user);
+        if (active) applyProfile(user);
       })
-      .catch((error) => active && showToast(errorMessage(error)))
-      .finally(() => active && setLoading(false));
+      .catch((error) => {
+        if (!active) return;
+        const message = errorMessage(error);
+        setLoadError(message);
+        showToast(message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
     return () => {
       active = false;
     };
@@ -125,7 +147,24 @@ export default function ProfilePage() {
     return <Skeleton />;
   }
 
-  const savedDisplayName = profile?.name || "username";
+  if (loadError || !profile) {
+    return (
+      <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <Toast {...toastMessage} onClose={closeToast} />
+        <EmptyState
+          title="We could not load your profile"
+          message={loadError || "Your profile details are not available right now."}
+          action={
+            <Button type="button" variant="primary" onClick={() => void retryProfile()}>
+              Retry
+            </Button>
+          }
+        />
+      </section>
+    );
+  }
+
+  const savedDisplayName = profile.name;
 
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
