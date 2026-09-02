@@ -57,6 +57,75 @@ describe("apiRequest", () => {
     window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
   });
 
+  it("notifies the app for an explicit account-invalidating response", async () => {
+    const onAuthExpired = vi.fn();
+    window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        headers: { get: () => "application/json" },
+        json: vi.fn().mockResolvedValue({
+          message: "This account has been banned.",
+          code: "ACCOUNT_DISABLED",
+        }),
+      }),
+    );
+
+    await expect(getProfile()).rejects.toMatchObject({
+      status: 403,
+      code: "ACCOUNT_DISABLED",
+      authInvalidating: true,
+    });
+
+    expect(onAuthExpired).toHaveBeenCalledTimes(1);
+    window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+  });
+
+  it("does not treat ordinary 403 responses as expired authentication", async () => {
+    const onAuthExpired = vi.fn();
+    window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        headers: { get: () => "application/json" },
+        json: vi.fn().mockResolvedValue({ message: "Invalid CSRF token." }),
+      }),
+    );
+
+    await expect(getProfile()).rejects.toMatchObject({
+      status: 403,
+      authInvalidating: false,
+    });
+
+    expect(onAuthExpired).not.toHaveBeenCalled();
+    window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+  });
+
+  it("preserves detailed validation messages from API error responses", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        headers: { get: () => "application/json" },
+        json: vi.fn().mockResolvedValue({
+          message: "Validation error",
+          errors: ["Name must be at least 2 characters long."],
+        }),
+      }),
+    );
+
+    await expect(getProfile()).rejects.toMatchObject({
+      status: 400,
+      message: "Validation error",
+      errors: ["Name must be at least 2 characters long."],
+    });
+  });
+
   it("refreshes a stale CSRF token and retries a quiz start once", async () => {
     const freshCsrfToken = "a4a76cac-cc8e-4b82-8d79-3184dc3a9804";
     const headers = (csrfToken = null) => ({

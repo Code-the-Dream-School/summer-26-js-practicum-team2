@@ -9,6 +9,11 @@ const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
 const CSRF_TOKEN_HEADER = "x-csrf-token";
 const CSRF_MISMATCH_MESSAGE = "Invalid CSRF token.";
+const ACCOUNT_INVALIDATING_CODES = new Set([
+  "ACCOUNT_DISABLED",
+  "ACCOUNT_DELETED",
+  "SESSION_INVALIDATED",
+]);
 let currentCsrfToken = null;
 export const AUTH_EXPIRED_EVENT = "sprout:auth-expired";
 export const CSRF_TOKEN_UPDATED_EVENT = "sprout:csrf-token-updated";
@@ -65,8 +70,10 @@ async function apiRequest(path, options = {}, hasRetriedCsrf = false) {
 
     const error = new Error(payload?.message || "Request failed. Please try again.");
     error.status = response.status;
+    error.code = payload?.code;
     error.errors = Array.isArray(payload?.errors) ? payload.errors : [];
-    if (response.status === 401 && typeof window !== "undefined") {
+    error.authInvalidating = response.status === 401 || ACCOUNT_INVALIDATING_CODES.has(error.code);
+    if (error.authInvalidating && typeof window !== "undefined") {
       clearCsrfToken();
       window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
     }
