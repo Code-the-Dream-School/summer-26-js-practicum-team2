@@ -4,9 +4,11 @@ const UserProgress = require("../models/UserProgress.model");
 const QuizAttempt = require("../models/QuizAttempt.model");
 const LessonModule = require("../models/LessonModule.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
+const { getModule } = require("../utils/content");
 const { dashboardEventSchema, validateRequest } = require("../validation/userValidation");
 
 const DASHBOARD_CACHE_TTL_MS = 30 * 1000;
+const DEFAULT_MODULE_ID = "cashFlow";
 const dashboardCache = new Map();
 
 function invalidateDashboardCache(userId) {
@@ -250,7 +252,9 @@ exports.getDashboard = async (req, res, next) => {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
 
-    const modules = await LessonModule.find({}).lean();
+    const databaseModules = await LessonModule.find({}).lean();
+    const defaultModule = databaseModules.length === 0 ? await getModule(DEFAULT_MODULE_ID) : null;
+    const modules = defaultModule ? [defaultModule] : databaseModules;
     const moduleIds = modules.map((module) => module.id);
     await reconcileProgressFromPassedAttempts(userId, modules);
     const progressRecords = await UserProgress.find({
