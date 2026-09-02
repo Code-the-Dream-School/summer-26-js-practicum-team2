@@ -51,7 +51,9 @@ export default function VerifyEmailPage() {
             <h1 className="font-heading text-h2 font-bold text-heading">
               We couldn't verify that link
             </h1>
-            <p className="mt-2 text-small text-danger">{error}</p>
+            <p role="alert" className="mt-2 text-small text-danger">
+              {error}
+            </p>
             <Link to={ROUTES.LOGIN} className="mt-4 inline-block text-primary underline">
               Back to login
             </Link>

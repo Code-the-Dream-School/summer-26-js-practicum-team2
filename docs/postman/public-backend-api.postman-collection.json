@@ -1,0 +1,222 @@
+{
+  "info": {
+    "_postman_id": "c2b5d8c7-3c58-4e88-8e59-5f90f0b1d8a1",
+    "name": "Sprout Public API",
+    "description": "Public, unauthenticated requests for lesson previews and answer checks.",
+    "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "csrfToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionCookie",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserPassword",
+      "value": "P@ssword123!",
+      "type": "string"
+    },
+    {
+      "key": "newTestUserPassword",
+      "value": "N3wP@ssword!",
+      "type": "string"
+    },
+    {
+      "key": "adminModuleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminLessonId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Hello",
+      "item": [
+        {
+          "name": "GET Hello",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /api/hello returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('GET /api/hello returns expected message', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Hello World');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hello",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hello"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "Get Public Lesson Content",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /lessons/public/:moduleId/:lessonId returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Public lesson response includes module and lesson data', function () {",
+                  "  pm.expect(responseJson.moduleData).to.be.an('object');",
+                  "  pm.expect(responseJson.lessonData).to.be.an('object');",
+                  "  pm.expect(responseJson.lessonData.id).to.eql('1.1');",
+                  "});",
+                  "pm.test('Public lesson response does not expose quiz answers', function () {",
+                  "  pm.expect(pm.response.text()).not.to.include('correctResponse');",
+                  "  pm.expect(pm.response.text()).not.to.include('explanation');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/public/cashFlow/1.1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                "public",
+                "cashFlow",
+                "1.1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "Check Quiz Answer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /quizzes/check returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Answer check returns correctness details', function () {",
+                  "  pm.expect(responseJson.isCorrect).to.be.a('boolean');",
+                  "  pm.expect(responseJson.correctChoiceIds).to.be.an('array');",
+                  "  pm.expect(responseJson.explanation).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"moduleId\": \"cashFlow\",\n  \"microLessonId\": \"1.1.2\",\n  \"questionId\": \"1.1.2-q3\",\n  \"choiceIds\": \"a\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "check"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

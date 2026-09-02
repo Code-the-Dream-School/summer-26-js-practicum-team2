@@ -2,13 +2,10 @@ const { StatusCodes } = require("http-status-codes");
 const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const QuizAttempt = require("../models/QuizAttempt.model");
+const LessonModule = require("../models/LessonModule.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
 const { dashboardEventSchema, validateRequest } = require("../validation/userValidation");
 
-const contentModules = {
-  cashFlow: require("../../../shared/content/budgeting.json"),
-};
-const moduleIds = Object.keys(contentModules);
 const DASHBOARD_CACHE_TTL_MS = 30 * 1000;
 const dashboardCache = new Map();
 
@@ -16,27 +13,26 @@ function invalidateDashboardCache(userId) {
   dashboardCache.delete(String(userId));
 }
 
-function getModuleLessons(moduleId) {
-  return contentModules[moduleId]?.lessons || [];
+function getModuleLessons(module) {
+  return module?.lessons || [];
 }
 
-function findLesson(moduleId, lessonId) {
-  return getModuleLessons(moduleId).find((lesson) => lesson.id === lessonId);
+function findLesson(module, lessonId) {
+  return getModuleLessons(module).find((lesson) => lesson.id === lessonId);
 }
 
-function findMicroLesson(moduleId, lessonId, microLessonId) {
-  return findLesson(moduleId, lessonId)?.microLessons?.find((micro) => micro.id === microLessonId);
+function findMicroLesson(module, lessonId, microLessonId) {
+  return findLesson(module, lessonId)?.microLessons?.find((micro) => micro.id === microLessonId);
 }
 
-function buildUnit(moduleId, progressRecord) {
-  const content = contentModules[moduleId];
-  const lessons = getModuleLessons(moduleId);
+function buildUnit(module, progressRecord) {
+  const lessons = getModuleLessons(module);
   const completedSet = new Set(progressRecord?.completed_lessons || []);
   const completedLessons = lessons.filter((lesson) => completedSet.has(lesson.id)).length;
 
   return {
-    id: moduleId,
-    name: content.title,
+    id: module.id,
+    name: module.title,
     completedLessons,
     totalLessons: lessons.length,
     totalMicroLessons: lessons.reduce(
@@ -47,18 +43,26 @@ function buildUnit(moduleId, progressRecord) {
   };
 }
 
-function getNextAction(progressByModule, units) {
-  for (const moduleId of moduleIds) {
-    const progressRecord = progressByModule.get(moduleId);
-    const currentNode = pickCurrentNode(
-      buildLearningPath(contentModules[moduleId]),
-      progressRecord,
-    );
+function buildOverallProgress(units) {
+  const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
+  const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
+
+  return {
+    completedLessons,
+    totalLessons,
+    overallPercent: totalLessons ? Math.round((completedLessons / totalLessons) * 100) : 0,
+  };
+}
+
+function getNextAction(modules, progressByModule, units) {
+  for (const module of modules) {
+    const progressRecord = progressByModule.get(module.id);
+    const currentNode = pickCurrentNode(buildLearningPath(module), progressRecord);
     if (!currentNode || currentNode.isModuleComplete) continue;
 
-    const lesson = findLesson(moduleId, currentNode.lessonId);
+    const lesson = findLesson(module, currentNode.lessonId);
     if (!lesson) continue;
-    const unit = units.find((item) => item.id === moduleId);
+    const unit = units.find((item) => item.id === module.id);
     const hasStarted =
       unit?.completedLessons > 0 || (progressRecord?.completed_micro_lessons?.length || 0) > 0;
 
@@ -68,19 +72,71 @@ function getNextAction(progressByModule, units) {
         ? "Pick up where you left off."
         : "Ready to start? Begin with this lesson.",
       ctaLabel: hasStarted ? `Continue ${lesson.title}` : `Start ${lesson.title}`,
-      href: `/learn/${moduleId}/${lesson.id}`,
+      href: `/learn/${module.id}/${lesson.id}`,
     };
   }
 
   return {
-    title: "Review Quiz",
-    description: "Great work. Review a quiz to reinforce what you learned.",
-    ctaLabel: "Review a Quiz",
+    title: modules.length ? "Review Quiz" : "Content coming soon",
+    description: modules.length
+      ? "Great work. Review a quiz to reinforce what you learned."
+      : "New lessons are being prepared. Check back soon.",
+    ctaLabel: modules.length ? "Review a Quiz" : "View learning path",
     href: "/learn",
   };
 }
 
-function getHero(userName, units, nextAction) {
+function getDateKey(date) {
+  return new Date(date).toISOString().slice(0, 10);
+}
+
+async function getMotivationData(userId) {
+  const passedAttempts = await QuizAttempt.find({
+    user_id: userId,
+    passed: true,
+    submitted_at: { $ne: null },
+  })
+    .select("submitted_at")
+    .lean();
+  const completedDays = new Set(passedAttempts.map((attempt) => getDateKey(attempt.submitted_at)));
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const todayKey = getDateKey(today);
+  const completedToday = passedAttempts.filter(
+    (attempt) => getDateKey(attempt.submitted_at) === todayKey,
+  ).length;
+  const streakDate = new Date(today);
+
+  if (!completedDays.has(todayKey)) {
+    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
+  }
+
+  let currentDays = 0;
+  while (completedDays.has(getDateKey(streakDate))) {
+    currentDays += 1;
+    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
+  }
+
+  const dailyGoalCurrent = Math.min(completedToday, 1);
+  return {
+    streak: {
+      currentDays,
+      helperText:
+        currentDays > 0
+          ? `${currentDays}-day learning streak.`
+          : "Complete a learning check to begin your streak.",
+    },
+    dailyGoal: {
+      type: "learning_checks",
+      current: dailyGoalCurrent,
+      target: 1,
+      isMet: dailyGoalCurrent === 1,
+      label: `${dailyGoalCurrent} / 1 learning check`,
+    },
+  };
+}
+
+function getHero(userName, units, nextAction, motivation) {
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const isNewUser = completedLessons === 0;
@@ -104,19 +160,14 @@ function getHero(userName, units, nextAction) {
     displayName: userName,
     greeting,
     statusText,
-    streak: { currentDays: 0, helperText: "Streak tracking is coming soon." },
-    dailyGoal: {
-      type: "lessons",
-      current: 0,
-      target: 1,
-      isMet: false,
-      label: "Coming soon",
-    },
+    streak: motivation.streak,
+    dailyGoal: motivation.dailyGoal,
     primaryAction: { label: nextAction.ctaLabel, href: nextAction.href },
   };
 }
 
-async function reconcileProgressFromPassedAttempts(userId) {
+async function reconcileProgressFromPassedAttempts(userId, modules) {
+  const moduleIds = modules.map((module) => module.id);
   const passedAttempts = await QuizAttempt.find({
     user_id: userId,
     module_id: { $in: moduleIds },
@@ -133,14 +184,17 @@ async function reconcileProgressFromPassedAttempts(userId) {
 
   await Promise.all(
     [...passedMicrosByModule].map(async ([moduleId, microLessonIds]) => {
-      const completedLessons = getModuleLessons(moduleId)
-        .filter((lesson) =>
-          lesson.microLessons
-            ?.filter((micro) =>
-              micro.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
-            )
-            .every((micro) => microLessonIds.includes(micro.id)),
-        )
+      const module = modules.find((item) => item.id === moduleId);
+      const completedLessons = getModuleLessons(module)
+        .filter((lesson) => {
+          const quizMicroLessons = lesson.microLessons?.filter((micro) =>
+            micro.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
+          );
+          return (
+            quizMicroLessons?.length > 0 &&
+            quizMicroLessons.every((micro) => microLessonIds.includes(micro.id))
+          );
+        })
         .map((lesson) => lesson.id);
 
       await UserProgress.findOneAndUpdate(
@@ -157,7 +211,7 @@ async function reconcileProgressFromPassedAttempts(userId) {
   );
 }
 
-async function getRecentActivity(userId) {
+async function getRecentActivity(userId, modulesById) {
   const attempts = await QuizAttempt.find({
     user_id: userId,
     submitted_at: { $ne: null },
@@ -167,7 +221,7 @@ async function getRecentActivity(userId) {
 
   return attempts.map((attempt) => {
     const microLesson = findMicroLesson(
-      attempt.module_id,
+      modulesById.get(attempt.module_id),
       attempt.lesson_id,
       attempt.micro_lesson_id,
     );
@@ -196,19 +250,27 @@ exports.getDashboard = async (req, res, next) => {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
 
-    await reconcileProgressFromPassedAttempts(userId);
+    const modules = await LessonModule.find({}).lean();
+    const moduleIds = modules.map((module) => module.id);
+    await reconcileProgressFromPassedAttempts(userId, modules);
     const progressRecords = await UserProgress.find({
       user_id: userId,
       module_id: { $in: moduleIds },
     });
     const progressByModule = new Map(progressRecords.map((record) => [record.module_id, record]));
-    const units = moduleIds.map((moduleId) => buildUnit(moduleId, progressByModule.get(moduleId)));
-    const nextAction = getNextAction(progressByModule, units);
+    const units = modules.map((module) => buildUnit(module, progressByModule.get(module.id)));
+    const progress = buildOverallProgress(units);
+    const nextAction = getNextAction(modules, progressByModule, units);
+    const [motivation, recentActivity] = await Promise.all([
+      getMotivationData(userId),
+      getRecentActivity(userId, new Map(modules.map((module) => [module.id, module]))),
+    ]);
     const payload = {
-      hero: getHero(user.name || "Learner", units, nextAction),
+      hero: getHero(user.name || "Learner", units, nextAction, motivation),
+      progress,
       nextAction,
       units,
-      recentActivity: await getRecentActivity(userId),
+      recentActivity,
       meta: {
         cachedForMs: DASHBOARD_CACHE_TTL_MS,
         generatedAt: new Date().toISOString(),

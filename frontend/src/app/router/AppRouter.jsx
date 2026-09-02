@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
 import { ROUTES } from "./routes";
+import { useAuthContext } from "../../context/AuthContext";
 import MainLayout from "../../shared/MainLayout/MainLayout.component";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
-import AdminDashboard from "../../pages/AdminDashboard";
 
 import HomePage from "../../pages/HomePage";
 import LoginPage from "../../pages/LoginPage";
@@ -18,8 +18,20 @@ import LastLessonRedirect from "../../pages/LastLessonRedirect";
 import PrivacyPage from "../../pages/PrivacyPage";
 import TermsPage from "../../pages/TermsPage";
 import NotFoundPage from "../../pages/NotFoundPage";
+import Spinner from "../../shared/Spinner/Spinner.component";
+import AdminDashboardPage from "../../pages/AdminDashboardPage";
 
 export default function AppRouter() {
+  const { isHydrating } = useAuthContext();
+
+  if (isHydrating) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Spinner label="Loading" />
+      </div>
+    );
+  }
+
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -43,7 +55,7 @@ export default function AppRouter() {
           path={ROUTES.ADMIN_DASHBOARD}
           element={
             <AdminRoute>
-              <AdminDashboard />
+              <AdminDashboardPage />
             </AdminRoute>
           }
         />

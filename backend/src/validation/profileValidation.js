@@ -14,9 +14,6 @@ const updateProfileSchema = Joi.object({
   goals: Joi.string().trim().max(500).allow("").optional().messages({
     "string.max": "Goals must be within 500 characters.",
   }),
-  theme: Joi.string().valid("Light", "Dark").optional().messages({
-    "any.only": "Theme must be either Light or Dark.",
-  }),
   notifications: Joi.boolean().optional().messages({
     "boolean.base": "Notifications setting must be true or false.",
   }),

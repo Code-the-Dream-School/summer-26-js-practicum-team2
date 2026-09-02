@@ -1,14 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 
 import { useAuthContext } from "../context/AuthContext";
-import {
-  changeProfilePassword,
-  //uncomment line 7 for use with admin deletion and user request acct deletion
-  deleteProfile,
-  getProfile,
-  notifyDashboardProgressChanged,
-  updateProfile,
-} from "../services/api";
+import { changeProfilePassword, deleteProfile, getProfile, updateProfile } from "../services/api";
 
 import Button from "../shared/Button/Button.component";
 import Input from "../shared/Input/Input.component";
@@ -17,9 +10,9 @@ import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 
 const errorMessage = (error) =>
-  error.errors?.length ? error.errors.join(" ") : error.message || "uh oh spaghetti-o";
+  error.errors?.length ? error.errors.join(" ") : error.message || "Something went wrong.";
 
-const Stat = ({label, value}) => {
+const Stat = ({ label, value }) => {
   return (
     <p className="text-center">
       <span>{label}</span>
@@ -29,18 +22,22 @@ const Stat = ({label, value}) => {
 };
 
 export default function ProfilePage() {
-  const { csrfToken } = useAuthContext();
+  const { csrfToken, refreshSession } = useAuthContext();
   const [profile, setProfile] = useState(null);
 
   const [name, setName] = useState("");
   const [goals, setGoals] = useState("");
+  const [notifications, setNotifications] = useState(true);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  //uncomment line 41 for use with admin direct acct deletion and user request
   const [deleteEmail, setDeleteEmail] = useState("");
 
-  const [toastMessage, setToastMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState({
+    isOpen: false,
+    message: "",
+    variant: "default",
+  });
   const [pending, setPending] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -55,9 +52,16 @@ export default function ProfilePage() {
   const applyProfile = useCallback((user) => {
     if (!user) return;
     setProfile(user);
-    setName(user.name);
-    setGoals(user.goals);
+    setName(user.name ?? "");
+    setGoals(user.goals ?? "");
+    setNotifications(user.notifications ?? true);
   }, []);
+
+  const reloadProfile = useCallback(async () => {
+    const { user } = await getProfile();
+    applyProfile(user);
+    return user;
+  }, [applyProfile]);
 
   useEffect(() => {
     let active = true;
@@ -73,14 +77,13 @@ export default function ProfilePage() {
     };
   }, [applyProfile, showToast]);
 
-  const saveProfile = async (event) => {
+  const saveProfile = async (event, updates, pendingKey, successMessage) => {
     event.preventDefault();
-    setPending("Profile");
+    setPending(pendingKey);
     try {
-      const result = await updateProfile({ name, goals, csrfToken });
-      applyProfile(result.user);
-      notifyDashboardProgressChanged({ avatarLabel: result.user?.name?.charAt(0) || "A" });
-      showToast(result.message, "success");
+      await updateProfile({ ...updates, csrfToken });
+      await reloadProfile();
+      showToast(successMessage, "success");
     } catch (error) {
       showToast(errorMessage(error));
     } finally {
@@ -90,9 +93,11 @@ export default function ProfilePage() {
 
   const changePassword = async (event) => {
     event.preventDefault();
-    setPending("Password");
+    setPending("password");
     try {
       const result = await changeProfilePassword({ currentPassword, newPassword, csrfToken });
+      refreshSession(result);
+      await reloadProfile();
       setCurrentPassword("");
       setNewPassword("");
       showToast(result.message, "success");
@@ -103,31 +108,16 @@ export default function ProfilePage() {
     }
   };
 
-  // const deleteAccount = async(event) => {
-  //   event.preventDefault();
-  //   setPending("Delete");
-  //   try{
-  //     await deleteProfile({email:deleteEmail, csrfToken})
-  //     try{
-  //       await logout()
-  //     }catch{}
-  //   }catch(error) {
-  //     showToast(result.message, "success");
-  //   } finally{
-  //     setPending("");
-  //   }
-  // };
-  
-  const requestDeleteAccount = async(event) => {
+  const requestDeleteAccount = async (event) => {
     event.preventDefault();
     setPending("delete");
-    try{
-      const result= await deleteProfile({email:deleteEmail, csrfToken})
+    try {
+      const result = await deleteProfile({ email: deleteEmail, csrfToken });
       showToast(result.message || "Request for account deletion sent to admin.", "success");
-      setDeleteEmail("")
-    } catch(error){
+      setDeleteEmail("");
+    } catch (error) {
       showToast(errorMessage(error));
-    }finally{
+    } finally {
       setPending("");
     }
   };
@@ -155,10 +145,12 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      {/* Identity & Goals Card */}
       <Card className="space-y-4">
-        <h2 className="font-heading text-h4 font-bold text-heading">Identity & Goals</h2>
-        <form onSubmit={saveProfile} className="space-y-4 max-w-md">
+        <h2 className="font-heading text-h4 font-bold text-heading">Identity</h2>
+        <form
+          onSubmit={(event) => void saveProfile(event, { name }, "identity", "Display name saved.")}
+          className="max-w-md space-y-4"
+        >
           <Input
             id="profile-name"
             label="Display Name"
@@ -166,9 +158,68 @@ export default function ProfilePage() {
             minLength={2}
             maxLength={30}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            disabled={pending === "identity"}
+            onChange={(event) => setName(event.target.value)}
           />
-          <Button type="submit">Save Changes</Button>
+          <div>
+            <p className="text-sm font-semibold text-heading">Email</p>
+            <p className="mt-1 text-sm text-foreground">{profile?.email || "-"}</p>
+          </div>
+          <Button type="submit" loading={pending === "identity"}>
+            Save display name
+          </Button>
+        </form>
+      </Card>
+
+      <Card className="space-y-4">
+        <h2 className="font-heading text-h4 font-bold text-heading">Goals</h2>
+        <form
+          onSubmit={(event) => void saveProfile(event, { goals }, "goals", "Goals saved.")}
+          className="max-w-2xl space-y-4"
+        >
+          <label htmlFor="profile-goals" className="block text-sm font-semibold text-heading">
+            What are you working toward?
+          </label>
+          <textarea
+            id="profile-goals"
+            className="min-h-28 w-full rounded-xl border border-neutral-300 bg-surface-input px-3 py-2 text-sm shadow-sm outline-none transition-all duration-200 focus:ring-4 focus:ring-primary/20 disabled:cursor-not-allowed"
+            maxLength={500}
+            value={goals}
+            disabled={pending === "goals"}
+            onChange={(event) => setGoals(event.target.value)}
+          />
+          <Button type="submit" loading={pending === "goals"}>
+            Save goals
+          </Button>
+        </form>
+      </Card>
+
+      <Card className="space-y-4">
+        <h2 className="font-heading text-h4 font-bold text-heading">Preferences</h2>
+        <form
+          onSubmit={(event) =>
+            void saveProfile(event, { notifications }, "preferences", "Preferences saved.")
+          }
+          className="max-w-md space-y-4"
+        >
+          <label className="flex items-start gap-3 text-sm text-foreground">
+            <input
+              type="checkbox"
+              checked={notifications}
+              disabled={pending === "preferences"}
+              onChange={(event) => setNotifications(event.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-primary"
+            />
+            <span>
+              <span className="block font-semibold text-heading">Learning notifications</span>
+              <span className="block text-neutral-600">
+                Receive updates about your lessons and progress.
+              </span>
+            </span>
+          </label>
+          <Button type="submit" loading={pending === "preferences"}>
+            Save preferences
+          </Button>
         </form>
       </Card>
 
@@ -176,10 +227,10 @@ export default function ProfilePage() {
       <Card className="space-y-4">
         <h2 className="font-heading text-h4 font-bold text-heading">Security & Credentials</h2>
         <form onSubmit={changePassword} className="space-y-4 max-w-md">
-          <label className="text-small font-semibold text-heading block"> Current Password</label>
           <Input
             id="current-password"
             type="password"
+            label="Current Password"
             required
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -194,21 +245,18 @@ export default function ProfilePage() {
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="••••••••"
           />
-          <Button type="submit" disable={pending === "password"}>
-            {pending === "password" ? "Updating..." : "Update Password"}
+          <Button type="submit" loading={pending === "password"}>
+            Update Password
           </Button>
         </form>
       </Card>
 
-      {/* Danger Zone-uncommented out Aug 27 for admin del and user request delete account */} 
       <div className="space-y-4 rounded-2xl border-2 border-dashed border-danger/40 bg-danger/5 p-6">
         <header className="space-y-1">
-          <h2 className="font-heading text-h4 font-bold text-danger">
-            Danger Zone
-          </h2>
+          <h2 className="font-heading text-h4 font-bold text-danger">Danger Zone</h2>
           <p className="text-small text-neutral-600">
-            Requesting account deletion will send a ticket to be reviewed by our admin. Your account will remain active until an admin approves the request. Just a reminder: Deleting your account triggers an irreversible data purge. You will immediately lose
-            platform streaks, course rewards, and accumulated lesson progress records once your account deletion is approved by administration.
+            Requesting account deletion sends a ticket to our administrators for review. Your
+            account remains active until a request is approved, at which point it is deactivated.
           </p>
         </header>
 
@@ -216,7 +264,7 @@ export default function ProfilePage() {
           <Input
             id="delete-account-email"
             type="email"
-            label="Type account email to verify permanent deletion:"
+            label="Type account email to verify deletion request:"
             required
             value={deleteEmail}
             onChange={(e) => setDeleteEmail(e.target.value)}
@@ -228,9 +276,9 @@ export default function ProfilePage() {
             className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
           >
             {pending === "delete" ? "Submitting request.." : "Request Account Deletion"}
-           </Button>
-           </form>
-         </div>
+          </Button>
+        </form>
+      </div>
     </section>
   );
 }
