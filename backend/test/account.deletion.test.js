@@ -144,6 +144,21 @@ describe("account deletion workflow", () => {
     expect(duplicateRequest.status).toBe(409);
   });
 
+  it("preserves detailed validation errors for malformed deletion requests", async () => {
+    const user = await createUser({ email: "invalid-profile-deletion@example.com" });
+
+    const response = await request(app)
+      .post("/api/v1/profile/request-deletion")
+      .set("Authorization", authHeader(user))
+      .send({ email: "not-an-email" });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      message: "Validation error",
+      errors: expect.arrayContaining(["Please provide email that is valid."]),
+    });
+  });
+
   it("redacts admin users and only approves pending deletion requests", async () => {
     const admin = await createUser({ email: "admin@example.com", role: "admin" });
     const learner = await createUser({ email: "learner@example.com" });

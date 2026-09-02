@@ -309,3 +309,26 @@ describe("admin access boundary", () => {
     expect(response.body.code).toBe("ACCOUNT_DISABLED");
   });
 });
+test("invalidates an existing session when an administrator bans a user", async () => {
+  const admin = await createUser("admin");
+  const learner = await createUser();
+  const learnerToken = tokenFor(learner._id, learner.role);
+
+  const banned = await request(app)
+    .patch(`/api/v1/admin/users/${learner._id}/disabled`)
+    .set("Authorization", `Bearer ${tokenFor(admin._id, admin.role)}`)
+    .send({ disabled: true, confirmation: "CONFIRM" });
+
+  expect(banned.status).toBe(200);
+  expect(await User.findById(learner._id)).toMatchObject({
+    is_disabled: true,
+    token_version: 1,
+  });
+
+  const staleSession = await request(app)
+    .get("/api/v1/dashboard")
+    .set("Authorization", `Bearer ${learnerToken}`);
+
+  expect(staleSession.status).toBe(401);
+  expect(staleSession.body.code).toBe("SESSION_INVALIDATED");
+});

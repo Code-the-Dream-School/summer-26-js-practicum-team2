@@ -157,7 +157,7 @@ const changePassword = async (req, res, next) => {
     });
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Error with validation",
+        message: "Validation error",
         errors: error.details.map((detail) => detail.message),
       });
     }
@@ -199,10 +199,11 @@ const changePassword = async (req, res, next) => {
 //POST /api/v1/profile/request-deletion for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
-    const { error, value } = deleteAccountSchema.validate(req.body);
+    const { error, value } = deleteAccountSchema.validate(req.body, { abortEarly: false });
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: error.details[0].message,
+        message: "Validation error",
+        errors: error.details.map((detail) => detail.message),
       });
     }
     const user = await User.findById(req.user.id);
