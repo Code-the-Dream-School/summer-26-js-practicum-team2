@@ -1,5 +1,33 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AUTH_EXPIRED_EVENT, clearCsrfToken, getProfile, startQuiz } from "./api";
+import {
+  AUTH_EXPIRED_EVENT,
+  clearCsrfToken,
+  getProfile,
+  notifyDashboardProgressChanged,
+  startQuiz,
+} from "./api";
+
+describe("notifyDashboardProgressChanged", () => {
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
+  it("clears dashboard caches even when no dashboard page is mounted", () => {
+    window.sessionStorage.setItem("sprout.dashboard.learner-1", "cached");
+    window.sessionStorage.setItem("sprout.dashboard.learner-2", "cached");
+    window.sessionStorage.setItem("sprout.auth", "active-session");
+    const listener = (event) => {
+      expect(event.detail).toEqual({ type: "lesson_complete" });
+    };
+    window.addEventListener("sprout:progress-updated", listener, { once: true });
+
+    notifyDashboardProgressChanged({ type: "lesson_complete" });
+
+    expect(window.sessionStorage.getItem("sprout.dashboard.learner-1")).toBeNull();
+    expect(window.sessionStorage.getItem("sprout.dashboard.learner-2")).toBeNull();
+    expect(window.sessionStorage.getItem("sprout.auth")).toBe("active-session");
+  });
+});
 
 describe("apiRequest", () => {
   afterEach(() => {

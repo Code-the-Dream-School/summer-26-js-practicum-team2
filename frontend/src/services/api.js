@@ -1,6 +1,7 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
 const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
+const DASHBOARD_CACHE_KEY_PREFIX = "sprout.dashboard.";
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
@@ -314,7 +315,18 @@ export const notifyProfileChange = (detail = {}) => {
 };
 
 export const notifyDashboardProgressChanged = (detail = {}) => {
-  window.dispatchEvent(new Event("sprout:progress-updated", { detail }));
+  try {
+    for (let index = window.sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = window.sessionStorage.key(index);
+      if (key?.startsWith(DASHBOARD_CACHE_KEY_PREFIX)) {
+        window.sessionStorage.removeItem(key);
+      }
+    }
+  } catch {
+    // Browser storage can be unavailable without affecting the progress refresh event.
+  }
+
+  window.dispatchEvent(new CustomEvent("sprout:progress-updated", { detail }));
 };
 
 export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
