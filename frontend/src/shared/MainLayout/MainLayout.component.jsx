@@ -22,6 +22,12 @@ export default function MainLayout() {
 
   return (
     <div className="mx-auto min-h-screen bg-surface-app text-foreground">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface-app focus:px-4 focus:py-2 focus:text-primary"
+      >
+        Skip to content
+      </a>
       <Header
         signedIn={isAuthenticated}
         isAdmin={isAdmin}
@@ -29,7 +35,7 @@ export default function MainLayout() {
         onLogout={handleLogout}
         isSigningOut={isSigningOut}
       />
-      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Outlet />
       </main>
       <Footer />

@@ -104,6 +104,13 @@ exports.getUserAttempts = async (req, res, next) => {
 //Route: POST /api/v1/quizzes/start
 exports.startQuiz = async (req, res, next) => {
   try {
+    const requestBody = req.body ?? {};
+    if (typeof requestBody.microLessonId === "undefined") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "microLessonId is required.",
+      });
+    }
+
     const validatedBody = validateRequest(res, quizStartSchema, req.body);
     if (!validatedBody) return;
     const { microLessonId, moduleId } = validatedBody;

@@ -9,148 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased Patch 5]
+
+## [0.3.8] - 2026-09-01
 
 ### Added
 
-- Added the backend admin authorization boundary and protected admin status endpoint
-- Assigned the first successfully registered user the admin role through an atomic bootstrap claim
-- Added admin user listing, progress reset, account disable/enable, and role management APIs
-- Added admin email verification and reversible user deletion actions
-- Added 30-day scheduled deletion metadata and banned-session enforcement
-- Added a role-protected admin route with an initial user control panel
-- Added admin module and nested lesson CRUD APIs with budgeting seed support
-- Added duplicate module and lesson protection with cache invalidation
-- Added explicit admin-only budgeting seed behavior for runtime lesson availability
-- Shared Postman CSRF and session variables across User and Admin collections
-- Fixed User Login cookie capture and routed Admin file imports through admin-session authorization
+- Added core rule utilities and corresponding tests for XP awards and caps, streak/freeze status, and lesson-unlock gating.
+- Added backend API integration, contract, and negative-path coverage for authentication, password reset, logout/CSRF protection, lesson and dashboard progress, quiz persistence and submission, middleware/error responses, security headers, and rate limiting.
+- Added shared backend authentication and request helpers to reduce repeated Authorization and session-plus-CSRF setup across integration tests.
+- Added backend coverage enforcement through `test:coverage` with global Jest coverage thresholds.
+- Added frontend regression and unit coverage for authentication, dashboard caching and refresh, lesson loading and navigation, learning-path state, quiz interactions and review flows, reducers, shared components, accessibility behavior, consent analytics, and email verification.
+- Added Playwright end-to-end testing with Chromium, including browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
+- Added CI artifacts for frontend test output, frontend builds, backend coverage, and Playwright reports/results to improve failure diagnostics.
+- Added a keyboard-accessible "Skip to content" link and main-content target to the shared application layout.
 
 ### Changed
 
-- Added explicit admin-role checks for admin API routes
-- Prevented disabled or deleted users from signing in
-- Disabled self-targeting admin account actions and repeated email verification
-- Labeled account blocking controls as Ban/Unban in the admin panel
-- Fixed soft-delete validation to accept the admin panel's delete state payload
-- Showed banned users an explicit banned-account message during login
-- Added an admin-only Admin link to the shared desktop and mobile navigation
-- Replaced admin panel action buttons with the shared Button component
-- Removed automatic runtime loading of lesson JSON files
-- Fixed Postman logout cookie handling, dashboard event compatibility, and multipart import headers
-- Made learning-path module discovery database-driven instead of defaulting to `cashFlow`
-- Styled the empty learning-path state with the shared EmptyState component and lesson artwork
-- Made dashboard next actions and empty states database-driven for unseeded applications
-- Added a full lesson JSON editor for lesson metadata, micro-lessons, quizzes, and content blocks
-- Added renderer block-type controls for switching paragraph, callout, formula, list, quiz, table, and budget blocks
-- Added structured editing for lists, character intros, knowledge checks, tables, and budget summaries
-- Added Postman coverage for admin status, user listing, module seed/detail/CRUD, and nested lesson CRUD
-- Split Postman workflows into public, user, and admin collections with shared environment guidance
-
----
-
-## [Unreleased Patch 4]
-
-### Added
-
-- Added frontend API support for fetching public lesson content
-
-### Changed
-
-- Updated signed-out lesson previews to use the public lesson API through `useLessonContent`
-
-### Removed
-
-- Removed the frontend preview dependency on bundled lesson content and `getSampleLesson`
-
----
-
-## [Unreleased Patch 3]
-
-### Added
-
-- Added a MongoDB lesson-module model for storing imported lesson content
-- Added a shared-secret lesson module import endpoint with Joi validation
-- Added cache invalidation after lesson module imports
-- Added integration coverage for refreshed content after module re-imports
-- Added Postman requests for public lessons, quiz answer checks, and lesson imports
-- Added the lesson import secret to the local Postman environment configuration
-- Added multipart `.json` file uploads for complete lesson module imports
-- Documented the budgeting lesson JSON fixture for selection in the Postman import request
-- Accepted additional top-level lesson content fields during imports
-
-### Changed
-
-- Updated content loading to prefer MongoDB while retaining JSON fallback support
-
----
-
-## [Unreleased Patch 2]
-
-### Added
-
-- Added sanitized public and authenticated lesson responses that hide quiz answers
-- Added server-side correctness checks for individual quiz answers
-
-### Changed
-
-- Prevented lesson content APIs from exposing `correctResponse` and `explanation`
-- Added a stateless public quiz answer-check endpoint
-- Sanitized all lessons nested in the module payload, not just the requested lesson
-- Updated quiz state to store server-provided correctness metadata
-
-### Removed
-
-- Removed client-side quiz correctness and explanation data from normalized questions
-
----
-
-## [Unreleased Patch 1]
-
-### Added
-
-- Added a public lesson content endpoint for signed-out lesson previews
-- Added backend integration tests for public lesson loading and unknown lessons
-
-### Changed
-
-- Added the unauthenticated lesson route before the protected lesson routes
-- Updated the lesson content hook and API client to support public lesson requests
-- Updated lesson normalization to consume API-provided lesson payloads
-- Updated signed-out sample previews to use the public lesson API
-
-### Removed
-
-- Removed the bundled content import and `getSampleLesson` preview helper
-
----
-
-## [Unreleased]
-
-### Added
-
-- Added profile management APIs and UI for viewing and updating profile details, setting an avatar URL, changing passwords, and submitting email-confirmed account deletion requests.
-- Added an admin dashboard with role-based routing, cached dashboard data, and endpoints to list administrators and review pending account deletion requests.
-- Added soft-deletion lifecycle fields, reactivation endpoints, profile validation, and Postman coverage for profile and account lifecycle routes.
-- Added backend and frontend regression tests for account deletion requests, admin approval and rejection, reactivation, session invalidation, API contracts, route guards, and Postman route coverage.
-
-### Changed
-
-- Updated login and navigation behavior to support administrator access and expose all navigation links from the mobile menu.
-- Updated the Postman collection and testing guide to use `sprout-api.postman-collection.json` and model deletion as an administrator-reviewed request.
-- Updated account-deletion copy to describe account deactivation rather than an unsupported irreversible data purge.
+- Updated CI pull-request triggers from `docs` to `main`.
+- Updated backend CI to enforce coverage thresholds and added browser journey checks to the CI pipeline.
+- Updated email-verification errors to use alert semantics so they are announced by assistive technology.
+- Updated formatting and test-result ignore configuration for generated coverage, build, and Playwright artifacts.
 
 ### Fixed
 
-- Fixed the profile model import and aligned profile deletion, admin approval, and admin rejection calls between the frontend and backend.
-- Fixed non-administrator access to the admin dashboard so it redirects to the standard dashboard.
-- Fixed reactivation lookups so recently soft-deleted accounts can be restored during the grace period.
-- Fixed the Postman collection test after the collection was renamed.
-
-### Security
-
-- Allowlisted administrator response fields to prevent password-hash exposure and stopped returning full user documents from deletion-review actions.
-- Restricted deletion approval and rejection to accounts with a pending deletion request.
-- Enforced database-backed JWT version checks so password changes and approved account deletions invalidate existing sessions.
+- Fixed the Express error-handler middleware contract to accept `next` and forward errors when response headers have already been sent.
 
 ---
 
