@@ -235,6 +235,7 @@ exports.submitQuiz = async (req, res, next) => {
     //Submit grades:
     let correctCount = 0;
     const missed = [];
+    const reviews = [];
     const evaluatedAnswers = contentQuestions.map((q) => {
       const rawChoices = answers[q.id] || [];
       const userChoices = Array.isArray(rawChoices) ? rawChoices : [rawChoices];
@@ -249,6 +250,13 @@ exports.submitQuiz = async (req, res, next) => {
       } else {
         missed.push(q.id);
       }
+
+      reviews.push({
+        questionId: q.id,
+        isCorrect,
+        correctChoiceIds: correctChoices,
+        explanation: q.explanation,
+      });
 
       return {
         question_id: q.id,
@@ -325,6 +333,7 @@ exports.submitQuiz = async (req, res, next) => {
       passed: attempt.passed,
       attempt_number: attempt.attempt_number,
       missed,
+      reviews,
     });
   } catch (error) {
     return next(error);

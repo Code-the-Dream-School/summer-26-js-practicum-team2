@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added URL-based avatar management on the Profile page, with avatar images shown in the shared navigation and an initials fallback when an image cannot load.
+- Added a public quiz answer-check endpoint that returns correctness, correct choices, and an explanation only after a learner submits an answer.
+- Added a retry state when profile details cannot be loaded.
+
+### Changed
+
+- Updated account reactivation to use the normalized sign-in credentials, login rate limit, and shared account-deletion lifecycle handling.
+- Updated profile, dashboard, and shared navigation state to synchronize learner details and current streaks after profile or learning-progress changes.
+- Improved administrator user management filters and in-place updates, and disabled account actions that are not available for accounts scheduled for deletion.
+- Standardized profile avatars as validated HTTP(S) URLs rather than file uploads.
+- Updated global API rate limits to use production-specific limits while keeping development and test environments practical.
+
+### Fixed
+
+- Fixed stale learning streaks after missed days and kept profile and dashboard streak displays consistent.
+- Fixed authentication handling so normal authorization and CSRF errors do not clear local sign-in state; confirmed invalidated, disabled, and deleted accounts now use stable session error codes.
+- Fixed profile, password, deletion, and reactivation validation responses to return consistent structured errors.
+
+---
+
 ## [0.4.1] - 2026-09-02
 
 ### Added

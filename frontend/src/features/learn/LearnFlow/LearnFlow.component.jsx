@@ -229,6 +229,12 @@ export default function LearnFlow({
     }
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
+    const submissionReviews =
+      submission?.reviews?.length > 0
+        ? Object.fromEntries(
+            submission.reviews.map(({ questionId, ...review }) => [questionId, review]),
+          )
+        : quiz.reviews;
 
     if (submission) {
       setSubmissions((current) => ({
@@ -239,7 +245,7 @@ export default function LearnFlow({
 
     setCompletedAttempts((current) => [
       ...current,
-      { questions: currentStepQuestions, answers: quiz.answers },
+      { questions: currentStepQuestions, answers: quiz.answers, reviews: submissionReviews },
     ]);
 
     quiz.reset();
@@ -300,10 +306,10 @@ export default function LearnFlow({
           />
 
           <h1 className="font-heading text-h2 font-bold text-heading">
-            {hasQuiz && !gradedPassed && getQuizCompletionWord(gradedPassed)}
+            {hasQuiz && getQuizCompletionWord(gradedPassed)}
           </h1>
           <p className="text-lg font-semibold text-heading">
-            {hasQuiz && !gradedPassed && getQuizCompletionPhrase(gradedPassed)}
+            {hasQuiz && getQuizCompletionPhrase(gradedPassed)}
           </p>
 
           {hasQuiz ? (

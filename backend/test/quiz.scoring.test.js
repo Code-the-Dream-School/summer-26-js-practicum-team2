@@ -60,6 +60,16 @@ describe("quiz submission grading (backend)", () => {
     expect(submitA.status).toBe(200);
     expect(submitA.body.score).toBe(67);
     expect(submitA.body.passed).toBe(false);
+    expect(submitA.body.reviews).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          questionId: "1.1.2-q3",
+          isCorrect: false,
+          correctChoiceIds: ["a"],
+          explanation: expect.any(String),
+        }),
+      ]),
+    );
 
     // Micro-lesson 1.1.4 has 3 different knowledge checks; answer all of them correctly.
     const startB = await request(app)
