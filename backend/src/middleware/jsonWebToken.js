@@ -5,7 +5,10 @@ const User = require("../models/User.model");
 const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
-const send401 = (res, { message = "No user is authenticated.", code } = {}) => {
+const send401 = (
+  res,
+  { message = "No user is authenticated.", code = "SESSION_INVALIDATED" } = {},
+) => {
   return res.status(StatusCodes.UNAUTHORIZED).json({
     message,
     ...(code ? { code } : {}),
