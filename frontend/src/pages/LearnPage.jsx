@@ -1,5 +1,12 @@
-import { useMemo } from "react";
-import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-router";
+import { useEffect, useMemo } from "react";
+import {
+  Link,
+  Navigate,
+  useLocation,
+  useOutletContext,
+  useParams,
+  useSearchParams,
+} from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
@@ -22,6 +29,7 @@ export default function LearnPage() {
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const setCurrentModuleResources = useOutletContext();
 
   const selectedMicroLessonId = location.state?.microLessonId;
 
@@ -55,6 +63,19 @@ export default function LearnPage() {
     ramona: ramonaImg,
     beaver: dabbingBeaverImg,
   };
+
+  useEffect(() => {
+    if (typeof setCurrentModuleResources !== "function") {
+      return undefined;
+    }
+
+    setCurrentModuleResources({
+      glossary: Array.isArray(learnData?.module?.glossary) ? learnData.module.glossary : [],
+      worksCited: Array.isArray(learnData?.module?.worksCited) ? learnData.module.worksCited : [],
+    });
+
+    return () => setCurrentModuleResources({ glossary: [], worksCited: [] });
+  }, [learnData?.module, setCurrentModuleResources]);
 
   // Wait for storage hydration before deciding to redirect
   if (isHydrating) {
