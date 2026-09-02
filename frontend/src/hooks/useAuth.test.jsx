@@ -49,25 +49,30 @@ describe("useAuth", () => {
     );
   });
 
-  it("clears stale stored authentication after a 401 during hydration", async () => {
-    sessionStorage.setItem(
-      "sprout.auth",
-      JSON.stringify({
-        user: { id: "user-id", email: "maya@example.com", role: "learner" },
-        csrfToken: "csrf-token",
-      }),
-    );
-    api.getProfile.mockRejectedValueOnce(Object.assign(new Error("Unauthorized"), { status: 401 }));
+  it.each(["ACCOUNT_DISABLED", "ACCOUNT_DELETED"])(
+    "clears stored authentication for %s during hydration",
+    async (code) => {
+      sessionStorage.setItem(
+        "sprout.auth",
+        JSON.stringify({
+          user: { id: "user-id", email: "maya@example.com", role: "learner" },
+          csrfToken: "csrf-token",
+        }),
+      );
+      api.getProfile.mockRejectedValueOnce(
+        Object.assign(new Error("Unauthorized"), { status: 401, code, authInvalidating: true }),
+      );
 
-    const { result } = renderHook(() => useAuth());
+      const { result } = renderHook(() => useAuth());
 
-    await waitFor(() => expect(result.current.isHydrating).toBe(false));
+      await waitFor(() => expect(result.current.isHydrating).toBe(false));
 
-    expect(result.current.isAuthenticated).toBe(false);
-    expect(result.current.user).toBeNull();
-    expect(result.current.csrfToken).toBeNull();
-    expect(sessionStorage.getItem("sprout.auth")).toBeNull();
-  });
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBeNull();
+      expect(result.current.csrfToken).toBeNull();
+      expect(sessionStorage.getItem("sprout.auth")).toBeNull();
+    },
+  );
 
   it("logs out when the API reports an expired authentication session", async () => {
     sessionStorage.setItem(
@@ -113,6 +118,69 @@ describe("useAuth", () => {
     expect(JSON.parse(sessionStorage.getItem("sprout.auth"))).toEqual(
       expect.objectContaining({ csrfToken: "fresh-csrf-token" }),
     );
+  });
+
+  it("synchronizes profile update events into stored auth state", async () => {
+    sessionStorage.setItem(
+      "sprout.auth",
+      JSON.stringify({
+        user: { id: "user-id", name: "Maya", email: "maya@example.com", role: "learner" },
+        csrfToken: "csrf-token",
+      }),
+    );
+    const { result } = renderHook(() => useAuth());
+
+    await waitFor(() => expect(result.current.isHydrating).toBe(false));
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent("sprout:profile-updated", {
+          detail: { user: { name: "Zoe" }, avatarUrl: "https://example.com/zoe.png" },
+        }),
+      );
+    });
+
+    expect(result.current.user).toEqual(
+      expect.objectContaining({ name: "Zoe", avatar_url: "https://example.com/zoe.png" }),
+    );
+    expect(JSON.parse(sessionStorage.getItem("sprout.auth")).user).toEqual(
+      expect.objectContaining({ name: "Zoe", avatar_url: "https://example.com/zoe.png" }),
+    );
+  });
+
+  it("preserves profile-derived stats when refreshing a password-change session", async () => {
+    sessionStorage.setItem(
+      "sprout.auth",
+      JSON.stringify({
+        user: {
+          id: "user-id",
+          name: "Maya",
+          email: "maya@example.com",
+          role: "learner",
+          xp: 125,
+          streak: 3,
+          avatar_url: "https://example.com/maya.png",
+        },
+        csrfToken: "old-csrf-token",
+      }),
+    );
+    const { result } = renderHook(() => useAuth());
+
+    await waitFor(() => expect(result.current.isHydrating).toBe(false));
+    act(() => {
+      result.current.refreshSession({
+        csrfToken: "new-csrf-token",
+        user: { id: "user-id", name: "Maya", email: "maya@example.com", role: "learner" },
+      });
+    });
+
+    expect(result.current).toMatchObject({
+      csrfToken: "new-csrf-token",
+      user: expect.objectContaining({
+        xp: 125,
+        streak: 3,
+        avatar_url: "https://example.com/maya.png",
+      }),
+    });
   });
 
   it("refreshes stored profile values after learning progress changes", async () => {
