@@ -1257,7 +1257,7 @@
                   "let responseJson = {};",
                   "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
                   "pm.test('Avatar response includes the submitted URL', function () {",
-                  "  pm.expect(responseJson.message).to.eql('Avatar uploaded.');",
+                  "  pm.expect(responseJson.message).to.eql('Avatar URL saved.');",
                   "  pm.expect(responseJson.avatar_url).to.eql('https://example.com/test-avatar.png');",
                   "});"
                 ],
