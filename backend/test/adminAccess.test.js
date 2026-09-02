@@ -279,7 +279,7 @@ describe("admin access boundary", () => {
     expect(verifyAgain.status).toBe(409);
   });
 
-  test("blocks banned users from authenticated routes", async () => {
+  test("invalidates banned users' authenticated sessions", async () => {
     const user = await createUser("admin");
     user.is_disabled = true;
     await user.save();
@@ -288,8 +288,9 @@ describe("admin access boundary", () => {
       .get("/api/v1/admin/status")
       .set("Authorization", `Bearer ${tokenFor(user._id, "admin")}`);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
     expect(response.body.message).toContain("banned");
+    expect(response.body.code).toBe("ACCOUNT_DISABLED");
   });
 
   test("shows banned users a banned message at login", async () => {
@@ -305,5 +306,6 @@ describe("admin access boundary", () => {
 
     expect(response.status).toBe(403);
     expect(response.body.message).toBe("This account has been banned.");
+    expect(response.body.code).toBe("ACCOUNT_DISABLED");
   });
 });

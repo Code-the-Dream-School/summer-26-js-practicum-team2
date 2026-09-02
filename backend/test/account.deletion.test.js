@@ -72,6 +72,50 @@ describe("account deletion workflow", () => {
       .send({ theme: "Dark" });
 
     expect(unsupportedFieldResponse.status).toBe(400);
+    expect(unsupportedFieldResponse.body).toEqual({
+      message: "Validation error",
+      errors: expect.arrayContaining([expect.stringContaining('"theme" is not allowed')]),
+    });
+  });
+
+  it("accepts only HTTP(S) avatar URLs and preserves the avatar contract", async () => {
+    const user = await createUser({ email: "profile-avatar@example.com" });
+    const authorization = authHeader(user);
+
+    const saved = await request(app)
+      .post("/api/v1/profile/avatar")
+      .set("Authorization", authorization)
+      .send({ avatar_url: "https://example.com/avatar.png" });
+
+    expect(saved.status).toBe(200);
+    expect(saved.body).toEqual({
+      message: "Avatar URL saved.",
+      avatar_url: "https://example.com/avatar.png",
+      avatar_initial: "A",
+    });
+
+    const rejected = await request(app)
+      .post("/api/v1/profile/avatar")
+      .set("Authorization", authorization)
+      .send({ avatar_url: "ftp://example.com/avatar.png" });
+
+    expect(rejected.status).toBe(400);
+    expect(rejected.body).toEqual({
+      message: "Validation error",
+      errors: expect.arrayContaining(["Avatar URL must use HTTP or HTTPS."]),
+    });
+
+    const reset = await request(app)
+      .post("/api/v1/profile/avatar")
+      .set("Authorization", authorization)
+      .send({ avatar_url: null });
+
+    expect(reset.status).toBe(200);
+    expect(reset.body).toEqual({
+      message: "Avatar set to default initial.",
+      avatar_url: null,
+      avatar_initial: "A",
+    });
   });
 
   it("serves a profile and prevents duplicate deletion requests", async () => {
@@ -146,18 +190,90 @@ describe("account deletion workflow", () => {
     });
     expect(deletedLearner.deletion_status).toBe("approved");
     expect(deletedLearner.token_version).toBe(1);
+    expect(
+      deletedLearner.deletion_scheduled_at.getTime() - deletedLearner.deleted_at.getTime(),
+    ).toBe(30 * 24 * 60 * 60 * 1000);
 
     const staleSessionResponse = await request(app)
       .get("/api/v1/profile")
       .set("Authorization", learnerAuthorization);
 
     expect(staleSessionResponse.status).toBe(401);
+    expect(staleSessionResponse.body.code).toBe("SESSION_INVALIDATED");
 
     const repeatedApproval = await request(app)
       .patch(`/api/v1/admin/deletions/approve/${learner._id}`)
       .set("Authorization", adminAuthorization);
 
     expect(repeatedApproval.status).toBe(409);
+  });
+
+  it("uses the same lifecycle state for reviewed and direct admin deletion", async () => {
+    const admin = await createUser({ email: "lifecycle-admin@example.com", role: "admin" });
+    const reviewedUser = await createUser({ email: "reviewed-delete@example.com" });
+    const dashboardUser = await createUser({ email: "dashboard-delete@example.com" });
+    const adminAuthorization = authHeader(admin);
+    const dashboardAuthorization = authHeader(dashboardUser);
+
+    const deletionRequest = await request(app)
+      .post("/api/v1/profile/request-deletion")
+      .set("Authorization", authHeader(reviewedUser))
+      .send({ email: reviewedUser.email });
+    expect(deletionRequest.status).toBe(200);
+
+    const approved = await request(app)
+      .patch(`/api/v1/admin/deletions/approve/${reviewedUser._id}`)
+      .set("Authorization", adminAuthorization);
+    expect(approved.status).toBe(200);
+
+    const scheduled = await request(app)
+      .patch(`/api/v1/admin/users/${dashboardUser._id}/deleted`)
+      .set("Authorization", adminAuthorization)
+      .send({ confirmation: "CONFIRM", deleted: true });
+    expect(scheduled.status).toBe(200);
+
+    const [reviewed, dashboard] = await Promise.all([
+      User.findOne({ _id: reviewedUser._id, is_deleted: true }),
+      User.findOne({ _id: dashboardUser._id, is_deleted: true }),
+    ]);
+    for (const user of [reviewed, dashboard]) {
+      expect(user).toMatchObject({
+        is_deleted: true,
+        deletion_status: "approved",
+        token_version: 1,
+        deletion_approved_by: admin._id,
+      });
+      expect(user.deleted_at).toBeInstanceOf(Date);
+      expect(user.deletion_scheduled_at.getTime() - user.deleted_at.getTime()).toBe(
+        30 * 24 * 60 * 60 * 1000,
+      );
+    }
+
+    const staleSessionResponse = await request(app)
+      .get("/api/v1/profile")
+      .set("Authorization", dashboardAuthorization);
+    expect(staleSessionResponse.status).toBe(401);
+    expect(staleSessionResponse.body.code).toBe("SESSION_INVALIDATED");
+  });
+
+  it("identifies a current session for a deleted account with a stable error code", async () => {
+    const deletedUser = await createUser({
+      email: "account-deleted@example.com",
+      is_deleted: true,
+      deleted_at: new Date(),
+      deletion_scheduled_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      deletion_status: "approved",
+    });
+
+    const response = await request(app)
+      .get("/api/v1/profile")
+      .set("Authorization", authHeader(deletedUser));
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({
+      message: "This account is scheduled for deletion.",
+      code: "ACCOUNT_DELETED",
+    });
   });
 
   it("reactivates a recently approved account", async () => {
@@ -178,6 +294,9 @@ describe("account deletion workflow", () => {
     const reactivatedUser = await User.findById(deletedUser._id);
     expect(reactivatedUser.is_deleted).toBe(false);
     expect(reactivatedUser.deletion_status).toBe("none");
+    expect(reactivatedUser.deleted_at).toBeNull();
+    expect(reactivatedUser.deletion_scheduled_at).toBeNull();
+    expect(reactivatedUser.deletion_approved_by).toBeNull();
   });
 
   it("allows a user to reactivate a recently approved account", async () => {
@@ -190,16 +309,21 @@ describe("account deletion workflow", () => {
       deleted_at: new Date(),
     });
 
-    const response = await request(app).post("/api/v1/users/reactivate").send({
-      email: deletedUser.email,
-      password,
-    });
+    const response = await request(app)
+      .post("/api/v1/users/reactivate")
+      .send({
+        email: ` ${deletedUser.email.toUpperCase()} `,
+        password,
+      });
 
     expect(response.status).toBe(200);
 
     const reactivatedUser = await User.findById(deletedUser._id);
     expect(reactivatedUser.is_deleted).toBe(false);
     expect(reactivatedUser.deletion_status).toBe("none");
+    expect(reactivatedUser.deleted_at).toBeNull();
+    expect(reactivatedUser.deletion_scheduled_at).toBeNull();
+    expect(reactivatedUser.deletion_approved_by).toBeNull();
   });
 
   it("rejects reactivation for an active account", async () => {
