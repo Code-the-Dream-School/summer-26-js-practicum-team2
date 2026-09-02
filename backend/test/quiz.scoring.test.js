@@ -1,8 +1,10 @@
 const request = require("supertest");
+const jwt = require("jsonwebtoken");
 const { useTestDb } = require("./setup");
 
 // setup.js sets JWT_SECRET before these modules are required, so the middleware/tokens match.
 const app = require("../src/app");
+const User = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
 const { createAuthedUser } = require("./helpers/authTestHelpers");
 

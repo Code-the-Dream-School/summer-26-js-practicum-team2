@@ -5,9 +5,14 @@ import * as api from "../services/api";
 
 // Mock the API functions so these tests only focus on how useAuth handles auth state.
 vi.mock("../services/api", () => ({
+  AUTH_EXPIRED_EVENT: "sprout:auth-expired",
+  CSRF_TOKEN_UPDATED_EVENT: "sprout:csrf-token-updated",
+  clearCsrfToken: vi.fn(),
+  getProfile: vi.fn(),
   registerUser: vi.fn(),
   loginUser: vi.fn(),
   logoutUser: vi.fn(),
+  setCsrfToken: vi.fn(),
   verifyUserEmail: vi.fn(),
   forgotPasswordRequest: vi.fn(),
   resetPasswordRequest: vi.fn(),
