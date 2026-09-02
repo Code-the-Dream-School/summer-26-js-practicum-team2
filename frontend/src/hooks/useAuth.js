@@ -34,6 +34,7 @@ export function useAuth() {
 
   const clearAuth = useCallback(() => {
     clearStoredAuth();
+    api.clearCsrfToken();
     dispatch({ type: actions.clearAuth });
   }, []);
 
@@ -42,6 +43,23 @@ export function useAuth() {
     window.addEventListener(api.AUTH_EXPIRED_EVENT, handleAuthExpired);
     return () => window.removeEventListener(api.AUTH_EXPIRED_EVENT, handleAuthExpired);
   }, [clearAuth]);
+
+  useEffect(() => {
+    const handleCsrfTokenUpdated = (event) => {
+      const nextCsrfToken = event.detail?.csrfToken;
+      if (!nextCsrfToken) return;
+      const stored = readStoredAuth();
+      if (stored?.user) {
+        const isRemembered =
+          !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+        writeStoredAuth({ user: stored.user, csrfToken: nextCsrfToken }, isRemembered);
+      }
+      dispatch({ type: actions.updateCsrfToken, csrfToken: nextCsrfToken });
+    };
+
+    window.addEventListener(api.CSRF_TOKEN_UPDATED_EVENT, handleCsrfTokenUpdated);
+    return () => window.removeEventListener(api.CSRF_TOKEN_UPDATED_EVENT, handleCsrfTokenUpdated);
+  }, []);
 
   // Restore the current auth state from browser storage on first mount.
   useEffect(() => {
@@ -53,6 +71,7 @@ export function useAuth() {
         !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
       let user = stored?.user ?? null;
       let csrfToken = stored?.csrfToken ?? null;
+      api.setCsrfToken(csrfToken);
 
       if (user) {
         try {
@@ -66,6 +85,7 @@ export function useAuth() {
             clearStoredAuth();
             user = null;
             csrfToken = null;
+            api.clearCsrfToken();
           }
         }
       }
@@ -86,6 +106,7 @@ export function useAuth() {
 
   // Keep the reducer and browser storage in sync whenever auth data changes.
   const commitAuth = useCallback((payload, remember = false) => {
+    api.setCsrfToken(payload.csrfToken);
     writeStoredAuth({ user: payload.user, csrfToken: payload.csrfToken }, remember);
     dispatch({
       type: actions.commitAuth,

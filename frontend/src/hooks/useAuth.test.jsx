@@ -6,7 +6,10 @@ import * as api from "../services/api";
 
 vi.mock("../services/api", () => ({
   AUTH_EXPIRED_EVENT: "sprout:auth-expired",
+  CSRF_TOKEN_UPDATED_EVENT: "sprout:csrf-token-updated",
+  clearCsrfToken: vi.fn(),
   getProfile: vi.fn(),
+  setCsrfToken: vi.fn(),
 }));
 
 describe("useAuth", () => {
@@ -86,5 +89,29 @@ describe("useAuth", () => {
     expect(result.current.user).toBeNull();
     expect(result.current.csrfToken).toBeNull();
     expect(sessionStorage.getItem("sprout.auth")).toBeNull();
+  });
+
+  it("updates the persisted CSRF token after a stale-token recovery", async () => {
+    sessionStorage.setItem(
+      "sprout.auth",
+      JSON.stringify({
+        user: { id: "user-id", email: "maya@example.com", role: "learner" },
+        csrfToken: "stale-csrf-token",
+      }),
+    );
+    const { result } = renderHook(() => useAuth());
+
+    await waitFor(() => expect(result.current.isHydrating).toBe(false));
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent("sprout:csrf-token-updated", { detail: { csrfToken: "fresh-csrf-token" } }),
+      );
+    });
+
+    expect(result.current.csrfToken).toBe("fresh-csrf-token");
+    expect(JSON.parse(sessionStorage.getItem("sprout.auth"))).toEqual(
+      expect.objectContaining({ csrfToken: "fresh-csrf-token" }),
+    );
   });
 });

@@ -6,19 +6,39 @@ const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
 const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
+const CSRF_TOKEN_HEADER = "x-csrf-token";
+const CSRF_MISMATCH_MESSAGE = "Invalid CSRF token.";
+let currentCsrfToken = null;
 export const AUTH_EXPIRED_EVENT = "sprout:auth-expired";
+export const CSRF_TOKEN_UPDATED_EVENT = "sprout:csrf-token-updated";
 
-async function apiRequest(path, options = {}) {
+export const setCsrfToken = (csrfToken) => {
+  currentCsrfToken = csrfToken ?? null;
+};
+
+export const clearCsrfToken = () => {
+  currentCsrfToken = null;
+};
+
+const refreshCsrfToken = (csrfToken) => {
+  setCsrfToken(csrfToken);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(CSRF_TOKEN_UPDATED_EVENT, { detail: { csrfToken } }));
+  }
+};
+
+async function apiRequest(path, options = {}, hasRetriedCsrf = false) {
   const { method = "GET", body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options;
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  const requestCsrfToken = currentCsrfToken ?? csrfToken;
   const requestHeaders = {
     "Content-Type": "application/json",
     ...headers,
   };
 
   if (isFormData) delete requestHeaders["Content-Type"];
-  if (csrfToken && CSRF_METHODS.has(method.toUpperCase())) {
-    requestHeaders["X-CSRF-TOKEN"] = csrfToken;
+  if (requestCsrfToken && CSRF_METHODS.has(method.toUpperCase())) {
+    requestHeaders["X-CSRF-TOKEN"] = requestCsrfToken;
   }
 
   const response = await fetch(`${basePath}${path}`, {
@@ -31,10 +51,22 @@ async function apiRequest(path, options = {}) {
   const payload = isJson ? await response.json() : null;
 
   if (!response.ok) {
+    const refreshedCsrfToken = response.headers.get(CSRF_TOKEN_HEADER);
+    if (
+      response.status === 403 &&
+      payload?.message === CSRF_MISMATCH_MESSAGE &&
+      refreshedCsrfToken &&
+      !hasRetriedCsrf
+    ) {
+      refreshCsrfToken(refreshedCsrfToken);
+      return apiRequest(path, options, true);
+    }
+
     const error = new Error(payload?.message || "Request failed. Please try again.");
     error.status = response.status;
     error.errors = Array.isArray(payload?.errors) ? payload.errors : [];
     if (response.status === 401 && typeof window !== "undefined") {
+      clearCsrfToken();
       window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
     }
     throw error;
