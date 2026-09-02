@@ -6,6 +6,7 @@ const User = require("../models/User.model.js");
 const AdminBootstrap = require("../models/AdminBootstrap.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { clearSessionCookie, issueSession } = require("../utils/session");
+const { isWithinReactivationGracePeriod, reactivateAccount } = require("../utils/accountDeletion");
 const {
   registerSchema,
   loginSchema,
@@ -99,12 +100,9 @@ const register = async (req, res, next) => {
 //POST reaactivate route /api/v1/users/reactivate
 const reactivate = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Email and password are needed." });
-    }
+    const body = validateRequest(res, loginSchema, req.body);
+    if (!body) return;
+    const { email, password } = body;
     const user = await User.findOne({
       email,
       is_deleted: { $in: [true, false] },
@@ -125,20 +123,11 @@ const reactivate = async (req, res, next) => {
       return res.status(StatusCodes.BAD_REQUEST).json({ message: "Account is active." });
     }
     //check if request is made within 30 day period to reactivate deleted account
-    const monthExpired = 30 * 24 * 3600 * 1000;
-    const timeSinceDeletedAcct = user.deleted_at
-      ? Date.now() - new Date(user.deleted_at).getTime()
-      : 0;
-    if (timeSinceDeletedAcct > monthExpired) {
+    if (!isWithinReactivationGracePeriod(user)) {
       return res.status(StatusCodes.GONE).json({ message: "Reactivation period has closed." });
     }
     //Restore user state of not deleted account
-    user.is_deleted = false;
-    user.is_archived = false;
-    user.deleted_at = null;
-    user.deletion_status = "none";
-    user.deletion_requested_at = null;
-    user.token_version = (user.token_version || 0) + 1;
+    reactivateAccount(user);
     await user.save();
 
     /*//remove ArchivedUser information
@@ -166,7 +155,11 @@ const login = async (req, res, next) => {
     //Joi gives the sanitized input and the value is the output
     const { email, password, remember } = value;
     // LOok up in mongo database
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email,
+      is_deleted: { $in: [true, false, null] },
+      is_archived: { $in: [true, false, null] },
+    });
     if (!user) {
       req.app.emit?.("login_failed", {
         email,
@@ -177,10 +170,16 @@ const login = async (req, res, next) => {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
     if (user.is_disabled) {
-      return res.status(StatusCodes.FORBIDDEN).json({ message: "This account has been banned." });
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: "This account has been banned.",
+        code: "ACCOUNT_DISABLED",
+      });
     }
-    if (user.deleted_at) {
-      return res.status(StatusCodes.FORBIDDEN).json({ message: "This account is unavailable." });
+    if (user.is_deleted || user.deleted_at) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: "This account is unavailable.",
+        code: "ACCOUNT_DELETED",
+      });
     }
     //compared hashed password
 

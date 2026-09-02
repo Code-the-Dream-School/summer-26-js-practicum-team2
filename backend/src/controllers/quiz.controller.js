@@ -154,7 +154,7 @@ exports.startQuiz = async (req, res, next) => {
 };
 
 // Route: POST /api/v1/quizzes/check
-// Checks one answer without creating an attempt or requiring authentication.
+// Supports immediate quiz feedback by returning the correct choices and explanation after a choice is submitted.
 exports.checkAnswer = async (req, res, next) => {
   try {
     const validatedBody = validateRequest(res, quizCheckSchema, req.body);
