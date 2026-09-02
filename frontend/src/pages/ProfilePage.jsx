@@ -28,7 +28,7 @@ const Stat = ({ label, value }) => {
 };
 
 export default function ProfilePage() {
-  const { csrfToken } = useAuthContext();
+  const { csrfToken, setProfile: setGlobalProfile } = useAuthContext();
   const [profile, setProfile] = useState(null);
 
   const [name, setName] = useState("");
@@ -50,13 +50,17 @@ export default function ProfilePage() {
     setToastMessage((value) => ({ ...value, isOpen: false }));
   }, []);
 
-  const applyProfile = useCallback((user) => {
-    console.log("PROFILE", user);
-    if (!user) return;
-    setProfile(user);
-    setName(user.name);
-    setGoals(user.goals);
-  }, []);
+  const applyProfile = useCallback(
+    (user) => {
+      console.log("PROFILE", user);
+      if (!user) return;
+      setProfile(user);
+      setGlobalProfile(user);
+      setName(user.name);
+      setGoals(user.goals);
+    },
+    [setGlobalProfile],
+  );
 
   useEffect(() => {
     let active = true;

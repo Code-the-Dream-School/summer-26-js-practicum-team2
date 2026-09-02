@@ -4,10 +4,12 @@ import { useAuthContext } from "../../context/AuthContext";
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
-import profile from "../../pages/ProfilePage";
 
 export default function MainLayout() {
-  const { isAuthenticated, user, logout } = useAuthContext();
+  const { isAuthenticated, user, profile, logout } = useAuthContext();
+
+  console.log("PROFILE IN MAINLAYOUT", profile);
+
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleLogout = async () => {
@@ -25,6 +27,7 @@ export default function MainLayout() {
         signedIn={isAuthenticated}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
         xp={profile?.xp ?? 0}
+        streak={profile?.current_streak ?? 0}
         onLogout={handleLogout}
         isSigningOut={isSigningOut}
       />

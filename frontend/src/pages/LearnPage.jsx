@@ -23,6 +23,7 @@ import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
 import rightAnswerIcon from "../assets/right_answer.svg";
 import wrongAnswerIcon from "../assets/wrong_answer.svg";
+//import refreshProfile from "../hooks/useAuth";
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
@@ -52,6 +53,7 @@ function LearnFlow({
   savedProgress = null,
   csrfToken,
   isReadOnly = false,
+  refreshProfile,
 }) {
   const { lessonSteps } = learnData;
 
@@ -176,6 +178,8 @@ function LearnFlow({
     }
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
+
+    await refreshProfile();
 
     if (submission) {
       setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
@@ -366,7 +370,7 @@ function LearnFlow({
 }
 
 export default function LearnPage() {
-  const { isAuthenticated, csrfToken } = useAuthContext();
+  const { isAuthenticated, csrfToken, refreshProfile } = useAuthContext();
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -427,6 +431,7 @@ export default function LearnPage() {
             characterImages={characterImages}
             guideImage={dabbingBeaverImg}
             isReadOnly
+            refreshProfile={refreshProfile}
           />
         </>
       );

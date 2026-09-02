@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import authReducer, { actions, initialState } from "../reducers/auth.reducer";
 import * as api from "../services/api";
 
@@ -32,6 +32,16 @@ export function useAuth() {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const { user, csrfToken } = authState;
 
+  //So profile can update with xp, badges and streaks updates
+  const [profile, setProfile] = useState(null);
+
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+
+    const { user: profileData } = await api.getProfile();
+    setProfile(profileData);
+  }, [user]);
+
   // Restore the current auth state from browser storage on first mount.
   useEffect(() => {
     const stored = readStoredAuth();
@@ -54,6 +64,7 @@ export function useAuth() {
 
   const clearAuth = useCallback(() => {
     clearStoredAuth();
+    setProfile(null);
     dispatch({ type: actions.clearAuth });
   }, []);
 
@@ -80,6 +91,10 @@ export function useAuth() {
     async ({ email, password, remember = false }) => {
       const payload = await runRequest(() => api.loginUser({ email, password, remember }));
       commitAuth(payload, remember);
+
+      //profile loads right after authentication
+      const { user: profileData } = await api.getProfile();
+      setProfile(profileData);
       return payload;
     },
     [runRequest, commitAuth],
@@ -120,6 +135,9 @@ export function useAuth() {
     () => ({
       ...authState,
       isAuthenticated: Boolean(user),
+      profile,
+      refreshProfile,
+      setProfile,
       register,
       login,
       logout,
@@ -131,6 +149,8 @@ export function useAuth() {
     [
       authState,
       user,
+      profile,
+      refreshProfile,
       register,
       login,
       logout,

@@ -308,7 +308,7 @@ exports.submitQuiz = async (req, res, next) => {
         `[Event: quiz_pass] User ${userId} passed quiz ${microLessonId}`,
       );*/
 
-      //Checking if this microlesson has been completed yet
+      //Checking if this microLesson is completed
       const existingProgress = await UserProgress.findOne({
         user_id: userId,
         module_id: moduleId,

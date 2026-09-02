@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-//import Badge from "../../../shared/Badge/Badge.component";
+import Badge from "../../../shared/Badge/Badge.component";
 import Button from "../../../shared/Button/Button.component";
-//import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
+import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
 
 const fallbackHero = {
   state: "new_user",
@@ -14,12 +14,12 @@ const fallbackHero = {
     activeLearningDays: 0,
     helperText: "Start your streak with a lesson.",
   },
-  // dailyGoal: {
-  //   current: 0,
-  //   target: 2,
-  //   label: "0 / 2 lessons",
-  //   isMet: false,
-  // },
+  dailyGoal: {
+    current: 0,
+    target: 2,
+    label: "0 / 2 lessons",
+    isMet: false,
+  },
   primaryAction: {
     label: "Start Budgeting Basics",
     href: "/learn/cashFlow/1.1",
@@ -46,13 +46,13 @@ export default function DashboardHero({ hero }) {
   const activeLearningDays = Number.isFinite(resolvedHero?.streak?.activeLearningDays)
     ? resolvedHero.streak.activeLearningDays
     : 0;
-  // const goalCurrent = Number.isFinite(resolvedHero?.dailyGoal?.current)
-  //   ? resolvedHero.dailyGoal.current
-  //   : 0;
-  // const goalTarget = Number.isFinite(resolvedHero?.dailyGoal?.target)
-  //   ? resolvedHero.dailyGoal.target
-  //   : 1;
-  // const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? "Goal met" : "In progress";
+  const goalCurrent = Number.isFinite(resolvedHero?.dailyGoal?.current)
+    ? resolvedHero.dailyGoal.current
+    : 0;
+  const goalTarget = Number.isFinite(resolvedHero?.dailyGoal?.target)
+    ? resolvedHero.dailyGoal.target
+    : 1;
+  const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? "Goal met" : "In progress";
   const ctaLabel = resolvedHero?.primaryAction?.label || "Continue learning";
   const ctaHref = resolvedHero?.primaryAction?.href || "/learn";
 
@@ -97,7 +97,7 @@ export default function DashboardHero({ hero }) {
             </p>
           </article>
 
-          {/* <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">
+          <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">
                 Today's goal
@@ -107,8 +107,8 @@ export default function DashboardHero({ hero }) {
                 variant={resolvedHero?.dailyGoal?.isMet ? "success" : "default"}
                 label={goalBadgeText}
                 className="px-2 py-1 text-xs"
-              /> */}
-          {/* </div>
+              />
+            </div>
             <p className="mt-1 font-semibold text-heading">{resolvedHero?.dailyGoal?.label}</p>
             <ProgressBar
               value={goalCurrent}
@@ -117,7 +117,7 @@ export default function DashboardHero({ hero }) {
               label="Daily goal progress"
               className="mt-3"
             />
-          </article> */}
+          </article>
         </div>
       </div>
 
