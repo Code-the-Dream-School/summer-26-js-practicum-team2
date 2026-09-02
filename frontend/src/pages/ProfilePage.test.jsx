@@ -3,7 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProfilePage from "./ProfilePage";
 import { useAuthContext } from "../context/AuthContext";
-import { changeProfilePassword, deleteProfile, getProfile, updateProfile } from "../services/api";
+import {
+  changeProfilePassword,
+  deleteProfile,
+  getProfile,
+  setProfileAvatarUrl,
+  updateProfile,
+} from "../services/api";
 
 vi.mock("../context/AuthContext", () => ({
   useAuthContext: vi.fn(),
@@ -13,6 +19,7 @@ vi.mock("../services/api", () => ({
   changeProfilePassword: vi.fn(),
   deleteProfile: vi.fn(),
   getProfile: vi.fn(),
+  setProfileAvatarUrl: vi.fn(),
   updateProfile: vi.fn(),
 }));
 
@@ -30,6 +37,7 @@ describe("ProfilePage", () => {
       notifications: true,
       xp: 125,
       streak: 3,
+      avatar_url: null,
     };
     refreshSession = vi.fn();
     useAuthContext.mockReturnValue({ csrfToken: "csrf-token", refreshSession });
@@ -44,6 +52,10 @@ describe("ProfilePage", () => {
       user: { ...profile },
     });
     deleteProfile.mockResolvedValue({ message: "Deletion request sent." });
+    setProfileAvatarUrl.mockImplementation(async ({ avatarUrl }) => {
+      profile = { ...profile, avatar_url: avatarUrl };
+      return { message: "Avatar URL saved.", avatar_url: avatarUrl };
+    });
   });
 
   it("saves identity, goals, and preferences with refreshed values and toasts", async () => {
@@ -116,6 +128,24 @@ describe("ProfilePage", () => {
     expect(screen.getByLabelText("Current Password")).toHaveValue("");
     expect(screen.getByLabelText("New Password")).toHaveValue("");
     expect(getProfile).toHaveBeenCalledTimes(2);
+  });
+
+  it("saves a URL avatar and refreshes the profile", async () => {
+    const user = userEvent.setup();
+    render(<ProfilePage />);
+
+    const avatarUrl = await screen.findByLabelText("Avatar image URL");
+    await user.type(avatarUrl, "https://example.com/maya.png");
+    await user.click(screen.getByRole("button", { name: "Save avatar" }));
+
+    await waitFor(() => {
+      expect(setProfileAvatarUrl).toHaveBeenCalledWith({
+        avatarUrl: "https://example.com/maya.png",
+        csrfToken: "csrf-token",
+      });
+    });
+    expect(await screen.findByRole("status")).toHaveTextContent("Avatar URL saved.");
+    expect(screen.getByLabelText("Avatar image URL")).toHaveValue("https://example.com/maya.png");
   });
 
   it("shows a retryable load error instead of placeholder profile details", async () => {

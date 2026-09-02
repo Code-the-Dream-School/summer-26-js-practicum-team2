@@ -1,7 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 
 import { useAuthContext } from "../context/AuthContext";
-import { changeProfilePassword, deleteProfile, getProfile, updateProfile } from "../services/api";
+import {
+  changeProfilePassword,
+  deleteProfile,
+  getProfile,
+  setProfileAvatarUrl,
+  updateProfile,
+} from "../services/api";
 
 import Button from "../shared/Button/Button.component";
 import Input from "../shared/Input/Input.component";
@@ -27,6 +33,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
 
   const [name, setName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [goals, setGoals] = useState("");
   const [notifications, setNotifications] = useState(true);
 
@@ -55,6 +62,7 @@ export default function ProfilePage() {
     if (!user) return;
     setProfile(user);
     setName(user.name ?? "");
+    setAvatarUrl(user.avatar_url ?? "");
     setGoals(user.goals ?? "");
     setNotifications(user.notifications ?? true);
   }, []);
@@ -122,6 +130,20 @@ export default function ProfilePage() {
       await reloadProfile();
       setCurrentPassword("");
       setNewPassword("");
+      showToast(result.message, "success");
+    } catch (error) {
+      showToast(errorMessage(error));
+    } finally {
+      setPending("");
+    }
+  };
+
+  const saveAvatar = async (event) => {
+    event.preventDefault();
+    setPending("avatar");
+    try {
+      const result = await setProfileAvatarUrl({ avatarUrl, csrfToken });
+      await reloadProfile();
       showToast(result.message, "success");
     } catch (error) {
       showToast(errorMessage(error));
@@ -206,6 +228,25 @@ export default function ProfilePage() {
           </div>
           <Button type="submit" loading={pending === "identity"}>
             Save display name
+          </Button>
+        </form>
+      </Card>
+
+      <Card className="space-y-4">
+        <h2 className="font-heading text-h4 font-bold text-heading">Avatar</h2>
+        <form onSubmit={saveAvatar} className="max-w-md space-y-4">
+          <Input
+            id="profile-avatar-url"
+            type="url"
+            label="Avatar image URL"
+            value={avatarUrl}
+            disabled={pending === "avatar"}
+            onChange={(event) => setAvatarUrl(event.target.value)}
+            placeholder="https://example.com/avatar.png"
+          />
+          <p className="text-small text-neutral-600">Leave blank to use your initials.</p>
+          <Button type="submit" loading={pending === "avatar"}>
+            Save avatar
           </Button>
         </form>
       </Card>
