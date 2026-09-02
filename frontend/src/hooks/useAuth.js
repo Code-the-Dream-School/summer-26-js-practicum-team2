@@ -115,6 +115,16 @@ export function useAuth() {
     });
   }, []);
 
+  const refreshSession = useCallback(
+    (payload) => {
+      if (!payload?.user || !payload.csrfToken) return;
+      const isRemembered =
+        !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+      commitAuth(payload, isRemembered);
+    },
+    [commitAuth],
+  );
+
   const clearError = useCallback(() => {
     dispatch({ type: actions.clearError });
   }, []);
@@ -181,6 +191,7 @@ export function useAuth() {
       register,
       login,
       logout,
+      refreshSession,
       verifyEmail,
       requestPasswordReset,
       confirmPasswordReset,
@@ -192,6 +203,7 @@ export function useAuth() {
       register,
       login,
       logout,
+      refreshSession,
       verifyEmail,
       requestPasswordReset,
       confirmPasswordReset,
