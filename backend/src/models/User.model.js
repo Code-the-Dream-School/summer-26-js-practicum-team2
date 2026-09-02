@@ -100,6 +100,10 @@ const userSchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+      active_learning_days: {
+        type: Number,
+        default: 0,
+      },
       last_active_date: {
         type: Date,
         default: null,

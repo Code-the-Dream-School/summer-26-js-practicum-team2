@@ -42,6 +42,7 @@ const getProfile = async (req, res, next) => {
         xp: xpTotal,
         current_streak: user.streak?.current ?? 0,
         longest_streak: user.streak?.longest ?? 0,
+        active_learning_days: user.streak?.active_learning_days ?? 0,
         timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),

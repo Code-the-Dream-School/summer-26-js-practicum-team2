@@ -80,31 +80,35 @@ function getNextAction(progressByModule, units) {
   };
 }
 
-function getHero(userName, units, nextAction) {
+function getHero(user, units, nextAction) {
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const isNewUser = completedLessons === 0;
   const isAllCaughtUp = totalLessons > 0 && completedLessons >= totalLessons;
   let state = "in_progress";
-  let greeting = `Welcome back, ${userName}`;
+  let greeting = `Welcome back, ${user.name || "Learner"}`;
   let statusText = "Nice pace. Your next lesson is ready when you are.";
 
   if (isNewUser) {
     state = "new_user";
-    greeting = `Welcome, ${userName}`;
+    greeting = `Welcome, ${user.name}`;
     statusText = "Start with one short lesson and get your first win today.";
   } else if (isAllCaughtUp) {
     state = "all_caught_up";
-    greeting = `You're caught up, ${userName}`;
+    greeting = `You're caught up, ${user.name}`;
     statusText = "Great work finishing every lesson. A quick review can keep the habit warm.";
   }
 
   return {
     state,
-    displayName: userName,
+    displayName: user.name || "Learner",
     greeting,
     statusText,
-    streak: { currentDays: 0, helperText: "Streak tracking is coming soon." },
+    streak: {
+      currentDays: user.streak?.current ?? 0,
+      longestDays: user.streak?.longest ?? 0,
+      activeLearningDays: user.streak?.active_learning_days ?? 0,
+    },
     dailyGoal: {
       type: "lessons",
       current: 0,
@@ -191,7 +195,7 @@ exports.getDashboard = async (req, res, next) => {
         .json(cached.payload);
     }
 
-    const user = await User.findById(userId).select("name");
+    const user = await User.findById(userId).select("name streak timezone");
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
@@ -206,7 +210,7 @@ exports.getDashboard = async (req, res, next) => {
     const units = moduleIds.map((moduleId) => buildUnit(moduleId, progressByModule.get(moduleId)));
     const nextAction = getNextAction(progressByModule, units);
     const payload = {
-      hero: getHero(user.name || "Learner", units, nextAction),
+      hero: getHero(user, units, nextAction),
       nextAction,
       xp: {
         total: xpTotal,

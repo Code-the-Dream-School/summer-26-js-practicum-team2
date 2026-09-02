@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import Badge from "../../../shared/Badge/Badge.component";
+//import Badge from "../../../shared/Badge/Badge.component";
 import Button from "../../../shared/Button/Button.component";
-import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
+//import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
 
 const fallbackHero = {
   state: "new_user",
@@ -10,14 +10,16 @@ const fallbackHero = {
   statusText: "Start with one short lesson and get your first win today.",
   streak: {
     currentDays: 0,
+    longestDays: 0,
+    activeLearningDays: 0,
     helperText: "Start your streak with a lesson.",
   },
-  dailyGoal: {
-    current: 0,
-    target: 2,
-    label: "0 / 2 lessons",
-    isMet: false,
-  },
+  // dailyGoal: {
+  //   current: 0,
+  //   target: 2,
+  //   label: "0 / 2 lessons",
+  //   isMet: false,
+  // },
   primaryAction: {
     label: "Start Budgeting Basics",
     href: "/learn/cashFlow/1.1",
@@ -37,13 +39,20 @@ export default function DashboardHero({ hero }) {
   const streakDays = Number.isFinite(resolvedHero?.streak?.currentDays)
     ? resolvedHero.streak.currentDays
     : 0;
-  const goalCurrent = Number.isFinite(resolvedHero?.dailyGoal?.current)
-    ? resolvedHero.dailyGoal.current
+
+  const longestStreak = Number.isFinite(resolvedHero?.streak?.longestDays)
+    ? resolvedHero.streak.longestDays
     : 0;
-  const goalTarget = Number.isFinite(resolvedHero?.dailyGoal?.target)
-    ? resolvedHero.dailyGoal.target
-    : 1;
-  const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? "Goal met" : "In progress";
+  const activeLearningDays = Number.isFinite(resolvedHero?.streak?.activeLearningDays)
+    ? resolvedHero.streak.activeLearningDays
+    : 0;
+  // const goalCurrent = Number.isFinite(resolvedHero?.dailyGoal?.current)
+  //   ? resolvedHero.dailyGoal.current
+  //   : 0;
+  // const goalTarget = Number.isFinite(resolvedHero?.dailyGoal?.target)
+  //   ? resolvedHero.dailyGoal.target
+  //   : 1;
+  // const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? "Goal met" : "In progress";
   const ctaLabel = resolvedHero?.primaryAction?.label || "Continue learning";
   const ctaHref = resolvedHero?.primaryAction?.href || "/learn";
 
@@ -67,6 +76,28 @@ export default function DashboardHero({ hero }) {
           </article>
 
           <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">
+              Longest Streak
+            </p>
+            <p className="mt-1 text-lg font-bold text-heading">
+              {formatStreakLabel(longestStreak)}
+            </p>
+            <p className="mt-1 text-small text-neutral-600">How far can you go?</p>
+          </article>
+
+          <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">
+              Learning Days
+            </p>
+            <p className="mt-1 text-lg font-bold text-heading">
+              {formatStreakLabel(activeLearningDays)}
+            </p>
+            <p className="mt-1 text-small text-neutral-600">
+              Total days you've completed a new micro lesson.
+            </p>
+          </article>
+
+          {/* <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">
                 Today's goal
@@ -76,8 +107,8 @@ export default function DashboardHero({ hero }) {
                 variant={resolvedHero?.dailyGoal?.isMet ? "success" : "default"}
                 label={goalBadgeText}
                 className="px-2 py-1 text-xs"
-              />
-            </div>
+              /> */}
+          {/* </div>
             <p className="mt-1 font-semibold text-heading">{resolvedHero?.dailyGoal?.label}</p>
             <ProgressBar
               value={goalCurrent}
@@ -86,7 +117,7 @@ export default function DashboardHero({ hero }) {
               label="Daily goal progress"
               className="mt-3"
             />
-          </article>
+          </article> */}
         </div>
       </div>
 

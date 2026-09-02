@@ -7,6 +7,9 @@ const XpEvent = require("../src/models/XpEvent.model");
 jest.mock("../src/models/QuizAttempt.model");
 jest.mock("../src/models/UserProgress.model");
 jest.mock("../src/models/XpEvent.model");
+jest.mock("../src/services/streak.service", () => ({
+  updateUserStreak: jest.fn().mockResolvedValue(),
+}));
 
 describe("quiz XP awards", () => {
   let req;
@@ -55,6 +58,10 @@ describe("quiz XP awards", () => {
       .mockResolvedValueOnce(attempt) //current attempt
       .mockResolvedValueOnce(null) //previousPass
       .mockResolvedValueOnce(null); //previousPerfect
+
+    UserProgress.findOne.mockResolvedValue({
+      completed_micro_lessons: [],
+    });
 
     UserProgress.findOneAndUpdate.mockResolvedValue({
       completed_micro_lessons: ["1.2.1", "1.2.2", "1.2.3", "1.2.4"],

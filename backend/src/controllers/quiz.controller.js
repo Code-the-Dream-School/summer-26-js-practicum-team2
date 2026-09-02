@@ -6,6 +6,7 @@ const quizEvents = new EventEmitter();
 //Event listeners for Quiz Cycle
 
 const { calculateXpDelta } = require("../utils/coreRules");
+const { updateUserStreak } = require("../services/streak.service");
 
 quizEvents.on("quiz_submit", ({ userId, microLessonId, score, attemptNumber }) => {
   console.log(
@@ -307,6 +308,15 @@ exports.submitQuiz = async (req, res, next) => {
         `[Event: quiz_pass] User ${userId} passed quiz ${microLessonId}`,
       );*/
 
+      //Checking if this microlesson has been completed yet
+      const existingProgress = await UserProgress.findOne({
+        user_id: userId,
+        module_id: moduleId,
+      });
+
+      const alreadyCompletedMicro =
+        existingProgress?.completed_micro_lessons?.includes(microLessonId) || false;
+
       const update = {
         $addToSet: {
           completed_micro_lessons: microLessonId,
@@ -357,6 +367,12 @@ exports.submitQuiz = async (req, res, next) => {
         update,
         { upsert: true, new: true },
       );
+
+      //Updating active learning day and streak when microlesson is completed
+      if (!alreadyCompletedMicro) {
+        await updateUserStreak(userId);
+      }
+
       const allMicroLessonsIds = getMicroLessonIdsForLesson(moduleId, lessonId);
       const userCompletedMicros = new Set(updatedProgress.completed_micro_lessons || []);
       const isLessonFullyCompleted =

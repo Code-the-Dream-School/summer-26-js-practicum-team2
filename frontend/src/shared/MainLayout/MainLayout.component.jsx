@@ -4,6 +4,7 @@ import { useAuthContext } from "../../context/AuthContext";
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
+import profile from "../../pages/ProfilePage";
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
@@ -23,6 +24,7 @@ export default function MainLayout() {
       <Header
         signedIn={isAuthenticated}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
+        xp={profile?.xp ?? 0}
         onLogout={handleLogout}
         isSigningOut={isSigningOut}
       />
