@@ -1,8 +1,8 @@
-//const { User, ArchivedUser } = require("../models/User.model");
-const { User } = require("../models/User.model");
+const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
+const { issueSession } = require("../utils/session");
 const {
   updateProfileSchema,
   changePasswordSchema,
@@ -14,7 +14,6 @@ const getFirstInitial = (name, email) => {
   const source = name?.trim() || email?.trim() || "?";
   return source.charAt(0).toUpperCase();
 };
-// Connect to profileRoutes.js
 //GET /api/v1/profile
 const getProfile = async (req, res, next) => {
   try {
@@ -139,67 +138,11 @@ const updateProfile = async (req, res, next) => {
     return next(error);
   }
 };
-/* const user = await User.findById(req.user.id);
-  if (!user || user.is_deleted) {
-    return res.status(StatusCodes.NOT_FOUND).json({message: " User not found. "});
-  } 
-  if (name !== undefined) user.name = name;
-  if (goals != undefined) user.goals = goals;
-  if (theme !== undefined) user.theme = theme;
-  if (notifications !== undefined) user.notifications = notifications;
-
-
-  await user.save();
-  return res.status(StatusCodes.OK).json({
-    message: "Profile updated with succeess.",
-   
-  });
-} catch (error) {
-  return next (error);
-}
-  try { 
-    const { name, email, goals, theme, notifications } = req.body;
-    const updates = {};
-    if (name !== undefined) updates.name = name;
-    if (email !== undefined) {
-      updates.email = email;
-      updates.email_verified_at = null;
-    }
-    if (Object.keys(updates).length === 0) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "No Valid fields provided for update." });
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        $set: updates,
-      },
-      { new: true, runValidators: true },
-    ).select("-password_hash");
-    if (!updatedUser || updatedUser.is_deleted) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
-    }
-    return res.status(StatusCodes.OK).json({
-      name: updatedUser.name,
-      email: updatedUser.email,
-      avatar_url: updatedUser.avatar_url || null,
-      avatar_initial: getFirstInitial(updatedUser.name, updatedUser.email),
-    });
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(StatusCodes.CONFLICT).json({ message: "Email is unavailable." });
-    }
-    return next(error);
-  }
-}; REMOVED Aug 13*/
 
 //POST /api/v1/profile/password (uS 2.4.7)
 const changePassword = async (req, res, next) => {
   try {
     //Validate password input using changePasswordSchema
-
     const { error, value } = changePasswordSchema.validate(req.body, {
       abortEarly: false,
     });
@@ -209,12 +152,7 @@ const changePassword = async (req, res, next) => {
         errors: error.details.map((detail) => detail.message),
       });
     }
-    //const { currentPassword, newPassword } = req.body;
-    //if (!currentPassword || !newPassword) {
-    //return res
-    // .status(StatusCodes.BAD_REQUEST)
-    // .json({ message: "Both the current and new passwords are needed." });
-    //}
+
     const { currentPassword, newPassword } = value;
     const user = await User.findById(req.user.id).select("+password_hash");
     if (!user || user.is_deleted) {
@@ -231,8 +169,18 @@ const changePassword = async (req, res, next) => {
     user.password_hash = await hashPassword(newPassword);
     user.token_version = (user.token_version || 0) + 1; //invalidates active jwt on other devices
     await user.save();
+
+    const csrfToken = issueSession(res, user);
+
     return res.status(StatusCodes.OK).json({
       message: "Password changed successfully.",
+      csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     return next(error);
@@ -251,6 +199,11 @@ const deleteAccount = async (req, res, next) => {
     const user = await User.findById(req.user.id);
     if (!user || user.is_deleted || user.is_archived) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    }
+    if (user.deletion_status === "pending") {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "An account deletion request is already pending.",
+      });
     }
     // user must type email to confirm the user wanting to delete their account
     if (user.email.toLowerCase() !== value.email.toLowerCase()) {
@@ -279,25 +232,3 @@ module.exports = {
   deleteAccount,
   uploadAvatar,
 };
-/*  
-    ==========removed creating a separate collection of archived user to a model in database 
-   await ArchivedUser.create({
-      original_user_id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      deleted_at: new Date(),
-   }); 
-
-   //clear session cookie THIS IS REMOVED SINCE WE ARE NOT LETTING USER TO INSTANTLY REMOVE ACCOUNT
-    res.clearCookie("session_token", {
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
-    return res.status(StatusCodes.OK).json({ message: "Account has been deleted successfully." });
-  } catch (error) {
-    return next(error);
-  }
-}; */

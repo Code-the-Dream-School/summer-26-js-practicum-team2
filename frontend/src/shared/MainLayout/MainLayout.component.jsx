@@ -30,7 +30,6 @@ export default function MainLayout() {
       </a>
       <Header
         signedIn={isAuthenticated}
-        //add line 28 for admin updates for frontend
         isAdmin={isAdmin}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
         onLogout={handleLogout}

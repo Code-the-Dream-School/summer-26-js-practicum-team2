@@ -1,6 +1,6 @@
 {
   "name": "sprout",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "private": true,
   "description": "Sprout is a full-stack financial literacy platform featuring guided learning paths, interactive quizzes, and progress tracking, built with React, Node.js, and Express.",
   "keywords": [

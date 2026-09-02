@@ -6,7 +6,7 @@ const primaryNavLinks = [{ label: "Home", href: "/" }];
 
 export default function NavBar({
   signedIn = false,
-  isAdmin = false, 
+  isAdmin = false,
   avatarLabel = "A",
   xp = 0,
   streak = 0,
@@ -15,15 +15,20 @@ export default function NavBar({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [currentAvatarLabel, setCurrentAvatarLabel] = useState(avatarLabel);
+  const [profileAvatarLabel, setProfileAvatarLabel] = useState(null);
+  const currentAvatarLabel =
+    profileAvatarLabel?.baseAvatarLabel === avatarLabel ? profileAvatarLabel.label : avatarLabel;
 
-  useEffect(()=>{
+  useEffect(() => {
     const handleProfileUpdate = (event) => {
       const user = event.detail?.user;
       const name = user?.name || event.detail?.avatarLabel;
 
-      if (name && typeof name === "string"){
-        setCurrentAvatarLabel(name.trim().charAt(0).toUpperCase());
+      if (name && typeof name === "string") {
+        setProfileAvatarLabel({
+          baseAvatarLabel: avatarLabel,
+          label: name.trim().charAt(0).toUpperCase(),
+        });
       }
     };
 
@@ -34,28 +39,26 @@ export default function NavBar({
       window.removeEventListener("sprout:profile-updated", handleProfileUpdate);
       window.removeEventListener("sprout:progress-updated", handleProfileUpdate);
     };
-  },[]);
+  }, [avatarLabel]);
 
   const authNavLinks = signedIn
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Learn", href: "/learn" },
-        ...(isAdmin ? [{label: "Admin Dashboard", href: "/admin/dashboard"}] : []),
+        ...(isAdmin ? [{ label: "Admin", href: "/admin/dashboard" }] : []),
       ]
     : [];
 
   const combinedNavLinks = [...primaryNavLinks, ...authNavLinks];
 
-  const mobileNavLinks =
-    signedIn
+  const mobileNavLinks = signedIn
     ? [...combinedNavLinks, { label: "Profile", href: "/profile" }]
     : [
         ...combinedNavLinks,
         { label: "Login", href: "/login" },
         { label: "Signup", href: "/register" },
       ];
-       //add logic to listen to profile change event 
-       //wrap in use effect to update avatar label
+
   return (
     <nav aria-label="Primary navigation">
       <menu className="hidden items-center gap-1 md:flex">
@@ -74,7 +77,7 @@ export default function NavBar({
               <NavLink
                 to={link.href}
                 className="rounded-lg px-3 py-2 text-sm font-semibold text-heading transition-colors hover:bg-surface-inset"
-              > 
+              >
                 {link.label}
               </NavLink>
             )}
@@ -141,8 +144,8 @@ export default function NavBar({
       </Button>
 
       {isOpen ? (
-         <div className="border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden">
-        {/* // <div className="max-h-[calc(100vh-5rem)] overflow-y-auto border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden shadow-lg"> */}
+        <div className="border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden">
+          {/* // <div className="max-h-[calc(100vh-5rem)] overflow-y-auto border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden shadow-lg"> */}
           <ul className="space-y-2">
             {mobileNavLinks.map((link) => (
               <li key={link.label}>

@@ -102,4 +102,41 @@ describe("quiz submission grading (backend)", () => {
     expect(scoresByMicroLesson["1.1.2"]).toBe(67);
     expect(scoresByMicroLesson["1.1.4"]).toBe(100);
   });
+  async function createCookieSession() {
+    const user = await User.create({
+      name: "Cookie Learner",
+      email: "cookie-quiz@example.com",
+      password_hash: "not-a-real-hash",
+      tos_agreement: true,
+    });
+    const csrfToken = "current-csrf-token";
+    const token = jwt.sign(
+      { id: user._id.toString(), role: user.role, csrfToken, token_version: user.token_version },
+      process.env.JWT_SECRET,
+    );
+
+    return { csrfToken, sessionCookie: `session_token=${token}` };
+  }
+
+  it("returns the current CSRF token for a stale cookie-authenticated quiz start", async () => {
+    const { csrfToken, sessionCookie } = await createCookieSession();
+
+    const rejected = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Cookie", sessionCookie)
+      .set("X-CSRF-TOKEN", "stale-csrf-token")
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+
+    expect(rejected.status).toBe(403);
+    expect(rejected.body).toEqual({ message: "Invalid CSRF token." });
+    expect(rejected.headers["x-csrf-token"]).toBe(csrfToken);
+
+    const retried = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Cookie", sessionCookie)
+      .set("X-CSRF-TOKEN", rejected.headers["x-csrf-token"])
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+
+    expect(retried.status).toBe(201);
+  });
 });

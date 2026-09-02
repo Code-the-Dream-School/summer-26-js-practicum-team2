@@ -4,7 +4,6 @@ import DashboardHero from "../features/dashboard/DashboardHero/DashboardHero.com
 import RecentActivityCard from "../features/dashboard/RecentActivityCard/RecentActivityCard.component";
 import UnitProgressRow from "../features/dashboard/UnitProgressRow/UnitProgressRow.component";
 import Button from "../shared/Button/Button.component";
-import Card from "../shared/Card/Card.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import { ROUTES } from "../app/router/routes";
@@ -51,29 +50,30 @@ export default function DashboardPage() {
     );
   }
 
-  const { hero, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  const { hero, progress, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  if (units.length === 0) {
+    return (
+      <section className="space-y-6">
+        <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
+        <EmptyState
+          icon="🌱"
+          title="Content coming soon"
+          message="New lessons are being prepared. Check back soon for something new to explore."
+          action={
+            <Button as={Link} to={ROUTES.LEARN} variant="primary" className="px-5 py-2.5">
+              View learning path
+            </Button>
+          }
+        />
+      </section>
+    );
+  }
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;
 
   return (
     <section className="space-y-6">
-      <DashboardHero hero={hero} />
-
-      <Card className="space-y-3">
-        <p className="text-small font-semibold uppercase tracking-wide text-primary">
-          Recommended next
-        </p>
-        <h2 className="font-heading text-h4 font-bold text-heading">{nextAction?.title}</h2>
-        <p className="text-neutral-600">{nextAction?.description}</p>
-        <Button
-          as={Link}
-          to={nextAction?.href || "/lessons"}
-          variant="primary"
-          className="px-5 py-2.5"
-        >
-          {nextAction?.ctaLabel || "Continue learning"}
-        </Button>
-      </Card>
+      <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
 
       {hasNoProgress ? (
         <EmptyState

@@ -45,6 +45,22 @@ const userSchema = new mongoose.Schema(
       enum: ["learner", "admin"],
       default: "learner",
     },
+    is_disabled: {
+      type: Boolean,
+      default: false,
+    },
+    disabled_at: {
+      type: Date,
+      default: null,
+    },
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
+    deletion_scheduled_at: {
+      type: Date,
+      default: null,
+    },
     tos_agreement: {
       type: Boolean,
       required: true,
@@ -85,10 +101,6 @@ const userSchema = new mongoose.Schema(
     is_deleted: {
       type: Boolean,
       default: false,
-    },
-    deleted_at: {
-      type: Date,
-      default: null, // Tracks when deletion occurs
     },
     //archival status
     is_archived: { type: Boolean, default: false },

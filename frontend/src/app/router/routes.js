@@ -11,7 +11,7 @@ export const ROUTES = {
   LEARN_LESSON: "/learn/:moduleId/:lessonId",
   PRIVACY: "/privacy",
   TERMS: "/terms",
-  ADMIN_DASHBOARD: "/admin/dashboard"
+  ADMIN_DASHBOARD: "/admin/dashboard",
 };
 
 // Link target, not a <Route path> — the query string opts into the unauthenticated preview.
