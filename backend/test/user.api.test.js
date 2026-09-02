@@ -3,6 +3,8 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const QuizAttempt = require("../src/models/QuizAttempt.model");
+const { hashPassword } = require("../src/utils/password");
 const { withSessionCsrf } = require("./helpers/requestTestHelpers");
 
 useTestDb();
@@ -50,12 +52,57 @@ describe("user API integration", () => {
 
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.csrfToken).toBeTruthy();
-    expect(loginRes.body.user.email).toBe(payload.email);
+    expect(loginRes.body.user).toMatchObject({
+      email: payload.email,
+      xp: 0,
+      streak: 0,
+      avatar_url: null,
+    });
 
     // Logging in should also create the session cookie used for authenticated requests.
     expect(loginRes.headers["set-cookie"]).toEqual(
       expect.arrayContaining([expect.stringContaining("session_token=")]),
     );
+  });
+
+  it("returns the shared streak and persisted display data when logging in", async () => {
+    const password = "Password1!";
+    const user = await User.create({
+      name: "Returning Learner",
+      email: "returning-learner@example.com",
+      password_hash: await hashPassword(password),
+      role: "learner",
+      tos_agreement: true,
+      email_verified_at: new Date(),
+      xp: 125,
+      streak: 99,
+      avatar_url: "https://example.com/returning-learner.png",
+    });
+    const now = new Date();
+    await QuizAttempt.create({
+      user_id: user._id,
+      module_id: "cashFlow",
+      lesson_id: "1.1",
+      micro_lesson_id: "1.1.2",
+      attempt_number: 1,
+      started_at: now,
+      submitted_at: now,
+      score: 100,
+      passed: true,
+    });
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password,
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.user).toMatchObject({
+      id: user._id.toString(),
+      xp: 125,
+      streak: 1,
+      avatar_url: "https://example.com/returning-learner.png",
+    });
   });
 
   it("rejects duplicate registration and invalid payloads", async () => {

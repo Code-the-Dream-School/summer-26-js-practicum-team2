@@ -86,27 +86,30 @@ describe("apiRequest", () => {
     window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
   });
 
-  it("does not treat ordinary 403 responses as expired authentication", async () => {
-    const onAuthExpired = vi.fn();
-    window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
+  it.each(["Invalid CSRF token.", "Admin access required."])(
+    "does not treat ordinary 403 %s responses as expired authentication",
+    async (message) => {
+      const onAuthExpired = vi.fn();
+      window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 403,
+          headers: { get: () => "application/json" },
+          json: vi.fn().mockResolvedValue({ message }),
+        }),
+      );
+
+      await expect(getProfile()).rejects.toMatchObject({
         status: 403,
-        headers: { get: () => "application/json" },
-        json: vi.fn().mockResolvedValue({ message: "Invalid CSRF token." }),
-      }),
-    );
+        authInvalidating: false,
+      });
 
-    await expect(getProfile()).rejects.toMatchObject({
-      status: 403,
-      authInvalidating: false,
-    });
-
-    expect(onAuthExpired).not.toHaveBeenCalled();
-    window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
-  });
+      expect(onAuthExpired).not.toHaveBeenCalled();
+      window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    },
+  );
 
   it("does not treat an ordinary 401 credential error as an expired session", async () => {
     const onAuthExpired = vi.fn();

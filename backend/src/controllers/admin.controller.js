@@ -7,6 +7,7 @@ const LessonModule = require("../models/LessonModule.model");
 const { clearModuleCache } = require("../utils/content");
 const { hashPassword } = require("../utils/password");
 const {
+  getScheduledDeletionFields,
   scheduleAccountDeletion,
   isWithinReactivationGracePeriod,
   reactivateAccount,
@@ -171,8 +172,35 @@ const approveDeleteAccount = async (req, res, next) => {
         message: "Deletion request is not pending.",
       });
     }
-    scheduleAccountDeletion(user, { approvedBy: req.user.id });
-    await user.save();
+    if (user._id.equals(req.user.id)) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "You cannot manage your own account." });
+    }
+    if (user.role === "admin") {
+      const otherActiveAdmins = await countOtherActiveAdmins(user._id);
+      if (otherActiveAdmins < 1) {
+        return res
+          .status(StatusCodes.CONFLICT)
+          .json({ message: "The last active admin cannot be deleted." });
+      }
+    }
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id, deletion_status: "pending", is_deleted: false },
+      {
+        $set: getScheduledDeletionFields({
+          approvedBy: req.user.id,
+          deletionRequestedAt: user.deletion_requested_at,
+        }),
+        $inc: { token_version: 1 },
+      },
+      { returnDocument: "after" },
+    );
+    if (!updatedUser) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "Deletion request is not pending.",
+      });
+    }
     return res.status(StatusCodes.OK).json({
       message: "Account has been approved for deletion.",
     });
@@ -193,7 +221,7 @@ const rejectDeleteAccount = async (req, res, next) => {
           deletion_requested_at: null,
         },
       },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!updatedUser) {
       return res.status(StatusCodes.CONFLICT).json({

@@ -41,6 +41,13 @@ authenticated learners receive immediate feedback. After the caller submits a ch
 response includes `isCorrect`, `correctChoiceIds`, and `explanation`. Lesson-content APIs
 continue to omit correct answers and explanations from their initial payloads.
 
+## Authentication State
+
+Protected-route session failures use HTTP `401` with one of these stable codes:
+`SESSION_INVALIDATED`, `ACCOUNT_DISABLED`, or `ACCOUNT_DELETED`. Clients clear local
+authentication only for those codes. Ordinary `403` CSRF and authorization responses do not
+invalidate a session.
+
 ## Profile Avatars
 
 `POST /api/v1/profile/avatar` supports a JSON `avatar_url` only. The URL must use HTTP or HTTPS;

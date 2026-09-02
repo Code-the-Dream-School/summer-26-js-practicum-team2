@@ -271,6 +271,57 @@ describe("account deletion workflow", () => {
     expect(staleSessionResponse.body.code).toBe("SESSION_INVALIDATED");
   });
 
+  it("does not let an administrator approve their own deletion request", async () => {
+    const admin = await createUser({ email: "self-approval-admin@example.com", role: "admin" });
+    await User.updateOne(
+      { _id: admin._id },
+      { $set: { deletion_status: "pending", deletion_requested_at: new Date() } },
+    );
+
+    const response = await request(app)
+      .patch(`/api/v1/admin/deletions/approve/${admin._id}`)
+      .set("Authorization", authHeader(admin));
+
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({ message: "You cannot manage your own account." });
+    expect(await User.findById(admin._id)).toMatchObject({
+      is_deleted: false,
+      deletion_status: "pending",
+      token_version: 0,
+    });
+  });
+
+  it("allows only one concurrent approval of a pending deletion request", async () => {
+    const firstAdmin = await createUser({
+      email: "first-approval-admin@example.com",
+      role: "admin",
+    });
+    const secondAdmin = await createUser({
+      email: "second-approval-admin@example.com",
+      role: "admin",
+    });
+    const learner = await createUser({
+      email: "concurrent-approval-learner@example.com",
+      deletion_status: "pending",
+      deletion_requested_at: new Date(),
+    });
+
+    const responses = await Promise.all([
+      request(app)
+        .patch(`/api/v1/admin/deletions/approve/${learner._id}`)
+        .set("Authorization", authHeader(firstAdmin)),
+      request(app)
+        .patch(`/api/v1/admin/deletions/approve/${learner._id}`)
+        .set("Authorization", authHeader(secondAdmin)),
+    ]);
+
+    expect(responses.map((response) => response.status).sort()).toEqual([200, 409]);
+    expect(await User.findOne({ _id: learner._id, is_deleted: true })).toMatchObject({
+      deletion_status: "approved",
+      token_version: 1,
+    });
+  });
+
   it("identifies a current session for a deleted account with a stable error code", async () => {
     const deletedUser = await createUser({
       email: "account-deleted@example.com",

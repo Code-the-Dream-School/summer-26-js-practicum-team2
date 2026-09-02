@@ -7,6 +7,7 @@ const AdminBootstrap = require("../models/AdminBootstrap.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { clearSessionCookie, issueSession } = require("../utils/session");
 const { isWithinReactivationGracePeriod, reactivateAccount } = require("../utils/accountDeletion");
+const { getLearningMotivation } = require("../utils/learningStats");
 const {
   registerSchema,
   loginSchema,
@@ -199,6 +200,7 @@ const login = async (req, res, next) => {
         .status(StatusCodes.FORBIDDEN)
         .json({ message: "Please verify your email before logging in." });
     }
+    const motivation = await getLearningMotivation(user._id);
     const csrfToken = issueSession(res, user, { remember });
     req.app.emit?.("login_success", {
       userId: user._id,
@@ -214,6 +216,9 @@ const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        xp: user.xp ?? 0,
+        streak: motivation.streak.currentDays,
+        avatar_url: user.avatar_url || null,
       },
     });
   } catch (err) {
