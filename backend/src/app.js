@@ -49,6 +49,7 @@ const corsOptions = {
     return callback(new Error("Origin is not allowed by CORS"));
   },
   credentials: true,
+  exposedHeaders: ["X-CSRF-TOKEN"],
 };
 
 // Configure Morgan based on environment

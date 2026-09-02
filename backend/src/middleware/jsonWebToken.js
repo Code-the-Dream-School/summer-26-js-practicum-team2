@@ -57,6 +57,7 @@ const authenticateUser = async (req, res, next) => {
     if (usedCookieAuth && !SAFE_METHODS.has(req.method)) {
       const csrfHeader = req.get("x-csrf-token");
       if (!csrfHeader || csrfHeader !== decoded.csrfToken) {
+        res.set("X-CSRF-TOKEN", decoded.csrfToken);
         return res.status(StatusCodes.FORBIDDEN).json({ message: "Invalid CSRF token." });
       }
     }

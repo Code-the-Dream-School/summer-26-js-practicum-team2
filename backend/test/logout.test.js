@@ -43,8 +43,8 @@ describe("cookie-authenticated logout", () => {
     expect(response.body).toEqual({ message: "Logout successful." });
   });
 
-  test("rejects a cookie session with a mismatched CSRF token", async () => {
-    const { sessionCookie } = await createCookieSession();
+  test("returns the current token for a cookie session with a mismatched CSRF token", async () => {
+    const { csrfToken, sessionCookie } = await createCookieSession();
 
     const response = await request(app)
       .post("/api/v1/users/logout")
@@ -53,5 +53,6 @@ describe("cookie-authenticated logout", () => {
 
     expect(response.status).toBe(403);
     expect(response.body).toEqual({ message: "Invalid CSRF token." });
+    expect(response.headers["x-csrf-token"]).toBe(csrfToken);
   });
 });
