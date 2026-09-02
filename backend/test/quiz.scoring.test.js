@@ -1,33 +1,39 @@
-const jwt = require("jsonwebtoken");
 const request = require("supertest");
 const { useTestDb } = require("./setup");
 
 // setup.js sets JWT_SECRET before these modules are required, so the middleware/tokens match.
 const app = require("../src/app");
-const User = require("../src/models/User.model");
+const UserProgress = require("../src/models/UserProgress.model");
+const { createAuthedUser } = require("./helpers/authTestHelpers");
 
 useTestDb();
 
-async function createAuthedUser() {
-  const user = await User.create({
-    name: "Test Learner",
-    email: "quiz-scoring@example.com",
-    password_hash: "not-a-real-hash",
-    tos_agreement: true,
+describe("quiz submission grading (backend)", () => {
+  it("returns the current user progress record for quiz tracking", async () => {
+    const { authHeader } = await createAuthedUser("Progress Reader", "quiz-progress@example.com");
+
+    // Request the progress record for the authenticated user.
+    const progressRes = await request(app)
+      .get("/api/v1/quizzes/progress")
+      .set("Authorization", authHeader);
+
+    expect(progressRes.status).toBe(200);
+    expect(progressRes.body).toMatchObject({
+      user_id: expect.any(String),
+      module_id: "cashFlow",
+    });
+
+    // Make sure the progress returned by the API was also saved to the database.
+    const savedProgress = await UserProgress.findOne({
+      user_id: progressRes.body.user_id,
+      module_id: "cashFlow",
+    });
+
+    expect(savedProgress).not.toBeNull();
   });
 
-  // Bearer auth (no session cookie) skips the CSRF header check in jwtMiddleware.
-  const token = jwt.sign(
-    { id: user._id.toString(), role: user.role, csrfToken: "test-csrf" },
-    process.env.JWT_SECRET,
-  );
-
-  return `Bearer ${token}`;
-}
-
-describe("quiz submission grading (backend)", () => {
   it("grades each micro-lesson quiz independently, with no lesson-wide aggregate", async () => {
-    const authHeader = await createAuthedUser();
+    const { authHeader } = await createAuthedUser();
 
     // Micro-lesson 1.1.2 has 3 knowledge checks; miss one so the score falls below the 70% pass threshold.
     const startA = await request(app)

@@ -111,7 +111,7 @@ function LearningPathPage() {
 
   // Refs used for drawing the lines between each learning path node
   const pathContainerRef = useRef(null);
-  const nodeRefs = useRef([]);
+  const nodeElementsRef = useRef([]);
 
   // State for storing the center coordinates of each node and the size of the SVG container
   const [nodeCenters, setNodeCenters] = useState([]);
@@ -144,7 +144,7 @@ function LearningPathPage() {
       });
 
       // Calculate the center coordinates of each node based on their bounding rectangles and the position of the path container. This allows us to draw lines between the centers of the nodes.
-      const nextCenters = nodeRefs.current.map((nodeElement) => {
+      const nextCenters = nodeElementsRef.current.map((nodeElement) => {
         if (!nodeElement) {
           return null;
         }
@@ -358,7 +358,7 @@ function LearningPathPage() {
                 tooltipText={`${node.microLessonTitle} - ${tooltipText}`}
                 onSelect={openLesson}
                 ref={(element) => {
-                  nodeRefs.current[index] = element;
+                  nodeElementsRef.current[index] = element;
 
                   if (index === currentIndex) {
                     currentNodeRef.current = element;

@@ -90,7 +90,6 @@ exports.updateLessonProgress = async (req, res, next) => {
   try {
     const requestBody = req.body ?? {};
     if (
-      Object.hasOwn(requestBody, "currentChunkIndex") &&
       typeof requestBody.lessonId === "undefined" &&
       typeof requestBody.microLessonId === "undefined"
     ) {
