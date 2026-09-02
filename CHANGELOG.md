@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.4.1] - 2026-09-02
+
+### Added
+
+- Added Playwright coverage verifying that saving a display name updates the header avatar.
+
+### Changed
+
+- Redesigned mobile navigation as an anchored dropdown with account details for signed-in learners and a direct account-creation action for visitors.
+- Improved mobile navigation accessibility with explicit open and close labels, menu relationships, active-link styling, click-away dismissal, and Escape-key support.
+- Updated lesson question normalization to preserve correct choice identifiers from current and legacy lesson payloads.
+
+### Fixed
+
+- Fixed dashboards in fresh environments with no persisted modules so new learners receive the default Cash Flow start action and passed quizzes reconcile into saved progress.
+
+---
+
 ## [0.4.0] - 2026-09-02
 
 ### Added
