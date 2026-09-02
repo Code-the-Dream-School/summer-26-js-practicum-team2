@@ -86,7 +86,10 @@ const listUsers = async (req, res, next) => {
   try {
     const query = validateRequest(res, adminUserQuerySchema, req.query);
     if (!query) return;
-    const filters = {};
+    const filters = {
+      is_deleted: { $in: [true, false, null] },
+      is_archived: { $ne: true },
+    };
     if (query.role) filters.role = query.role;
     if (query.emailVerified !== undefined) {
       filters.email_verified_at = query.emailVerified ? { $ne: null } : null;
@@ -203,6 +206,7 @@ const approveDeleteAccount = async (req, res, next) => {
     }
     return res.status(StatusCodes.OK).json({
       message: "Account has been approved for deletion.",
+      user: safeUser(updatedUser),
     });
   } catch (error) {
     return next(error);
@@ -369,8 +373,14 @@ const setUserDisabled = async (req, res, next) => {
     const body = validateRequest(res, adminDisableSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
-    if (!target || target.deleted_at) {
+    if (!target) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    }
+    if (target.is_deleted || target.deleted_at) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message:
+          "A deletion-scheduled account must be restored before its ban status can be changed.",
+      });
     }
     if (target._id.equals(req.user.id)) {
       return res

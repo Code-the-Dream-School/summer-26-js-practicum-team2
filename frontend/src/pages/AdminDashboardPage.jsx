@@ -36,6 +36,7 @@ const lessonBlockTypes = [
   "table",
   "budget-summary",
 ];
+const getUserId = (user) => String(user?.id || user?._id || "");
 
 export default function AdminDashboardPage() {
   const { csrfToken, user: currentUser } = useAuthContext();
@@ -74,20 +75,63 @@ export default function AdminDashboardPage() {
 
   const selectedModule = modules.find((module) => module.id === selectedModuleId);
 
-  async function runAction(action, successMessage) {
+  const refreshUsers = useCallback(async () => {
+    const userPayload = await getAdminUsers();
+    setUsers(userPayload.users ?? []);
+  }, []);
+
+  const refreshModules = useCallback(async () => {
+    const modulePayload = await getAdminModules();
+    const nextModules = modulePayload.modules ?? [];
+    setModules(nextModules);
+    setSelectedModuleId((current) =>
+      nextModules.some((module) => module.id === current) ? current : (nextModules[0]?.id ?? ""),
+    );
+  }, []);
+
+  function updateUserInList(updatedUser) {
+    const updatedUserId = getUserId(updatedUser);
+    if (!updatedUserId) return;
+    setUsers((current) =>
+      current.map((user) =>
+        getUserId(user) === updatedUserId ? { ...user, ...updatedUser } : user,
+      ),
+    );
+    if (updatedUser.is_deleted) {
+      setPendingDeletions((current) => current.filter((user) => getUserId(user) !== updatedUserId));
+    }
+  }
+
+  function removeUserFromList(userId) {
+    const targetUserId = String(userId);
+    setUsers((current) => current.filter((user) => getUserId(user) !== targetUserId));
+    setPendingDeletions((current) => current.filter((user) => getUserId(user) !== targetUserId));
+  }
+
+  async function runAction(action, successMessage, { applyResult, refresh = false } = {}) {
     try {
-      await action();
-      setState({ isLoading: false, error: "", message: successMessage });
-      await loadData();
+      const result = await action();
+      await applyResult?.(result);
+      setState((current) => ({ ...current, isLoading: false, error: "", message: successMessage }));
+      if (refresh) await loadData();
+      return result;
     } catch (error) {
       setState((current) => ({ ...current, error: error.message }));
+      return null;
     }
   }
 
   async function runPendingDeletionAction(action, userId, actionName, successMessage) {
     setPendingAction({ userId, actionName });
     try {
-      await runAction(() => action(userId, csrfToken), successMessage);
+      const result = await action(userId, csrfToken);
+      setPendingDeletions((current) =>
+        current.filter((user) => getUserId(user) !== String(userId)),
+      );
+      if (result?.user) updateUserInList(result.user);
+      setState((current) => ({ ...current, isLoading: false, error: "", message: successMessage }));
+    } catch (error) {
+      setState((current) => ({ ...current, error: error.message }));
     } finally {
       setPendingAction(null);
     }
@@ -321,7 +365,7 @@ export default function AdminDashboardPage() {
                                 approveDeleteAccount,
                                 userId,
                                 "approve",
-                                "Deletion approved.",
+                                "Deletion scheduled.",
                               )
                             }
                           >
@@ -363,7 +407,10 @@ export default function AdminDashboardPage() {
               variant="secondary"
               size="sm"
               onClick={() =>
-                void runAction(() => seedAdminRandomUsers(csrfToken), "10 random users seeded.")
+                void runAction(() => seedAdminRandomUsers(csrfToken), "10 random users seeded.", {
+                  applyResult: refreshUsers,
+                  refresh: false,
+                })
               }
             >
               Seed 10 users
@@ -402,11 +449,15 @@ export default function AdminDashboardPage() {
                         variant="ghost"
                         size="sm"
                         className="min-h-8 px-2 py-1 text-xs underline"
-                        disabled={adminUser.id === currentUser?.id}
+                        disabled={
+                          adminUser.id === currentUser?.id ||
+                          Boolean(adminUser.is_deleted || adminUser.deleted_at)
+                        }
                         onClick={() =>
                           void runAction(
                             () => resetAdminUserProgress({ userId: adminUser.id, csrfToken }),
                             "Progress reset.",
+                            { refresh: false },
                           )
                         }
                       >
@@ -416,7 +467,10 @@ export default function AdminDashboardPage() {
                         variant="ghost"
                         size="sm"
                         className="min-h-8 px-2 py-1 text-xs underline"
-                        disabled={adminUser.id === currentUser?.id}
+                        disabled={
+                          adminUser.id === currentUser?.id ||
+                          Boolean(adminUser.is_deleted || adminUser.deleted_at)
+                        }
                         onClick={() =>
                           void runAction(
                             () =>
@@ -426,6 +480,7 @@ export default function AdminDashboardPage() {
                                 csrfToken,
                               }),
                             "User status updated.",
+                            { applyResult: updateUserInList, refresh: false },
                           )
                         }
                       >
@@ -436,11 +491,15 @@ export default function AdminDashboardPage() {
                           variant="ghost"
                           size="sm"
                           className="min-h-8 px-2 py-1 text-xs underline"
-                          disabled={adminUser.id === currentUser?.id}
+                          disabled={
+                            adminUser.id === currentUser?.id ||
+                            Boolean(adminUser.is_deleted || adminUser.deleted_at)
+                          }
                           onClick={() =>
                             void runAction(
                               () => verifyAdminUserEmail({ userId: adminUser.id, csrfToken }),
                               "Email verified.",
+                              { applyResult: updateUserInList, refresh: false },
                             )
                           }
                         >
@@ -461,8 +520,10 @@ export default function AdminDashboardPage() {
                                   csrfToken,
                                 }),
                               "User role updated.",
+                              { applyResult: updateUserInList, refresh: false },
                             )
                           }
+                          disabled={Boolean(adminUser.is_deleted || adminUser.deleted_at)}
                         >
                           {adminUser.role === "admin" ? "Demote" : "Promote"}
                         </Button>
@@ -481,6 +542,7 @@ export default function AdminDashboardPage() {
                                 csrfToken,
                               }),
                             adminUser.deleted_at ? "User restored." : "Deletion scheduled.",
+                            { applyResult: updateUserInList, refresh: false },
                           )
                         }
                       >
@@ -502,6 +564,10 @@ export default function AdminDashboardPage() {
                                     csrfToken,
                                   }),
                                 "User permanently deleted.",
+                                {
+                                  applyResult: () => removeUserFromList(adminUser.id),
+                                  refresh: false,
+                                },
                               );
                             }
                           }}
@@ -528,6 +594,7 @@ export default function AdminDashboardPage() {
                 void runAction(
                   () => seedAdminBudgetingModule(csrfToken),
                   "Budgeting module seeded.",
+                  { applyResult: refreshModules, refresh: false },
                 )
               }
             >
@@ -545,6 +612,7 @@ export default function AdminDashboardPage() {
                     void runAction(
                       () => importAdminLessonModule({ file, csrfToken }),
                       "Lesson module imported.",
+                      { applyResult: refreshModules, refresh: false },
                     );
                   event.target.value = "";
                 }}
@@ -606,6 +674,7 @@ export default function AdminDashboardPage() {
                           })
                         : createAdminModule({ module: moduleForm, csrfToken }),
                     selectedModule ? "Module updated." : "Module created.",
+                    { applyResult: refreshModules, refresh: false },
                   )
                 }
               >
@@ -620,6 +689,7 @@ export default function AdminDashboardPage() {
                       void runAction(
                         () => deleteAdminModule({ moduleId: selectedModule.id, csrfToken }),
                         "Module deleted.",
+                        { applyResult: refreshModules, refresh: false },
                       );
                   }}
                 >
@@ -649,6 +719,7 @@ export default function AdminDashboardPage() {
                             csrfToken,
                           }),
                         "Lesson created.",
+                        { applyResult: refreshModules, refresh: false },
                       );
                       setLessonTitle("");
                     }}
@@ -685,6 +756,7 @@ export default function AdminDashboardPage() {
                                   csrfToken,
                                 }),
                               "Lesson deleted.",
+                              { applyResult: refreshModules, refresh: false },
                             );
                         }}
                       >
@@ -718,6 +790,7 @@ export default function AdminDashboardPage() {
                                   csrfToken,
                                 }),
                               "Lesson content saved.",
+                              { applyResult: refreshModules, refresh: false },
                             );
                           } catch (error) {
                             setState((current) => ({ ...current, error: error.message }));

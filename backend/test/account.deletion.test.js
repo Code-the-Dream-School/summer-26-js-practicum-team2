@@ -196,7 +196,14 @@ describe("account deletion workflow", () => {
       .set("Authorization", adminAuthorization);
 
     expect(approvedResponse.status).toBe(200);
-    expect(approvedResponse.body).not.toHaveProperty("user");
+    expect(approvedResponse.body.user).toEqual(
+      expect.objectContaining({
+        id: learner._id.toString(),
+        is_deleted: true,
+        deletion_status: "approved",
+      }),
+    );
+    expect(approvedResponse.body.user).not.toHaveProperty("password_hash");
 
     const deletedLearner = await User.findOne({
       _id: learner._id,

@@ -60,6 +60,56 @@ describe("admin access boundary", () => {
     expect(response.body.users[0]).not.toHaveProperty("password_hash");
   });
 
+  test("keeps deletion-scheduled users visible for administrative follow-up", async () => {
+    const admin = await createUser("admin");
+    const target = await createUser();
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    const scheduled = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", deleted: true });
+    expect(scheduled.status).toBe(200);
+
+    const listed = await request(app).get("/api/v1/admin/users").set(auth);
+
+    expect(listed.status).toBe(200);
+    expect(listed.body.total).toBe(2);
+    expect(listed.body.users).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: target._id.toString(),
+          is_deleted: true,
+          deletion_status: "approved",
+          deleted_at: expect.any(String),
+          deletion_scheduled_at: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
+  test("explains why a scheduled account cannot be banned", async () => {
+    const admin = await createUser("admin");
+    const target = await createUser();
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", deleted: true });
+
+    const response = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/disabled`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", disabled: true });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({
+      message:
+        "A deletion-scheduled account must be restored before its ban status can be changed.",
+    });
+  });
+
   test("allows admins to seed random learner accounts", async () => {
     const admin = await createUser("admin");
     const response = await request(app)
