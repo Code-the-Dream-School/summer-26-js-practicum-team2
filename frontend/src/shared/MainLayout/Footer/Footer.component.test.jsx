@@ -1,108 +1,76 @@
-//Test verifie floating button renders when module has active glossary data, click button will open glossary modal, button can be accessed by keyboard
-import { MemoryRouter } from "react-router";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import Footer from "./Footer.component";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-//Mock GlossaryModal so we test Footer
-vi.mock("../../../features/learn/GlossaryModal/GlossaryModal.component.jsx", () => ({
-  default: ({ isOpen, onClose, glossary, worksCited }) =>
-    isOpen ? (
-      <div data-testid="mock-glossary-modal">
-        <span data-testid="modal-glossary-count">{glossary?.length || 0}</span>
-        <span data-testid="modal-cited-count">{worksCited?.length || 0}</span>
+import { MemoryRouter } from "react-router";
+import { describe, expect, it } from "vitest";
+import Footer from "./Footer.component";
 
-        <button onClick={onClose}>Close Modal</button>
-      </div>
-    ) : null,
-}));
+const glossary = [{ id: "module-term", term: "Module term", definition: "Only here." }];
+const worksCited = [
+  {
+    id: "module-source",
+    title: "Module source",
+    citation: "A source for this module.",
+    url: "https://example.test/module-source",
+  },
+];
 
-const mockGlossary = [{ term: "Budget", definition: "Spending plan." }];
+function renderFooter({ glossaryEntries, worksCitedEntries, path = "/learn/cashFlow/1.1" } = {}) {
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <Footer glossary={glossaryEntries} worksCited={worksCitedEntries} />
+    </MemoryRouter>,
+  );
+}
 
-describe("Footer - Floating Glossary Button", () => {
-  it("renders floating glossary button when glossary exists", () => {
-    render(
-      <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />
-      </MemoryRouter>,
-    );
-    const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary and references/i,
-    });
-    expect(glossaryBtn).toBeInTheDocument();
-  });
-  it("opens the GlossaryModal when the floating button is clicked", () => {
-    render(
-      <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />
-      </MemoryRouter>,
-    );
-    const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary and references/i,
-    });
-    //modal should be closed on default
-    expect(screen.queryByTestId("mock-glossary-modal")).not.toBeInTheDocument();
-    //click to open modal
-    fireEvent.click(glossaryBtn);
-    expect(screen.getByTestId("mock-glossary-modal")).toBeInTheDocument();
-  });
-  it("closes the GlossaryModal when onClose is chosen inside modal", () => {
-    render(
-      <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />
-      </MemoryRouter>,
-    );
-    // open modal
-    const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary and references/i,
-    });
-    fireEvent.click(glossaryBtn);
-    // close modal with mock button
-    const closeBtn = screen.getByText("Close Modal");
-    fireEvent.click(closeBtn);
-    expect(screen.queryByTestId("mock-glossary-modal")).not.toBeInTheDocument();
-  });
-  it("is keyboard accessible and can make choices when enter key is pressed", async () => {
+describe("Footer glossary button", () => {
+  it("opens glossary and references supplied by the active module", async () => {
     const user = userEvent.setup();
-    render(
-      <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={mockGlossary} />
-      </MemoryRouter>,
-    );
-    const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary and references/i,
-    });
-    //Simulate enter button
-    glossaryBtn.focus();
-    await user.keyboard("{Enter}");
-    //fireEvent.keyDown(glossaryBtn, { key: "Enter", code: "Enter" });
-    expect(screen.getByTestId("mock-glossary-modal")).toBeInTheDocument();
-  });
-});
+    renderFooter({ glossaryEntries: glossary, worksCitedEntries: worksCited });
 
-///check if glossary button is hidden on non-allowed routes
+    await user.click(screen.getByRole("button", { name: "Open glossary and references" }));
 
-describe("Footer - Floating Glossary Button(Hidden)", () => {
-  it("will not render floating glossary button on non-allowed routes", () => {
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <Footer currentGlossary={mockGlossary} />
-      </MemoryRouter>,
+    expect(screen.getByText("Module term")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Works Cited" }));
+    expect(screen.getByText("Module source")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View Source" })).toHaveAttribute(
+      "href",
+      "https://example.test/module-source",
     );
-    const glossaryBtn = screen.queryByRole("button", {
-      name: /open glossary and references/i,
-    });
-    expect(glossaryBtn).not.toBeInTheDocument();
   });
-  it("render floating glossary button using default fallback data when current glossary is empty", () => {
-    render(
-      <MemoryRouter initialEntries={["/learn"]}>
-        <Footer currentGlossary={[]} />
-      </MemoryRouter>,
-    );
-    const glossaryBtn = screen.getByRole("button", {
-      name: /open glossary and references/i,
-    });
-    expect(glossaryBtn).toBeInTheDocument();
+
+  it.each([undefined, [], null])(
+    "shows the empty state when module glossary data is %s",
+    async (entries) => {
+      const user = userEvent.setup();
+      renderFooter({ glossaryEntries: entries });
+
+      await user.click(screen.getByRole("button", { name: "Open glossary and references" }));
+
+      expect(screen.getByText("No glossary terms available")).toBeInTheDocument();
+      expect(screen.queryByText("Budget")).not.toBeInTheDocument();
+    },
+  );
+
+  it("closes with Escape and restores focus to the opener", async () => {
+    const user = userEvent.setup();
+    renderFooter({ glossaryEntries: glossary });
+
+    const opener = screen.getByRole("button", { name: "Open glossary and references" });
+    await user.click(opener);
+    const dialog = screen.getByRole("dialog", { name: "Glossary and References" });
+
+    expect(screen.getByRole("button", { name: "Close dialog" })).toHaveFocus();
+    fireEvent(dialog, new Event("cancel", { cancelable: true }));
+
+    await waitFor(() => expect(dialog).not.toHaveAttribute("open"));
+    expect(opener).toHaveFocus();
+  });
+
+  it("is not shown outside a lesson route", () => {
+    renderFooter({ path: "/dashboard" });
+
+    expect(
+      screen.queryByRole("button", { name: "Open glossary and references" }),
+    ).not.toBeInTheDocument();
   });
 });
