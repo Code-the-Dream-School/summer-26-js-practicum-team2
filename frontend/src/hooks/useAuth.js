@@ -81,7 +81,7 @@ export function useAuth() {
             writeStoredAuth({ user, csrfToken }, isRemembered);
           }
         } catch (error) {
-          if (error.status === 401) {
+          if (error.authInvalidating || error.status === 401) {
             clearStoredAuth();
             user = null;
             csrfToken = null;
@@ -124,6 +124,36 @@ export function useAuth() {
     },
     [commitAuth],
   );
+
+  const syncProfileAfterProgress = useCallback(async () => {
+    const stored = readStoredAuth();
+    if (!stored?.user) return;
+    const isRemembered =
+      !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+
+    try {
+      const profile = await api.getProfile();
+      if (profile?.user) {
+        commitAuth(
+          { user: { ...stored.user, ...profile.user }, csrfToken: stored.csrfToken },
+          isRemembered,
+        );
+      }
+    } catch (error) {
+      if (error.authInvalidating || error.status === 401) {
+        clearAuth();
+      }
+    }
+  }, [clearAuth, commitAuth]);
+
+  useEffect(() => {
+    const handleProgressUpdate = () => {
+      void syncProfileAfterProgress();
+    };
+
+    window.addEventListener("sprout:progress-updated", handleProgressUpdate);
+    return () => window.removeEventListener("sprout:progress-updated", handleProgressUpdate);
+  }, [syncProfileAfterProgress]);
 
   const clearError = useCallback(() => {
     dispatch({ type: actions.clearError });

@@ -114,4 +114,27 @@ describe("useAuth", () => {
       expect.objectContaining({ csrfToken: "fresh-csrf-token" }),
     );
   });
+
+  it("refreshes stored profile values after learning progress changes", async () => {
+    sessionStorage.setItem(
+      "sprout.auth",
+      JSON.stringify({
+        user: { id: "user-id", email: "maya@example.com", role: "learner", streak: 0 },
+        csrfToken: "csrf-token",
+      }),
+    );
+    const { result } = renderHook(() => useAuth());
+
+    await waitFor(() => expect(result.current.isHydrating).toBe(false));
+    api.getProfile.mockResolvedValueOnce({
+      user: { id: "user-id", name: "Maya", email: "maya@example.com", streak: 1 },
+    });
+
+    act(() => {
+      window.dispatchEvent(new Event("sprout:progress-updated"));
+    });
+
+    await waitFor(() => expect(result.current.user.streak).toBe(1));
+    expect(JSON.parse(sessionStorage.getItem("sprout.auth")).user.streak).toBe(1);
+  });
 });
