@@ -1,7 +1,31 @@
 const request = require("supertest");
 const app = require("../src/app");
+const { authorizeRoles } = require("../src/middleware/jsonWebToken");
 
 describe("middleware contracts", () => {
+  it("allows an authenticated user with an authorized role", () => {
+    const next = jest.fn();
+    const middleware = authorizeRoles("admin");
+
+    middleware({ user: { role: "admin" } }, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it("denies users without a permitted role", () => {
+    const next = jest.fn();
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    authorizeRoles("admin")({ user: { role: "learner" } }, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "Access denied." });
+    expect(next).not.toHaveBeenCalled();
+  });
+
   it("returns the JSON 404 contract for unknown API routes", async () => {
     // Request an API route that does not exist so the 404 middleware handles it.
     const res = await request(app).get("/api/v1/does-not-exist");
