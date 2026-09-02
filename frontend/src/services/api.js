@@ -72,7 +72,7 @@ async function apiRequest(path, options = {}, hasRetriedCsrf = false) {
     error.status = response.status;
     error.code = payload?.code;
     error.errors = Array.isArray(payload?.errors) ? payload.errors : [];
-    error.authInvalidating = response.status === 401 || ACCOUNT_INVALIDATING_CODES.has(error.code);
+    error.authInvalidating = ACCOUNT_INVALIDATING_CODES.has(error.code);
     if (error.authInvalidating && typeof window !== "undefined") {
       clearCsrfToken();
       window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
@@ -157,6 +157,17 @@ export const deleteProfile = ({ email, csrfToken }) =>
     csrfToken,
     basePath: PROFILE_BASE_PATH,
   });
+
+export const setProfileAvatarUrl = async ({ avatarUrl, csrfToken }) => {
+  const response = await apiRequest("/avatar", {
+    method: "POST",
+    body: { avatar_url: avatarUrl || null },
+    csrfToken,
+    basePath: PROFILE_BASE_PATH,
+  });
+  notifyProfileChange({ avatarUrl: response?.avatar_url || null });
+  return response;
+};
 
 export const getAdminUsers = ({ page, limit, role, emailVerified, search } = {}) => {
   const params = new URLSearchParams();

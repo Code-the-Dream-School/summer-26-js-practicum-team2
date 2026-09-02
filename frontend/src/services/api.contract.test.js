@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { changeProfilePassword, clearCsrfToken, deleteProfile } from "./api";
+import { changeProfilePassword, clearCsrfToken, deleteProfile, setProfileAvatarUrl } from "./api";
 
 describe("profile API contracts", () => {
   afterEach(() => {
@@ -46,6 +46,32 @@ describe("profile API contracts", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ currentPassword: "CurrentPass1!", newPassword: "NewPass2!" }),
+        headers: expect.objectContaining({ "X-CSRF-TOKEN": "csrf-token" }),
+      }),
+    );
+  });
+
+  it("sends URL avatar changes to the profile avatar endpoint", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: { get: () => "application/json" },
+      json: async () => ({
+        message: "Avatar URL saved.",
+        avatar_url: "https://example.com/maya.png",
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await setProfileAvatarUrl({
+      avatarUrl: "https://example.com/maya.png",
+      csrfToken: "csrf-token",
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/profile/avatar",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ avatar_url: "https://example.com/maya.png" }),
         headers: expect.objectContaining({ "X-CSRF-TOKEN": "csrf-token" }),
       }),
     );
