@@ -43,6 +43,10 @@ describe("user API integration", () => {
     expect(verifyRes.status).toBe(200);
     expect(verifyRes.body.message).toContain("Email verified successfully");
     expect(verifyRes.body.user.email).toBe(payload.email);
+    expect(verifyRes.body.csrfToken).toEqual(expect.any(String));
+    expect(verifyRes.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringContaining("session_token=")]),
+    );
 
     // The user should now be able to log in with the same credentials.
     const loginRes = await request(app).post("/api/v1/users/login").send({
@@ -224,6 +228,10 @@ describe("user API integration", () => {
 
     expect(resetRes.status).toBe(200);
     expect(resetRes.body.message).toContain("Password reset successful");
+    expect(resetRes.body.csrfToken).toEqual(expect.any(String));
+    expect(resetRes.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringContaining("session_token=")]),
+    );
 
     // Make sure the new password actually works after the reset.
     const loginRes = await request(app).post("/api/v1/users/login").send({
@@ -234,6 +242,80 @@ describe("user API integration", () => {
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.user.email).toBe(email);
   });
+
+  test.each([
+    ["disabled", { is_disabled: true }, "ACCOUNT_DISABLED", "This account has been banned."],
+    [
+      "deleted",
+      { is_deleted: true, deleted_at: new Date() },
+      "ACCOUNT_DELETED",
+      "This account is unavailable.",
+    ],
+  ])(
+    "does not issue a session to a %s user after a password reset",
+    async (accountStateName, accountState, code, message) => {
+      const resetToken = accountStateName === "disabled" ? "a".repeat(64) : "b".repeat(64);
+      await User.create({
+        name: `${accountStateName} Reset User`,
+        email: `${accountStateName}-reset@example.com`,
+        password_hash: await hashPassword("CurrentPassword1!"),
+        role: "learner",
+        tos_agreement: true,
+        email_verified_at: new Date(),
+        password_reset_token: resetToken,
+        password_reset_expires_at: new Date(Date.now() + 60 * 60 * 1000),
+        ...accountState,
+      });
+
+      const resetRes = await request(app).post("/api/v1/users/reset-password").send({
+        token: resetToken,
+        newPassword: "NewPassword1!",
+      });
+
+      expect(resetRes.status).toBe(403);
+      expect(resetRes.body).toEqual({ message, code });
+      expect(resetRes.body.csrfToken).toBeUndefined();
+      expect(resetRes.headers["set-cookie"] ?? []).not.toEqual(
+        expect.arrayContaining([expect.stringContaining("session_token=")]),
+      );
+    },
+  );
+
+  test.each([
+    ["disabled", { is_disabled: true }, "ACCOUNT_DISABLED", "This account has been banned."],
+    [
+      "deleted",
+      { is_deleted: true, deleted_at: new Date() },
+      "ACCOUNT_DELETED",
+      "This account is unavailable.",
+    ],
+  ])(
+    "does not issue a session when a %s user verifies email",
+    async (accountStateName, accountState, code, message) => {
+      const verificationToken = `${accountStateName}-verification-token`;
+      await User.create({
+        name: `${accountStateName} Verification User`,
+        email: `${accountStateName}-verification@example.com`,
+        password_hash: await hashPassword("CurrentPassword1!"),
+        role: "learner",
+        tos_agreement: true,
+        verification_token: verificationToken,
+        verification_token_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        ...accountState,
+      });
+
+      const verifyRes = await request(app)
+        .get("/api/v1/users/verify")
+        .query({ token: verificationToken });
+
+      expect(verifyRes.status).toBe(403);
+      expect(verifyRes.body).toEqual({ message, code });
+      expect(verifyRes.body.csrfToken).toBeUndefined();
+      expect(verifyRes.headers["set-cookie"] ?? []).not.toEqual(
+        expect.arrayContaining([expect.stringContaining("session_token=")]),
+      );
+    },
+  );
 
   it("returns a generic message for forgotten-password requests for unknown emails", async () => {
     // Unknown emails should get the same response so the endpoint

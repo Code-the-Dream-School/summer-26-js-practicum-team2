@@ -343,6 +343,26 @@ describe("admin access boundary", () => {
     expect(response.body.code).toBe("ACCOUNT_DISABLED");
   });
 
+  test.each([
+    ["an active account", {}],
+    ["a banned account", { is_disabled: true }],
+    ["a deleted account", { is_deleted: true, deleted_at: new Date() }],
+  ])("does not disclose the state of %s with an incorrect password", async (_, accountState) => {
+    const user = await createUser();
+    user.password_hash = await hashPassword("P@ssword123!");
+    user.email_verified_at = new Date();
+    Object.assign(user, accountState);
+    await user.save();
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password: "WrongPassword1!",
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ message: "Invalid email or password." });
+  });
+
   test("shows banned users a banned message at login", async () => {
     const user = await createUser();
     user.password_hash = await hashPassword("P@ssword123!");
@@ -357,6 +377,23 @@ describe("admin access boundary", () => {
     expect(response.status).toBe(403);
     expect(response.body.message).toBe("This account has been banned.");
     expect(response.body.code).toBe("ACCOUNT_DISABLED");
+  });
+
+  test("shows deleted users an unavailable message at login", async () => {
+    const user = await createUser();
+    user.password_hash = await hashPassword("P@ssword123!");
+    user.is_deleted = true;
+    user.deleted_at = new Date();
+    await user.save();
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password: "P@ssword123!",
+    });
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe("This account is unavailable.");
+    expect(response.body.code).toBe("ACCOUNT_DELETED");
   });
 });
 test("invalidates an existing session when an administrator bans a user", async () => {

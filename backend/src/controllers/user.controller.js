@@ -17,6 +17,29 @@ const {
 } = require("../validation/userValidation.js");
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
+const accountStateLookup = {
+  is_deleted: { $in: [true, false, null] },
+  is_archived: { $in: [true, false, null] },
+};
+
+const sendAccountStateError = (res, user) => {
+  if (user.is_disabled) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "This account has been banned.",
+      code: "ACCOUNT_DISABLED",
+    });
+    return true;
+  }
+  if (user.is_deleted || user.deleted_at) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "This account is unavailable.",
+      code: "ACCOUNT_DELETED",
+    });
+    return true;
+  }
+
+  return false;
+};
 
 //function register registers a new user document in MongoDB user story 2.1.6
 
@@ -158,8 +181,7 @@ const login = async (req, res, next) => {
     // LOok up in mongo database
     const user = await User.findOne({
       email,
-      is_deleted: { $in: [true, false, null] },
-      is_archived: { $in: [true, false, null] },
+      ...accountStateLookup,
     });
     if (!user) {
       req.app.emit?.("login_failed", {
@@ -169,18 +191,6 @@ const login = async (req, res, next) => {
       });
 
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
-    }
-    if (user.is_disabled) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "This account has been banned.",
-        code: "ACCOUNT_DISABLED",
-      });
-    }
-    if (user.is_deleted || user.deleted_at) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "This account is unavailable.",
-        code: "ACCOUNT_DELETED",
-      });
     }
     //compared hashed password
 
@@ -194,6 +204,8 @@ const login = async (req, res, next) => {
       });
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
+
+    if (sendAccountStateError(res, user)) return;
 
     if (!user.email_verified_at) {
       return res
@@ -252,6 +264,7 @@ const verifyEmail = async (req, res, next) => {
     const user = await User.findOne({
       verification_token: token,
       verification_token_expires_at: { $gt: new Date() },
+      ...accountStateLookup,
     }).select("+verification_token");
     if (!user) {
       return res
@@ -264,6 +277,8 @@ const verifyEmail = async (req, res, next) => {
     user.verification_token = undefined;
     user.verification_token_expires_at = undefined;
     await user.save();
+
+    if (sendAccountStateError(res, user)) return;
 
     const csrfToken = issueSession(res, user);
 
@@ -337,6 +352,7 @@ const resetPassword = async (req, res, next) => {
     const user = await User.findOne({
       password_reset_token: token,
       password_reset_expires_at: { $gt: new Date() },
+      ...accountStateLookup,
     }).select("+password_reset_token");
 
     if (!user) {
@@ -350,6 +366,8 @@ const resetPassword = async (req, res, next) => {
     user.password_reset_expires_at = undefined;
     user.token_version = (user.token_version || 0) + 1;
     await user.save();
+
+    if (sendAccountStateError(res, user)) return;
 
     const csrfToken = issueSession(res, user);
 
