@@ -1,6 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
 const LessonModule = require("../models/LessonModule.model");
+const QuizAttempt = require("../models/QuizAttempt.model");
+const { invalidateDashboardCache } = require("./dashboard.controller");
 const {
   getModule,
   getLesson,
@@ -10,6 +12,7 @@ const {
 } = require("../utils/content");
 const {
   lessonProgressSchema,
+  lessonCompletionSchema,
   lessonImportSchema,
   validateRequest,
 } = require("../validation/userValidation");
@@ -186,6 +189,93 @@ exports.updateLessonProgress = async (req, res, next) => {
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
 
+    return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.completeLesson = async (req, res, next) => {
+  try {
+    const validatedBody = validateRequest(res, lessonCompletionSchema, req.body);
+    if (!validatedBody) return;
+    const { moduleId, lessonId } = validatedBody;
+    const moduleData = await LessonModule.findOne({ id: moduleId }).select("lessons").lean();
+
+    if (!moduleData) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Module '${moduleId}' was not found.`,
+      });
+    }
+
+    const lesson = (moduleData.lessons || []).find((item) => item.id === lessonId);
+    if (!lesson) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Lesson '${lessonId}' was not found in module '${moduleId}'.`,
+      });
+    }
+
+    const microLessonIds = (lesson.microLessons || []).map((microLesson) => microLesson.id);
+    const quizMicroLessonIds = (lesson.microLessons || [])
+      .filter((microLesson) =>
+        microLesson.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
+      )
+      .map((microLesson) => microLesson.id);
+
+    if (quizMicroLessonIds.length > 0) {
+      const passedAttempts = await QuizAttempt.find({
+        user_id: req.user.id,
+        module_id: moduleId,
+        lesson_id: lessonId,
+        micro_lesson_id: { $in: quizMicroLessonIds },
+        passed: true,
+        submitted_at: { $ne: null },
+      }).select("micro_lesson_id");
+      const passedMicroLessonIds = new Set(
+        passedAttempts.map((attempt) => attempt.micro_lesson_id),
+      );
+
+      if (!quizMicroLessonIds.every((microLessonId) => passedMicroLessonIds.has(microLessonId))) {
+        return res.status(StatusCodes.CONFLICT).json({
+          message: "Pass every knowledge check before completing this lesson.",
+        });
+      }
+    }
+
+    const positionUpdate = {
+      course_lesson_id: lessonId,
+      current_chunk_index: 0,
+    };
+    if (microLessonIds.length > 0) {
+      positionUpdate.current_micro_lesson_id = microLessonIds[microLessonIds.length - 1];
+    }
+
+    const progressUpdate = {
+      $set: positionUpdate,
+      $addToSet: {
+        completed_lessons: lessonId,
+      },
+    };
+    if (microLessonIds.length > 0) {
+      progressUpdate.$addToSet.completed_micro_lessons = { $each: microLessonIds };
+    }
+
+    const progressRecord = await UserProgress.findOneAndUpdate(
+      { user_id: req.user.id, module_id: moduleId },
+      progressUpdate,
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    );
+    const completedLessonIds = new Set(progressRecord.completed_lessons || []);
+    const isModuleCompleted =
+      moduleData.lessons.length > 0 &&
+      moduleData.lessons.every((moduleLesson) => completedLessonIds.has(moduleLesson.id));
+
+    if (progressRecord.is_module_completed !== isModuleCompleted) {
+      progressRecord.is_module_completed = isModuleCompleted;
+      await progressRecord.save();
+    }
+
+    invalidateDashboardCache(req.user.id);
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
   } catch (error) {
     return next(error);

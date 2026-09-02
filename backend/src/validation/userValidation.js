@@ -62,6 +62,11 @@ const lessonProgressSchema = Joi.object({
   currentChunkIndex: Joi.number().integer().min(0),
 }).or("lessonId", "microLessonId");
 
+const lessonCompletionSchema = Joi.object({
+  moduleId: moduleIdSchema,
+  lessonId: Joi.string().trim().min(1).required(),
+});
+
 const quizStartSchema = Joi.object({
   moduleId: moduleIdSchema,
   microLessonId: microLessonIdSchema.required(),
@@ -186,6 +191,7 @@ module.exports = {
   loginSchema,
   passwordSchema,
   lessonProgressSchema,
+  lessonCompletionSchema,
   quizStartSchema,
   quizSubmissionParamsSchema,
   quizCheckSchema,

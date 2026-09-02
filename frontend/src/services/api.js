@@ -369,6 +369,18 @@ export const updateLessonProgress = ({
     basePath: LESSONS_BASE_PATH,
   });
 
+export const completeLesson = async ({ moduleId, lessonId, csrfToken }) => {
+  const response = await apiRequest("/progress/complete", {
+    method: "POST",
+    csrfToken,
+    body: { moduleId, lessonId },
+    basePath: LESSONS_BASE_PATH,
+  });
+
+  notifyDashboardProgressChanged({ type: "lesson_complete" });
+  return response;
+};
+
 export const restartLessonProgress = ({ moduleId, csrfToken }) =>
   apiRequest("/progress/restart", {
     method: "PATCH",

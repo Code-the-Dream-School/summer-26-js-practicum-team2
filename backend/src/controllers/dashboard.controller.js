@@ -43,6 +43,17 @@ function buildUnit(module, progressRecord) {
   };
 }
 
+function buildOverallProgress(units) {
+  const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
+  const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
+
+  return {
+    completedLessons,
+    totalLessons,
+    overallPercent: totalLessons ? Math.round((completedLessons / totalLessons) * 100) : 0,
+  };
+}
+
 function getNextAction(modules, progressByModule, units) {
   for (const module of modules) {
     const progressRecord = progressByModule.get(module.id);
@@ -202,9 +213,11 @@ exports.getDashboard = async (req, res, next) => {
     });
     const progressByModule = new Map(progressRecords.map((record) => [record.module_id, record]));
     const units = modules.map((module) => buildUnit(module, progressByModule.get(module.id)));
+    const progress = buildOverallProgress(units);
     const nextAction = getNextAction(modules, progressByModule, units);
     const payload = {
       hero: getHero(user.name || "Learner", units, nextAction),
+      progress,
       nextAction,
       units,
       recentActivity: await getRecentActivity(
