@@ -86,7 +86,57 @@ function getNextAction(modules, progressByModule, units) {
   };
 }
 
-function getHero(userName, units, nextAction) {
+function getDateKey(date) {
+  return new Date(date).toISOString().slice(0, 10);
+}
+
+async function getMotivationData(userId) {
+  const passedAttempts = await QuizAttempt.find({
+    user_id: userId,
+    passed: true,
+    submitted_at: { $ne: null },
+  })
+    .select("submitted_at")
+    .lean();
+  const completedDays = new Set(passedAttempts.map((attempt) => getDateKey(attempt.submitted_at)));
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const todayKey = getDateKey(today);
+  const completedToday = passedAttempts.filter(
+    (attempt) => getDateKey(attempt.submitted_at) === todayKey,
+  ).length;
+  const streakDate = new Date(today);
+
+  if (!completedDays.has(todayKey)) {
+    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
+  }
+
+  let currentDays = 0;
+  while (completedDays.has(getDateKey(streakDate))) {
+    currentDays += 1;
+    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
+  }
+
+  const dailyGoalCurrent = Math.min(completedToday, 1);
+  return {
+    streak: {
+      currentDays,
+      helperText:
+        currentDays > 0
+          ? `${currentDays}-day learning streak.`
+          : "Complete a learning check to begin your streak.",
+    },
+    dailyGoal: {
+      type: "learning_checks",
+      current: dailyGoalCurrent,
+      target: 1,
+      isMet: dailyGoalCurrent === 1,
+      label: `${dailyGoalCurrent} / 1 learning check`,
+    },
+  };
+}
+
+function getHero(userName, units, nextAction, motivation) {
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const isNewUser = completedLessons === 0;
@@ -110,14 +160,8 @@ function getHero(userName, units, nextAction) {
     displayName: userName,
     greeting,
     statusText,
-    streak: { currentDays: 0, helperText: "Streak tracking is coming soon." },
-    dailyGoal: {
-      type: "lessons",
-      current: 0,
-      target: 1,
-      isMet: false,
-      label: "Coming soon",
-    },
+    streak: motivation.streak,
+    dailyGoal: motivation.dailyGoal,
     primaryAction: { label: nextAction.ctaLabel, href: nextAction.href },
   };
 }
@@ -142,13 +186,15 @@ async function reconcileProgressFromPassedAttempts(userId, modules) {
     [...passedMicrosByModule].map(async ([moduleId, microLessonIds]) => {
       const module = modules.find((item) => item.id === moduleId);
       const completedLessons = getModuleLessons(module)
-        .filter((lesson) =>
-          lesson.microLessons
-            ?.filter((micro) =>
-              micro.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
-            )
-            .every((micro) => microLessonIds.includes(micro.id)),
-        )
+        .filter((lesson) => {
+          const quizMicroLessons = lesson.microLessons?.filter((micro) =>
+            micro.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
+          );
+          return (
+            quizMicroLessons?.length > 0 &&
+            quizMicroLessons.every((micro) => microLessonIds.includes(micro.id))
+          );
+        })
         .map((lesson) => lesson.id);
 
       await UserProgress.findOneAndUpdate(
@@ -215,15 +261,16 @@ exports.getDashboard = async (req, res, next) => {
     const units = modules.map((module) => buildUnit(module, progressByModule.get(module.id)));
     const progress = buildOverallProgress(units);
     const nextAction = getNextAction(modules, progressByModule, units);
+    const [motivation, recentActivity] = await Promise.all([
+      getMotivationData(userId),
+      getRecentActivity(userId, new Map(modules.map((module) => [module.id, module]))),
+    ]);
     const payload = {
-      hero: getHero(user.name || "Learner", units, nextAction),
+      hero: getHero(user.name || "Learner", units, nextAction, motivation),
       progress,
       nextAction,
       units,
-      recentActivity: await getRecentActivity(
-        userId,
-        new Map(modules.map((module) => [module.id, module])),
-      ),
+      recentActivity,
       meta: {
         cachedForMs: DASHBOARD_CACHE_TTL_MS,
         generatedAt: new Date().toISOString(),

@@ -4,6 +4,7 @@ const { useTestDb } = require("./setup");
 
 const app = require("../src/app");
 const LessonModule = require("../src/models/LessonModule.model");
+const QuizAttempt = require("../src/models/QuizAttempt.model");
 const User = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
 
@@ -82,6 +83,7 @@ describe("dashboard endpoint", () => {
       .get("/api/v1/dashboard")
       .set("Authorization", authHeader);
     expect(initialResponse.body.progress.overallPercent).toBe(0);
+    expect(initialResponse.body.hero.state).toBe("new_user");
 
     const completionResponse = await request(app)
       .post("/api/v1/lessons/progress/complete")
@@ -94,6 +96,48 @@ describe("dashboard endpoint", () => {
       .get("/api/v1/dashboard")
       .set("Authorization", authHeader);
     expect(refreshedResponse.body.progress.overallPercent).toBe(50);
+    expect(refreshedResponse.body.hero.state).toBe("in_progress");
     expect(refreshedResponse.body.nextAction.href).toBe("/learn/budgeting/1.2");
+
+    const finalCompletionResponse = await request(app)
+      .post("/api/v1/lessons/progress/complete")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "budgeting", lessonId: "1.2" });
+    expect(finalCompletionResponse.status).toBe(200);
+
+    const caughtUpResponse = await request(app)
+      .get("/api/v1/dashboard")
+      .set("Authorization", authHeader);
+    expect(caughtUpResponse.body.hero.state).toBe("all_caught_up");
+    expect(caughtUpResponse.body.nextAction.title).toBe("Review Quiz");
+  });
+
+  it("derives the streak and daily goal from successful learning checks", async () => {
+    const { authHeader, userId } = await createAuthedUser("dashboard-motivation@example.com");
+    await seedDashboardModule();
+    const now = new Date();
+    await QuizAttempt.create({
+      user_id: userId,
+      module_id: "budgeting",
+      lesson_id: "1.1",
+      micro_lesson_id: "1.1.1",
+      attempt_number: 1,
+      started_at: now,
+      submitted_at: now,
+      score: 100,
+      passed: true,
+    });
+
+    const response = await request(app).get("/api/v1/dashboard").set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.hero.streak.currentDays).toBe(1);
+    expect(response.body.hero.dailyGoal).toEqual({
+      type: "learning_checks",
+      current: 1,
+      target: 1,
+      isMet: true,
+      label: "1 / 1 learning check",
+    });
   });
 });
