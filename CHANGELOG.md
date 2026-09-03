@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2026-09-03
+
+### Changed
+
+- Updated OAuth sign-in to carry requested destinations through the complete provider round trip using short-lived, provider-scoped state metadata.
+- Centralized post-login destination selection for password and OAuth sign-in flows.
+
+### Fixed
+
+- Fixed post-login routing so administrators without a requested destination reach the admin dashboard instead of the learner dashboard.
+- Fixed OAuth sign-in so a valid requested destination survives the provider redirect and is restored only after successful OAuth state validation.
+- Fixed an open-redirect risk by rejecting absolute, protocol-relative, malformed, and non-string post-login destinations and falling back to the user's normal dashboard.
+
+### Security
+
+- Prevented provider callback parameters from overriding the destination stored by the application before OAuth authorization.
+
+---
+
 ## [0.6.0] - 2026-09-02
 
 ### Added
