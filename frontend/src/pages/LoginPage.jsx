@@ -14,6 +14,7 @@ export default function LoginPage() {
   const { login } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const next = new URLSearchParams(location.search).get("next");
 
   const {
     register,
@@ -29,7 +30,6 @@ export default function LoginPage() {
     try {
       // Return users to the protected page they originally requested, when available.
       const { user } = await login(values);
-      const next = new URLSearchParams(location.search).get("next");
       const destination = getPostLoginDestination({ user, next });
       navigate(destination, { replace: true });
     } catch (err) {
@@ -98,7 +98,7 @@ export default function LoginPage() {
           or
           <span className="h-px flex-1 bg-neutral-200" />
         </div>
-        <OAuthButtons />
+        <OAuthButtons next={next} />
 
         <div className="mt-4 flex items-center justify-between text-small">
           <Link to={ROUTES.REGISTER} className="text-primary underline hover:text-primary-hover">

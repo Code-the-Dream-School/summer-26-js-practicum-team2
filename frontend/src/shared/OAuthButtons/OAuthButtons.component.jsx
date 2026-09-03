@@ -4,7 +4,7 @@ import { ROUTES } from "../../app/router/routes";
 import { getOAuthProviders, getOAuthUrl } from "../../services/api";
 import Button from "../Button/Button.component";
 
-export default function OAuthButtons() {
+export default function OAuthButtons({ next }) {
   const [providers, setProviders] = useState(null);
   const [tosAccepted, setTosAccepted] = useState(false);
 
@@ -61,7 +61,7 @@ export default function OAuthButtons() {
           <Button
             key={provider}
             as="a"
-            href={getOAuthUrl(provider, tosAccepted)}
+            href={getOAuthUrl(provider, tosAccepted, next)}
             variant="secondary"
           >
             Continue with {label}

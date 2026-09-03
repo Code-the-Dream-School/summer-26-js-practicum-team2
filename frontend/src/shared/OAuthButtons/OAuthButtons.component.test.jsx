@@ -10,8 +10,12 @@ const { mockGetOAuthProviders } = vi.hoisted(() => ({
 
 vi.mock("../../services/api", () => ({
   getOAuthProviders: mockGetOAuthProviders,
-  getOAuthUrl: (provider, tosAccepted = false) =>
-    `/api/v1/auth/${provider}${tosAccepted ? "?tos=true" : ""}`,
+  getOAuthUrl: (provider, tosAccepted = false, next) => {
+    const query = new URLSearchParams();
+    if (tosAccepted) query.set("tos", "true");
+    if (next) query.set("next", next);
+    return `/api/v1/auth/${provider}${query.size ? `?${query}` : ""}`;
+  },
 }));
 
 const renderOAuthButtons = () =>

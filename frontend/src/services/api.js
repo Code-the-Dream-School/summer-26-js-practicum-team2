@@ -111,8 +111,14 @@ export const getOAuthProviders = () =>
     basePath: AUTH_BASE_PATH,
   });
 
-export const getOAuthUrl = (provider, tosAccepted = false) =>
-  `${AUTH_BASE_PATH}/${provider}${tosAccepted ? "?tos=true" : ""}`;
+export const getOAuthUrl = (provider, tosAccepted = false, next) => {
+  const query = new URLSearchParams();
+  if (tosAccepted) query.set("tos", "true");
+  if (next) query.set("next", next);
+
+  const search = query.toString();
+  return `${AUTH_BASE_PATH}/${provider}${search ? `?${search}` : ""}`;
+};
 
 export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);
 
