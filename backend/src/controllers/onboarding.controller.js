@@ -4,6 +4,7 @@ const { User } = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
 const { calculateXpDelta } = require("../utils/coreRules.js");
 const XpEvent = require("../models/XpEvent.model.js");
+const { getXpEarnedToday } = require("../services/xp.service.js");
 //const { STATES } = require("mongoose");
 
 const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
@@ -159,14 +160,9 @@ const updateOnboardingProgress = async (req, res, next) => {
       user.onboarding.is_completed = true;
       user.onboarding.completed_at = new Date();
 
-      // ****************** TODO: Replace with XP earned today once XP event tracking exists ***************
+      //Calculate user's current xp total for the day to make sure they don't exceed the daily cap
 
-      // Change to grab user's xp for today
-      // const progress = await UserProgress.findOne({
-      //   user_id: userId,
-      // });
-
-      const currentTotal = 0;
+      const currentTotal = await getXpEarnedToday(userId);
 
       //Award xp for first time onboarding completion
       const xpResult = calculateXpDelta({

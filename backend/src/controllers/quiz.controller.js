@@ -7,6 +7,7 @@ const quizEvents = new EventEmitter();
 
 const { calculateXpDelta } = require("../utils/coreRules");
 const { updateUserStreak } = require("../services/streak.service");
+const { getXpEarnedToday } = require("../services/xp.service");
 
 quizEvents.on("quiz_submit", ({ userId, microLessonId, score, attemptNumber }) => {
   console.log(
@@ -255,15 +256,11 @@ exports.submitQuiz = async (req, res, next) => {
       score: 100,
     });
 
-    // ****************** TODO: Replace with XP earned today once XP event tracking exists ***************
-
-    //Change to grab user's xp for today
-    // const progress = await UserProgress.findOne({
-    //   user_id: userId,
-    // });
-
     //Add xp for passing quiz
-    const currentTotal = 0;
+
+    //Calculate user's current xp total for the day to make sure they don't exceed the daily cap
+
+    const currentTotal = await getXpEarnedToday(userId);
 
     const quizPassXp = calculateXpDelta({
       eventType: "quiz_pass",
