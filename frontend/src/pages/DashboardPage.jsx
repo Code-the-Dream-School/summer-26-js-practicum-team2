@@ -11,6 +11,9 @@ import { ROUTES } from "../app/router/routes";
 
 import useDashboardData from "../hooks/useDashboardData";
 
+//import { useOnboarding } from "../context/OnboardingContext1";
+//import OnboardingOverlay from "../features/onboarding1/OnboardingOverlay1.component"; //adeded aug 30
+
 function DashboardSkeleton() {
   return (
     <section className="space-y-6" aria-hidden="true">
@@ -26,6 +29,8 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardPage() {
+  // const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
+  //   useOnboarding();
   const { user, isAuthenticated } = useAuthContext();
   const { dashboard, isLoading, error } = useDashboardData({
     userId: user?.id,
@@ -56,7 +61,32 @@ export default function DashboardPage() {
   const hasNoProgress = completedLessons === 0;
 
   return (
-    <section className="space-y-6">
+    <section className="p-6 max-w-4xl mx-auto space-y-6">
+      {/* Onboarding Banner handles own
+
+      {/* {!hasCompleted && currentStep === 0 && ( */}
+
+      {/* {!hasCompleted && activePage === "dashboardPage" && (
+        <OnboardingOverlay
+          hasCompleted={hasCompleted}
+          //status ={status}
+          currentStep={currentStep}
+          activePage={activePage}
+          pageName="dashboardPage"
+          onNext={handleNextStep}
+          onStart={startOnboarding}
+          onSkip={skipOnboarding}
+        />
+      )} */} 
+
+      {/* Main Dashboard Content */}
+      <header className="space-y-1">
+        {/* <div className="flex justify-between items-center"> */}
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-900"> Dashboard</h1>
+          <p className="text-neutral-600">Welcome! Here is an overview of your progress</p>
+        </div>
+      </header>
       <DashboardHero hero={hero} />
 
       <Card className="space-y-3">

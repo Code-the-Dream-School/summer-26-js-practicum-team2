@@ -7,6 +7,8 @@ import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNod
 import Button from "../shared/Button/Button.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 
+// import { useOnboarding } from "../features/onboarding1/useOnboarding1";
+// import OnboardingOverlay from "../features/onboarding1/OnboardingOverlay1.component";
 function getMicroLessonPreview(content = []) {
   return content
     .filter(
@@ -19,6 +21,8 @@ function getMicroLessonPreview(content = []) {
 }
 
 function LearningPathPage() {
+  // const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
+  //   useOnboarding();
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
@@ -305,6 +309,23 @@ function LearningPathPage() {
               );
             })}
           </svg>
+          {/* Render learning path Onboarding overly
+         
+          <div>
+            {!hasCompleted && activePage === "learningPath" && (
+              <OnboardingOverlay
+                hasCompleted={hasCompleted}
+                //status ={status}
+                currentStep={currentStep}
+                //activePage="learningPath"
+                activePage={activePage}
+                pageName="learningPath"
+                onNext={handleNextStep}
+                onStart={startOnboarding}
+                onSkip={skipOnboarding}
+              />
+            )}
+          </div> */}
 
           {/* Rendering the learning path */}
           {learningPath.map((node, index) => {

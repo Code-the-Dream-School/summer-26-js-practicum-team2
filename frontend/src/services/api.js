@@ -1,10 +1,12 @@
 // Base URL is determined by the VITE_API_BASE_URL environment variable, which can be set in the .env file.
+
 // Removes trailing slashes from the URL to ensure consistent path construction
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
 const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
+const ONBOARDING_BASE_PATH = `${API_BASE_URL}/api/v1/onboarding`;
 
 // Helper function to make API requests to the backend.
 async function apiRequest(path, options = {}) {
@@ -55,6 +57,48 @@ export const logoutUser = (csrfToken) =>
   apiRequest("/logout", {
     method: "POST",
     csrfToken,
+  });
+// helper functions for onboarding to connect front to backend
+export const beginOnboarding = () =>
+  apiRequest("/begin", {
+    method: "GET",
+    basePath: ONBOARDING_BASE_PATH,
+  });
+export const getOnboardingState = () =>
+  apiRequest("", {
+    method: "GET",
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const toggleOnboardingWorkflow = ({ enabled, csrfToken }) =>
+  apiRequest("/toggle", {
+    method: "PATCH",
+    csrfToken,
+    body: { enabled },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const updateOnboardingProgress = ({
+  tourKey,
+  step,
+  status,
+  dismissed,
+  markAllComplete,
+  csrfToken,
+}) =>
+  apiRequest("/step", {
+    method: "PATCH",
+    csrfToken,
+    //body: { tourKey, step, status, dismissed, markAllComplete, csrfToken },
+    body: { tourKey, step, status, dismissed, markAllComplete },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const resetOnboardingProgress = (csrfToken) =>
+  apiRequest("/reset", {
+    method: "POST",
+    csrfToken,
+    basePath: ONBOARDING_BASE_PATH,
   });
 
 export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);

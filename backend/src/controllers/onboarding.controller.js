@@ -2,12 +2,26 @@ const { StatusCodes } = require("http-status-codes");
 const { updateOnboardingProgressSchema } = require("../validation/userValidation.js");
 const User = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
-//const { STATES } = require("mongoose");
 
 //Configure XP reward per completed page tour
 const TOUR_XP_REWARD = 50;
 
-const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
+const TOUR_KEYS = ["dashboardPage","profilePage","lessonPage","learningPath" ];
+
+const createDefaultTours = () =>
+  TOUR_KEYS.reduce((acc, key) => {
+    acc[key] = { step: 0, status: "pending", dismissed: false };
+    return acc;
+  }, {});
+const beginOnboarding = async (req, res, next) => {
+  try {
+    const defaultTours = createDefaultTours();
+    return res.status(StatusCodes.OK).json({ success: true, tours: defaultTours });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 //POST /api/v1/onboarding/toggle
 
 const toggleOnboardingWorkflow = async (req, res, next) => {
@@ -15,6 +29,7 @@ const toggleOnboardingWorkflow = async (req, res, next) => {
     const userId = req.user.id;
     const { enabled } = req.body;
     const user = await User.findById(userId);
+
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
@@ -25,14 +40,10 @@ const toggleOnboardingWorkflow = async (req, res, next) => {
     if (enabled) {
       user.onboarding = {
         is_completed: false,
+        current_step: 0,
         started_at: new Date(),
         completed_at: null,
-        tours: {
-          dashboardPage: { step: 0, dismissed: false },
-          learningPath: { step: 0, dismissed: false },
-          lessonPage: { step: 0, dismissed: false },
-          profilePage: { step: 0, dismissed: false },
-        },
+        tours: createDefaultTours(),
       };
     } else {
       //disable onboarding: mark completed and dismiss all tours
@@ -45,6 +56,7 @@ const toggleOnboardingWorkflow = async (req, res, next) => {
       TOUR_KEYS.forEach((key) => {
         user.onboarding.tours[key] = {
           step: user.onboarding.tours[key]?.step || 0,
+          status: "skipped",
           dismissed: true,
         };
       });
@@ -96,17 +108,13 @@ const updateOnboardingProgress = async (req, res, next) => {
       req.body = value;
     }
     const userId = req.user.id;
-    const { tourKey, step, dismissed, markAllComplete } = req.body;
-    //  try {
-    //   const userId = req.user.id;
-    //   const { tourKey, step, dismissed, markAllComplete } = req.body;
-
+    const { tourKey, step, status, dismissed, markAllComplete } = req.body;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "No user found." });
     }
     if (!user.onboarding) {
-      user.onboarding = { is_completed: false, tours: {} };
+      user.onboarding = { is_completed: false, current_step: 0, tours: {} };
     }
     if (!user.onboarding.started_at) {
       user.onboarding.started_at = new Date();
@@ -120,71 +128,77 @@ const updateOnboardingProgress = async (req, res, next) => {
       if (!TOUR_KEYS.includes(tourKey)) {
         //if (!validTourKeys.includes(tourKey)) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          message: `No tourkey found. Need to include one of ${TOUR_KEYS.join(",")}`,
+          message: `No tourKey found. Need to include one of ${TOUR_KEYS.join(",")}`,
         });
       }
       if (!user.onboarding.tours) {
-        user.onboarding.tours = {};
+        user.onboarding.tours = createDefaultTours();
       }
 
       const currentTour = user.onboarding.tours[tourKey] || {
         step: 0,
+        status: "pending",
         dismissed: false,
       };
-
-      //check for first-time completion to award XP
-      const isFirstTimeCompletion = dismissed === true && !currentTour.dismissed;
+      const getStepStatus = status || (dismissed ? "skipped" : currentTour.status || "pending");
+      //const completedTour = currentTour.status === "completed";
 
       if (typeof step === "number") {
         currentTour.step = step;
+        user.onboarding.current_step = step; //sync with database in case user needs to resume
       }
-      if (typeof dismissed === "boolean") {
-        currentTour.dismissed = dismissed;
-      }
-      user.onboarding.tours[tourKey] = currentTour;
+      currentTour.status = getStepStatus;
+      currentTour.dismissed = getStepStatus == "skipped" || dismissed === true;
 
-      if (isFirstTimeCompletion) {
+      if (getStepStatus === "completed") {
+        currentTour.completed_at = new Date();
+      }
+
+      user.onboarding.tours[tourKey] = currentTour;
+    }
+    const tours = user.onboarding.tours || {};
+    const totalToursDecided = TOUR_KEYS.every(
+      (key) => tours[key] && ["completed", "skipped"].includes(tours[key].status),
+    );
+    // let xpAwarded = 0;
+    //Award XP on first time step completion so no prior completions count
+    const noSkippedTours = TOUR_KEYS.every((key) => tours[key]?.status === "completed");
+    const allDismissed = TOUR_KEYS.every(
+      (key) => tours[key]?.status === "skipped" || tours[key]?.dismissed === true,
+    );
+    if ((markAllComplete || totalToursDecided) && !user.onboarding.is_completed) {
+      user.onboarding.is_completed = true;
+      user.onboarding.completed_at = new Date();
+      //points awards for full complete onboarding with zero skipping
+
+      if (noSkippedTours) {
         xpAwarded = TOUR_XP_REWARD;
         await UserProgress.findOneAndUpdate(
           { user_id: userId },
           { $inc: { xp: xpAwarded } },
-          { upsert: true, returnDocument: 'after'},
+          { upsert: true, returnDocument: "after" },
         );
       }
     }
-    //check if all single page tours are dismissed
-    const tours = user.onboarding.tours || {};
-    const allDismissed =
-      // tours.dashboardPage.dismissed &&
-      // tours.learningPath.dismissed &&
-      // tours.lessonPage.dismissed &&
-      // tours.profilePage.dismissed;
-      TOUR_KEYS.every((key) => tours[key]?.dismissed === true);
-    //update all completed
-
-    if ((markAllComplete || allDismissed) && !user.onboarding.is_completed) {
-      user.onboarding.is_completed = true;
-      user.onboarding.completed_at = new Date();
-    }
     user.markModified("onboarding");
     await user.save();
-
     return res.status(StatusCodes.OK).json({
       success: true,
       message:
         xpAwarded > 0
           ? `You completed the tour. You earned ${xpAwarded} XP.`
-          : "Onboarding progress updated with success.",
+          : "Onboarding progress has been updated.",
       xpAwarded,
       onboarding: user.onboarding,
+      statistics: {
+        allCompleted: noSkippedTours,
+        allDismissed: allDismissed,
+      },
     });
   } catch (err) {
     return next(err);
   }
 };
-
-//POST /api/v1/onboarding/reset
-//reset onboarding document to initial state
 
 const resetOnboardingProgress = async (req, res, next) => {
   try {
@@ -201,12 +215,7 @@ const resetOnboardingProgress = async (req, res, next) => {
       is_completed: false,
       started_at: null,
       completed_at: null,
-      tours: {
-        dashboardPage: { step: 0, dismissed: false },
-        learningPath: { step: 0, dismissed: false },
-        lessonPage: { step: 0, dismissed: false },
-        profilePage: { step: 0, dismissed: false },
-      },
+      tours: createDefaultTours(),
     };
     user.markModified("onboarding");
     //save the user infor in the database
@@ -222,6 +231,7 @@ const resetOnboardingProgress = async (req, res, next) => {
 };
 
 module.exports = {
+  beginOnboarding,
   toggleOnboardingWorkflow,
   getOnboardingState,
   updateOnboardingProgress,

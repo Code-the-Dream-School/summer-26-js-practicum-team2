@@ -53,7 +53,7 @@ const loginSchema = Joi.object({
 });
 
 //Schema for PATCH /api/v1/onboarding/step
-const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
+const TOUR_KEYS = ["dashboardPage", "profilePage", "lessonPage", "learningPath"];
 const updateOnboardingProgressSchema = Joi.object({
   tourKey: Joi.string()
     .valid(...TOUR_KEYS)
@@ -66,6 +66,11 @@ const updateOnboardingProgressSchema = Joi.object({
     "number.integer": "Step must be an integer.",
     "number.min": "Step cannot be a negative number.",
   }),
+  status: Joi.string()
+  .valid("pending", "completed","skipped")
+  .optional()
+  .messages ({"any.only": "Status must be pending, completed, or skipped."}),
+
   dismissed: Joi.boolean().strict().optional().messages({
     "boolean.base": "Dismissed must be a boolean value.",
   }),
