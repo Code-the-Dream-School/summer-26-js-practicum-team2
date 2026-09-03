@@ -1,37 +1,34 @@
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const { getAuthenticationFailure, issueAuthenticatedSession } = require("../utils/authSession.js");
 
-const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
-const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
 
-const getCookieOptions = (maxAge) => ({
-  httpOnly: true,
-  secure: process.env.COOKIE_SECURE === "true",
-  sameSite: process.env.COOKIE_SAME_SITE || "lax",
-  path: "/",
-  maxAge,
+const OAUTH_PUBLIC_ERROR_CODES = Object.freeze({
+  OAUTH_VERIFIED_EMAIL_REQUIRED: "oauth_email_required",
+  OAUTH_TERMS_REQUIRED: "oauth_terms_required",
+  OAUTH_PROVIDER_UNAVAILABLE: "oauth_unavailable",
 });
 
-// Shared by every OAuth provider callback: issue the same session cookie login() creates,
-// then hand the browser back to the SPA so it can hydrate auth state via GET /users/me.
+const getOAuthFailureRedirect = (errorCode) => {
+  const publicErrorCode = OAUTH_PUBLIC_ERROR_CODES[errorCode] || "oauth_failed";
+  return `${CLIENT_URL}/login?error=${publicErrorCode}`;
+};
+
 const completeOAuthLogin = (req, res) => {
   const user = req.user;
-  const csrfToken = crypto.randomUUID();
-  const token = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-    expiresIn: "14d",
-  });
+  const authenticationFailure = getAuthenticationFailure(user);
+  if (authenticationFailure) {
+    return res.redirect(getOAuthFailureRedirect());
+  }
 
-  res.cookie("session_token", token, getCookieOptions(FOURTEEN_DAYS));
-  req.app.emit?.("login_success", {
-    userId: user._id,
-    email: user.email,
-    ip: req.ip,
-  });
+  issueAuthenticatedSession({ req, res, user });
 
   return res.redirect(`${CLIENT_URL}/oauth/callback`);
 };
 
-const oauthFailureRedirect = `${CLIENT_URL}/login?error=oauth_failed`;
+const oauthFailureRedirect = getOAuthFailureRedirect();
 
-module.exports = { completeOAuthLogin, oauthFailureRedirect };
+module.exports = {
+  completeOAuthLogin,
+  getOAuthFailureRedirect,
+  oauthFailureRedirect,
+};
