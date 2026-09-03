@@ -1,10 +1,25 @@
 import { expect, test } from "@playwright/test";
+import budgetingModule from "../shared/content/budgeting.json" with { type: "json" };
 
 const sampleLessonUrl = "/learn/cashFlow/1.1?sample=true";
+const sampleLesson = budgetingModule.lessons.find(({ id }) => id === "1.1");
+
+const mockSampleLesson = (page) =>
+  page.route("**/api/v1/lessons/public/cashFlow/1.1", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        moduleData: budgetingModule,
+        lessonData: sampleLesson,
+        progress: null,
+      }),
+    }),
+  );
 
 test("learners can view glossary resources without changing their lesson state", async ({
   page,
 }) => {
+  await mockSampleLesson(page);
   const progressWrites = [];
   page.on("request", (request) => {
     if (
@@ -48,6 +63,7 @@ test("learners can view glossary resources without changing their lesson state",
 });
 
 test("the glossary dialog fits a mobile lesson viewport", async ({ page }) => {
+  await mockSampleLesson(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(sampleLessonUrl);
 

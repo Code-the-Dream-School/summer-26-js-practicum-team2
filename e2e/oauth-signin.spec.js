@@ -3,6 +3,12 @@ import { expect, test } from "@playwright/test";
 test("learners can start Google or GitHub sign-in from the login page", async ({
   page,
 }) => {
+  await page.route("**/api/v1/auth/providers", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ google: true, github: true }),
+    }),
+  );
   await page.goto("/login");
 
   await expect(
