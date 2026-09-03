@@ -161,7 +161,7 @@ const updateOnboardingProgress = async (req, res, next) => {
 
       // ****************** TODO: Replace with XP earned today once XP event tracking exists ***************
 
-      //Change to grab user's xp for today
+      // Change to grab user's xp for today
       // const progress = await UserProgress.findOne({
       //   user_id: userId,
       // });

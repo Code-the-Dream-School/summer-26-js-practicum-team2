@@ -34,15 +34,18 @@ const formatStreakLabel = (days) => {
   return `${days} days`;
 };
 
-export default function DashboardHero({ hero }) {
+export default function DashboardHero({ hero, xp = 0 }) {
   const resolvedHero = hero || fallbackHero;
   const streakDays = Number.isFinite(resolvedHero?.streak?.currentDays)
     ? resolvedHero.streak.currentDays
     : 0;
 
+  const totalXp = Number.isFinite(xp) ? xp : 0;
+
   const longestStreak = Number.isFinite(resolvedHero?.streak?.longestDays)
     ? resolvedHero.streak.longestDays
     : 0;
+
   const activeLearningDays = Number.isFinite(resolvedHero?.streak?.activeLearningDays)
     ? resolvedHero.streak.activeLearningDays
     : 0;
@@ -55,6 +58,8 @@ export default function DashboardHero({ hero }) {
   const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? "Goal met" : "In progress";
   const ctaLabel = resolvedHero?.primaryAction?.label || "Continue learning";
   const ctaHref = resolvedHero?.primaryAction?.href || "/learn";
+
+  console.log("XP PROP", xp);
 
   return (
     <section className="rounded-2xl border border-neutral-200 bg-surface-raised p-5 text-foreground shadow-sm sm:p-6">
@@ -73,6 +78,16 @@ export default function DashboardHero({ hero }) {
             <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">Streak</p>
             <p className="mt-1 text-lg font-bold text-heading">{formatStreakLabel(streakDays)}</p>
             <p className="mt-1 text-small text-neutral-600">{resolvedHero?.streak?.helperText}</p>
+          </article>
+
+          <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">
+              Total XP
+            </p>
+            <p className="mt-1 text-lg font-bold text-heading">{totalXp} XP</p>
+            <p className="mt-1 text-small text-neutral-600">
+              Total experience earned from lessons and quizzes.
+            </p>
           </article>
 
           <article className="rounded-xl border border-neutral-200 bg-surface-inset p-3">

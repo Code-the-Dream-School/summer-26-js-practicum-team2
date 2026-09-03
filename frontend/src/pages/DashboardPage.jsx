@@ -51,13 +51,13 @@ export default function DashboardPage() {
     );
   }
 
-  const { hero, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  const { hero, xp, nextAction, units = [], recentActivity = [] } = dashboard || {};
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;
 
   return (
     <section className="space-y-6">
-      <DashboardHero hero={hero} />
+      <DashboardHero hero={hero} xp={xp?.total ?? 0} />
 
       <Card className="space-y-3">
         <p className="text-small font-semibold uppercase tracking-wide text-primary">
