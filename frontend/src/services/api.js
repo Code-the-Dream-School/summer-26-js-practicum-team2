@@ -62,7 +62,14 @@ export const getCurrentUser = () => apiRequest("/me", { method: "GET" });
 
 // Full-page navigation targets — the browser must follow the OAuth provider's redirect chain,
 // so these are used as anchor hrefs rather than fetched with apiRequest.
-export const getOAuthUrl = (provider) => `${AUTH_BASE_PATH}/${provider}`;
+export const getOAuthProviders = () =>
+  apiRequest("/providers", {
+    method: "GET",
+    basePath: AUTH_BASE_PATH,
+  });
+
+export const getOAuthUrl = (provider, tosAccepted = false) =>
+  `${AUTH_BASE_PATH}/${provider}${tosAccepted ? "?tos=true" : ""}`;
 
 export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);
 

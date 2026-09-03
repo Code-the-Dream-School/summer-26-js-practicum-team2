@@ -6,6 +6,10 @@ import LoginPage from "./LoginPage";
 import OAuthCallbackPage from "./OAuthCallbackPage";
 import RegisterPage from "./RegisterPage";
 
+const { mockGetOAuthProviders } = vi.hoisted(() => ({
+  mockGetOAuthProviders: vi.fn(),
+}));
+
 const mockAuth = {
   login: vi.fn(),
   register: vi.fn(),
@@ -17,10 +21,17 @@ vi.mock("../context/AuthContext", () => ({
   useAuthContext: () => mockAuth,
 }));
 
+vi.mock("../services/api", () => ({
+  getOAuthProviders: mockGetOAuthProviders,
+  getOAuthUrl: (provider, tosAccepted = false) =>
+    `/api/v1/auth/${provider}${tosAccepted ? "?tos=true" : ""}`,
+}));
+
 describe("auth pages", () => {
   beforeEach(() => {
     // Reset the auth mocks before each test so calls do not carry over.
     vi.clearAllMocks();
+    mockGetOAuthProviders.mockResolvedValue({ google: true, github: true });
   });
 
   it("logs in and redirects to the requested next page", async () => {
@@ -82,7 +93,21 @@ describe("auth pages", () => {
     });
   });
 
-  it("links the social sign-in buttons to their backend provider routes", () => {
+  it("explains when an OAuth provider cannot supply a verified email", () => {
+    render(
+      <MemoryRouter initialEntries={["/login?error=oauth_email_required"]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "We need a verified email address from your sign-in provider",
+    );
+  });
+
+  it("links the social sign-in buttons to their backend provider routes", async () => {
     render(
       <MemoryRouter initialEntries={["/login"]}>
         <Routes>
@@ -91,7 +116,7 @@ describe("auth pages", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("link", { name: "Continue with Google" })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: "Continue with Google" })).toHaveAttribute(
       "href",
       "/api/v1/auth/google",
     );
@@ -156,7 +181,9 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^email$/i), "new@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
-    await user.click(screen.getByRole("checkbox"));
+    await user.click(
+      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
+    );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     // Make sure registration receives the values entered in the form.
@@ -194,7 +221,9 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^email$/i), "taken@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
-    await user.click(screen.getByRole("checkbox"));
+    await user.click(
+      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
+    );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     // The registration conflict should be shown as an error for the email field.
