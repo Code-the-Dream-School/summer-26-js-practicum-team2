@@ -128,12 +128,16 @@ GITHUB_CLIENT_SECRET=your-github-client-secret
 GITHUB_CALLBACK_URL=http://localhost:8080/api/v1/auth/github/callback
 ```
 
-4. Run `npm run dev`, then open `http://localhost:5173/login` and choose a provider.
+4. Run `npm run dev`, then open `http://localhost:5173/login` and choose a provider. The UI
+   checks `/api/v1/auth/providers` and only shows providers whose ID and secret are configured.
 
 OAuth must begin as a browser navigation, not a fetch request or Postman request. After a
 successful provider callback, the backend creates an HTTP-only session cookie and redirects
-to `/oauth/callback`, where the frontend loads the signed-in user. A failed or cancelled
-attempt returns to `/login?error=oauth_failed`.
+to `/oauth/callback`, where the frontend loads the signed-in user. OAuth start requests also issue a
+short-lived, HTTP-only state cookie. The provider callback must return its matching state value,
+which is consumed after one use. New OAuth accounts require a verified provider email and the
+explicit Terms of Service and Privacy Policy acknowledgement beside the social sign-in buttons.
+A failed or cancelled attempt returns to the login page with a safe OAuth error code.
 
 ### Production OAuth Configuration
 
@@ -146,8 +150,9 @@ corresponding deployed callback URL for each provider:
 <API_URL>/api/v1/auth/github/callback
 ```
 
-Use HTTPS in production and update the provider dashboard before deploying a changed
-frontend or backend URL. Never put OAuth client secrets in frontend environment variables.
+Use HTTPS in production and update the provider dashboard before deploying a changed frontend or
+backend URL. Session and OAuth state cookies are marked `Secure` in production. Never put OAuth
+client secrets in frontend environment variables.
 
 ### Testing OAuth
 

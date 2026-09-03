@@ -5,9 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- ## [Unreleased] -->
+## [Unreleased]
 
-<!-- --- -->
+### Added
+
+- Added direct OAuth account-linking coverage and an OAuth provider availability endpoint for the sign-in UI.
+
+### Fixed
+
+- Hardened Google and GitHub sign-in with verified-email selection, explicit Terms acknowledgement for new accounts, and one-time OAuth state validation.
+- Restored the required User email contract and sparse provider ID behavior so ordinary accounts do not collide on OAuth indexes.
+
+---
 
 ## [0.3.6] - 2026-08-25
 
