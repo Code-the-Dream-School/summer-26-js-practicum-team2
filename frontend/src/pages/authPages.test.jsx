@@ -231,4 +231,22 @@ describe("auth pages", () => {
       expect(screen.getByText("That email is already in use.")).toBeInTheDocument();
     });
   });
+
+  it("OAuth preserves a valid next destination for learner users", async () => {
+    mockAuth.completeOAuthLogin.mockResolvedValue({ id: "learner-user", role: "learner" });
+
+    render(
+      <MemoryRouter initialEntries={["/oauth/callback?next=%2Flearn%2FcashFlow%2F1.1"]}>
+        <Routes>
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/learn/cashFlow/1.1" element={<div>Lesson page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(mockAuth.completeOAuthLogin).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("Lesson page")).toBeInTheDocument();
+    });
+  });
 });

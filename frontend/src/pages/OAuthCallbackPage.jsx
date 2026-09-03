@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
+import { getPostLoginDestination } from "../utils/postLoginRouting";
 import Card from "../shared/Card/Card.component";
 import Spinner from "../shared/Spinner/Spinner.component";
 
@@ -9,6 +10,7 @@ import Spinner from "../shared/Spinner/Spinner.component";
 export default function OAuthCallbackPage() {
   const { completeOAuthLogin } = useAuthContext();
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState(null);
 
   const ranRef = useRef(false);
@@ -19,13 +21,15 @@ export default function OAuthCallbackPage() {
 
     (async () => {
       try {
-        await completeOAuthLogin();
-        navigate(ROUTES.DASHBOARD, { replace: true });
+        const user = await completeOAuthLogin();
+        const next = new URLSearchParams(location.search).get("next");
+        const destination = getPostLoginDestination({ user, next });
+        navigate(destination, { replace: true });
       } catch (err) {
         setError(err.message || "Sign-in failed.");
       }
     })();
-  }, [completeOAuthLogin, navigate]);
+  }, [completeOAuthLogin, navigate, location.search]);
 
   return (
     <div className="mx-auto max-w-md py-16">

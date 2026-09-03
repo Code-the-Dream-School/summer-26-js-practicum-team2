@@ -35,22 +35,33 @@ describe("OAuthButtons", () => {
     expect(screen.queryByRole("link", { name: "Continue with GitHub" })).not.toBeInTheDocument();
   });
 
-  it("requires explicit Terms acknowledgement before a new OAuth flow includes consent", async () => {
+  it("passes Terms consent to the OAuth provider when the checkbox is checked", async () => {
     const user = userEvent.setup();
     mockGetOAuthProviders.mockResolvedValue({ google: true, github: true });
 
     renderOAuthButtons();
 
     const googleLink = await screen.findByRole("link", { name: "Continue with Google" });
-    await user.click(googleLink);
-    expect(screen.getByRole("alert")).toHaveTextContent("Please agree to the Terms of Service");
     expect(googleLink).toHaveAttribute("href", "/api/v1/auth/google");
 
-    await user.click(screen.getByRole("checkbox", { name: "Agree to Terms for social sign-in" }));
+    // After checking the Terms checkbox, the OAuth URLs should include the tos parameter
+    await user.click(
+      screen.getByRole("checkbox", { name: "Agree to Terms of Service and Privacy Policy" }),
+    );
     expect(googleLink).toHaveAttribute("href", "/api/v1/auth/google?tos=true");
     expect(screen.getByRole("link", { name: "Continue with GitHub" })).toHaveAttribute(
       "href",
       "/api/v1/auth/github?tos=true",
+    );
+
+    // After unchecking, the URLs should not include the tos parameter
+    await user.click(
+      screen.getByRole("checkbox", { name: "Agree to Terms of Service and Privacy Policy" }),
+    );
+    expect(googleLink).toHaveAttribute("href", "/api/v1/auth/google");
+    expect(screen.getByRole("link", { name: "Continue with GitHub" })).toHaveAttribute(
+      "href",
+      "/api/v1/auth/github",
     );
   });
 

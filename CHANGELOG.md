@@ -11,9 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Google and GitHub social sign-in with provider availability detection and account linking.
 - Added direct OAuth account-linking coverage and an OAuth provider availability endpoint for the sign-in UI.
+- Added OAuth post-login routing that preserves requested destinations (the `next` parameter) just like regular password login.
 
 ### Changed
 
+- Updated OAuth sign-in flow to make Terms acceptance optional at the button level, matching password-login UX; Terms acceptance is still required by the backend only during new account creation.
 - Updated API and development setup documentation with OAuth configuration and sign-in details.
 
 ### Fixed

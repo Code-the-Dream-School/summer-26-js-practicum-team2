@@ -7,7 +7,6 @@ import Button from "../Button/Button.component";
 export default function OAuthButtons() {
   const [providers, setProviders] = useState(null);
   const [tosAccepted, setTosAccepted] = useState(false);
-  const [consentError, setConsentError] = useState(null);
 
   useEffect(() => {
     let isCurrent = true;
@@ -25,13 +24,6 @@ export default function OAuthButtons() {
     };
   }, []);
 
-  const handleProviderClick = (event) => {
-    if (tosAccepted) return;
-
-    event.preventDefault();
-    setConsentError("Please agree to the Terms of Service and Privacy Policy to continue.");
-  };
-
   const availableProviders = [
     ["google", "Google"],
     ["github", "GitHub"],
@@ -44,11 +36,10 @@ export default function OAuthButtons() {
       <label className="flex items-start gap-3 text-small text-neutral-700">
         <input
           type="checkbox"
-          aria-label="Agree to Terms for social sign-in"
+          aria-label="Agree to Terms of Service and Privacy Policy"
           checked={tosAccepted}
           onChange={(event) => {
             setTosAccepted(event.target.checked);
-            setConsentError(null);
           }}
           className="mt-1 h-4 w-4 border-neutral-300 accent-primary"
         />
@@ -65,12 +56,6 @@ export default function OAuthButtons() {
         </span>
       </label>
 
-      {consentError && (
-        <p role="alert" className="text-small font-medium text-danger">
-          {consentError}
-        </p>
-      )}
-
       <div className="flex flex-col gap-2">
         {availableProviders.map(([provider, label]) => (
           <Button
@@ -78,9 +63,6 @@ export default function OAuthButtons() {
             as="a"
             href={getOAuthUrl(provider, tosAccepted)}
             variant="secondary"
-            aria-disabled={!tosAccepted || undefined}
-            onClick={handleProviderClick}
-            className={!tosAccepted ? "cursor-not-allowed opacity-50" : ""}
           >
             Continue with {label}
           </Button>
