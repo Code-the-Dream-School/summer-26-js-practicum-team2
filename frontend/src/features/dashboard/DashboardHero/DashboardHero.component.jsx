@@ -32,7 +32,7 @@ const formatStreakLabel = (days) => {
   return `${days} days`;
 };
 
-export default function DashboardHero({ hero }) {
+export default function DashboardHero({ hero, nextAction, overallProgress }) {
   const resolvedHero = hero || fallbackHero;
   const streakDays = Number.isFinite(resolvedHero?.streak?.currentDays)
     ? resolvedHero.streak.currentDays
@@ -46,6 +46,19 @@ export default function DashboardHero({ hero }) {
   const goalBadgeText = resolvedHero?.dailyGoal?.isMet ? "Goal met" : "In progress";
   const ctaLabel = resolvedHero?.primaryAction?.label || "Continue learning";
   const ctaHref = resolvedHero?.primaryAction?.href || "/learn";
+  const recommendationTitle = nextAction?.title || ctaLabel;
+  const recommendationDescription = nextAction?.description || resolvedHero.statusText;
+  const recommendationCtaLabel = nextAction?.ctaLabel || ctaLabel;
+  const recommendationHref = nextAction?.href || ctaHref;
+  const completedLessons = Number.isFinite(overallProgress?.completedLessons)
+    ? overallProgress.completedLessons
+    : 0;
+  const totalLessons = Number.isFinite(overallProgress?.totalLessons)
+    ? overallProgress.totalLessons
+    : 0;
+  const overallPercent = Number.isFinite(overallProgress?.overallPercent)
+    ? overallProgress.overallPercent
+    : 0;
 
   return (
     <section className="rounded-2xl border border-neutral-200 bg-surface-raised p-5 text-foreground shadow-sm sm:p-6">
@@ -54,9 +67,42 @@ export default function DashboardHero({ hero }) {
           <h1 className="font-heading text-h2 font-bold text-heading">{resolvedHero.greeting}</h1>
           <p className="mt-2 max-w-2xl text-neutral-700">{resolvedHero.statusText}</p>
 
-          <Button as={Link} to={ctaHref} variant="primary" className="mt-5 px-5 py-2.5">
-            {ctaLabel}
-          </Button>
+          {totalLessons > 0 ? (
+            <div className="mt-4 max-w-md">
+              <div className="flex items-center justify-between gap-3 text-small text-neutral-700">
+                <span className="font-semibold text-heading">Overall progress</span>
+                <span>{overallPercent}%</span>
+              </div>
+              <ProgressBar
+                value={overallPercent}
+                min={0}
+                max={100}
+                label="Overall learning progress"
+                className="mt-2"
+              />
+              <p className="mt-1 text-small text-neutral-600">
+                {completedLessons} of {totalLessons} lessons complete
+              </p>
+            </div>
+          ) : null}
+
+          <div className="mt-5">
+            <p className="text-small font-semibold uppercase tracking-wide text-primary">
+              Recommended next
+            </p>
+            <h2 className="mt-1 font-heading text-h4 font-bold text-heading">
+              {recommendationTitle}
+            </h2>
+            <p className="mt-1 max-w-xl text-small text-neutral-700">{recommendationDescription}</p>
+            <Button
+              as={Link}
+              to={recommendationHref}
+              variant="primary"
+              className="mt-3 px-5 py-2.5"
+            >
+              {recommendationCtaLabel}
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-1">

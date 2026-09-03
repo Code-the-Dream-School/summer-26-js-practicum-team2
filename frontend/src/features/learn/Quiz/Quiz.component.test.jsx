@@ -75,7 +75,11 @@ describe("QuizComponent", () => {
         questionNumber={1}
         totalQuestions={1}
         selectedChoiceIds={["a"]}
-        reviewAnswer={{ isCorrect: true, explanation: "A budget is a plan for your money." }}
+        reviewAnswer={{
+          isCorrect: true,
+          correctChoiceIds: ["a"],
+          explanation: "A budget is a plan for your money.",
+        }}
         onChange={onChange}
         reviewMode
         {...icons}

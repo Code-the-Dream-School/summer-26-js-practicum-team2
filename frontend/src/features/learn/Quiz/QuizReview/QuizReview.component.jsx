@@ -10,6 +10,7 @@ export default function QuizReview({ attempts, onDone, rightAnswerIcon, wrongAns
     attempt.questions.map((question) => ({
       question,
       selectedChoiceIds: attempt.answers[question.id] ?? [],
+      feedback: attempt.reviews?.[question.id] ?? null,
     })),
   );
 
@@ -20,17 +21,19 @@ export default function QuizReview({ attempts, onDone, rightAnswerIcon, wrongAns
     return null;
   }
 
-  const { question, selectedChoiceIds } = currentReview;
+  const { question, selectedChoiceIds, feedback } = currentReview;
+  const correctChoiceIds = feedback?.correctChoiceIds ?? question.correctChoiceIds ?? [];
 
   const isCorrect =
-    selectedChoiceIds.length === question.correctChoiceIds.length &&
-    selectedChoiceIds.every((id) => question.correctChoiceIds.includes(id));
+    feedback?.isCorrect ??
+    (selectedChoiceIds.length === correctChoiceIds.length &&
+      selectedChoiceIds.every((id) => correctChoiceIds.includes(id)));
 
   const reviewAnswer = {
     isCorrect,
-    explanation: question.explanation,
+    explanation: feedback?.explanation ?? question.explanation,
     selectedChoiceIds,
-    correctChoiceIds: question.correctChoiceIds,
+    correctChoiceIds,
   };
 
   const isFirstQuestion = reviewIndex === 0;

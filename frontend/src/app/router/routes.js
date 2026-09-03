@@ -11,6 +11,7 @@ export const ROUTES = {
   LEARN_LESSON: "/learn/:moduleId/:lessonId",
   PRIVACY: "/privacy",
   TERMS: "/terms",
+  ADMIN_DASHBOARD: "/admin/dashboard",
 };
 
 // Link target, not a <Route path> — the query string opts into the unauthenticated preview.
@@ -27,6 +28,7 @@ const TITLES = {
   [ROUTES.LEARN]: "Learning path — Sprout",
   [ROUTES.PRIVACY]: "Privacy policy — Sprout",
   [ROUTES.TERMS]: "Terms of service — Sprout",
+  [ROUTES.ADMIN_DASHBOARD]: "Admin Dashboard - Sprout",
 };
 
 export function getRouteTitle(pathname) {

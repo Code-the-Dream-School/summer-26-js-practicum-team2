@@ -3,6 +3,8 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const QuizAttempt = require("../src/models/QuizAttempt.model");
+const { hashPassword } = require("../src/utils/password");
 const { withSessionCsrf } = require("./helpers/requestTestHelpers");
 
 useTestDb();
@@ -41,6 +43,10 @@ describe("user API integration", () => {
     expect(verifyRes.status).toBe(200);
     expect(verifyRes.body.message).toContain("Email verified successfully");
     expect(verifyRes.body.user.email).toBe(payload.email);
+    expect(verifyRes.body.csrfToken).toEqual(expect.any(String));
+    expect(verifyRes.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringContaining("session_token=")]),
+    );
 
     // The user should now be able to log in with the same credentials.
     const loginRes = await request(app).post("/api/v1/users/login").send({
@@ -50,12 +56,57 @@ describe("user API integration", () => {
 
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.csrfToken).toBeTruthy();
-    expect(loginRes.body.user.email).toBe(payload.email);
+    expect(loginRes.body.user).toMatchObject({
+      email: payload.email,
+      xp: 0,
+      streak: 0,
+      avatar_url: null,
+    });
 
     // Logging in should also create the session cookie used for authenticated requests.
     expect(loginRes.headers["set-cookie"]).toEqual(
       expect.arrayContaining([expect.stringContaining("session_token=")]),
     );
+  });
+
+  it("returns the shared streak and persisted display data when logging in", async () => {
+    const password = "Password1!";
+    const user = await User.create({
+      name: "Returning Learner",
+      email: "returning-learner@example.com",
+      password_hash: await hashPassword(password),
+      role: "learner",
+      tos_agreement: true,
+      email_verified_at: new Date(),
+      xp: 125,
+      streak: 99,
+      avatar_url: "https://example.com/returning-learner.png",
+    });
+    const now = new Date();
+    await QuizAttempt.create({
+      user_id: user._id,
+      module_id: "cashFlow",
+      lesson_id: "1.1",
+      micro_lesson_id: "1.1.2",
+      attempt_number: 1,
+      started_at: now,
+      submitted_at: now,
+      score: 100,
+      passed: true,
+    });
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password,
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.user).toMatchObject({
+      id: user._id.toString(),
+      xp: 125,
+      streak: 1,
+      avatar_url: "https://example.com/returning-learner.png",
+    });
   });
 
   it("rejects duplicate registration and invalid payloads", async () => {
@@ -109,7 +160,7 @@ describe("user API integration", () => {
     expect(loginRes.body.message).toContain("verify your email");
   });
 
-  it("serves the hello endpoint, redirects the root route, and logs a user out", async () => {
+  it("redirects the root route and logs a user out", async () => {
     // Create a verified user directly since this test only needs an authenticated logout request.
     const user = await User.create({
       name: "Logout User",
@@ -126,10 +177,6 @@ describe("user API integration", () => {
       { id: user._id.toString(), role: user.role, csrfToken: "test-csrf" },
       process.env.JWT_SECRET,
     );
-
-    const helloRes = await request(app).get("/api/hello");
-    expect(helloRes.status).toBe(200);
-    expect(helloRes.body.message).toBe("Hello World");
 
     // Disable redirect following so we can check the redirect response itself.
     const rootRes = await request(app).get("/").redirects(0);
@@ -177,6 +224,10 @@ describe("user API integration", () => {
 
     expect(resetRes.status).toBe(200);
     expect(resetRes.body.message).toContain("Password reset successful");
+    expect(resetRes.body.csrfToken).toEqual(expect.any(String));
+    expect(resetRes.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringContaining("session_token=")]),
+    );
 
     // Make sure the new password actually works after the reset.
     const loginRes = await request(app).post("/api/v1/users/login").send({
@@ -187,6 +238,80 @@ describe("user API integration", () => {
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.user.email).toBe(email);
   });
+
+  test.each([
+    ["disabled", { is_disabled: true }, "ACCOUNT_DISABLED", "This account has been banned."],
+    [
+      "deleted",
+      { is_deleted: true, deleted_at: new Date() },
+      "ACCOUNT_DELETED",
+      "This account is unavailable.",
+    ],
+  ])(
+    "does not issue a session to a %s user after a password reset",
+    async (accountStateName, accountState, code, message) => {
+      const resetToken = accountStateName === "disabled" ? "a".repeat(64) : "b".repeat(64);
+      await User.create({
+        name: `${accountStateName} Reset User`,
+        email: `${accountStateName}-reset@example.com`,
+        password_hash: await hashPassword("CurrentPassword1!"),
+        role: "learner",
+        tos_agreement: true,
+        email_verified_at: new Date(),
+        password_reset_token: resetToken,
+        password_reset_expires_at: new Date(Date.now() + 60 * 60 * 1000),
+        ...accountState,
+      });
+
+      const resetRes = await request(app).post("/api/v1/users/reset-password").send({
+        token: resetToken,
+        newPassword: "NewPassword1!",
+      });
+
+      expect(resetRes.status).toBe(403);
+      expect(resetRes.body).toEqual({ message, code });
+      expect(resetRes.body.csrfToken).toBeUndefined();
+      expect(resetRes.headers["set-cookie"] ?? []).not.toEqual(
+        expect.arrayContaining([expect.stringContaining("session_token=")]),
+      );
+    },
+  );
+
+  test.each([
+    ["disabled", { is_disabled: true }, "ACCOUNT_DISABLED", "This account has been banned."],
+    [
+      "deleted",
+      { is_deleted: true, deleted_at: new Date() },
+      "ACCOUNT_DELETED",
+      "This account is unavailable.",
+    ],
+  ])(
+    "does not issue a session when a %s user verifies email",
+    async (accountStateName, accountState, code, message) => {
+      const verificationToken = `${accountStateName}-verification-token`;
+      await User.create({
+        name: `${accountStateName} Verification User`,
+        email: `${accountStateName}-verification@example.com`,
+        password_hash: await hashPassword("CurrentPassword1!"),
+        role: "learner",
+        tos_agreement: true,
+        verification_token: verificationToken,
+        verification_token_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        ...accountState,
+      });
+
+      const verifyRes = await request(app)
+        .get("/api/v1/users/verify")
+        .query({ token: verificationToken });
+
+      expect(verifyRes.status).toBe(403);
+      expect(verifyRes.body).toEqual({ message, code });
+      expect(verifyRes.body.csrfToken).toBeUndefined();
+      expect(verifyRes.headers["set-cookie"] ?? []).not.toEqual(
+        expect.arrayContaining([expect.stringContaining("session_token=")]),
+      );
+    },
+  );
 
   it("returns a generic message for forgotten-password requests for unknown emails", async () => {
     // Unknown emails should get the same response so the endpoint

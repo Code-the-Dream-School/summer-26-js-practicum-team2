@@ -7,6 +7,8 @@ import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.comp
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
+  //add for admin update
+  const isAdmin = user?.role === "admin";
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleLogout = async () => {
@@ -28,7 +30,11 @@ export default function MainLayout() {
       </a>
       <Header
         signedIn={isAuthenticated}
+        isAdmin={isAdmin}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
+        avatarUrl={user?.avatar_url ?? null}
+        xp={user?.xp ?? 0}
+        streak={user?.streak ?? 0}
         onLogout={handleLogout}
         isSigningOut={isSigningOut}
       />
