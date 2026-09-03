@@ -10,14 +10,8 @@ import {
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
-
-import {
-  getSampleLesson,
-  normalizeLearnData,
-  selectRandomLesson,
-} from "../features/learn/normalizeLesson";
+import { normalizeLearnData, selectRandomLesson } from "../features/learn/normalizeLesson";
 import LearnFlow from "../features/learn/LearnFlow/LearnFlow.component";
-
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
@@ -32,7 +26,6 @@ export default function LearnPage() {
   const setCurrentModuleResources = useOutletContext();
 
   const selectedMicroLessonId = location.state?.microLessonId;
-
   const isSamplePreview = searchParams.get("sample") === "true";
 
   const {
@@ -41,21 +34,20 @@ export default function LearnPage() {
     progress,
     isLoading,
     error,
-  } = useLessonContent({ moduleId, lessonId, enabled: isAuthenticated });
-
-  // Signed-out previews read bundled content because the lesson API requires a session.
-  const sampleLesson = useMemo(() => {
-    if (isAuthenticated || !isSamplePreview) return null;
-    return getSampleLesson({ moduleId, lessonId });
-  }, [isAuthenticated, isSamplePreview, lessonId, moduleId]);
+  } = useLessonContent({
+    moduleId,
+    lessonId,
+    enabled: isAuthenticated || isSamplePreview,
+    isPublic: !isAuthenticated && isSamplePreview,
+  });
 
   const learnData = useMemo(
     () =>
       normalizeLearnData({
-        moduleData: fetchedModuleData ?? sampleLesson?.moduleData,
-        lessonData: fetchedLessonData ?? sampleLesson?.lessonData,
+        moduleData: fetchedModuleData,
+        lessonData: fetchedLessonData,
       }),
-    [fetchedLessonData, fetchedModuleData, sampleLesson],
+    [fetchedLessonData, fetchedModuleData],
   );
 
   const characterImages = {
@@ -86,36 +78,7 @@ export default function LearnPage() {
     );
   }
 
-  if (!isAuthenticated) {
-    if (isSamplePreview && learnData) {
-      const randomStep = selectRandomLesson(learnData.lessonSteps);
-      // Keep only the questions for the previewed step so local scoring reflects a real attempt.
-      const sampleLearnData = randomStep
-        ? {
-            ...learnData,
-            lessonSteps: [randomStep],
-            questions: learnData.questions.filter(
-              (question) => question.lessonStepId === randomStep.id,
-            ),
-          }
-        : learnData;
-
-      return (
-        <>
-          <p className="mx-auto mb-4 max-w-5xl rounded-xl border border-primary/20 bg-danger/5 px-4 py-3 text-sm font-medium text-primary sm:px-6">
-            This is a sample of a lesson.
-          </p>
-          <LearnFlow
-            key={`${learnData.moduleId}:${learnData.id}`}
-            learnData={sampleLearnData}
-            characterImages={characterImages}
-            guideImage={dabbingBeaverImg}
-            isReadOnly
-          />
-        </>
-      );
-    }
-
+  if (!isAuthenticated && !isSamplePreview) {
     const next = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`${ROUTES.LOGIN}?next=${next}`} replace />;
   }
@@ -139,6 +102,34 @@ export default function LearnPage() {
           </Link>
         </Card>
       </section>
+    );
+  }
+
+  if (!isAuthenticated) {
+    const randomStep = selectRandomLesson(learnData.lessonSteps);
+    const sampleLearnData = randomStep
+      ? {
+          ...learnData,
+          lessonSteps: [randomStep],
+          questions: learnData.questions.filter(
+            (question) => question.lessonStepId === randomStep.id,
+          ),
+        }
+      : learnData;
+
+    return (
+      <>
+        <p className="mx-auto mb-4 max-w-5xl rounded-xl border border-primary/20 bg-danger/5 px-4 py-3 text-sm font-medium text-primary sm:px-6">
+          This is a sample of a lesson.
+        </p>
+        <LearnFlow
+          key={`${learnData.moduleId}:${learnData.id}`}
+          learnData={sampleLearnData}
+          characterImages={characterImages}
+          guideImage={dabbingBeaverImg}
+          isReadOnly
+        />
+      </>
     );
   }
 

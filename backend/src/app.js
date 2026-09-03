@@ -2,20 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 
 // Middleware imports
-const jwtMiddleware = require("./middleware/jsonWebToken");
+const { authenticateUser: jwtMiddleware } = require("./middleware/jsonWebToken");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const notFoundMiddleware = require("./middleware/notFound");
+const { apiLimiter } = require("./middleware/rateLimiter");
+const requireAdmin = require("./middleware/requireAdmin");
 
 // Route imports
-const helloRoutes = require("./routes/hello.routes");
+const healthRoutes = require("./routes/health.routes");
 const userRoutes = require("./routes/user.routes");
 const lessonRoutes = require("./routes/lesson.routes");
+const lessonPublicRoutes = require("./routes/lessonPublic.routes");
+const lessonImportRoutes = require("./routes/lessonImport.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
+const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
+const quizPublicRoutes = require("./routes/quizPublic.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 // Create Express app
 const app = express();
@@ -32,14 +38,6 @@ const parseAllowedOrigins = () => {
   return [...new Set([...configuredOrigins, ...fallbackOrigins])];
 };
 
-// Rate Limiting Configuration for Production But Not Development
-// Sets a limit of 200 requests per 15 minutes per IP address
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-
-  max: process.env.NODE_ENV === "production" ? 200 : 1000000,
-});
-
 // CORS Configuration
 const allowedOrigins = parseAllowedOrigins();
 const corsOptions = {
@@ -51,6 +49,7 @@ const corsOptions = {
     return callback(new Error("Origin is not allowed by CORS"));
   },
   credentials: true,
+  exposedHeaders: ["X-CSRF-TOKEN"],
 };
 
 // Configure Morgan based on environment
@@ -63,14 +62,20 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan(morganConfig));
-app.use(limiter);
+app.use("/health", healthRoutes);
+app.use(apiLimiter);
 
 // Routes
-app.use("/api/hello", helloRoutes);
+app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/lessons", lessonImportRoutes);
+app.use("/api/v1/lessons", lessonPublicRoutes);
 app.use("/api/v1/lessons", jwtMiddleware, lessonRoutes);
 app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
+app.use("/api/v1/profile", jwtMiddleware, profileRoutes);
+app.use("/api/v1/quizzes", quizPublicRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
+app.use("/api/v1/admin", jwtMiddleware, requireAdmin, adminRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application

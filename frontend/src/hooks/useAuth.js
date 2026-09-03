@@ -32,18 +32,81 @@ export function useAuth() {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const { user, csrfToken } = authState;
 
+  const clearAuth = useCallback(() => {
+    clearStoredAuth();
+    api.clearCsrfToken();
+    dispatch({ type: actions.clearAuth });
+  }, []);
+
+  useEffect(() => {
+    const handleAuthExpired = () => clearAuth();
+    window.addEventListener(api.AUTH_EXPIRED_EVENT, handleAuthExpired);
+    return () => window.removeEventListener(api.AUTH_EXPIRED_EVENT, handleAuthExpired);
+  }, [clearAuth]);
+
+  useEffect(() => {
+    const handleCsrfTokenUpdated = (event) => {
+      const nextCsrfToken = event.detail?.csrfToken;
+      if (!nextCsrfToken) return;
+      const stored = readStoredAuth();
+      if (stored?.user) {
+        const isRemembered =
+          !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+        writeStoredAuth({ user: stored.user, csrfToken: nextCsrfToken }, isRemembered);
+      }
+      dispatch({ type: actions.updateCsrfToken, csrfToken: nextCsrfToken });
+    };
+
+    window.addEventListener(api.CSRF_TOKEN_UPDATED_EVENT, handleCsrfTokenUpdated);
+    return () => window.removeEventListener(api.CSRF_TOKEN_UPDATED_EVENT, handleCsrfTokenUpdated);
+  }, []);
+
   // Restore the current auth state from browser storage on first mount.
   useEffect(() => {
-    const stored = readStoredAuth();
-    dispatch({
-      type: actions.hydrateComplete,
-      user: stored?.user ?? null,
-      csrfToken: stored?.csrfToken ?? null,
-    });
+    let isActive = true;
+
+    const hydrateAuth = async () => {
+      const stored = readStoredAuth();
+      const isRemembered =
+        !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+      let user = stored?.user ?? null;
+      let csrfToken = stored?.csrfToken ?? null;
+      api.setCsrfToken(csrfToken);
+
+      if (user) {
+        try {
+          const profile = await api.getProfile();
+          if (profile?.user) {
+            user = { ...user, ...profile.user };
+            writeStoredAuth({ user, csrfToken }, isRemembered);
+          }
+        } catch (error) {
+          if (error.authInvalidating) {
+            clearStoredAuth();
+            user = null;
+            csrfToken = null;
+            api.clearCsrfToken();
+          }
+        }
+      }
+
+      if (!isActive) return;
+      dispatch({
+        type: actions.hydrateComplete,
+        user,
+        csrfToken,
+      });
+    };
+
+    hydrateAuth();
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   // Keep the reducer and browser storage in sync whenever auth data changes.
   const commitAuth = useCallback((payload, remember = false) => {
+    api.setCsrfToken(payload.csrfToken);
     writeStoredAuth({ user: payload.user, csrfToken: payload.csrfToken }, remember);
     dispatch({
       type: actions.commitAuth,
@@ -52,10 +115,68 @@ export function useAuth() {
     });
   }, []);
 
-  const clearAuth = useCallback(() => {
-    clearStoredAuth();
-    dispatch({ type: actions.clearAuth });
-  }, []);
+  useEffect(() => {
+    const handleProfileUpdated = (event) => {
+      const stored = readStoredAuth();
+      if (!stored?.user) return;
+      const detail = event.detail || {};
+      const hasAvatarUpdate = Object.hasOwn(detail, "avatarUrl");
+      if (!detail.user && !hasAvatarUpdate) return;
+      const isRemembered =
+        !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+      const user = {
+        ...stored.user,
+        ...detail.user,
+        ...(hasAvatarUpdate ? { avatar_url: detail.avatarUrl } : {}),
+      };
+
+      commitAuth({ user, csrfToken: stored.csrfToken }, isRemembered);
+    };
+
+    window.addEventListener("sprout:profile-updated", handleProfileUpdated);
+    return () => window.removeEventListener("sprout:profile-updated", handleProfileUpdated);
+  }, [commitAuth]);
+
+  const refreshSession = useCallback(
+    (payload) => {
+      if (!payload?.user || !payload.csrfToken) return;
+      const stored = readStoredAuth();
+      const isRemembered =
+        !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+      commitAuth({ ...payload, user: { ...stored?.user, ...payload.user } }, isRemembered);
+    },
+    [commitAuth],
+  );
+
+  const syncProfileAfterProgress = useCallback(async () => {
+    const stored = readStoredAuth();
+    if (!stored?.user) return;
+    const isRemembered =
+      !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+
+    try {
+      const profile = await api.getProfile();
+      if (profile?.user) {
+        commitAuth(
+          { user: { ...stored.user, ...profile.user }, csrfToken: stored.csrfToken },
+          isRemembered,
+        );
+      }
+    } catch (error) {
+      if (error.authInvalidating) {
+        clearAuth();
+      }
+    }
+  }, [clearAuth, commitAuth]);
+
+  useEffect(() => {
+    const handleProgressUpdate = () => {
+      void syncProfileAfterProgress();
+    };
+
+    window.addEventListener("sprout:progress-updated", handleProgressUpdate);
+    return () => window.removeEventListener("sprout:progress-updated", handleProgressUpdate);
+  }, [syncProfileAfterProgress]);
 
   const clearError = useCallback(() => {
     dispatch({ type: actions.clearError });
@@ -123,6 +244,7 @@ export function useAuth() {
       register,
       login,
       logout,
+      refreshSession,
       verifyEmail,
       requestPasswordReset,
       confirmPasswordReset,
@@ -134,6 +256,7 @@ export function useAuth() {
       register,
       login,
       logout,
+      refreshSession,
       verifyEmail,
       requestPasswordReset,
       confirmPasswordReset,

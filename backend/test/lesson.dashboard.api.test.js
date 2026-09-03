@@ -57,13 +57,13 @@ describe("lesson and dashboard API integration", () => {
     expect(lessonRes.body.progress.currentMicroLessonId).toBe("1.1.2");
   });
 
-  it("builds a dashboard payload for a new learner and exposes the next action", async () => {
+  it("falls back to bundled Cash Flow content when MongoDB has no seeded modules", async () => {
     const { authHeader } = await createAuthedUser(
       "Dashboard Learner",
       "dashboard-example@example.com",
     );
 
-    // A brand-new learner should get the dashboard's new-user state.
+    // With no LessonModule records seeded in the test database, the default bundled module is used.
     const dashboardRes = await request(app)
       .get("/api/v1/dashboard")
       .set("Authorization", authHeader);
