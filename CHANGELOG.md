@@ -5,11 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.0] - 2026-09-02
 
 ### Added
 
+- Added Google and GitHub social sign-in with provider availability detection and account linking.
 - Added direct OAuth account-linking coverage and an OAuth provider availability endpoint for the sign-in UI.
+
+### Changed
+
+- Updated API and development setup documentation with OAuth configuration and sign-in details.
 
 ### Fixed
 
@@ -18,66 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.6] - 2026-08-25
-
-### Added
-
-- Added core rules and tests for XP calculations and lesson unlocking
-- Added user API integration tests for registration, verification, and login
-- Added lesson and dashboard API integration tests
-- Added integration tests for lesson progress and dashboard reconciliation
-- Added integration coverage for completing lessons after all required quizzes are passed
-- Added integration coverage for the hello endpoint, root redirect, and authenticated logout
-- Added integration coverage for retrieving and verifying saved quiz progress
-- Added integration coverage for processing supported dashboard events
-- Added integration test coverage for backend API error handling and negative paths, including missing/invalid/expired authentication, CSRF validation, invalid lesson progress, quiz submission errors, and duplicate submission conflict handling
-- Added backend Jest coverage guardrails with a dedicated coverage script and global thresholds to prevent test-coverage regression
-- Added backend CI enforcement for test coverage thresholds by running the coverage test command in the backend workflow job
-- Added integration test coverage for rejecting logout requests with mismatched CSRF tokens
-- Added integration test coverage for returning 404 errors when lesson content is requested with an unknown module or lesson ID
-- Added middleware contract coverage for unknown-route 404 responses, malformed JSON handling, and baseline helmet security headers
-- Added rate-limiter contract coverage for register and login endpoint throttle behavior
-- Added error-handler contract coverage for validation, cast, duplicate-key, and fallback 500 error branches
-- Added backend and frontend CI upload of the coverage report artifact for easier debugging on failed or passing runs
-- Added middleware contract coverage for policy-oriented helmet headers (content-security-policy and referrer-policy)
-- Added a shared backend auth test helper to reduce duplicated authenticated-user setup across integration suites
-- Added shared backend request test helpers for Authorization and session+CSRF headers to reduce repeated request setup
-- Added frontend hook test coverage for restoring saved authentication, logging in with remembered sessions, and clearing auth state on logout
-- Added frontend integration test coverage for login redirects, login errors, successful registration, and registration conflict errors
-- Added frontend integration test coverage for password reset requests and protected route access for authenticated and unauthenticated users
-- Added frontend hook test coverage for dashboard loading, session caching, and refreshing cached data after progress updates
-- Added frontend component test coverage for rendering dashboard content and showing the empty state for new learners
-- Added frontend integration test coverage for last-lesson redirects using API results and cached fallback paths
-- Added frontend integration test coverage for sample lesson previews and redirecting unauthenticated learners to login
-- Added frontend integration test coverage for lesson navigation and immediate quiz answer feedback
-- Added frontend integration test coverage for passing preview quiz results and the registration call-to-action
-- Added frontend integration test coverage for syncing lesson progress and submitting quizzes for authenticated learners
-- Added .prettierignore to exclude coverage, node_modules, and dist directories
-- Added frontend reducer, lesson normalization, consent utility, lesson renderer, and quiz interaction test coverage
-- Added frontend shared-component accessibility coverage for fields, buttons, cards, modals, toasts, spinners, and empty states
-- Added frontend learning-path and keyboard navigation coverage for progress states, locked nodes, lesson navigation, and mobile menus
-- Added frontend lesson-content hook coverage for success, disabled, and error states
-- Added skip to content link and update main element ID for accessibility
-- Added role attribute to error message for accessibility
-- Added frontend verification-page coverage for pending, success, missing-token, and failure states
-- Added dashboard cache coverage for malformed and expired entries
-- Installed Playwright
-- Added Playwright smoke coverage for protected-route redirects and keyboard-accessible mobile navigation
-- Added core rules implementation and corresponding tests for XP calculations and lesson unlocking
-- Added `backend/src/utils/coreRules.js` with coverage for XP caps and award rules, streak/freeze status, and lesson-unlock gating.
-- Added end-to-end backend API coverage for user auth flows (register, verify email, login/logout, forgot/reset password), lesson/dashboard progress flows, and quiz-progress persistence.
-- Added negative-path API coverage for missing, malformed, and expired auth; CSRF mismatches; invalid lesson progress payloads; missing lesson/module resources; and duplicate quiz submissions.
-- Added middleware and error-contract test coverage for 404 and malformed JSON responses, Helmet headers (including CSP and referrer-policy), rate-limiter behavior for register/login, and stable error payload mappings.
-- Added a shared backend auth test helper to reduce repeated authenticated-user setup across integration suites.
-- Added backend coverage guardrails via `test:coverage` and Jest global thresholds (statements: 85, branches: 60, functions: 90, lines: 85).
-- Added CI artifacts for frontend tests, frontend build output, and backend coverage to improve diagnostics in pull-request runs.
-- Added shared backend request test helpers for Authorization and session-plus-CSRF headers to reduce repeated API request setup.
-- Added frontend test coverage for auth restoration, remembered-session login, logout, registration, password reset, and protected-route access.
-- Added frontend regression coverage for dashboard loading, caching, and refresh; last-lesson redirects; sample lesson previews and navigation; and quiz feedback, progress synchronization, completion, and submission.
-- Added Playwright end-to-end testing with Chromium, including local `test:e2e` support, CI retries and tracing, and generated test reports.
-- Added browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
-- Expanded frontend regression coverage for lesson rendering and normalization, quiz interactions and review states, lesson-content loading, learning-path progress and navigation, dashboard cache recovery, and email verification flows.
-- Added unit coverage for authentication and quiz reducers, navigation behavior, shared UI components, modal focus management, form accessibility, loading and status states, and legal-consent analytics handling.
 ## [0.3.8] - 2026-09-01
 
 ### Added
