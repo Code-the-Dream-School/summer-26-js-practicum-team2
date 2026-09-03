@@ -35,6 +35,16 @@ async function awardEligibleBadges(userId) {
     awarded.push(BADGES.FIRST_STEPS);
   }
 
+  //LEARNING MACHINE BADGE
+  if (completedMicroLessons >= 10 && !existingBadgeIds.has(BADGES.LEARNING_MACHINE.id)) {
+    user.earned_badges.push({
+      badge_id: BADGES.LEARNING_MACHINE.id,
+      awarded_at: new Date(),
+    });
+
+    awarded.push(BADGES.LEARNING_MACHINE);
+  }
+
   await user.save();
 
   console.log("BADGES AWARDED", awarded);
