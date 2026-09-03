@@ -14,6 +14,7 @@ const createVerifyCallback =
         providerId: profile.id,
         name: profile.displayName || profile.username,
         emails: profile.emails,
+        photos: profile.photos,
         tosAccepted: req.oauth?.tosAccepted === true,
       });
       return done(null, user);

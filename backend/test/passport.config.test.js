@@ -33,6 +33,7 @@ describe("Passport OAuth configuration", () => {
         { value: "secondary@example.com", verified: true, primary: false },
         { value: "primary@example.com", verified: true, primary: true },
       ],
+      photos: [{ value: "https://avatars.githubusercontent.com/u/123" }],
     };
     mockFindOrCreateOAuthUser.mockResolvedValue(user);
 
@@ -49,6 +50,7 @@ describe("Passport OAuth configuration", () => {
       providerId: "github-provider-id",
       name: "github-user",
       emails: profile.emails,
+      photos: profile.photos,
       tosAccepted: true,
     });
     expect(done).toHaveBeenCalledWith(null, user);
@@ -61,6 +63,7 @@ describe("Passport OAuth configuration", () => {
       id: "google-provider-id",
       displayName: "Google User",
       emails: [{ value: "google@example.com", verified: true }],
+      photos: [{ value: "https://lh3.googleusercontent.com/avatar" }],
     };
     mockFindOrCreateOAuthUser.mockResolvedValue({ _id: "google-user" });
 
@@ -76,6 +79,7 @@ describe("Passport OAuth configuration", () => {
       providerId: "google-provider-id",
       name: "Google User",
       emails: profile.emails,
+      photos: profile.photos,
       tosAccepted: false,
     });
   });

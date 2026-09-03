@@ -2,6 +2,7 @@ const { useTestDb } = require("./setup");
 const User = require("../src/models/User.model.js");
 const {
   findOrCreateOAuthUser,
+  selectProviderAvatar,
   selectVerifiedEmail,
 } = require("../src/services/oauthUser.service.js");
 
@@ -60,6 +61,14 @@ describe("OAuth user service", () => {
     ).toBe("verified@example.com");
   });
 
+  it("accepts only HTTP(S) provider avatar URLs", () => {
+    expect(selectProviderAvatar([{ value: "https://example.com/avatar.png" }])).toBe(
+      "https://example.com/avatar.png",
+    );
+    expect(selectProviderAvatar([{ value: "javascript:alert(1)" }])).toBeNull();
+    expect(selectProviderAvatar([{ value: "not a URL" }])).toBeNull();
+  });
+
   it.each([
     ["google", "google_id", "google-provider-id"],
     ["github", "github_id", "github-provider-id"],
@@ -86,11 +95,13 @@ describe("OAuth user service", () => {
       providerId: "github-provider-id",
       name: "GitHub User",
       emails: verifiedEmail(existingUser.email),
+      photos: [{ value: "https://avatars.githubusercontent.com/u/123" }],
       tosAccepted: false,
     });
 
     expect(user._id.toString()).toBe(existingUser._id.toString());
     expect(user.github_id).toBe("github-provider-id");
+    expect(user.avatar_url).toBe("https://avatars.githubusercontent.com/u/123");
     expect(await User.countDocuments()).toBe(1);
   });
 
@@ -100,6 +111,7 @@ describe("OAuth user service", () => {
       providerId: "google-provider-id",
       name: "Google User",
       emails: verifiedEmail("new-oauth@example.com"),
+      photos: [{ value: "https://lh3.googleusercontent.com/avatar" }],
       tosAccepted: true,
     });
 
@@ -109,6 +121,7 @@ describe("OAuth user service", () => {
       google_id: "google-provider-id",
       role: "learner",
       tos_agreement: true,
+      avatar_url: "https://lh3.googleusercontent.com/avatar",
     });
     expect(user.email_verified_at).toBeInstanceOf(Date);
     expect(user.tos_agreement_at).toBeInstanceOf(Date);
@@ -202,13 +215,19 @@ describe("OAuth user service", () => {
       providerId: "github-provider-id",
       name: "GitHub User",
       emails: verifiedEmail("repeat@example.com"),
+      photos: [{ value: "https://avatars.githubusercontent.com/u/first" }],
       tosAccepted: true,
     };
 
     const firstUser = await findOrCreateOAuthUser(input);
-    const secondUser = await findOrCreateOAuthUser({ ...input, tosAccepted: false });
+    const secondUser = await findOrCreateOAuthUser({
+      ...input,
+      photos: [{ value: "https://avatars.githubusercontent.com/u/updated" }],
+      tosAccepted: false,
+    });
 
     expect(secondUser._id.toString()).toBe(firstUser._id.toString());
+    expect(secondUser.avatar_url).toBe("https://avatars.githubusercontent.com/u/updated");
     expect(await User.countDocuments()).toBe(1);
   });
 });
