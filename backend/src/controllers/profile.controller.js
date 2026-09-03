@@ -32,6 +32,8 @@ const getProfile = async (req, res, next) => {
 
     const xpTotal = await getUserXpTotal(req.user.id);
 
+    console.log("USER BADGES", user.earned_badges);
+
     return res.status(StatusCodes.OK).json({
       user: {
         id: user._id,
@@ -48,7 +50,7 @@ const getProfile = async (req, res, next) => {
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
         current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
-        badges: progress?.earned_badges || [],
+        badges: user.earned_badges || [],
       },
     });
   } catch (error) {

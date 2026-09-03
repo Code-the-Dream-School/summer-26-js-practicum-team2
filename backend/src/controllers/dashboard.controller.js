@@ -196,7 +196,7 @@ exports.getDashboard = async (req, res, next) => {
         .json(cached.payload);
     }
 
-    const user = await User.findById(userId).select("name streak timezone");
+    const user = await User.findById(userId).select("name streak timezone earned_badges");
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
@@ -217,6 +217,7 @@ exports.getDashboard = async (req, res, next) => {
       xp: {
         total: xpTotal,
       },
+      badges: user.earned_badges || [],
       units,
       recentActivity: await getRecentActivity(userId),
       meta: {

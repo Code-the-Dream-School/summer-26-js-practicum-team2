@@ -126,6 +126,8 @@ export default function ProfilePage() {
 
   const savedDisplayName = profile?.name || "username";
 
+  console.log("PROFILE BADGES", profile?.badges);
+
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       <Toast {...toastMessage} onClose={closeToast} />

@@ -1,7 +1,9 @@
 import { Link } from "react-router";
 import Badge from "../../../shared/Badge/Badge.component";
+import Card from "../../../shared/Card/Card.component";
 import Button from "../../../shared/Button/Button.component";
 import ProgressBar from "../../../shared/ProgressBar/ProgressBar.component";
+import { badgeMap } from "../../../constants/badges";
 
 const fallbackHero = {
   state: "new_user",
@@ -34,7 +36,7 @@ const formatStreakLabel = (days) => {
   return `${days} days`;
 };
 
-export default function DashboardHero({ hero, xp = 0 }) {
+export default function DashboardHero({ hero, badges = [], xp = 0 }) {
   const resolvedHero = hero || fallbackHero;
   const streakDays = Number.isFinite(resolvedHero?.streak?.currentDays)
     ? resolvedHero.streak.currentDays
@@ -71,6 +73,46 @@ export default function DashboardHero({ hero, xp = 0 }) {
           <Button as={Link} to={ctaHref} variant="primary" className="mt-5 px-5 py-2.5">
             {ctaLabel}
           </Button>
+
+          <article className="mt-5 rounded-xl border border-neutral-200 bg-surface-inset p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">
+              Earned Badges
+            </p>
+
+            {badges.length === 0 ? (
+              <div className="mt-5 mb-5 rounded-lg border border-dashed border-neutral-300 p-4 text-center">
+                <p className="font-semibold text-heading">Welcome to your progress dashboard! 🎉</p>
+                <p className="mt-1 text-small text-neutral-600">
+                  Complete lessons, build streaks, and pass quizzes to earn your first badge.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-3 flex flex-wrap gap-3">
+                {badges.map((earnedBadge) => {
+                  const badge = badgeMap[earnedBadge.badge_id];
+
+                  if (!badge) return null;
+
+                  return (
+                    <Card
+                      key={earnedBadge.badge_id}
+                      className="flex items-start gap-3 rounded-lg border border-neutral-200 bg-surface-inset px-3 py-2"
+                    >
+                      <div className="flex flex-col">
+                        <div className="text-3xl">{badge.icon}</div>
+
+                        <div className="flex flex-col">
+                          <h3 className="font-semibold">{badge.title}</h3>
+
+                          <p className="text-small text-neutral-600">{badge.description}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </article>
         </div>
 
         <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-1">
@@ -134,6 +176,7 @@ export default function DashboardHero({ hero, xp = 0 }) {
             />
           </article>
         </div>
+        <div></div>
       </div>
 
       {resolvedHero.state === "all_caught_up" ? (
