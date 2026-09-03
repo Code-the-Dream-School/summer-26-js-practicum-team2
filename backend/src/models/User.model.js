@@ -109,6 +109,15 @@ const userSchema = new mongoose.Schema(
         default: null,
       },
     },
+    earned_badges: [
+      {
+        badge_id: {
+          type: String,
+          required: true,
+        },
+        awarded_at: { type: Date, default: Date.now },
+      },
+    ],
     timezone: {
       type: String,
       default: "UTC",

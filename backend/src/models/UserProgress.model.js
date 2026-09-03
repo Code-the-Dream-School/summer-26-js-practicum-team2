@@ -45,12 +45,6 @@ const userProgressSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    earned_badges: [
-      {
-        badge_name: String,
-        awarded_at: { type: Date, default: Date.now },
-      },
-    ],
   },
   {
     timestamps: { createdAt: false, updatedAt: "updated_at" },

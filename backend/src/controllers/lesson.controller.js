@@ -3,6 +3,7 @@ const UserProgress = require("../models/UserProgress.model");
 const { getModule, getLesson } = require("../utils/content");
 const { updateUserStreak } = require("../services/streak.service");
 const { invalidateDashboardCache } = require("./dashboard.controller");
+const { awardEligibleBadges } = require("../services/badge.service");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -114,8 +115,10 @@ exports.completeMicroLesson = async (req, res, next) => {
       },
     );
 
+    //If this is first completion, udpate the streak and award the badge
     if (!alreadyCompleted) {
       await updateUserStreak(req.user.id);
+      await awardEligibleBadges(req.user.id);
     }
 
     invalidateDashboardCache(req.user.id);
