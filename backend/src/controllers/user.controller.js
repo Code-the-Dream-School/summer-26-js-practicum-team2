@@ -1,9 +1,13 @@
 const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
-const { sendVerificationEmail } = require("../utils/sendEmail.js");
-//User is capitalized because it represents a model which is a collection of items forthe database
+const { sendVerificationEmail } = require("../utils/sendEmail");
+//User is capitalized because it represents a model which is a collection of items for the database
 const User = require("../models/User.model.js");
+const AdminBootstrap = require("../models/AdminBootstrap.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
+const { clearSessionCookie, issueSession } = require("../utils/session");
+const { isWithinReactivationGracePeriod, reactivateAccount } = require("../utils/accountDeletion");
+const { getLearningMotivation } = require("../utils/learningStats");
 const {
   registerSchema,
   loginSchema,
@@ -18,6 +22,29 @@ const {
 } = require("../utils/authSession.js");
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
+const accountStateLookup = {
+  is_deleted: { $in: [true, false, null] },
+  is_archived: { $in: [true, false, null] },
+};
+
+const sendAccountStateError = (res, user) => {
+  if (user.is_disabled) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "This account has been banned.",
+      code: "ACCOUNT_DISABLED",
+    });
+    return true;
+  }
+  if (user.is_deleted || user.deleted_at) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "This account is unavailable.",
+      code: "ACCOUNT_DELETED",
+    });
+    return true;
+  }
+
+  return false;
+};
 
 //function register registers a new user document in MongoDB user story 2.1.6
 
@@ -60,6 +87,16 @@ const register = async (req, res, next) => {
       verification_token: verificationToken,
       verification_token_expires_at: tokenExpiresAt,
     });
+
+    const bootstrapRecord = await AdminBootstrap.findOneAndUpdate(
+      { key: "first-user-admin" },
+      { $setOnInsert: { key: "first-user-admin", user_id: newUser._id } },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    );
+    if (String(bootstrapRecord.user_id) === String(newUser._id)) {
+      newUser.role = "admin";
+      await newUser.save();
+    }
     const verifyUrl = `${CLIENT_URL}/verify?token=${verificationToken}`;
 
     await sendVerificationEmail(
@@ -89,8 +126,50 @@ const register = async (req, res, next) => {
     return next(err);
   }
 };
-//user story 2.1.8 - Login
+//POST reaactivate route /api/v1/users/reactivate
+const reactivate = async (req, res, next) => {
+  try {
+    const body = validateRequest(res, loginSchema, req.body);
+    if (!body) return;
+    const { email, password } = body;
+    const user = await User.findOne({
+      email,
+      is_deleted: { $in: [true, false] },
+      is_archived: { $in: [true, false] },
+    });
+    if (!user) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "Email or password is incorrect." });
+    }
+    const isMatch = await comparePassword(password, user.password_hash);
+    if (!isMatch) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "Email or password is incorrect." });
+    }
+    if (!user.is_deleted) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: "Account is active." });
+    }
+    //check if request is made within 30 day period to reactivate deleted account
+    if (!isWithinReactivationGracePeriod(user)) {
+      return res.status(StatusCodes.GONE).json({ message: "Reactivation period has closed." });
+    }
+    //Restore user state of not deleted account
+    reactivateAccount(user);
+    await user.save();
 
+    /*//remove ArchivedUser information
+    if (ArchivedUser) {
+      await ArchivedUser.deleteOne({ original_user_id: user._id });
+    }*/
+    return res.status(StatusCodes.OK).json({ message: "Account is reactivated. Please log in." });
+  } catch (error) {
+    return next(error);
+  }
+};
+//user story 2.1.8 - Login
+//POST /api/v1/users/login
 const login = async (req, res, next) => {
   try {
     const { error, value } = loginSchema.validate(req.body, {
@@ -105,13 +184,17 @@ const login = async (req, res, next) => {
     //Joi gives the sanitized input and the value is the output
     const { email, password, remember } = value;
     // LOok up in mongo database
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email,
+      ...accountStateLookup,
+    });
     if (!user) {
       req.app.emit?.("login_failed", {
         email,
         ip: req.ip,
         reason: "user_not_found",
       });
+
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
     //compared hashed password
@@ -127,13 +210,21 @@ const login = async (req, res, next) => {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
 
-    const authenticationFailure = getAuthenticationFailure(user);
-    if (authenticationFailure) {
+    if (sendAccountStateError(res, user)) return;
+
+    if (!user.email_verified_at) {
+      const authenticationFailure = getAuthenticationFailure(user);
       return res
         .status(authenticationFailure.status)
         .json({ message: authenticationFailure.message });
     }
-    const { csrfToken } = issueAuthenticatedSession({ req, res, user, remember });
+    const motivation = await getLearningMotivation(user._id);
+    const csrfToken = issueSession(res, user, { remember });
+    req.app.emit?.("login_success", {
+      userId: user._id,
+      email: user.email,
+      ip: req.ip,
+    });
 
     return res.status(StatusCodes.OK).json({
       message: "Login successful!",
@@ -143,6 +234,9 @@ const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        xp: user.xp ?? 0,
+        streak: motivation.streak.currentDays,
+        avatar_url: user.avatar_url || null,
       },
     });
   } catch (err) {
@@ -154,9 +248,8 @@ const login = async (req, res, next) => {
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
 const logout = async (req, res) => {
-  const { ...cookieOptions } = getSessionCookieOptions();
   const hasSessionCookie = Boolean(req.cookies?.session_token);
-  res.clearCookie("session_token", cookieOptions);
+  clearSessionCookie(res);
 
   if (!hasSessionCookie) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
@@ -177,6 +270,7 @@ const verifyEmail = async (req, res, next) => {
     const user = await User.findOne({
       verification_token: token,
       verification_token_expires_at: { $gt: new Date() },
+      ...accountStateLookup,
     }).select("+verification_token");
     if (!user) {
       return res
@@ -190,7 +284,15 @@ const verifyEmail = async (req, res, next) => {
     user.verification_token_expires_at = undefined;
     await user.save();
 
-    const { csrfToken } = issueAuthenticatedSession({ req, res, user });
+    if (sendAccountStateError(res, user)) return;
+
+    const csrfToken = issueSession(res, user);
+
+    req.app.emit?.("login_success", {
+      userId: user._id,
+      email: user.email,
+      ip: req.ip,
+    });
 
     return res.status(StatusCodes.OK).json({
       message: "Email verified successfully. You are now signed in.",
@@ -256,6 +358,7 @@ const resetPassword = async (req, res, next) => {
     const user = await User.findOne({
       password_reset_token: token,
       password_reset_expires_at: { $gt: new Date() },
+      ...accountStateLookup,
     }).select("+password_reset_token");
 
     if (!user) {
@@ -267,14 +370,12 @@ const resetPassword = async (req, res, next) => {
     user.password_hash = await hashPassword(newPassword);
     user.password_reset_token = undefined;
     user.password_reset_expires_at = undefined;
+    user.token_version = (user.token_version || 0) + 1;
     await user.save();
 
-    const { csrfToken } = issueAuthenticatedSession({
-      req,
-      res,
-      user,
-      emitLoginEvent: false,
-    });
+    if (sendAccountStateError(res, user)) return;
+
+    const csrfToken = issueSession(res, user);
 
     return res.status(StatusCodes.OK).json({
       message: "Password reset successful. You are now signed in.",
@@ -314,6 +415,7 @@ const getCurrentUser = async (req, res, next) => {
 
 module.exports = {
   register,
+  reactivate,
   login,
   logout,
   verifyEmail,

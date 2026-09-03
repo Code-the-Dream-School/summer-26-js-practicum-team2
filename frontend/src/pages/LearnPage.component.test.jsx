@@ -28,10 +28,24 @@ describe("learn page", () => {
   });
 
   it("shows a sample lesson preview to visitors without a session", () => {
-    // Return an empty lesson state since the sample preview does not need authenticated lesson data.
+    // Supply lesson content because a sample preview still renders a real lesson flow.
     useLessonContent.mockReturnValue({
-      moduleData: null,
-      lessonData: null,
+      moduleData: {
+        id: "cashFlow",
+        title: "Cash Flow",
+        lessons: [{ id: "1.1" }],
+      },
+      lessonData: {
+        id: "1.1",
+        title: "Sample lesson",
+        microLessons: [
+          {
+            id: "1.1.1",
+            title: "Sample step",
+            microLessonContent: [{ type: "paragraph", text: "Sample content." }],
+          },
+        ],
+      },
       progress: null,
       isLoading: false,
       error: "",

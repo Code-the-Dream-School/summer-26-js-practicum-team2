@@ -1,8 +1,10 @@
 const request = require("supertest");
+const jwt = require("jsonwebtoken");
 const { useTestDb } = require("./setup");
 
 // setup.js sets JWT_SECRET before these modules are required, so the middleware/tokens match.
 const app = require("../src/app");
+const User = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
 const { createAuthedUser } = require("./helpers/authTestHelpers");
 
@@ -58,6 +60,16 @@ describe("quiz submission grading (backend)", () => {
     expect(submitA.status).toBe(200);
     expect(submitA.body.score).toBe(67);
     expect(submitA.body.passed).toBe(false);
+    expect(submitA.body.reviews).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          questionId: "1.1.2-q3",
+          isCorrect: false,
+          correctChoiceIds: ["a"],
+          explanation: expect.any(String),
+        }),
+      ]),
+    );
 
     // Micro-lesson 1.1.4 has 3 different knowledge checks; answer all of them correctly.
     const startB = await request(app)
@@ -101,5 +113,42 @@ describe("quiz submission grading (backend)", () => {
     );
     expect(scoresByMicroLesson["1.1.2"]).toBe(67);
     expect(scoresByMicroLesson["1.1.4"]).toBe(100);
+  });
+  async function createCookieSession() {
+    const user = await User.create({
+      name: "Cookie Learner",
+      email: "cookie-quiz@example.com",
+      password_hash: "not-a-real-hash",
+      tos_agreement: true,
+    });
+    const csrfToken = "current-csrf-token";
+    const token = jwt.sign(
+      { id: user._id.toString(), role: user.role, csrfToken, token_version: user.token_version },
+      process.env.JWT_SECRET,
+    );
+
+    return { csrfToken, sessionCookie: `session_token=${token}` };
+  }
+
+  it("returns the current CSRF token for a stale cookie-authenticated quiz start", async () => {
+    const { csrfToken, sessionCookie } = await createCookieSession();
+
+    const rejected = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Cookie", sessionCookie)
+      .set("X-CSRF-TOKEN", "stale-csrf-token")
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+
+    expect(rejected.status).toBe(403);
+    expect(rejected.body).toEqual({ message: "Invalid CSRF token." });
+    expect(rejected.headers["x-csrf-token"]).toBe(csrfToken);
+
+    const retried = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Cookie", sessionCookie)
+      .set("X-CSRF-TOKEN", rejected.headers["x-csrf-token"])
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+
+    expect(retried.status).toBe(201);
   });
 });
