@@ -27,8 +27,8 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     try {
-      const { user } = await login(values);
       // Return users to the protected page they originally requested, when available.
+      const { user } = await login(values);
       const next = new URLSearchParams(location.search).get("next");
       const destination = getPostLoginDestination({ user, next });
       navigate(destination, { replace: true });

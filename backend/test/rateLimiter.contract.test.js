@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../src/app");
+const { GLOBAL_API_LIMIT } = require("../src/middleware/rateLimiter");
 
 describe("rate limiter contracts", () => {
   it("enforces the register limiter after repeated requests from the same IP", async () => {
@@ -44,5 +45,32 @@ describe("rate limiter contracts", () => {
 
     expect(limitedRes.status).toBe(429);
     expect(limitedRes.body.message).toContain("Too many failed login attempts");
+  });
+
+  it("validates and rate-limits reactivation credential attempts", async () => {
+    const invalidEmail = "not-a-reactivation-email";
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const response = await request(app)
+        .post("/api/v1/users/reactivate")
+        .send({ email: invalidEmail, password: "bad" });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        message: "Validation error",
+        errors: expect.arrayContaining([expect.stringContaining("valid email")]),
+      });
+    }
+
+    const limitedResponse = await request(app)
+      .post("/api/v1/users/reactivate")
+      .send({ email: invalidEmail, password: "bad" });
+
+    expect(limitedResponse.status).toBe(429);
+    expect(limitedResponse.body.message).toContain("Too many failed login attempts");
+  });
+
+  it("uses a high global limit outside production without weakening credential limiters", () => {
+    expect(GLOBAL_API_LIMIT).toBeGreaterThan(100);
   });
 });

@@ -7,7 +7,13 @@ import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.comp
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
+  //add for admin update
+  const isAdmin = user?.role === "admin";
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [currentModuleResources, setCurrentModuleResources] = useState({
+    glossary: [],
+    worksCited: [],
+  });
 
   const handleLogout = async () => {
     setIsSigningOut(true);
@@ -28,14 +34,21 @@ export default function MainLayout() {
       </a>
       <Header
         signedIn={isAuthenticated}
+        isAdmin={isAdmin}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
+        avatarUrl={user?.avatar_url ?? null}
+        xp={user?.xp ?? 0}
+        streak={user?.streak ?? 0}
         onLogout={handleLogout}
         isSigningOut={isSigningOut}
       />
       <main id="main-content" className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Outlet />
+        <Outlet context={setCurrentModuleResources} />
       </main>
-      <Footer />
+      <Footer
+        glossary={currentModuleResources.glossary}
+        worksCited={currentModuleResources.worksCited}
+      />
       <ConsentBanner />
     </div>
   );

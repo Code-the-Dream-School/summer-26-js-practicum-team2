@@ -77,6 +77,14 @@ describe("core rules", () => {
       freezeUsed: true,
       freezesRemaining: 0,
     });
+
+    expect(
+      calculateStreakStatus({
+        activeDates: ["2026-08-17"],
+        today: new Date("2026-08-20T12:00:00Z"),
+        freezeBalance: 1,
+      }),
+    ).toMatchObject({ currentStreak: 0 });
   });
 
   it("locks lessons until the previous lesson is complete", () => {
