@@ -25,3 +25,18 @@ GET    /api/v1/lessons/progress?moduleId=cashFlow
 PATCH  /api/v1/lessons/progress
 PATCH  /api/v1/lessons/progress/restart
 ```
+
+## OAuth Browser Routes
+
+```text
+GET    /api/v1/auth/google
+GET    /api/v1/auth/google/callback
+GET    /api/v1/auth/github
+GET    /api/v1/auth/github/callback
+```
+
+Start OAuth through a browser by visiting a provider route from the login or registration
+page. The provider calls the matching callback route after authorization. On success, the
+backend creates an HTTP-only session cookie and redirects to `/oauth/callback`; on failure,
+it redirects to `/login?error=oauth_failed`. These routes rely on external provider redirects
+and are not intended for Postman requests.
