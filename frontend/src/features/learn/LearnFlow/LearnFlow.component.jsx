@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import { updateLessonProgress } from "../../../services/api";
+import { restartLessonProgress, updateLessonProgress } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -56,7 +56,14 @@ export default function LearnFlow({
   const { lessonSteps } = learnData;
 
   const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
-  const [chunkIndex, setChunkIndex] = useState(0);
+  const [chunkIndex, setChunkIndex] = useState(() => {
+    const resumeIndex = getResumeIndex(lessonSteps, savedProgress);
+    const resumedStep = lessonSteps[resumeIndex];
+    const savedChunkIndex = savedProgress?.currentChunkIndex;
+
+    if (!Number.isInteger(savedChunkIndex) || savedChunkIndex < 0) return 0;
+    return Math.min(savedChunkIndex, Math.max(countChunks(resumedStep) - 1, 0));
+  });
   const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
@@ -91,11 +98,19 @@ export default function LearnFlow({
       moduleId: learnData.moduleId,
       lessonId: learnData.id,
       microLessonId: currentMicroLessonId,
+      currentChunkIndex: chunkIndex,
       csrfToken,
     }).catch(() => {
       // A dropped position update should never interrupt the lesson.
     });
-  }, [canSyncProgress, csrfToken, currentMicroLessonId, learnData.id, learnData.moduleId]);
+  }, [
+    canSyncProgress,
+    csrfToken,
+    chunkIndex,
+    currentMicroLessonId,
+    learnData.id,
+    learnData.moduleId,
+  ]);
 
   useEffect(() => {
     function handleStorageChange() {
@@ -133,6 +148,7 @@ export default function LearnFlow({
   );
 
   const isFirstChunk = stepIndex === 0 && chunkIndex === 0;
+  const isAtLessonStart = isFirstChunk;
   const isLastChunkOfStep = chunkIndex >= chunks.length - 1;
   const isLastStep = stepIndex >= lessonSteps.length - 1;
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
@@ -212,6 +228,25 @@ export default function LearnFlow({
       setStepIndex((current) => current - 1);
       setChunkIndex(Math.max(countChunks(previousStep) - 1, 0));
     }
+  }
+
+  async function handleStartOver() {
+    if (canSyncProgress) {
+      try {
+        await restartLessonProgress({
+          moduleId: learnData.moduleId,
+          csrfToken,
+        });
+      } catch {
+        return;
+      }
+    }
+
+    setStepIndex(0);
+    setChunkIndex(0);
+    setPhase("lesson");
+    setIsComplete(false);
+    setIsReviewing(false);
   }
 
   if (isComplete && isReviewing) {

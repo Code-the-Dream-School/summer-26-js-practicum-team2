@@ -9,6 +9,7 @@ import * as api from "../../../services/api";
 vi.mock("../../../services/api", () => ({
   startQuiz: vi.fn(),
   submitQuiz: vi.fn(),
+  restartLessonProgress: vi.fn(),
   updateLessonProgress: vi.fn(),
 }));
 
