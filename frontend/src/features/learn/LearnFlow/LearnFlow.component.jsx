@@ -50,6 +50,7 @@ export default function LearnFlow({
   characterImages,
   guideImage,
   savedProgress = null,
+  selectedMicroLessonId = null,
   csrfToken,
   isReadOnly = false,
 }) {
@@ -148,7 +149,7 @@ export default function LearnFlow({
   );
 
   const isFirstChunk = stepIndex === 0 && chunkIndex === 0;
-  const isAtLessonStart = isFirstChunk;
+  const isAtLessonStart = isFirstChunk && phase === "lesson";
   const isLastChunkOfStep = chunkIndex >= chunks.length - 1;
   const isLastStep = stepIndex >= lessonSteps.length - 1;
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;

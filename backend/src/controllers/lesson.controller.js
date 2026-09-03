@@ -122,6 +122,9 @@ exports.updateLessonProgress = async (req, res, next) => {
     if (typeof currentChunkIndex === "number") {
       update.current_chunk_index = currentChunkIndex;
     }
+    if (typeof currentChunkIndex === "number") {
+      update.current_chunk_index = currentChunkIndex;
+    }
 
     const progressRecord = await UserProgress.findOneAndUpdate(
       { user_id: req.user.id, module_id: moduleId },
