@@ -9,7 +9,17 @@ const getModule = async (moduleId) => {
   }
 
   const databaseModule = await LessonModule.findOne({ id: moduleId }).lean();
-  const moduleData = databaseModule || (moduleId === defaultModule.id ? defaultModule : null);
+  const moduleData = databaseModule
+    ? moduleId === defaultModule.id
+      ? {
+          ...databaseModule,
+          glossary: databaseModule.glossary ?? defaultModule.glossary,
+          worksCited: databaseModule.worksCited ?? defaultModule.worksCited,
+        }
+      : databaseModule
+    : moduleId === defaultModule.id
+      ? defaultModule
+      : null;
   if (moduleData) {
     moduleCache.set(moduleId, moduleData);
   }

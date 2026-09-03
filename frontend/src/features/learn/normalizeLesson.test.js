@@ -13,6 +13,8 @@ describe("lesson normalization", () => {
       id: "cashFlow",
       title: "Cash Flow",
       lessons: [{ id: "1.1" }, { id: "1.2" }],
+      glossary: [{ id: "budget", term: "Budget", definition: "A spending plan." }],
+      worksCited: [{ id: "source", title: "Financial education source" }],
     };
 
     // Mix regular lesson content with a knowledge check so they can be split into the right places.
@@ -54,6 +56,8 @@ describe("lesson normalization", () => {
       passThreshold: 0.8,
       nextLessonId: "1.2",
     });
+    expect(normalized.module.glossary).toEqual(moduleData.glossary);
+    expect(normalized.module.worksCited).toEqual(moduleData.worksCited);
 
     // Regular lesson content should stay with the lesson step.
     expect(normalized.lessonSteps[0]).toMatchObject({

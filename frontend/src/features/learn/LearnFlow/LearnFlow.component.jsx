@@ -50,7 +50,6 @@ export default function LearnFlow({
   characterImages,
   guideImage,
   savedProgress = null,
-  selectedMicroLessonId = null,
   csrfToken,
   isReadOnly = false,
 }) {

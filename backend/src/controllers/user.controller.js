@@ -15,11 +15,7 @@ const {
   resetPasswordSchema,
   validateRequest,
 } = require("../validation/userValidation.js");
-const {
-  getAuthenticationFailure,
-  getSessionCookieOptions,
-  issueAuthenticatedSession,
-} = require("../utils/authSession.js");
+const { getAuthenticationFailure } = require("../utils/authSession.js");
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 const accountStateLookup = {

@@ -23,6 +23,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-09-02
+
+### Added
+
+- Added module-level glossary terms, definitions, and Works Cited sources for the budgeting curriculum.
+- Added a floating Glossary and References action throughout lesson routes, with alphabetical term browsing, filtering, source links, and clear empty states.
+- Added unit, integration, API-contract, and Playwright coverage for glossary resources, empty states, focus restoration, responsive layout, and unchanged lesson progress and quiz submission.
+
+### Changed
+
+- Updated the lesson layout to pass the active module's glossary and Works Cited data to the footer instead of falling back to budgeting content.
+- Updated glossary search to use the shared accessible input component and accessible controls for switching between glossary and reference views.
+- Updated quiz scoring test fixtures to match the current micro-lesson question identifiers.
+
+---
+
 ## [0.4.2] - 2026-09-02
 
 ### Added

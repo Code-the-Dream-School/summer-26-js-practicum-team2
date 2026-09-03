@@ -1,5 +1,12 @@
-import { useMemo } from "react";
-import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-router";
+import { useEffect, useMemo } from "react";
+import {
+  Link,
+  Navigate,
+  useLocation,
+  useOutletContext,
+  useParams,
+  useSearchParams,
+} from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
@@ -16,6 +23,8 @@ export default function LearnPage() {
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const setCurrentModuleResources = useOutletContext();
+
   const selectedMicroLessonId = location.state?.microLessonId;
   const isSamplePreview = searchParams.get("sample") === "true";
 
@@ -40,6 +49,20 @@ export default function LearnPage() {
       }),
     [fetchedLessonData, fetchedModuleData],
   );
+  const sampleLearnData = useMemo(() => {
+    if (!learnData || isAuthenticated) return learnData;
+
+    const randomStep = selectRandomLesson(learnData.lessonSteps);
+    return randomStep
+      ? {
+          ...learnData,
+          lessonSteps: [randomStep],
+          questions: learnData.questions.filter(
+            (question) => question.lessonStepId === randomStep.id,
+          ),
+        }
+      : learnData;
+  }, [isAuthenticated, learnData]);
 
   const characterImages = {
     abigail: abigailImg,
@@ -47,6 +70,20 @@ export default function LearnPage() {
     beaver: dabbingBeaverImg,
   };
 
+  useEffect(() => {
+    if (typeof setCurrentModuleResources !== "function") {
+      return undefined;
+    }
+
+    setCurrentModuleResources({
+      glossary: Array.isArray(learnData?.module?.glossary) ? learnData.module.glossary : [],
+      worksCited: Array.isArray(learnData?.module?.worksCited) ? learnData.module.worksCited : [],
+    });
+
+    return () => setCurrentModuleResources({ glossary: [], worksCited: [] });
+  }, [learnData?.module, setCurrentModuleResources]);
+
+  // Wait for storage hydration before deciding to redirect
   if (isHydrating) {
     return (
       <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
@@ -83,17 +120,6 @@ export default function LearnPage() {
   }
 
   if (!isAuthenticated) {
-    const randomStep = selectRandomLesson(learnData.lessonSteps);
-    const sampleLearnData = randomStep
-      ? {
-          ...learnData,
-          lessonSteps: [randomStep],
-          questions: learnData.questions.filter(
-            (question) => question.lessonStepId === randomStep.id,
-          ),
-        }
-      : learnData;
-
     return (
       <>
         <p className="mx-auto mb-4 max-w-5xl rounded-xl border border-primary/20 bg-danger/5 px-4 py-3 text-sm font-medium text-primary sm:px-6">
@@ -117,7 +143,6 @@ export default function LearnPage() {
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
-      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
     />
   );
