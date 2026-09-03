@@ -52,7 +52,6 @@ export default function ProfilePage() {
 
   const applyProfile = useCallback(
     (user) => {
-      console.log("PROFILE", user);
       if (!user) return;
       setProfile(user);
       setGlobalProfile(user);

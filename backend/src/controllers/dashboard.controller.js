@@ -4,6 +4,7 @@ const UserProgress = require("../models/UserProgress.model");
 const QuizAttempt = require("../models/QuizAttempt.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
 const { getUserXpTotal } = require("../services/xp.service");
+const { getDisplayStreak } = require("../utils/streaks");
 
 const contentModules = {
   cashFlow: require("../../../shared/content/budgeting.json"),
@@ -105,7 +106,7 @@ function getHero(user, units, nextAction) {
     greeting,
     statusText,
     streak: {
-      currentDays: user.streak?.current ?? 0,
+      currentDays: getDisplayStreak(user.streak),
       longestDays: user.streak?.longest ?? 0,
       activeLearningDays: user.streak?.active_learning_days ?? 0,
     },
@@ -209,6 +210,7 @@ exports.getDashboard = async (req, res, next) => {
     const progressByModule = new Map(progressRecords.map((record) => [record.module_id, record]));
     const units = moduleIds.map((moduleId) => buildUnit(moduleId, progressByModule.get(moduleId)));
     const nextAction = getNextAction(progressByModule, units);
+
     const payload = {
       hero: getHero(user, units, nextAction),
       nextAction,

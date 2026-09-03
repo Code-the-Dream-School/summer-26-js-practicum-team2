@@ -83,7 +83,7 @@ export const getDashboard = () =>
 export const getProfile = () =>
   apiRequest("", {
     basePath: PROFILE_BASE_PATH,
-    method: "GET"
+    method: "GET",
   });
 
 export const updateProfile = ({ csrfToken, ...profile }) =>
@@ -151,6 +151,7 @@ export const getLessonProgress = (moduleId) =>
     basePath: LESSONS_BASE_PATH,
   });
 
+//updates users progress through the microlessons and lesson
 export const updateLessonProgress = ({ moduleId, lessonId, microLessonId, csrfToken }) =>
   apiRequest("/progress", {
     method: "PATCH",
@@ -158,6 +159,21 @@ export const updateLessonProgress = ({ moduleId, lessonId, microLessonId, csrfTo
     body: { moduleId, lessonId, microLessonId },
     basePath: LESSONS_BASE_PATH,
   });
+
+//User completes microlesson
+export const completeMicroLesson = async ({ moduleId, microLessonId, csrfToken }) => {
+  const response = await apiRequest("/complete", {
+    method: "POST",
+    csrfToken,
+    body: {
+      moduleId,
+      microLessonId,
+    },
+    basePath: LESSONS_BASE_PATH,
+  });
+
+  return response;
+};
 
 export const getQuizProgress = () =>
   apiRequest("/progress", {

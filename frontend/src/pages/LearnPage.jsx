@@ -3,7 +3,8 @@ import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-r
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
-import { updateLessonProgress } from "../services/api";
+import { updateLessonProgress, completeMicroLesson } from "../services/api";
+import { notifyDashboardProgressChanged } from "../services/api";
 import {
   getResumeIndex,
   getSampleLesson,
@@ -23,7 +24,6 @@ import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
 import rightAnswerIcon from "../assets/right_answer.svg";
 import wrongAnswerIcon from "../assets/wrong_answer.svg";
-//import refreshProfile from "../hooks/useAuth";
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
@@ -145,7 +145,19 @@ function LearnFlow({
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
 
-  function advanceStep() {
+  async function advanceStep() {
+    if (!isReadOnly && currentMicroLessonId) {
+      await completeMicroLesson({
+        moduleId: learnData.moduleId,
+        microLessonId: currentMicroLessonId,
+        csrfToken,
+      });
+
+      await refreshProfile();
+
+      notifyDashboardProgressChanged();
+    }
+
     if (!isLastStep) {
       setStepIndex((current) => current + 1);
       setChunkIndex(0);
@@ -178,8 +190,6 @@ function LearnFlow({
     }
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
-
-    await refreshProfile();
 
     if (submission) {
       setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
@@ -471,6 +481,7 @@ export default function LearnPage() {
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
       csrfToken={csrfToken}
+      refreshProfile={refreshProfile}
     />
   );
 }

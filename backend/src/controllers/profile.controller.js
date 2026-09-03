@@ -8,6 +8,7 @@ const {
   deleteAccountSchema,
 } = require("../validation/profileValidation");
 const { getUserXpTotal } = require("../services/xp.service");
+const { getDisplayStreak } = require("../utils/streaks");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -40,7 +41,7 @@ const getProfile = async (req, res, next) => {
         theme: user.theme ?? "Light",
         notifications: user.notifications ?? true,
         xp: xpTotal,
-        current_streak: user.streak?.current ?? 0,
+        current_streak: getDisplayStreak(user.streak),
         longest_streak: user.streak?.longest ?? 0,
         active_learning_days: user.streak?.active_learning_days ?? 0,
         timezone: user.timezone,
@@ -134,6 +135,7 @@ const updateProfile = async (req, res, next) => {
 
     await user.save();
     const xpTotal = await getUserXpTotal(req.user.id);
+
     return res.status(StatusCodes.OK).json({
       message: "You have successfully updated your profile.",
       user: {
@@ -144,7 +146,7 @@ const updateProfile = async (req, res, next) => {
         theme: user.theme,
         notifications: user.notifications,
         xp: xpTotal,
-        current_streak: user.streak?.current ?? 0,
+        current_streak: getDisplayStreak(user.streak),
         longest_streak: user.streak?.longest ?? 0,
         timezone: user.timezone,
         avatar_url: user.avatar_url || null,

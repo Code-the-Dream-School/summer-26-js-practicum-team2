@@ -66,6 +66,7 @@ export default function useDashboardData({ userId, isAuthenticated }) {
 
       try {
         const payload = await getDashboard();
+
         setDashboard(payload);
         cacheDashboard(userId, payload);
         return payload;

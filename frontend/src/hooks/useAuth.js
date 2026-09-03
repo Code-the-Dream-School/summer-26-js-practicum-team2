@@ -44,12 +44,22 @@ export function useAuth() {
 
   // Restore the current auth state from browser storage on first mount.
   useEffect(() => {
-    const stored = readStoredAuth();
-    dispatch({
-      type: actions.hydrateComplete,
-      user: stored?.user ?? null,
-      csrfToken: stored?.csrfToken ?? null,
-    });
+    const hydrate = async () => {
+      const stored = readStoredAuth();
+      dispatch({
+        type: actions.hydrateComplete,
+        user: stored?.user ?? null,
+        csrfToken: stored?.csrfToken ?? null,
+      });
+
+      //Restore profile after page refresh
+      if (stored?.user) {
+        const { user: profileData } = await api.getProfile();
+        setProfile(profileData);
+      }
+    };
+
+    hydrate();
   }, []);
 
   // Keep the reducer and browser storage in sync whenever auth data changes.

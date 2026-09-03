@@ -1,6 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const UserProgress = require("../models/UserProgress.model");
 const { getModule, getLesson } = require("../utils/content");
+const { updateUserStreak } = require("../services/streak.service");
+const { invalidateDashboardCache } = require("./dashboard.controller");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -81,6 +83,49 @@ exports.getLessonProgress = async (req, res, next) => {
   }
 };
 
+// POST /api/v1/lessons/complete
+exports.completeMicroLesson = async (req, res, next) => {
+  try {
+    const { moduleId = DEFAULT_MODULE_ID, microLessonId } = req.body;
+
+    const progress = await UserProgress.findOne({
+      user_id: req.user.id,
+      module_id: moduleId,
+    });
+
+    const alreadyCompleted = progress?.completed_micro_lessons?.includes(microLessonId) || false;
+
+    const updatedProgress = await UserProgress.findOneAndUpdate(
+      {
+        user_id: req.user.id,
+        module_id: moduleId,
+      },
+      {
+        $addToSet: {
+          completed_micro_lessons: microLessonId,
+        },
+        $set: {
+          current_micro_lesson_id: microLessonId,
+        },
+      },
+      {
+        upsert: true,
+        new: true,
+      },
+    );
+
+    if (!alreadyCompleted) {
+      await updateUserStreak(req.user.id);
+    }
+
+    invalidateDashboardCache(req.user.id);
+
+    return res.status(StatusCodes.OK).json(shapeProgress(updatedProgress));
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // PATCH /api/v1/lessons/progress
 // Body: { moduleId, lessonId, microLessonId }
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
@@ -115,6 +160,8 @@ exports.updateLessonProgress = async (req, res, next) => {
       },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     );
+
+    invalidateDashboardCache(req.user.id);
 
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
   } catch (error) {

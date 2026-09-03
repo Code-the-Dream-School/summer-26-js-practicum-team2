@@ -8,8 +8,6 @@ import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.comp
 export default function MainLayout() {
   const { isAuthenticated, user, profile, logout } = useAuthContext();
 
-  console.log("PROFILE IN MAINLAYOUT", profile);
-
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleLogout = async () => {
