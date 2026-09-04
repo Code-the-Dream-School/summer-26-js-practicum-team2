@@ -3,10 +3,11 @@ import { Navigate } from "react-router";
 import { getLastLesson } from "../services/api";
 import { ROUTES } from "../app/router/routes";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-
+import { useOptionalOnboarding } from "../context/OnboardingContext1";
 const STORAGE_KEY = "lastLessonPath";
 
 export default function LastLessonRedirect() {
+  const currentStep = useOptionalOnboarding()?.currentStep ?? null;
   const [target, setTarget] = useState(null);
 
   useEffect(() => {
@@ -29,9 +30,9 @@ export default function LastLessonRedirect() {
       isMounted = false;
     };
   }, []);
-
-  if (target) return <Navigate to={target} replace />;
-
+//OnboardingOverlay set up for page
+  if (target && currentStep !==2) { return <Navigate to={target} replace />;
+  }
   return (
     <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
       <Skeleton />

@@ -1,9 +1,39 @@
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { useAuthContext } from "../../context/AuthContext";
+import { OnboardingProvider, useOnboarding } from "../../context/OnboardingContext1";
+import OnboardingOverlay from "../../features/onboarding1/OnboardingOverlay1.component";
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
+
+function OnboardingWrapper() {
+  const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
+    useOnboarding();
+  const location = useLocation();
+
+  const pageName = (() => {
+    if (location.pathname.includes("/dashboard") || location.pathname === "/") {
+      return "dashboardPage";
+    }
+    if (location.pathname.includes("/profile")) return "profilePage";
+    if (location.pathname.includes("/learn/last-lesson")) return "lessonPage";
+    if (location.pathname.includes("/learn")) return "learningPath";
+    return "";
+  })();
+
+  return (
+    <OnboardingOverlay
+      hasCompleted={hasCompleted}
+      currentStep={currentStep}
+      activePage={activePage}
+      pageName={pageName}
+      onNext={handleNextStep}
+      onStart={startOnboarding}
+      onSkip={skipOnboarding}
+    />
+  );
+}
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
@@ -25,7 +55,8 @@ export default function MainLayout() {
   };
 
   return (
-    <div className="mx-auto min-h-screen bg-surface-app text-foreground">
+    <OnboardingProvider>
+      <div className="mx-auto min-h-screen bg-surface-app text-foreground">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface-app focus:px-4 focus:py-2 focus:text-primary"
@@ -43,6 +74,7 @@ export default function MainLayout() {
         isSigningOut={isSigningOut}
       />
       <main id="main-content" className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {isAuthenticated && <OnboardingWrapper />}
         <Outlet context={setCurrentModuleResources} />
       </main>
       <Footer
@@ -50,6 +82,7 @@ export default function MainLayout() {
         worksCited={currentModuleResources.worksCited}
       />
       <ConsentBanner />
-    </div>
+      </div>
+    </OnboardingProvider>
   );
 }

@@ -6,7 +6,13 @@ const mongoose = require("mongoose");
 const pageTourSchema = new mongoose.Schema(
   {
     step: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ["pending", "completed", "skipped"],
+      default: "pending",
+    },
     dismissed: { type: Boolean, default: false },
+    completed_at: { type: Date, default: null },
   },
   { _id: false },
 );
@@ -93,6 +99,7 @@ const userSchema = new mongoose.Schema(
     },
     onboarding: {
       is_completed: { type: Boolean, default: false },
+      current_step: { type: Number, default: 0 },
       started_at: {
         type: Date,
         default: null,
