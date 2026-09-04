@@ -32,7 +32,7 @@ const loginLimiter = rateLimiter({
 // Sets a limit of 100 requests per 15 minutes per IP address
 const apiLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: process.env.NODE_ENV === "production" ? 300 : 1000,
 });
 
 module.exports = { registerLimiter, loginLimiter, apiLimiter };

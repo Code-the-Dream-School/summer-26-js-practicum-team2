@@ -32,8 +32,6 @@ const getProfile = async (req, res, next) => {
 
     const xpTotal = await getUserXpTotal(req.user.id);
 
-    console.log("USER BADGES", user.earned_badges);
-
     return res.status(StatusCodes.OK).json({
       user: {
         id: user._id,

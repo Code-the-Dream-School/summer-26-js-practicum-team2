@@ -59,8 +59,6 @@ async function getXpEarnedToday(userId) {
 
   const totalXpToday = xpEvents.reduce((total, event) => total + event.amount, 0);
 
-  console.log("XpEarnedToday", totalXpToday);
-
   return totalXpToday;
 }
 

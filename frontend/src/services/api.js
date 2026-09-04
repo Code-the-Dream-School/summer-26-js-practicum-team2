@@ -113,7 +113,11 @@ export const deleteProfile = ({ email, csrfToken }) =>
 // Dispatches a custom event to notify the application that dashboard progress has been updated
 // This allows other components to listen for this event and update their state accordingly
 export const notifyDashboardProgressChanged = (detail = {}) => {
-  window.dispatchEvent(new Event("sprout:progress-updated", { detail }));
+  window.dispatchEvent(
+    new CustomEvent("sprout:progress-updated", {
+      detail,
+    }),
+  );
 };
 
 // Tracks a dashboard event by sending it to the backend and notifying listeners of progress changes
@@ -131,6 +135,10 @@ export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
   // Notify listeners that dashboard progress has changed
   notifyDashboardProgressChanged();
   return response;
+};
+
+export const clearDashboardCache = (userId) => {
+  window.sessionStorage.removeItem(`sprout.dashboard.${userId}`);
 };
 
 export const getLesson = (moduleId, lessonId) =>
@@ -172,6 +180,7 @@ export const completeMicroLesson = async ({ moduleId, microLessonId, csrfToken }
     basePath: LESSONS_BASE_PATH,
   });
 
+  notifyDashboardProgressChanged();
   return response;
 };
 

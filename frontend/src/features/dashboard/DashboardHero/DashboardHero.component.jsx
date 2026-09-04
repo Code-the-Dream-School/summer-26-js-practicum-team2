@@ -61,8 +61,6 @@ export default function DashboardHero({ hero, badges = [], xp = 0 }) {
   const ctaLabel = resolvedHero?.primaryAction?.label || "Continue learning";
   const ctaHref = resolvedHero?.primaryAction?.href || "/learn";
 
-  console.log("XP PROP", xp);
-
   return (
     <section className="rounded-2xl border border-neutral-200 bg-surface-raised p-5 text-foreground shadow-sm sm:p-6">
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)] lg:items-start">

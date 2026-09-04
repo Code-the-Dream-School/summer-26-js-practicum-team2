@@ -52,7 +52,6 @@ export default function DashboardPage() {
   }
 
   const { hero, xp, badges, nextAction, units = [], recentActivity = [] } = dashboard || {};
-  console.log("DASHBOARD BADGES", badges);
 
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;

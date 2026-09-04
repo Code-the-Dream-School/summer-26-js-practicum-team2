@@ -3,8 +3,11 @@ import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-r
 import { useAuthContext } from "../context/AuthContext";
 import useLessonContent from "../hooks/useLessonContent";
 import { ROUTES } from "../app/router/routes";
-import { updateLessonProgress, completeMicroLesson } from "../services/api";
-import { notifyDashboardProgressChanged } from "../services/api";
+import {
+  updateLessonProgress,
+  completeMicroLesson,
+  notifyDashboardProgressChanged,
+} from "../services/api";
 import {
   getResumeIndex,
   getSampleLesson,
@@ -153,7 +156,11 @@ function LearnFlow({
         csrfToken,
       });
 
+      //clearDashboardCache(auth.user.id);
+
       await refreshProfile();
+
+      console.log("DISPATCHING DASHBOARD REFRESH EVENT");
 
       notifyDashboardProgressChanged();
     }
