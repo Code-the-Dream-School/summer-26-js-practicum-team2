@@ -25,6 +25,12 @@ upserts those results into `leaderboardhistories`, and removes the previous week
 The history contains internal user IDs, XP, and ranks but no profile or contact information. The
 job is idempotent if retried because history records are uniquely keyed by learner and week.
 
+`backend/src/jobs/leaderboardScheduler.js` starts after the database connection. It runs catch-up
+rotation and rollup work once at process startup, schedules the weekly rotation for **Monday at
+00:00 UTC**, and schedules current-week rollups nightly at **00:05 UTC**. Each timer calculates its
+next UTC boundary after it finishes instead of relying on the server's local timezone. Job errors
+are logged and the following run remains scheduled.
+
 XP awards are recorded in the `xpevents` collection. Each event stores the requested and actually
 awarded XP, its UTC day bucket, and its leaderboard week bucket. Weekly totals sum `awarded_xp`,
 not `requested_xp`. The `(user_id, source_key)` unique index makes reward sources idempotent, while
