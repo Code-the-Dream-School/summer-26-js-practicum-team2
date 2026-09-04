@@ -42,4 +42,5 @@ This storage contract does not make a learner visible. Leaderboard queries must 
 Opted-out learners receive empty rankings, and opted-out, disabled, deleted, or archived accounts
 are removed before ranks are assigned. Ranked entries project only an internal user ID, display
 name, avatar URL, weekly XP, and rank. The default public group contains 20 learners; the current
-learner is returned separately even when ranked outside that group.
+learner is returned separately even when ranked outside that group. Learners with equal XP share
+the same competition rank, with internal user ID used only for stable display ordering.

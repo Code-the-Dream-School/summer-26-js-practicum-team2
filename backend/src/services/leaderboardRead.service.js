@@ -60,10 +60,11 @@ async function getLeaderboardForUser({
     },
     {
       $setWindowFields: {
-        sortBy: { xp_total: -1, user_id: 1 },
-        output: { rank: { $documentNumber: {} } },
+        sortBy: { xp_total: -1 },
+        output: { rank: { $rank: {} } },
       },
     },
+    { $sort: { xp_total: -1, user_id: 1 } },
     {
       $project: {
         _id: 0,
