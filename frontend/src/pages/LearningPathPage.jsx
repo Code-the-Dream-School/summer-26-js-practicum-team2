@@ -134,6 +134,7 @@ function LearningPathPage() {
 
   // For scrolling to the current microLesson node in the learning path
   const currentNodeRef = useRef(null);
+  const hasScrolledToCurrentNodeRef = useRef(false);
 
   // Refs used for drawing the lines between each learning path node
   const pathContainerRef = useRef(null);
@@ -200,13 +201,19 @@ function LearningPathPage() {
     };
   }, [pathHeight]);
 
-  // Scroll to the current lesson when the page opens.
+  // Scroll once the asynchronously loaded current lesson has rendered.
   useEffect(() => {
-    currentNodeRef.current?.scrollIntoView({
+    if (currentIndex < 0 || !currentNodeRef.current || hasScrolledToCurrentNodeRef.current) {
+      return;
+    }
+
+    hasScrolledToCurrentNodeRef.current = true;
+    currentNodeRef.current.scrollIntoView({
       behavior: "smooth",
       block: "center",
+      inline: "nearest",
     });
-  }, []);
+  }, [currentIndex]);
   // Function to calculate the start and end points of the line connecting two nodes
   function getPathPoints(x1, y1, x2, y2, padding = circleRadius + visibleGap) {
     // Calculate the distance between the two points in the x and y directions
