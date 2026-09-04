@@ -55,14 +55,9 @@ function QuizComponent({
       >
         {question.choices.map((choice) => {
           const isSelected = selectedChoiceIds.includes(choice.id);
-          const isCorrectChoice = question.correctChoiceIds.includes(choice.id);
-          const variant = !reviewAnswer
-            ? "choice"
-            : isCorrectChoice
-              ? "success"
-              : isSelected
-                ? "danger"
-                : "choice";
+          const isCorrectChoice = reviewAnswer?.correctChoiceIds?.includes(choice.id);
+          const variant =
+            reviewAnswer && isSelected ? (reviewAnswer.isCorrect ? "success" : "danger") : "choice";
           const selectedIcon = reviewAnswer
             ? isSelected && isCorrectChoice
               ? rightAnswerIcon
