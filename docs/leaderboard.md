@@ -13,6 +13,11 @@ available as a stable tie-breaker.
 The future aggregation and reset jobs must use `getLeaderboardWeek` from
 `backend/src/utils/leaderboardTime.js` rather than calculating their own boundaries.
 
+`rollupLeaderboardWeek` in `backend/src/services/weeklyLeaderboard.service.js` materializes a
+week on demand. It groups immutable XP events by learner and replaces each stored `xp_total`, so
+rerunning the rollup is idempotent rather than adding the same XP again. A scheduler can safely run
+this rollup nightly and immediately before the weekly reset.
+
 XP awards are recorded in the `xpevents` collection. Each event stores the requested and actually
 awarded XP, its UTC day bucket, and its leaderboard week bucket. Weekly totals sum `awarded_xp`,
 not `requested_xp`. The `(user_id, source_key)` unique index makes reward sources idempotent, while
