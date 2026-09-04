@@ -148,7 +148,7 @@ const updateOnboardingProgress = async (req, res, next) => {
         await UserProgress.findOneAndUpdate(
           { user_id: userId },
           { $inc: { xp: xpAwarded } },
-          { upsert: true, returnDocument: 'after'},
+          { upsert: true, returnDocument: "after" },
         );
       }
     }
