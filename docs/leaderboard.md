@@ -13,5 +13,13 @@ available as a stable tie-breaker.
 The future aggregation and reset jobs must use `getLeaderboardWeek` from
 `backend/src/utils/leaderboardTime.js` rather than calculating their own boundaries.
 
+XP awards are recorded in the `xpevents` collection. Each event stores the requested and actually
+awarded XP, its UTC day bucket, and its leaderboard week bucket. Weekly totals sum `awarded_xp`,
+not `requested_xp`. The `(user_id, source_key)` unique index makes reward sources idempotent, while
+the `(user_id, day_start)` index supports enforcing the 500 XP daily cap in UTC.
+
+XP events contain internal identifiers and award data only. They must not contain names, email
+addresses, avatars, or other profile information.
+
 This storage contract does not make a learner visible. Leaderboard queries must separately require
 `leaderboard_opt_in: true` and must return only display name, avatar, weekly XP, and rank.
