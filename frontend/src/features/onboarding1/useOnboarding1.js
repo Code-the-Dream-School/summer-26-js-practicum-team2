@@ -30,8 +30,8 @@ export function useOnboarding() {
     }
     return status === "true";
   });
-useEffect (() => {
-  async function fetchOnboardingState() {
+  useEffect(() => {
+    async function fetchOnboardingState() {
       try {
         const response = await apiGetOnboardingState();
         if (response?.onboarding) {
@@ -42,17 +42,18 @@ useEffect (() => {
           localStorage.setItem("sprout_onboarding_complete", completed ? "true" : "false");
 
           //Only set active step if user started and not finished
-          if(!completed && onboarding.started_at){
+          if (!completed && onboarding.started_at) {
             setCurrentStep(onboarding.current_step ?? 0);
-          }else{
+          } else {
             setCurrentStep(null);
           }
         }
-          }catch(err){
-            console.error("fail",err)
-          }
-        }
-        fetchOnboardingState()},[]);
+      } catch (err) {
+        console.error("fail", err);
+      }
+    }
+    fetchOnboardingState();
+  }, []);
 
   const startOnboarding = async () => {
     console.log("startOnboarding called");
@@ -73,7 +74,7 @@ useEffect (() => {
       console.error("Fail to reset onboarding session:", err);
     }
   };
-  
+
   //helper function to update progress in database via Path /api/v1/onboarding/step route
   const sendOnboardingStepToDB = async (tourKey, step, status, dismissed) => {
     try {
@@ -92,26 +93,26 @@ useEffect (() => {
     const activeTourKey = ONBOARDING_STEPS[currentStep]?.page;
     try {
       if (activeTourKey && currentStep !== null) {
-       await sendOnboardingStepToDB(activeTourKey, currentStep, "skipped", true);
+        await sendOnboardingStepToDB(activeTourKey, currentStep, "skipped", true);
       }
-       //Reset local step state so popup closes and dashboard banner is available for user at a later time 
-       setCurrentStep(null);
-       localStorage.setItem("sprout_onboarding_complete", "false");
-       setHasCompleted(false);
-        navigate("/dashboard");
-    
-//Commenting out lines 148 to 151 with apiToggleOnboarding since it may have been forcing all unvisited keys as skipped preventing to try onboarding later. may later figure out logic to track user who do a an absolute skip all to all onboarding tours
+      //Reset local step state so popup closes and dashboard banner is available for user at a later time
+      setCurrentStep(null);
+      localStorage.setItem("sprout_onboarding_complete", "false");
+      setHasCompleted(false);
+      navigate("/dashboard");
 
-    // try {
-    //   await apiToggleOnboarding({
-    //     enabled: false,
-    //     csrfToken,
-    //     // await fetch("/api/v1/onboarding/toggle", {
-        //   method: "PATCH",
-        //   credentials: "include",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
+      //Commenting out lines 148 to 151 with apiToggleOnboarding since it may have been forcing all unvisited keys as skipped preventing to try onboarding later. may later figure out logic to track user who do a an absolute skip all to all onboarding tours
+
+      // try {
+      //   await apiToggleOnboarding({
+      //     enabled: false,
+      //     csrfToken,
+      //     // await fetch("/api/v1/onboarding/toggle", {
+      //   method: "PATCH",
+      //   credentials: "include",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
       //});
     } catch (err) {
       console.error("Failed to skip onboarding session:", err);

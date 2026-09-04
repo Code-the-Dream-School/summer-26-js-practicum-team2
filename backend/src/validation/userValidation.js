@@ -67,9 +67,9 @@ const updateOnboardingProgressSchema = Joi.object({
     "number.min": "Step cannot be a negative number.",
   }),
   status: Joi.string()
-  .valid("pending", "completed","skipped")
-  .optional()
-  .messages ({"any.only": "Status must be pending, completed, or skipped."}),
+    .valid("pending", "completed", "skipped")
+    .optional()
+    .messages({ "any.only": "Status must be pending, completed, or skipped." }),
 
   dismissed: Joi.boolean().strict().optional().messages({
     "boolean.base": "Dismissed must be a boolean value.",
