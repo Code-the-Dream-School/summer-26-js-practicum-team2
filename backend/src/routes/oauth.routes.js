@@ -3,7 +3,6 @@ const passport = require("../config/passport.js");
 const {
   completeOAuthLogin,
   getOAuthFailureRedirect,
-  oauthFailureRedirect,
 } = require("../controllers/oauth.controller.js");
 const {
   OAUTH_PROVIDER_SCOPES,
@@ -13,6 +12,18 @@ const {
 const { createOAuthState, validateOAuthState } = require("../middleware/oauthState.js");
 
 const router = express.Router();
+
+const logOAuthFailure = (provider, err, info) => {
+  if (process.env.NODE_ENV === "test") return;
+
+  const failure = err || info;
+  console.error(`[oauth:${provider}] Authentication failed`, {
+    name: failure?.name,
+    code: failure?.code,
+    message: failure?.message,
+    statusCode: failure?.oauthError?.statusCode,
+  });
+};
 
 const requireEnabledProvider = (provider) => (req, res, next) => {
   if (!isOAuthProviderEnabled(provider)) {
@@ -33,11 +44,12 @@ const startOAuthProvider = (provider) => [
 ];
 
 const completeOAuthProvider = (provider) => [
-  validateOAuthState(provider, oauthFailureRedirect),
+  validateOAuthState(provider, getOAuthFailureRedirect),
   requireEnabledProvider(provider),
   (req, res, next) =>
     passport.authenticate(provider, { session: false }, (err, user, info) => {
       if (err || !user) {
+        logOAuthFailure(provider, err, info);
         return res.redirect(getOAuthFailureRedirect(err?.code || info?.code));
       }
 

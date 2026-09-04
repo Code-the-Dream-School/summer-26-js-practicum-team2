@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.7.1] - 2026-09-04
+
+### Added
+
+- Added focused regression coverage for mapping dashboard, profile, learning-path, lesson, and unrelated URLs to onboarding page names.
+
+### Changed
+
+- Centralized onboarding step and route definitions in a shared constants module so the context and standalone hook cannot drift apart.
+- Extracted onboarding page detection into a shared utility, preserving exact learning-path matching and nested lesson-route detection.
+- Added provider-scoped OAuth failure diagnostics without logging state values or other sensitive callback data.
+
+### Fixed
+
+- Fixed invalid, missing, expired, or reused OAuth state callbacks to return a specific sign-in-session error instead of the generic OAuth failure message.
+
+---
+
 ## [0.7.0] - 2026-09-04
 
 ### Added

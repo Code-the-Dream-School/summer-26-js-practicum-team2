@@ -6,15 +6,7 @@ import OnboardingOverlay from "../../features/onboarding1/OnboardingOverlay1.com
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
-import { ROUTES } from "../../app/router/routes";
-
-function getOnboardingPageName(pathname) {
-  if (pathname === ROUTES.DASHBOARD || pathname === ROUTES.HOME) return "dashboardPage";
-  if (pathname === ROUTES.PROFILE) return "profilePage";
-  if (pathname === ROUTES.LEARN) return "learningPath";
-  if (pathname.startsWith(`${ROUTES.LEARN}/`)) return "lessonPage";
-  return "";
-}
+import { getOnboardingPageName } from "../../features/onboarding1/onboarding.utils";
 
 function OnboardingWrapper() {
   const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
