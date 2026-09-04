@@ -33,14 +33,24 @@ const updateUserStreak = async (userId) => {
     user.streak.last_active_date = now;
 
     await user.save();
-    return;
+    return {
+      streakAwarded: true,
+      currentStreak: user.streak.current,
+      longestStreak: user.streak.longest,
+      activeLearningDays: user.streak.active_learning_days,
+    };
   }
 
   const lastActiveKey = getDayKey(user.streak.last_active_date, timeZone);
 
   //If they already completed a lesson today
   if (todayKey === lastActiveKey) {
-    return;
+    return {
+      streakAwarded: false,
+      currentStreak: user.streak.current,
+      longestStreak: user.streak.longest,
+      activeLearningDays: user.streak.active_learning_days,
+    };
   }
 
   //Figure out if their Current Streak is still unbroken
@@ -65,6 +75,13 @@ const updateUserStreak = async (userId) => {
   user.streak.last_active_date = now;
 
   await user.save();
+
+  return {
+    streakAwarded: true,
+    currentStreak: user.streak.current,
+    longestStreak: user.streak.longest,
+    activeLearningDays: user.streak.active_learning_days,
+  };
 };
 
 module.exports = { updateUserStreak };

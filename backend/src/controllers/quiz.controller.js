@@ -172,6 +172,7 @@ exports.startQuiz = async (req, res, next) => {
 //Function: Submit quiz responses based on courseId, grades answers, logs the number of quiz attempts, updates lesson progress.
 
 exports.submitQuiz = async (req, res, next) => {
+  const xpRewards = [];
   try {
     const microLessonId = req.params.id;
     const userId = req.user.id; //due to middleware from jwt
@@ -341,6 +342,14 @@ exports.submitQuiz = async (req, res, next) => {
         });
       }
 
+      //award xp to send to frontend for Toast notification
+      if (quizPassXp.amount > 0) {
+        xpRewards.push({
+          type: "quiz_pass",
+          amount: quizPassXp.amount,
+        });
+      }
+
       //increases UserProgress.xp
       if (perfectXp.amount > 0) {
         update.$inc = {
@@ -356,6 +365,13 @@ exports.submitQuiz = async (req, res, next) => {
           event_type: "quiz_perfect",
           amount: perfectXp.amount,
           reference_id: microLessonId,
+        });
+      }
+
+      if (perfectXp.amount > 0) {
+        xpRewards.push({
+          type: "quiz_perfect",
+          amount: perfectXp.amount,
         });
       }
 
@@ -408,6 +424,14 @@ exports.submitQuiz = async (req, res, next) => {
             reference_id: lessonId,
           });
         }
+
+        //award xp for Toast notification to frontend for lesson completion
+        if (lessonXp.amount > 0) {
+          xpRewards.push({
+            type: "lesson_complete",
+            amount: lessonXp.amount,
+          });
+        }
       }
     }
     invalidateDashboardCache(userId);
@@ -416,6 +440,9 @@ exports.submitQuiz = async (req, res, next) => {
       passed: attempt.passed,
       attempt_number: attempt.attempt_number,
       missed,
+      rewards: {
+        xp: xpRewards,
+      },
     });
   } catch (error) {
     return next(error);

@@ -125,16 +125,24 @@ exports.completeMicroLesson = async (req, res, next) => {
 
     console.log("LESSON COMPLETE CHECK", microLessonId, alreadyCompleted);
 
+    let streakAward = null;
+
     //If this is first completion, udpate the streak and award the badge
     if (!alreadyCompleted) {
-      await updateUserStreak(req.user.id);
+      streakAward = await updateUserStreak(req.user.id);
     }
 
-    await awardEligibleBadges(req.user.id);
+    const awardedBadges = await awardEligibleBadges(req.user.id);
 
     invalidateDashboardCache(req.user.id);
 
-    return res.status(StatusCodes.OK).json(shapeProgress(updatedProgress));
+    return res.status(StatusCodes.OK).json({
+      progress: shapeProgress(updatedProgress),
+      rewards: {
+        streak: streakAward,
+        badges: awardedBadges,
+      },
+    });
   } catch (error) {
     return next(error);
   }
