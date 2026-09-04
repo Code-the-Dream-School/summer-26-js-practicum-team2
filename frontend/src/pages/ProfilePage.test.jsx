@@ -151,6 +151,10 @@ describe("ProfilePage", () => {
       "src",
       "https://example.com/maya.png",
     );
+    expect(screen.getByRole("img", { name: "Maya avatar" })).toHaveAttribute(
+      "referrerpolicy",
+      "no-referrer",
+    );
   });
 
   it("renders the user's initial when no avatar image is saved", async () => {
