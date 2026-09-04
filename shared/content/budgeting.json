@@ -359,7 +359,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.2-q1",
+              "id": "1.2.1-q1",
               "questionType": "multipleChoice",
               "question": "What is an example of income?",
               "answerChoices": [
@@ -373,7 +373,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.2-q2",
+              "id": "1.2.1-q2",
               "questionType": "trueFalse",
               "question": "True or False? Income only includes the money you make from a job.",
               "answerChoices": [
@@ -389,7 +389,7 @@
 
             {
               "type": "knowledgeCheck",
-              "id": "1.2.2-q3",
+              "id": "1.2.1-q3",
               "questionType": "multiSelect",
               "question": "Select Abigail's source(s) of income (select all that apply)",
               "answerChoices": [
@@ -429,7 +429,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q1",
+              "id": "1.2.2-q1",
               "questionType": "multiSelect",
               "question": "Select the most common pay frequencies for paychecks (select all that apply):",
               "answerChoices": [
@@ -443,7 +443,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q2",
+              "id": "1.2.2-q2",
               "questionType": "multipleChoice",
               "question": "How many paychecks does Abigail receive per year since she is paid on a bi-weekly basis?",
               "answerChoices": [
@@ -457,7 +457,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q3",
+              "id": "1.2.2-q3",
               "questionType": "trueFalse",
               "question": "True or false? Semi-monthly paychecks are paid on the same 2 dates every month?",
               "answerChoices": [
@@ -472,7 +472,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q4",
+              "id": "1.2.2-q4",
               "questionType": "multipleChoice",
               "question": "Let's help Abigail calculate her income.\n\nAbigail works a full-time job as a nurse at the local hospital. She makes $70,200 a year after taxes and deductions are taken out. What is her monthly income? (Hint: Divide total yearly income by 12 to get monthly income)",
               "answerChoices": [
@@ -487,7 +487,7 @@
           ]
         },
         {
-          "id": "1.2.4",
+          "id": "1.2.3",
           "title": "Gross vs Net Income",
           "microLessonContent": [
             {
@@ -516,7 +516,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q1",
+              "id": "1.2.3-q1",
               "questionType": "multipleChoice",
               "question": "Gross Pay is:",
               "answerChoices": [
@@ -539,7 +539,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q2",
+              "id": "1.2.3-q2",
               "questionType": "multipleChoice",
               "question": "Net pay is:",
               "answerChoices": [
@@ -556,7 +556,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q3",
+              "id": "1.2.3-q3",
               "questionType": "multipleChoice",
               "question": "If Ramona works 20 hours per week for $15 per hour, what is Ramona's gross pay for one week?",
               "answerChoices": [
@@ -570,7 +570,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q4",
+              "id": "1.2.3-q4",
               "questionType": "multipleChoice",
               "question": "What is the correct formula for calculating your net pay?",
               "answerChoices": [

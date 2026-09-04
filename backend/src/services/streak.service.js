@@ -1,5 +1,4 @@
 const { User } = require("../models/User.model");
-const { awardEligibleBadges } = require("./badge.service");
 
 //Get user's date in their timezone
 function getDayKey(date, timeZone) {
@@ -34,8 +33,6 @@ const updateUserStreak = async (userId) => {
     user.streak.last_active_date = now;
 
     await user.save();
-
-    await awardEligibleBadges(userId);
     return;
   }
 
@@ -68,8 +65,6 @@ const updateUserStreak = async (userId) => {
   user.streak.last_active_date = now;
 
   await user.save();
-
-  await awardEligibleBadges(userId);
 };
 
 module.exports = { updateUserStreak };

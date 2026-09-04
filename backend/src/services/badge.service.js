@@ -14,7 +14,9 @@ async function awardEligibleBadges(userId) {
     user_id: userId,
   });
 
-  console.log("COMPLETED MICRO LESSONS", progress?.completed_micro_lessons.length || 0);
+  console.log("COMPLETED MICRO LESSONS", progress?.completed_micro_lessons?.length || 0);
+
+  console.log("COMPLETED MICRO LESSON IDS", progress?.completed_micro_lessons);
 
   const awarded = [];
 
@@ -48,7 +50,7 @@ async function awardEligibleBadges(userId) {
     completedMicroLessons,
     existingBadgeIds.has(BADGES.LEARNING_MACHINE.id),
   );
-  if (completedMicroLessons >= 10 && !existingBadgeIds.has(BADGES.LEARNING_MACHINE.id)) {
+  if (completedMicroLessons >= 5 && !existingBadgeIds.has(BADGES.LEARNING_MACHINE.id)) {
     user.earned_badges.push({
       badge_id: BADGES.LEARNING_MACHINE.id,
       awarded_at: new Date(),
