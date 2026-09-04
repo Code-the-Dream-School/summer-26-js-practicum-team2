@@ -60,14 +60,7 @@ const findOrCreateOAuthUser = async ({
     throw new OAuthUserError("OAUTH_PROVIDER_ID_REQUIRED", "OAuth provider identity is missing.");
   }
 
-  const email = selectVerifiedEmail(emails);
   const avatarUrl = selectProviderAvatar(photos);
-  if (!email) {
-    throw new OAuthUserError(
-      "OAUTH_VERIFIED_EMAIL_REQUIRED",
-      `We need a verified email address from ${provider === "github" ? "GitHub" : "Google"} to create your Sprout account.`,
-    );
-  }
 
   const providerUser = await User.findOne({ [providerField]: normalizedProviderId });
   if (providerUser) {
@@ -76,6 +69,16 @@ const findOrCreateOAuthUser = async ({
       await providerUser.save();
     }
     return providerUser;
+  }
+
+  // A provider may omit email data on later authorizations. Once the stable
+  // provider ID is linked, it is sufficient to identify the existing account.
+  const email = selectVerifiedEmail(emails);
+  if (!email) {
+    throw new OAuthUserError(
+      "OAUTH_VERIFIED_EMAIL_REQUIRED",
+      `We need a verified email address from ${provider === "github" ? "GitHub" : "Google"} to create your Sprout account.`,
+    );
   }
 
   const emailUser = await User.findOne({ email });
