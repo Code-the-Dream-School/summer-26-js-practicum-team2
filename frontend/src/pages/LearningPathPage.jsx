@@ -213,6 +213,39 @@ function LearningPathPage() {
     };
   }
 
+  function getVineGeometry(points, index) {
+    const xDistance = points.x2 - points.x1;
+    const yDistance = points.y2 - points.y1;
+    const length = Math.hypot(xDistance, yDistance) || 1;
+    const curveDirection = index % 2 === 0 ? 1 : -1;
+    const curve = Math.min(18, length * 0.12) * curveDirection;
+    const normalX = (-yDistance / length) * curve;
+    const normalY = (xDistance / length) * curve;
+
+    return {
+      path: `M ${points.x1} ${points.y1} C ${points.x1 + xDistance * 0.3 + normalX} ${
+        points.y1 + yDistance * 0.3 + normalY
+      }, ${points.x1 + xDistance * 0.7 + normalX} ${
+        points.y1 + yDistance * 0.7 + normalY
+      }, ${points.x2} ${points.y2}`,
+      angle: (Math.atan2(yDistance, xDistance) * 180) / Math.PI,
+      leaves: [
+        {
+          id: "early",
+          x: points.x1 + xDistance * 0.34 + normalX * 0.72,
+          y: points.y1 + yDistance * 0.34 + normalY * 0.72,
+          scale: 0.78,
+        },
+        {
+          id: "late",
+          x: points.x1 + xDistance * 0.68 + normalX * 0.72,
+          y: points.y1 + yDistance * 0.68 + normalY * 0.72,
+          scale: 0.92,
+        },
+      ],
+    };
+  }
+
   // Function to navigate to the selected lesson when a node is clicked
   function openLesson(node) {
     if (!node) {
@@ -289,27 +322,13 @@ function LearningPathPage() {
           className="relative mx-auto mt-5 w-full max-w-[18rem] md:max-w-[34rem] lg:max-w-[44rem]"
           style={{ height: `${pathHeight}rem` }}
         >
-          {/* Lines connecting the learning path nodes */}
+          {/* Leafy vines connecting the learning path nodes */}
           <svg
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
             viewBox={`0 0 ${svgSize.width} ${svgSize.height}`}
             fill="none"
           >
-            <defs>
-              <marker
-                id="learning-path-arrow"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="4"
-                markerHeight="4"
-                orient="auto-start-reverse"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-learning-path-line)" />
-              </marker>
-            </defs>
-
             {learningPath.slice(0, -1).map((node, index) => {
               const nextNode = learningPath[index + 1];
 
@@ -321,19 +340,56 @@ function LearningPathPage() {
               }
 
               const points = getPathPoints(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+              const vine = getVineGeometry(points, index);
 
               return (
-                <line
-                  key={`${node.microLessonId}-${nextNode.microLessonId}`}
-                  x1={points.x1}
-                  y1={points.y1}
-                  x2={points.x2}
-                  y2={points.y2}
-                  stroke="var(--color-learning-path-line)"
-                  strokeWidth="1.5"
-                  markerEnd="url(#learning-path-arrow)"
-                  strokeLinecap="round"
-                />
+                <g key={`${node.microLessonId}-${nextNode.microLessonId}`}>
+                  <path
+                    d={vine.path}
+                    stroke="var(--color-learning-path-line)"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    opacity="0.12"
+                  />
+                  <path
+                    d={vine.path}
+                    stroke="var(--color-learning-path-line)"
+                    strokeWidth="2.25"
+                    strokeLinecap="round"
+                  />
+                  {vine.leaves.map((leaf, leafIndex) => (
+                    <g
+                      key={leaf.id}
+                      transform={`translate(${leaf.x} ${leaf.y}) rotate(${
+                        vine.angle + (leafIndex === 0 ? -5 : 6)
+                      }) scale(${leaf.scale} ${leafIndex === 0 ? leaf.scale : -leaf.scale})`}
+                      fill="var(--color-learning-path-line)"
+                    >
+                      <path
+                        d="M 0 0 C -2 -4 -4 -7 -6 -10"
+                        fill="none"
+                        stroke="var(--color-learning-path-line)"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M -6 -9 C -11 -8 -15 -10 -18 -14 L -13 -15 L -16 -21 L -10 -19 L -8 -26 L -4 -20 L 1 -24 L 0 -17 L 6 -17 C 3 -12 -1 -9 -6 -9 Z"
+                        opacity="0.88"
+                        stroke="var(--color-learning-path-line)"
+                        strokeWidth="0.75"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M -6 -10 L -7 -20 M -7 -15 L -12 -18 M -7 -16 L -2 -20"
+                        fill="none"
+                        stroke="var(--color-learning-path-surface)"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                        opacity="0.55"
+                      />
+                    </g>
+                  ))}
+                </g>
               );
             })}
           </svg>
