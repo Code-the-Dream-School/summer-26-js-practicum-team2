@@ -53,7 +53,7 @@ const loginSchema = Joi.object({
 });
 
 //Schema for PATCH /api/v1/onboarding/step
-const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
+const TOUR_KEYS = ["dashboardPage", "profilePage", "lessonPage", "learningPath"];
 const updateOnboardingProgressSchema = Joi.object({
   tourKey: Joi.string()
     .valid(...TOUR_KEYS)
@@ -66,6 +66,11 @@ const updateOnboardingProgressSchema = Joi.object({
     "number.integer": "Step must be an integer.",
     "number.min": "Step cannot be a negative number.",
   }),
+  status: Joi.string()
+    .valid("pending", "completed", "skipped")
+    .optional()
+    .messages({ "any.only": "Status must be pending, completed, or skipped." }),
+
   dismissed: Joi.boolean().strict().optional().messages({
     "boolean.base": "Dismissed must be a boolean value.",
   }),
@@ -75,15 +80,20 @@ const updateOnboardingProgressSchema = Joi.object({
     .messages({ "boolean.base": "markAllComplete must be a boolean value." }),
 });
 
-const moduleIdSchema = Joi.string().trim().valid("cashFlow").default("cashFlow");
+const moduleIdSchema = Joi.string().trim().min(1).required();
 const microLessonIdSchema = Joi.string().trim().min(1);
 
 const lessonProgressSchema = Joi.object({
-  moduleId: Joi.string().trim().min(1).default("cashFlow"),
+  moduleId: Joi.string().trim().min(1).strict().default("cashFlow"),
   lessonId: Joi.string().trim().min(1),
   microLessonId: microLessonIdSchema,
   currentChunkIndex: Joi.number().integer().min(0),
 }).or("lessonId", "microLessonId");
+
+const lessonCompletionSchema = Joi.object({
+  moduleId: moduleIdSchema,
+  lessonId: Joi.string().trim().min(1).required(),
+});
 
 const quizStartSchema = Joi.object({
   moduleId: moduleIdSchema,
@@ -92,6 +102,15 @@ const quizStartSchema = Joi.object({
 
 const quizSubmissionParamsSchema = Joi.object({
   id: microLessonIdSchema.required(),
+});
+
+const quizCheckSchema = Joi.object({
+  moduleId: moduleIdSchema,
+  microLessonId: microLessonIdSchema.required(),
+  questionId: Joi.string().trim().min(1).required(),
+  choiceIds: Joi.alternatives()
+    .try(Joi.string().trim(), Joi.array().items(Joi.string().trim()))
+    .required(),
 });
 
 const quizSubmissionSchema = Joi.object({
@@ -122,7 +141,66 @@ const resetPasswordSchema = Joi.object({
 
 const dashboardEventSchema = Joi.object({
   type: Joi.string().trim().valid("lesson_complete", "quiz_submit").required(),
+}).unknown(true);
+
+const lessonImportSchema = Joi.object({
+  id: Joi.string().trim().min(1).required(),
+  title: Joi.string().trim().min(1).required(),
+  lessons: Joi.array().required(),
+}).unknown(true);
+
+const adminUserQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(25),
+  role: Joi.string().valid("learner", "admin"),
+  emailVerified: Joi.boolean(),
+  search: Joi.string().trim().max(100),
 });
+
+const adminUserSeedSchema = Joi.object({
+  count: Joi.number().integer().min(1).max(100).default(10),
+});
+
+const adminRoleSchema = Joi.object({
+  role: Joi.string().valid("learner", "admin").required(),
+  confirmation: Joi.string().valid("CONFIRM").required(),
+});
+
+const adminActionSchema = Joi.object({
+  confirmation: Joi.string().valid("CONFIRM").required(),
+});
+
+const adminDisableSchema = adminActionSchema.keys({
+  disabled: Joi.boolean().required(),
+});
+
+const adminDeleteSchema = adminActionSchema.keys({
+  email: Joi.string()
+    .trim()
+    .email({ tlds: { allow: false } })
+    .required(),
+});
+
+const adminSoftDeleteSchema = adminActionSchema.keys({
+  deleted: Joi.boolean().required(),
+});
+
+const adminModuleSchema = Joi.object({
+  id: Joi.string().trim().min(1).required(),
+  title: Joi.string().trim().min(1).required(),
+  lessons: Joi.array().required(),
+}).unknown(true);
+
+const adminModuleUpdateSchema = Joi.object({
+  title: Joi.string().trim().min(1),
+  lessons: Joi.array(),
+})
+  .min(1)
+  .unknown(true);
+
+const adminLessonSchema = Joi.object({
+  id: Joi.string().trim().min(1).required(),
+}).unknown(true);
 
 function validateRequest(res, schema, payload) {
   const { error, value } = schema.validate(payload ?? {}, { abortEarly: false });
@@ -141,12 +219,25 @@ module.exports = {
   loginSchema,
   passwordSchema,
   lessonProgressSchema,
+  lessonCompletionSchema,
   quizStartSchema,
   quizSubmissionParamsSchema,
+  quizCheckSchema,
   quizSubmissionSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   dashboardEventSchema,
+  lessonImportSchema,
+  adminUserQuerySchema,
+  adminUserSeedSchema,
+  adminRoleSchema,
+  adminActionSchema,
+  adminDisableSchema,
+  adminDeleteSchema,
+  adminSoftDeleteSchema,
+  adminModuleSchema,
+  adminModuleUpdateSchema,
+  adminLessonSchema,
   validateRequest,
   updateOnboardingProgressSchema,
 };

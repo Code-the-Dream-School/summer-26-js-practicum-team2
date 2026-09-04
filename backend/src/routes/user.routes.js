@@ -1,5 +1,5 @@
 const express = require("express");
-const jwtMiddleware = require("../middleware/jsonWebToken");
+const { authenticateUser: jwtMiddleware } = require("../middleware/jsonWebToken");
 const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 const {
   register,
@@ -9,6 +9,7 @@ const {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getCurrentUser,
 } = require("../controllers/user.controller");
 const router = express.Router();
 
@@ -17,9 +18,11 @@ router.post("/register", registerLimiter, register);
 // GET/ verify ? token = (new endpoint for email verification link clicks)
 router.get("/verify", verifyEmail);
 // POST /api/v1/users/reactivate
-router.post("/reactivate", reactivate);
+router.post("/reactivate", loginLimiter, reactivate);
 // POST /api/v1/users/login
 router.post("/login", loginLimiter, login);
+// GET /api/v1/users/me
+router.get("/me", jwtMiddleware, getCurrentUser);
 // POST /api/v1/users/logout
 router.post("/logout", jwtMiddleware, logout);
 // POST /api/v1/users/forgot-password

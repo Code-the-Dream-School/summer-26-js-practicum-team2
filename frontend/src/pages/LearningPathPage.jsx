@@ -1,14 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
-import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from "../hooks/useLessonContent";
-import { getLesson, getLessonProgress,toggleOnboardingAPI } from "../services/api";
+import { getLesson, getLessonModules, getLessonProgress } from "../services/api";
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
+import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-
-// Import onboarding overlay component
-import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
+import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -21,7 +19,7 @@ function getMicroLessonPreview(content = []) {
     .join(" ");
 }
 
-function LearningPathPage({ onboarding }) {
+function LearningPathPage() {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAuthContext();
@@ -39,11 +37,26 @@ function LearningPathPage({ onboarding }) {
 
     async function loadLearningPath() {
       try {
-        // The saved progress tells us which module and lesson to load the content for.
-        const progressPayload = await getLessonProgress(DEFAULT_MODULE_ID);
+        const modulePayload = await getLessonModules();
+        const firstModuleId = modulePayload.modules?.[0]?.id;
+        if (!firstModuleId) {
+          if (isActive)
+            setError(
+              "No lesson modules have been seeded yet. Ask an admin to seed or import lessons.",
+            );
+          return;
+        }
+
+        const progressPayload = await getLessonProgress(firstModuleId);
+        const firstLessonId =
+          progressPayload.currentLessonId || modulePayload.modules[0].firstLessonId;
+        if (!firstLessonId) {
+          if (isActive) setError("The selected module does not contain any lessons yet.");
+          return;
+        }
         const lessonPayload = await getLesson(
-          progressPayload.currentModule || DEFAULT_MODULE_ID,
-          progressPayload.currentLessonId || DEFAULT_LESSON_ID,
+          progressPayload.currentModule || firstModuleId,
+          firstLessonId,
         );
 
         if (!isActive) {
@@ -114,7 +127,7 @@ function LearningPathPage({ onboarding }) {
 
   // Refs used for drawing the lines between each learning path node
   const pathContainerRef = useRef(null);
-  const nodeRefs = useRef([]);
+  const nodeElementsRef = useRef([]);
 
   // State for storing the center coordinates of each node and the size of the SVG container
   const [nodeCenters, setNodeCenters] = useState([]);
@@ -147,7 +160,7 @@ function LearningPathPage({ onboarding }) {
       });
 
       // Calculate the center coordinates of each node based on their bounding rectangles and the position of the path container. This allows us to draw lines between the centers of the nodes.
-      const nextCenters = nodeRefs.current.map((nodeElement) => {
+      const nextCenters = nodeElementsRef.current.map((nodeElement) => {
         if (!nodeElement) {
           return null;
         }
@@ -215,6 +228,22 @@ function LearningPathPage({ onboarding }) {
   }
 
   if (error) {
+    const isContentEmpty =
+      error.includes("No lesson modules") || error.includes("does not contain any lessons");
+
+    if (isContentEmpty) {
+      return (
+        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+          <EmptyState
+            className="border-primary/20 bg-surface-inset py-16"
+            icon={<img src={dabbingBeaverImg} alt="" className="h-14 w-14 object-contain" />}
+            title="Content coming soon"
+            message="New lessons are being prepared. Check back soon for something new to explore."
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <p className="text-sm font-medium text-danger">{error}</p>
@@ -260,7 +289,7 @@ function LearningPathPage({ onboarding }) {
           className="relative mx-auto mt-5 w-full max-w-[18rem] md:max-w-[34rem] lg:max-w-[44rem]"
           style={{ height: `${pathHeight}rem` }}
         >
-  
+          {/* Lines connecting the learning path nodes */}
           <svg
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
@@ -308,7 +337,25 @@ function LearningPathPage({ onboarding }) {
               );
             })}
           </svg>
+          {/* Render learning path Onboarding overly
+         
+          <div>
+            {!hasCompleted && activePage === "learningPath" && (
+              <OnboardingOverlay
+                hasCompleted={hasCompleted}
+                //status ={status}
+                currentStep={currentStep}
+                //activePage="learningPath"
+                activePage={activePage}
+                pageName="learningPath"
+                onNext={handleNextStep}
+                onStart={startOnboarding}
+                onSkip={skipOnboarding}
+              />
+            )}
+          </div> */}
 
+          {/* Rendering the learning path */}
           {learningPath.map((node, index) => {
             let status = "locked";
 
@@ -360,7 +407,7 @@ function LearningPathPage({ onboarding }) {
                 tooltipText={`${node.microLessonTitle} - ${tooltipText}`}
                 onSelect={openLesson}
                 ref={(element) => {
-                  nodeRefs.current[index] = element;
+                  nodeElementsRef.current[index] = element;
 
                   if (index === currentIndex) {
                     currentNodeRef.current = element;
@@ -399,14 +446,6 @@ function LearningPathPage({ onboarding }) {
             </Button>
           )}
         </div>
-        {toggleOnboardingAPI && !toggleOnboardingAPI.hasCompleted && (
-        <OnboardingOverlay
-          currentStep={toggleOnboardingAPI.currentStep}
-          activePage={toggleOnboardingAPI.activePage}
-          pageName="lessonPath"
-          onNext={toggleOnboardingAPI.handleNextStep}
-        />
-      )}
       </footer>
     </div>
   );
