@@ -18,8 +18,10 @@ const loginLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 5,
   skipSuccessfulRequests: true,
-  keyGenerator: (req, res) =>
-    req.body?.email ? req.body.email.toLowerCase() : ipKeyGenerator(req, res),
+  keyGenerator: (req, res) => {
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    return email || ipKeyGenerator(req, res);
+  },
   standardHeaders: true, //return rate limit info in Ratelimit headers
   legacyHeaders: false, //disable X-Rate limit
   message: {
@@ -28,11 +30,14 @@ const loginLimiter = rateLimiter({
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
 });
 
-// Rate Limiting Configuration
-// Sets a limit of 100 requests per 15 minutes per IP address
+const GLOBAL_API_LIMIT = process.env.NODE_ENV === "production" ? 200 : 10000;
+
+// Keep local development and integration tests from consuming a production-scale shared bucket.
 const apiLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  limit: GLOBAL_API_LIMIT,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-module.exports = { registerLimiter, loginLimiter, apiLimiter };
+module.exports = { registerLimiter, loginLimiter, apiLimiter, GLOBAL_API_LIMIT };

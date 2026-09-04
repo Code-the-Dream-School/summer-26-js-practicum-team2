@@ -1,5 +1,3 @@
-import { modules } from "../../../../shared/content/index";
-
 export function normalizeContent(content = []) {
   return content.map((item, index) => ({
     // Some content blocks lack IDs, so generate one for stable rendering and tracking.
@@ -10,9 +8,8 @@ export function normalizeContent(content = []) {
 
 export function normalizeQuestion(question, index) {
   // Support both the current answerChoices fields and the legacy choices fields.
-  const correctResponse = question.correctResponse;
-  const correctChoiceIds = Array.isArray(correctResponse) ? correctResponse : [correctResponse];
   const answerChoices = question.answerChoices ?? question.choices ?? [];
+  const correctResponse = question.correctResponse ?? question.correctChoiceIds ?? [];
 
   return {
     id: question.id ?? `question-${index + 1}`,
@@ -23,8 +20,11 @@ export function normalizeQuestion(question, index) {
       id: choice.key ?? choice.id,
       label: choice.text ?? choice.label,
     })),
-    correctChoiceIds: correctChoiceIds.filter(Boolean),
-    explanation: question.explanation ?? "Review the lesson and try this one again.",
+    correctChoiceIds: Array.isArray(correctResponse)
+      ? correctResponse
+      : correctResponse
+        ? [correctResponse]
+        : [],
   };
 }
 
@@ -71,15 +71,6 @@ export function normalizeLearnData({ moduleData, lessonData }) {
     lessonSteps,
     questions,
   };
-}
-
-// Signed-out visitors can't call the authenticated lesson API, so previews read bundled content.
-export function getSampleLesson({ moduleId, lessonId }) {
-  const moduleData = modules[moduleId] ?? modules.cashFlow;
-  const lessonData =
-    moduleData?.lessons?.find((lesson) => lesson.id === lessonId) ?? moduleData?.lessons?.[0];
-
-  return { moduleData, lessonData };
 }
 
 export function selectRandomLesson(lessonSteps) {
