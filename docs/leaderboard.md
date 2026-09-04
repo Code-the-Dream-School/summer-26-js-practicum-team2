@@ -21,5 +21,11 @@ the `(user_id, day_start)` index supports enforcing the 500 XP daily cap in UTC.
 XP events contain internal identifiers and award data only. They must not contain names, email
 addresses, avatars, or other profile information.
 
+All new reward paths must call `awardXp` from `backend/src/services/xpAward.service.js`. Inside a
+MongoDB transaction, the service checks the reward's source key, atomically allocates remaining XP
+from the learner's `dailyxptotals` document, and creates the event. The shared daily document makes
+concurrent rewards contend on the same record, preventing their combined total from exceeding 500
+XP. Production MongoDB must support transactions (as MongoDB Atlas and replica sets do).
+
 This storage contract does not make a learner visible. Leaderboard queries must separately require
 `leaderboard_opt_in: true` and must return only display name, avatar, weekly XP, and rank.
