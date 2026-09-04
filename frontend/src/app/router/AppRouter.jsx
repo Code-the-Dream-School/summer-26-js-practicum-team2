@@ -9,6 +9,7 @@ import HomePage from "../../pages/HomePage";
 import LoginPage from "../../pages/LoginPage";
 import RegisterPage from "../../pages/RegisterPage";
 import VerifyEmailPage from "../../pages/VerifyEmailPage";
+import OAuthCallbackPage from "../../pages/OAuthCallbackPage";
 import PasswordResetPage from "../../pages/PasswordResetPage";
 import ProfilePage from "../../pages/ProfilePage";
 import DashboardPage from "../../pages/DashboardPage";
@@ -39,6 +40,7 @@ export default function AppRouter() {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
         <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
+        <Route path={ROUTES.OAUTH_CALLBACK} element={<OAuthCallbackPage />} />
         <Route path={ROUTES.PASSWORD_RESET} element={<PasswordResetPage />} />
         <Route path={ROUTES.PRIVACY} element={<PrivacyPage />} />
         <Route path={ROUTES.TERMS} element={<TermsPage />} />

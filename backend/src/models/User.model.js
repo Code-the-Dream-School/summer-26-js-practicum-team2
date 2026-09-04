@@ -15,8 +15,19 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     password_hash: {
+      // Optional because OAuth users (Google/GitHub) never set a local password.
       type: String,
-      required: [true, "Password is required"],
+      default: null,
+    },
+    google_id: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    github_id: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     email_verified_at: {
       type: Date,

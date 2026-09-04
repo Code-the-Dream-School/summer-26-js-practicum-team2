@@ -15,6 +15,7 @@ vi.mock("../../../services/api", () => ({
   completeLesson: vi.fn().mockResolvedValue({}),
   startQuiz: vi.fn(),
   submitQuiz: vi.fn(),
+  restartLessonProgress: vi.fn(),
   updateLessonProgress: vi.fn(),
 }));
 

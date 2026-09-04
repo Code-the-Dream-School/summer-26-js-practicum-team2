@@ -50,32 +50,20 @@ export default function LearnFlow({
   characterImages,
   guideImage,
   savedProgress = null,
-  selectedMicroLessonId = null,
   csrfToken,
   isReadOnly = false,
 }) {
   const { lessonSteps } = learnData;
 
-  const [stepIndex, setStepIndex] = useState(() => {
-    if (selectedMicroLessonId) {
-      const index = lessonSteps.findIndex((step) => step.id === selectedMicroLessonId);
+  const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
+  const [chunkIndex, setChunkIndex] = useState(() => {
+    const resumeIndex = getResumeIndex(lessonSteps, savedProgress);
+    const resumedStep = lessonSteps[resumeIndex];
+    const savedChunkIndex = savedProgress?.currentChunkIndex;
 
-      if (index >= 0) {
-        return index;
-      }
-    }
-
-    return getResumeIndex(lessonSteps, savedProgress);
+    if (!Number.isInteger(savedChunkIndex) || savedChunkIndex < 0) return 0;
+    return Math.min(savedChunkIndex, Math.max(countChunks(resumedStep) - 1, 0));
   });
-
-  //For the resume button to make sure you jump back to the right chunk
-  const shouldResumeChunk =
-    !selectedMicroLessonId || selectedMicroLessonId === savedProgress?.currentMicroLessonId;
-
-  const resumeChunkIndex = shouldResumeChunk ? (savedProgress?.currentChunkIndex ?? 0) : 0;
-
-  const [chunkIndex, setChunkIndex] = useState(() => resumeChunkIndex);
-
   const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);
   const completionRequestRef = useRef(false);
@@ -90,8 +78,6 @@ export default function LearnFlow({
   const currentChunk = chunks[chunkIndex];
   const currentMicroLessonId = currentStep?.id;
   const canSyncProgress = !isReadOnly && Boolean(csrfToken);
-
-  const isAtLessonStart = stepIndex === 0 && chunkIndex === 0 && phase === "lesson";
 
   const currentStepQuestions = useMemo(
     () => learnData.questions.filter((question) => question.lessonStepId === currentMicroLessonId),
@@ -121,10 +107,10 @@ export default function LearnFlow({
   }, [
     canSyncProgress,
     csrfToken,
+    chunkIndex,
     currentMicroLessonId,
     learnData.id,
     learnData.moduleId,
-    chunkIndex,
   ]);
 
   useEffect(() => {
@@ -163,6 +149,7 @@ export default function LearnFlow({
   );
 
   const isFirstChunk = stepIndex === 0 && chunkIndex === 0;
+  const isAtLessonStart = isFirstChunk && phase === "lesson";
   const isLastChunkOfStep = chunkIndex >= chunks.length - 1;
   const isLastStep = stepIndex >= lessonSteps.length - 1;
   const isLastQuestion = quiz.questionIndex >= currentStepQuestions.length - 1;
@@ -266,18 +253,22 @@ export default function LearnFlow({
   }
 
   async function handleStartOver() {
-    try {
-      await restartLessonProgress({
-        moduleId: learnData.moduleId,
-        csrfToken,
-      });
-
-      setStepIndex(0);
-      setChunkIndex(0);
-      setPhase("lesson");
-    } catch (error) {
-      console.error(error);
+    if (canSyncProgress) {
+      try {
+        await restartLessonProgress({
+          moduleId: learnData.moduleId,
+          csrfToken,
+        });
+      } catch {
+        return;
+      }
     }
+
+    setStepIndex(0);
+    setChunkIndex(0);
+    setPhase("lesson");
+    setIsComplete(false);
+    setIsReviewing(false);
   }
 
   if (isComplete && isReviewing) {

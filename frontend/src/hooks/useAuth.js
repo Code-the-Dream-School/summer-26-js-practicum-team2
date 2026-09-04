@@ -214,6 +214,14 @@ export function useAuth() {
     }
   }, [csrfToken, clearAuth]);
 
+  // Called after an OAuth redirect lands back on the SPA; the session cookie is already set,
+  // so this just fetches the user/csrfToken to hydrate the reducer and browser storage.
+  const completeOAuthLogin = useCallback(async () => {
+    const payload = await runRequest(() => api.getCurrentUser());
+    commitAuth(payload, false);
+    return payload;
+  }, [runRequest, commitAuth]);
+
   const verifyEmail = useCallback(
     async (token) => {
       const payload = await runRequest(() => api.verifyUserEmail(token));
@@ -246,6 +254,7 @@ export function useAuth() {
       logout,
       refreshSession,
       verifyEmail,
+      completeOAuthLogin,
       requestPasswordReset,
       confirmPasswordReset,
       clearError,
@@ -258,6 +267,7 @@ export function useAuth() {
       logout,
       refreshSession,
       verifyEmail,
+      completeOAuthLogin,
       requestPasswordReset,
       confirmPasswordReset,
       clearError,

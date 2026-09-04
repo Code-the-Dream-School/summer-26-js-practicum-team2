@@ -9,6 +9,7 @@ const {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getCurrentUser,
 } = require("../controllers/user.controller");
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.get("/verify", verifyEmail);
 router.post("/reactivate", loginLimiter, reactivate);
 // POST /api/v1/users/login
 router.post("/login", loginLimiter, login);
+// GET /api/v1/users/me
+router.get("/me", jwtMiddleware, getCurrentUser);
 // POST /api/v1/users/logout
 router.post("/logout", jwtMiddleware, logout);
 // POST /api/v1/users/forgot-password

@@ -5,9 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- ## [Unreleased] -->
+## [0.6.1] - 2026-09-03
 
-<!-- --- -->
+### Changed
+
+- Updated OAuth sign-in to carry requested destinations through the complete provider round trip using short-lived, provider-scoped state metadata.
+- Centralized post-login destination selection for password and OAuth sign-in flows.
+
+### Fixed
+
+- Fixed post-login routing so administrators without a requested destination reach the admin dashboard instead of the learner dashboard.
+- Fixed OAuth sign-in so a valid requested destination survives the provider redirect and is restored only after successful OAuth state validation.
+- Fixed an open-redirect risk by rejecting absolute, protocol-relative, malformed, and non-string post-login destinations and falling back to the user's normal dashboard.
+
+### Security
+
+- Prevented provider callback parameters from overriding the destination stored by the application before OAuth authorization.
+
+---
+
+## [0.6.0] - 2026-09-02
+
+### Added
+
+- Added Google and GitHub social sign-in with provider availability detection and account linking.
+- Added direct OAuth account-linking coverage and an OAuth provider availability endpoint for the sign-in UI.
+- Added OAuth post-login routing that preserves requested destinations (the `next` parameter) just like regular password login.
+
+### Changed
+
+- Updated OAuth sign-in flow to make Terms acceptance optional at the button level, matching password-login UX; Terms acceptance is still required by the backend only during new account creation.
+- Updated API and development setup documentation with OAuth configuration and sign-in details.
+
+### Fixed
+
+- Hardened Google and GitHub sign-in with verified-email selection, explicit Terms acknowledgement for new accounts, and one-time OAuth state validation.
+- Restored the required User email contract and sparse provider ID behavior so ordinary accounts do not collide on OAuth indexes.
+
+---
 
 ## [0.5.0] - 2026-09-02
 
@@ -22,6 +57,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the lesson layout to pass the active module's glossary and Works Cited data to the footer instead of falling back to budgeting content.
 - Updated glossary search to use the shared accessible input component and accessible controls for switching between glossary and reference views.
 - Updated quiz scoring test fixtures to match the current micro-lesson question identifiers.
+
+---
+
 ## [0.4.2] - 2026-09-02
 
 ### Added
@@ -160,6 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed error handler middleware signature to include next parameter
 - Fixed the Express error-handler middleware contract to accept `next` and forward errors when response headers have already been sent.
 
 ---

@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const passport = require("./config/passport.js");
 
 // Middleware imports
 const { authenticateUser: jwtMiddleware } = require("./middleware/jsonWebToken");
@@ -14,6 +15,7 @@ const requireAdmin = require("./middleware/requireAdmin");
 // Route imports
 const healthRoutes = require("./routes/health.routes");
 const userRoutes = require("./routes/user.routes");
+const oauthRoutes = require("./routes/oauth.routes");
 const lessonRoutes = require("./routes/lesson.routes");
 const lessonPublicRoutes = require("./routes/lessonPublic.routes");
 const lessonImportRoutes = require("./routes/lessonImport.routes");
@@ -62,10 +64,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan(morganConfig));
-app.use("/health", healthRoutes);
 app.use(apiLimiter);
+app.use(passport.initialize());
 
 // Routes
+app.use("/api/v1/auth", oauthRoutes);
+app.use("/health", healthRoutes);
+app.use(apiLimiter);
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", lessonImportRoutes);

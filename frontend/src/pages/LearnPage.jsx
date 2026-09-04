@@ -49,6 +49,20 @@ export default function LearnPage() {
       }),
     [fetchedLessonData, fetchedModuleData],
   );
+  const sampleLearnData = useMemo(() => {
+    if (!learnData || isAuthenticated) return learnData;
+
+    const randomStep = selectRandomLesson(learnData.lessonSteps);
+    return randomStep
+      ? {
+          ...learnData,
+          lessonSteps: [randomStep],
+          questions: learnData.questions.filter(
+            (question) => question.lessonStepId === randomStep.id,
+          ),
+        }
+      : learnData;
+  }, [isAuthenticated, learnData]);
 
   const characterImages = {
     abigail: abigailImg,
@@ -106,17 +120,6 @@ export default function LearnPage() {
   }
 
   if (!isAuthenticated) {
-    const randomStep = selectRandomLesson(learnData.lessonSteps);
-    const sampleLearnData = randomStep
-      ? {
-          ...learnData,
-          lessonSteps: [randomStep],
-          questions: learnData.questions.filter(
-            (question) => question.lessonStepId === randomStep.id,
-          ),
-        }
-      : learnData;
-
     return (
       <>
         <p className="mx-auto mb-4 max-w-5xl rounded-xl border border-primary/20 bg-danger/5 px-4 py-3 text-sm font-medium text-primary sm:px-6">
@@ -140,7 +143,6 @@ export default function LearnPage() {
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
-      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
     />
   );

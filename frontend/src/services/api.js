@@ -1,4 +1,5 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
+const AUTH_BASE_PATH = `${API_BASE_URL}/api/v1/auth`;
 const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const DASHBOARD_CACHE_KEY_PREFIX = "sprout.dashboard.";
@@ -99,6 +100,25 @@ export const logoutUser = (csrfToken) =>
     method: "POST",
     csrfToken,
   });
+
+export const getCurrentUser = () => apiRequest("/me", { method: "GET" });
+
+// Full-page navigation targets — the browser must follow the OAuth provider's redirect chain,
+// so these are used as anchor hrefs rather than fetched with apiRequest.
+export const getOAuthProviders = () =>
+  apiRequest("/providers", {
+    method: "GET",
+    basePath: AUTH_BASE_PATH,
+  });
+
+export const getOAuthUrl = (provider, tosAccepted = false, next) => {
+  const query = new URLSearchParams();
+  if (tosAccepted) query.set("tos", "true");
+  if (next) query.set("next", next);
+
+  const search = query.toString();
+  return `${AUTH_BASE_PATH}/${provider}${search ? `?${search}` : ""}`;
+};
 
 export const verifyUserEmail = (token) => apiRequest(`/verify?token=${encodeURIComponent(token)}`);
 

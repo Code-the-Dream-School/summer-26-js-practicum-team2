@@ -15,6 +15,7 @@ const {
   resetPasswordSchema,
   validateRequest,
 } = require("../validation/userValidation.js");
+const { getAuthenticationFailure } = require("../utils/authSession.js");
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 const accountStateLookup = {
@@ -208,9 +209,10 @@ const login = async (req, res, next) => {
     if (sendAccountStateError(res, user)) return;
 
     if (!user.email_verified_at) {
+      const authenticationFailure = getAuthenticationFailure(user);
       return res
-        .status(StatusCodes.FORBIDDEN)
-        .json({ message: "Please verify your email before logging in." });
+        .status(authenticationFailure.status)
+        .json({ message: authenticationFailure.message });
     }
     const motivation = await getLearningMotivation(user._id);
     const csrfToken = issueSession(res, user, { remember });
@@ -386,6 +388,27 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+// GET /users/me - lets the SPA hydrate auth state after an OAuth redirect (no JSON body returned by that flow).
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
+    }
+    return res.status(StatusCodes.OK).json({
+      csrfToken: req.user.csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 module.exports = {
   register,
   reactivate,
@@ -394,4 +417,5 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getCurrentUser,
 };
