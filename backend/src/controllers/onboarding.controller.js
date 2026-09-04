@@ -2,6 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const { updateOnboardingProgressSchema } = require("../validation/userValidation.js");
 const User = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
+const { awardXp } = require("../services/xpAward.service.js");
 
 //Configure XP reward per completed page tour
 const TOUR_XP_REWARD = 50;
@@ -172,12 +173,23 @@ const updateOnboardingProgress = async (req, res, next) => {
       //points awards for full complete onboarding with zero skipping
 
       if (noSkippedTours) {
-        xpAwarded = TOUR_XP_REWARD;
-        await UserProgress.findOneAndUpdate(
-          { user_id: userId },
-          { $inc: { xp: xpAwarded } },
-          { upsert: true, returnDocument: "after" },
-        );
+        const reward = await awardXp({
+          userId,
+          eventType: "onboarding_complete",
+          sourceKey: "onboarding:v1",
+          requestedXp: TOUR_XP_REWARD,
+        });
+
+        if (!reward.duplicate) {
+          xpAwarded = reward.event.awarded_xp;
+          if (xpAwarded > 0) {
+            await UserProgress.findOneAndUpdate(
+              { user_id: userId },
+              { $inc: { xp: xpAwarded } },
+              { upsert: true, returnDocument: "after" },
+            );
+          }
+        }
       }
     }
     user.markModified("onboarding");

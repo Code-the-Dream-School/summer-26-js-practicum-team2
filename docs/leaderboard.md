@@ -27,5 +27,8 @@ from the learner's `dailyxptotals` document, and creates the event. The shared d
 concurrent rewards contend on the same record, preventing their combined total from exceeding 500
 XP. Production MongoDB must support transactions (as MongoDB Atlas and replica sets do).
 
+The onboarding-completion reward uses the source key `onboarding:v1`. Resetting or replaying the
+onboarding tour therefore cannot award it a second time.
+
 This storage contract does not make a learner visible. Leaderboard queries must separately require
 `leaderboard_opt_in: true` and must return only display name, avatar, weekly XP, and rank.
