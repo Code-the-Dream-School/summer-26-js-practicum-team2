@@ -18,6 +18,13 @@ week on demand. It groups immutable XP events by learner and replaces each store
 rerunning the rollup is idempotent rather than adding the same XP again. A scheduler can safely run
 this rollup nightly and immediately before the weekly reset.
 
+At the Monday boundary, `rotatePreviousLeaderboardWeek` in
+`backend/src/services/leaderboardReset.service.js` performs the reset in one transaction. It first
+finalizes the previous week's rollup, assigns final ranks only among eligible opted-in learners,
+upserts those results into `leaderboardhistories`, and removes the previous week from active totals.
+The history contains internal user IDs, XP, and ranks but no profile or contact information. The
+job is idempotent if retried because history records are uniquely keyed by learner and week.
+
 XP awards are recorded in the `xpevents` collection. Each event stores the requested and actually
 awarded XP, its UTC day bucket, and its leaderboard week bucket. Weekly totals sum `awarded_xp`,
 not `requested_xp`. The `(user_id, source_key)` unique index makes reward sources idempotent, while
