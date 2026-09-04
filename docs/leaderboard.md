@@ -37,3 +37,9 @@ onboarding tour therefore cannot award it a second time.
 
 This storage contract does not make a learner visible. Leaderboard queries must separately require
 `leaderboard_opt_in: true` and must return only display name, avatar, weekly XP, and rank.
+
+`getLeaderboardForUser` in `backend/src/services/leaderboardRead.service.js` enforces that rule.
+Opted-out learners receive empty rankings, and opted-out, disabled, deleted, or archived accounts
+are removed before ranks are assigned. Ranked entries project only an internal user ID, display
+name, avatar URL, weekly XP, and rank. The default public group contains 20 learners; the current
+learner is returned separately even when ranked outside that group.
