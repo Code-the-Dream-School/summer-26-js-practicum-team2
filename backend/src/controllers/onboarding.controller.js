@@ -6,7 +6,7 @@ const UserProgress = require("../models/UserProgress.model.js");
 //Configure XP reward per completed page tour
 const TOUR_XP_REWARD = 50;
 
-const TOUR_KEYS = ["dashboardPage","profilePage","lessonPage","learningPath" ];
+const TOUR_KEYS = ["dashboardPage", "profilePage", "lessonPage", "learningPath"];
 
 const createDefaultTours = () =>
   TOUR_KEYS.reduce((acc, key) => {

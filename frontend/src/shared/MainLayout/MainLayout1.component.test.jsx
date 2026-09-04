@@ -8,17 +8,17 @@ vi.mock("../../context/AuthContext", () => ({
   useAuthContext: () => ({ isAuthenticated: false, user: null, logout: vi.fn() }),
 }));
 
-  describe("check correct mapping of /profile path in MainLayout component to profilePage content", () => {
-    it("renders profile view when visiting /profile ", () => {
-      render(
-        <MemoryRouter initialEntries={['/profile']}>
-          <Routes>
-            <Route element={<MainLayout />}>
+describe("check correct mapping of /profile path in MainLayout component to profilePage content", () => {
+  it("renders profile view when visiting /profile ", () => {
+    render(
+      <MemoryRouter initialEntries={["/profile"]}>
+        <Routes>
+          <Route element={<MainLayout />}>
             <Route path="/profile" element={<div data-testid="profile">Profile</div>} />
-            </Route>
-          </Routes>
-        </MemoryRouter>
-      );
-      expect(screen.getByTestId("profile")).toBeInTheDocument();
-    });
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByTestId("profile")).toBeInTheDocument();
   });
+});

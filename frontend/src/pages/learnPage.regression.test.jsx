@@ -83,12 +83,14 @@ const moduleData = {
   id: "module-two",
   title: "Module Two",
   glossary: [{ id: "module-term", term: "Module term", definition: "Only in this module." }],
-  worksCited: [{
-    id: "module-source",
-    title: "Module source",
-    citation: "Source for module two.",
-    url: "https://example.test/module-source",
-  }],
+  worksCited: [
+    {
+      id: "module-source",
+      title: "Module source",
+      citation: "Source for module two.",
+      url: "https://example.test/module-source",
+    },
+  ],
   lessons: [{ id: "lesson-one" }],
 };
 
@@ -151,13 +153,15 @@ describe("LearnPage glossary integration", () => {
     const user = userEvent.setup();
     renderLesson();
 
-    await waitFor(() => expect(api.updateLessonProgress).toHaveBeenCalledWith({
-      moduleId: "module-two",
-      lessonId: "lesson-one",
-      microLessonId: "step-two",
-      currentChunkIndex: 0,
-      csrfToken: "csrf-token",
-    }));
+    await waitFor(() =>
+      expect(api.updateLessonProgress).toHaveBeenCalledWith({
+        moduleId: "module-two",
+        lessonId: "lesson-one",
+        microLessonId: "step-two",
+        currentChunkIndex: 0,
+        csrfToken: "csrf-token",
+      }),
+    );
     api.updateLessonProgress.mockClear();
 
     expect(screen.getByRole("heading", { name: "Second step" })).toBeInTheDocument();

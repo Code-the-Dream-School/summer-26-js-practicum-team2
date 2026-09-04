@@ -1,8 +1,6 @@
 //need to import mongoose
 const mongoose = require("mongoose");
 
-//present pageTourSchema for onboarding so userSchema can use it
-
 const pageTourSchema = new mongoose.Schema(
   {
     step: { type: Number, default: 0 },

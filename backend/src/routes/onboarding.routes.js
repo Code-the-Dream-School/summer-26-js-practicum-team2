@@ -12,7 +12,7 @@ const { authenticateUser: jwtMiddleware } = require("../middleware/jsonWebToken"
 
 router.use(jwtMiddleware);
 
-//GET /api/v1/onboarding/begin Get initial default tour structure of the object 
+//GET /api/v1/onboarding/begin Get initial default tour structure of the object
 router.get("/begin", beginOnboarding);
 
 //PATCH /api/v1/onboarding/toggle
