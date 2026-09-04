@@ -1,6 +1,23 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const sampleLessonUrl = "/learn/cashFlow/1.1?sample=true";
+const moduleData = JSON.parse(
+  readFileSync(resolve(process.cwd(), "shared/content/budgeting.json"), "utf8"),
+);
+const lessonData = moduleData.lessons.find((lesson) => lesson.id === "1.1");
+
+test.beforeEach(async ({ page }) => {
+  // Keep these UI checks independent of any stale or locally imported database content.
+  await page.route("**/api/v1/lessons/public/cashFlow/1.1", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ moduleData, lessonData }),
+    }),
+  );
+});
 
 test("learners can view glossary resources without changing their lesson state", async ({
   page,
