@@ -7,6 +7,8 @@ import Button from "../shared/Button/Button.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
+import abigailImg from "../assets/abigail.webp";
+import ramonaImg from "../assets/ramona.webp";
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -121,6 +123,14 @@ function LearningPathPage() {
     : Math.min(Math.max(savedIndex, lastCompletedIndex + 1), learningPath.length - 1);
 
   const currentNode = currentIndex >= 0 ? learningPath[currentIndex] : null;
+  const completedCount = learningPath.filter((node) =>
+    completedMicroLessons.has(node.microLessonId),
+  ).length;
+  const progressPercent = isModuleComplete
+    ? 100
+    : learningPath.length
+      ? Math.round((completedCount / learningPath.length) * 100)
+      : 0;
 
   // For scrolling to the current microLesson node in the learning path
   const currentNodeRef = useRef(null);
@@ -291,14 +301,60 @@ function LearningPathPage() {
   return (
     <div className="min-h-screen bg-learning-path-surface text-learning-path-text">
       <main className="mx-auto flex min-h-screen max-w-[22rem] flex-col px-4 pb-28 pt-5 sm:max-w-[24rem] sm:px-6 md:max-w-4xl lg:max-w-6xl lg:px-8">
-        <div className="text-center">
-          <h1 className="text-[2.25rem] font-semibold leading-[1.04] tracking-tight text-learning-path-heading sm:text-[2.7rem]">
-            Learning:
-          </h1>
+        <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-white/70 px-5 pb-5 pt-7 text-center shadow-[0_18px_45px_rgba(20,73,61,0.1)] sm:px-8 md:min-h-52 md:px-48 md:py-8">
+          <div className="pointer-events-none absolute -left-8 -top-8 h-28 w-28 rounded-full bg-accent/15" />
+          <div className="pointer-events-none absolute -bottom-12 -right-8 h-36 w-36 rounded-full bg-circle-completed/20" />
 
-          <h2 className="mt-1 text-[2rem] font-semibold leading-[1.05] tracking-tight text-learning-path-heading sm:text-[2.35rem]">
+          <img
+            src={abigailImg}
+            alt=""
+            aria-hidden="true"
+            className="absolute -bottom-2 left-5 hidden w-28 drop-shadow-sm md:block lg:left-12 lg:w-32"
+          />
+          <img
+            src={ramonaImg}
+            alt=""
+            aria-hidden="true"
+            className="absolute -bottom-2 right-5 hidden w-28 drop-shadow-sm md:block lg:right-12 lg:w-32"
+          />
+
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            Your learning adventure
+          </p>
+          <h1 className="mt-2 font-heading text-[2rem] font-bold leading-tight tracking-tight text-learning-path-heading sm:text-[2.5rem]">
             Personal Finance
-          </h2>
+          </h1>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-learning-path-muted">
+            Follow the trail, grow your skills, and build money confidence one quick lesson at a
+            time.
+          </p>
+
+          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-full bg-white/80 p-2 pr-4 shadow-sm">
+            <img
+              src={dabbingBeaverImg}
+              alt="Sprout, your learning guide"
+              className="h-11 w-11 object-contain"
+            />
+            <div className="min-w-0 flex-1 text-left">
+              <div className="flex items-center justify-between gap-3 text-xs font-semibold text-learning-path-heading">
+                <span>{isModuleComplete ? "Trail complete!" : "Keep growing!"}</span>
+                <span>{progressPercent}%</span>
+              </div>
+              <div
+                role="progressbar"
+                aria-label="Module progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={progressPercent}
+                className="mt-1.5 h-2 overflow-hidden rounded-full bg-primary/15"
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-7 flex items-center gap-4">
@@ -393,23 +449,6 @@ function LearningPathPage() {
               );
             })}
           </svg>
-          {/* Render learning path Onboarding overly
-         
-          <div>
-            {!hasCompleted && activePage === "learningPath" && (
-              <OnboardingOverlay
-                hasCompleted={hasCompleted}
-                //status ={status}
-                currentStep={currentStep}
-                //activePage="learningPath"
-                activePage={activePage}
-                pageName="learningPath"
-                onNext={handleNextStep}
-                onStart={startOnboarding}
-                onSkip={skipOnboarding}
-              />
-            )}
-          </div> */}
 
           {/* Rendering the learning path */}
           {learningPath.map((node, index) => {
