@@ -13,7 +13,7 @@ import Input from "../shared/Input/Input.component";
 import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component";
+// import OnboardingOverlay from "../features/onboarding/OnboardingOverlay.component"; // Commented out until states are defined
 
 const errorMessage = (error) =>
   error.errors?.length ? error.errors.join(" ") : error.message || "uh oh spaghetti-o";
@@ -56,17 +56,17 @@ export default function ProfilePage({ onboarding }) {
   }, []);
 
   useEffect(() => {
-      let active = true;
-      getProfile()
-        .then(({ user }) => {if (!active) return;
-          applyProfile(user);
-        })
-        .catch((error) => active && showToast(errorMessage(error)))
-        .finally(() => active && setLoading(false));
-        return () => {
-          active=false;
-        };
-    }, [applyProfile, showToast]);
+    let active = true;
+    getProfile()
+      .then(({ user }) => {if (!active) return;
+        applyProfile(user);
+      })
+      .catch((error) => active && showToast(errorMessage(error)))
+      .finally(() => active && setLoading(false));
+      return () => {
+        active=false;
+      };
+  }, [applyProfile, showToast]);
 
   const saveProfile = async (event) => {
     event.preventDefault();
@@ -107,7 +107,7 @@ export default function ProfilePage({ onboarding }) {
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       <Toast {...toastMessage} onClose={closeToast}/>
-
+      
       {/* Header Profile Summary */}
       <header className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-surface-raised p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -120,9 +120,9 @@ export default function ProfilePage({ onboarding }) {
         </div>
 
         <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-surface-app px-4 py-3 shadow-inner">
-         <Stat label="XP Points:" value={` ${(profile?.xp?? 0).toLocaleString()}`}/>
+          <Stat label="XP Points:" value={` ${(profile?.xp?? 0).toLocaleString()}`}/>
           <div className="h-8 w-px bg-neutral-200" />
-            <Stat label="Streak:" value={` ${profile?.streak?? 0} days`}/>
+          <Stat label="Streak:" value={` ${profile?.streak?? 0} days`}/>
         </div>
       </header>
 
@@ -167,10 +167,10 @@ export default function ProfilePage({ onboarding }) {
           Security & Credentials
         </h2>
         <form onSubmit={changePassword} className="space-y-4 max-w-md">
-            <label className="text-small font-semibold text-heading block"> Current Password</label>
             <Input
               id="current-password"
               type="password"
+              label="Current Password"
               required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
@@ -193,15 +193,23 @@ export default function ProfilePage({ onboarding }) {
           </Button>
         </form>
       </Card>
- 
-      {/* Onboarding Overlay */}
-      {!loading && onboarding && !onboarding.loading && (
+    
+      {/* Onboarding Overlay Section - Commented out until state variables are declared */}
+      {/* 
+      <section className="p-6 max-w-4xl mx-auto space-y-6">
+        {!hasCompleted && currentStep===0 && (
         <OnboardingOverlay
-          tourKey="profilePage"
-          onboarding={onboarding.onboardingData}
-          onSaveProgress={onboarding.saveTourProgress}
+          currentStep={currentStep}
+          activePage="dashboard"
+          hasCompleted={hasCompleted}
+          pageName="dashboardPage"
+          onNext={handleNextStep}
+          onStart={startOnboarding}
+          onSkip={skipOnboarding}
         />
-      )}
+        )}
+      </section>
+      */}
 
       {/* Danger Zone - Kept completely commented out as requested */}
       {/* 
@@ -220,21 +228,11 @@ export default function ProfilePage({ onboarding }) {
           <Input
             id="delete-account-email"
             type="email"
-            label="Type account email to verify permanent deletion:"
+            label="Type your email to confirm"
             required
-            value={deleteEmail}
-            onChange={(e) => setDeleteEmail(e.target.value)}
-            placeholder="you@domain.com"
           />
-          <Button
-            type="submit"
-            disabled={pending === "delete"}
-            className="rounded-xl bg-danger px-5 py-2.5 text-sm font-semibold text-white hover:bg-danger/90"
-          >
-            {pending === "delete" ? "Deleting..." : "Delete Account"}
-          </Button>
         </form>
-      </div> 
+      </div>
       */}
     </section>
   );

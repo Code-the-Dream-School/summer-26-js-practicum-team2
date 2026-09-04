@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  beginOnboarding,
   getOnboardingState,
   updateOnboardingProgress,
   resetOnboardingProgress,
@@ -11,14 +12,14 @@ const jwtMiddleware = require("../middleware/jsonWebToken");
 
 router.use(jwtMiddleware);
 
+//GET /api/v1/begin
+router.get("/beginOnboarding", beginOnboarding);
 //GET /api/v1/onboarding
 router.get("/", getOnboardingState);
 //PATCH /api/v1/onboarding/toggle
 router.patch("/toggle", toggleOnboardingWorkflow);
-
 //PATCH /api/v1/onboarding/step
 router.patch("/step", updateOnboardingProgress);
-
 //POST /api/v1/onboarding/reset
 router.post("/reset", resetOnboardingProgress);
 

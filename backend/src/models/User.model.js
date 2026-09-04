@@ -1,4 +1,5 @@
 //need to import mongoose
+const { boolean } = require("joi");
 const mongoose = require("mongoose");
 
 //present pageTourSchema for onboarding so userSchema can use it
@@ -6,7 +7,9 @@ const mongoose = require("mongoose");
 const pageTourSchema = new mongoose.Schema(
   {
     step: { type:Number, default:0 },
+    status: {type: String, enum:["pending", "completed", "skipped"], default: "pending",},
     dismissed: { type:Boolean, default:false },
+    completed_at: {type:Date, default: null }, 
   },
   { _id:false },
 );
@@ -70,23 +73,25 @@ const userSchema = new mongoose.Schema(
         type:Date,
         default:null,
       },
+      current_step: {type:Number, step:0 },
+      started_at: {type:Date, default:null },
       completed_at:{ type:Date, default:null },
       tours: {
         dashboardPage: {
           type:pageTourSchema,
-          default: () => ({ step:0, dismissed:false }),
-        },
-        learningPath: {
-          type: pageTourSchema,
-          default: () => ({ step:0, dismissed:false }),
-        },
-        lessonPage: {
-          type: pageTourSchema,
-          default: () => ({ step:0, dismissed:false }),
+          default: () => ({ step:0, status:"pending",dismissed:false }),
         },
         profilePage: {
           type: pageTourSchema,
-          default: () => ({ step:0, dismissed:false }),
+          default: () => ({ step:1, status:"pending", dismissed:false }),
+        },
+        lessonPage: {
+          type: pageTourSchema,
+          default: () => ({ step:2, status:"pending", dismissed:false }),
+        },
+        learningPath: {
+          type: pageTourSchema,
+          default: () => ({ step:3,status:"pending", dismissed:false }),
         },
       },
     },

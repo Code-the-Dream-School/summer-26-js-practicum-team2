@@ -1,84 +1,23 @@
-// import React from "react";
-
-// const TOUR_STEPS = {
-//   dashboardPage: [
-//     { title: "Welcome to Sprout!", text: "This is your main dashboard hub. Let's look around your metrics." },
-//     { title: "Recommended Actions", text: "This card points you directly to the highest priority micro-lesson you should tackle next." },
-//     { title: "Unit Progress Rows", text: "Down here you can track how many total modules and sub-lessons you have completed." }
-//   ],
-//   profilePage: [
-//     { title: "Your Profile Settings", text: "Manage your identity here! You can adjust your display name or update security credentials." },
-//     { title: "Achievements Panel", text: "Keep an eye on this upper counter to monitor your total platform XP Points and daily learning streaks." }
-//   ],
-//   learningPath: [
-//     { title: "Your Learning Path Map", text: "This interactive layout charts your journey. Click unlocked nodes to launch into training activities." }
-//   ],
-//   lessonPage: [
-//     { title: "Activity Finished!", text: "Fantastic job completing your training module! This final milestone successfully finishes your introductory user tour. Click 'Got it!' to wrap up." }
-//   ]
-// };
-
-// const OnboardingOverlay = ({ tourKey, onboarding, onSaveProgress }) => {
-//   if (!onboarding || onboarding.is_completed) return null;
-  
-//   const currentTourData = onboarding.tours?.[tourKey];
-//   if (!currentTourData || currentTourData.dismissed) return null;
-
-//   const stepsList = TOUR_STEPS[tourKey] || [];
-//   const currentStepIndex = currentTourData.step ?? 0;
-//   const content = stepsList[currentStepIndex];
-
-//   if (!content) return null;
-
-//   const isLastStep = currentStepIndex >= stepsList.length - 1;
-
-//   const handleNext = () => {
-//     if (!isLastStep) {
-//       onSaveProgress({ tourKey, step: currentStepIndex + 1, dismissed: false });
-//     } else {
-//       onSaveProgress({ tourKey, step: currentStepIndex, dismissed: true });
-//     }
-//   };
-
-//   return (
-//     <div className="fixed bottom-6 right-6 z-50 max-w-sm rounded-xl border border-neutral-200 bg-white p-5 shadow-2xl animate-fade-in text-left">
-//       <div className="flex items-center gap-2">
-//         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-//           {currentStepIndex + 1}
-//         </span>
-//         <h4 className="font-heading text-sm font-bold text-heading">{content.title}</h4>
-//       </div>
-//       <p className="mt-2 text-xs text-neutral-600 leading-relaxed">{content.text}</p>
-//       <div className="mt-4 flex justify-end">
-//         <button
-//           onClick={handleNext}
-//           className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors"
-//         >
-//           {isLastStep ? "Got it!" : "Next"}
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default OnboardingOverlay;
-
+//import {useState} from "react";
 const STEP_CONTENT = {
  0: {
    title: "Welcome to Sprout!",
-   text: "Your email has been successfully verified! Let's kick things off with a quick tour. Click 'Next Step' to hop straight over to your profile manager layout.",
+   text: "Your email has been successfully verified! Let's kick things off with a quick tour. This is your dashboard where you can see your achievements. Click 'Next Step' to hop straight over to your profile manager layout.",
  },
  1: {
    title: "Your Profile Page",
-   text: "This is where your achievements live. You can click your avatar section icon right here to upload a custom picture! Ready? Let's check out a sample lesson.",
+   text: "This is where your personal information live. You can update your avatar section icon right here by updating the your name, it will show the first letter of your name! Ready? Let's check out a sample lesson.",
  },
  2: {
    title: "Sample Lesson Activity",
-   text: "Welcome to your first learning playground! Complete your tasks on this view screen to finish setting up your account details.",
+   text: "Welcome to your first learning playground! Here you will go through small lessons followed by mini checks your knowledge from the lesson..",
  },
+ 3: {
+   title: "Learning Path",
+   text: "This is the learning path and helps you see where you are in your journey. Click on an unlocked step and proceed to the lesson. Have Fun!"
+ }
 };
-
-
+//const [isDismissed, setIsDismissed] = useState(false);
 // export default function OnboardingOverlay({ hasCompleted, currentStep, activePage, pageName, onNext, onStart, onSkip,}) {
 export default function OnboardingOverlay({
  hasCompleted,
@@ -106,6 +45,7 @@ export default function OnboardingOverlay({
          <label className="flex items-center space-x-3 cursor-pointer">
            <input
              type="checkbox"
+             checked = {currentStep !== null}
              id="onboarding-say-yes"
              onChange={(e) => {
                if (e.target.checked) {
@@ -143,7 +83,7 @@ export default function OnboardingOverlay({
          onClick={onNext}
          className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors"
        >
-         {currentStep === 2 ? "Finish Tour" : "Next Step"}
+         {currentStep === 3 ? "Finish Tour" : "Next Step"}
        </button>
      </div>
    </div>
@@ -243,4 +183,5 @@ export default function OnboardingOverlay({
 //     </div>
 //   );
 // }
+
 
