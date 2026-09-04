@@ -6,21 +6,22 @@ import OnboardingOverlay from "../../features/onboarding1/OnboardingOverlay1.com
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
+import { ROUTES } from "../../app/router/routes";
+
+function getOnboardingPageName(pathname) {
+  if (pathname === ROUTES.DASHBOARD || pathname === ROUTES.HOME) return "dashboardPage";
+  if (pathname === ROUTES.PROFILE) return "profilePage";
+  if (pathname === ROUTES.LEARN) return "learningPath";
+  if (pathname.startsWith(`${ROUTES.LEARN}/`)) return "lessonPage";
+  return "";
+}
 
 function OnboardingWrapper() {
   const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
     useOnboarding();
   const location = useLocation();
 
-  const pageName = (() => {
-    if (location.pathname.includes("/dashboard") || location.pathname === "/") {
-      return "dashboardPage";
-    }
-    if (location.pathname.includes("/profile")) return "profilePage";
-    if (location.pathname.includes("/learn/last-lesson")) return "lessonPage";
-    if (location.pathname.includes("/learn")) return "learningPath";
-    return "";
-  })();
+  const pageName = getOnboardingPageName(location.pathname);
 
   return (
     <OnboardingOverlay
