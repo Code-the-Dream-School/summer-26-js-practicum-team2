@@ -147,6 +147,17 @@ describe("ProfilePage", () => {
     });
     expect(await screen.findByRole("status")).toHaveTextContent("Avatar URL saved.");
     expect(screen.getByLabelText("Avatar image URL")).toHaveValue("https://example.com/maya.png");
+    expect(screen.getByRole("img", { name: "Maya avatar" })).toHaveAttribute(
+      "src",
+      "https://example.com/maya.png",
+    );
+  });
+
+  it("renders the user's initial when no avatar image is saved", async () => {
+    render(<ProfilePage />);
+
+    expect(await screen.findByLabelText("Maya avatar")).toHaveTextContent("M");
+    expect(screen.queryByRole("img", { name: "Maya avatar" })).not.toBeInTheDocument();
   });
 
   it("switches quiz feedback between instant and end-of-quiz modes", async () => {

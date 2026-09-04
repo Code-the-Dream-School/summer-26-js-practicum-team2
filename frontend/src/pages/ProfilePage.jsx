@@ -32,6 +32,7 @@ const Stat = ({ label, value }) => {
 export default function ProfilePage() {
   const { csrfToken, refreshSession } = useAuthContext();
   const [profile, setProfile] = useState(null);
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState(null);
 
   const [name, setName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -188,6 +189,9 @@ export default function ProfilePage() {
   }
 
   const savedDisplayName = profile.name;
+  const savedAvatarUrl = profile.avatar_url;
+  const avatarInitial = savedDisplayName?.charAt(0)?.toUpperCase() || "A";
+  const showAvatarImage = Boolean(savedAvatarUrl && failedAvatarUrl !== savedAvatarUrl);
 
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -195,9 +199,23 @@ export default function ProfilePage() {
 
       {/* Header Profile Summary */}
       <header className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-surface-raised p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-heading text-h3 font-bold text-heading">{savedDisplayName}</h1>
-          <p className="text-small text-neutral-600">Manage your profile and preferences.</p>
+        <div className="flex items-center gap-4">
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/40 bg-surface-inset text-h3 font-semibold text-heading">
+            {showAvatarImage ? (
+              <img
+                src={savedAvatarUrl}
+                alt={`${savedDisplayName} avatar`}
+                onError={() => setFailedAvatarUrl(savedAvatarUrl)}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span aria-label={`${savedDisplayName} avatar`}>{avatarInitial}</span>
+            )}
+          </span>
+          <div>
+            <h1 className="font-heading text-h3 font-bold text-heading">{savedDisplayName}</h1>
+            <p className="text-small text-neutral-600">Manage your profile and preferences.</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-surface-app px-4 py-3 shadow-inner">
