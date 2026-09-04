@@ -48,6 +48,12 @@ describe("lesson and dashboard API integration", () => {
     expect(lessonRes.status).toBe(200);
     expect(lessonRes.body.moduleData.id).toBe("cashFlow");
     expect(lessonRes.body.lessonData.id).toBe("1.1");
+    expect(lessonRes.body.moduleData.glossary).toEqual(
+      expect.arrayContaining([expect.objectContaining({ term: "Budget" })]),
+    );
+    expect(lessonRes.body.moduleData.worksCited).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: "cfpb-youth-glossary" })]),
+    );
     expect(lessonRes.body.progress.currentMicroLessonId).toBe("1.1.2");
   });
 
