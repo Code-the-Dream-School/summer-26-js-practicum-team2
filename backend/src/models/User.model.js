@@ -4,7 +4,13 @@ const mongoose = require("mongoose");
 const pageTourSchema = new mongoose.Schema(
   {
     step: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ["pending", "completed", "skipped"],
+      default: "pending",
+    },
     dismissed: { type: Boolean, default: false },
+    completed_at: { type: Date, default: null },
   },
   { _id: false },
 );
@@ -91,13 +97,29 @@ const userSchema = new mongoose.Schema(
     },
     onboarding: {
       is_completed: { type: Boolean, default: false },
-      started_at: { type: Date, default: null },
+      current_step: { type: Number, default: 0 },
+      started_at: {
+        type: Date,
+        default: null,
+      },
       completed_at: { type: Date, default: null },
       tours: {
-        dashboardPage: { type: pageTourSchema, default: () => ({}) },
-        learningPath: { type: pageTourSchema, default: () => ({}) },
-        lessonPage: { type: pageTourSchema, default: () => ({}) },
-        profilePage: { type: pageTourSchema, default: () => ({}) },
+        dashboardPage: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+        learningPath: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+        lessonPage: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
+        profilePage: {
+          type: pageTourSchema,
+          default: () => ({ step: 0, dismissed: false }),
+        },
       },
     },
     // additional updates for profile and user account features

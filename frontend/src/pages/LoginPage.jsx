@@ -45,6 +45,8 @@ export default function LoginPage() {
     oauth_terms_required: "Please agree to the Terms of Service and Privacy Policy to continue.",
     oauth_unavailable:
       "That sign-in provider is not available right now. Please choose another option.",
+    oauth_state_failed:
+      "The sign-in session expired or its browser cookie was blocked. Please try again.",
   };
   const oauthError = oauthErrorMessages[new URLSearchParams(location.search).get("error")];
 

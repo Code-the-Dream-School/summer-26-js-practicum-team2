@@ -133,7 +133,9 @@ describe("OAuth authentication", () => {
       .get("/api/v1/auth/google/callback")
       .query({ state, code: "provider-code" })
       .redirects(0);
-    expect(reusedResponse.headers.location).toBe("http://localhost:5173/login?error=oauth_failed");
+    expect(reusedResponse.headers.location).toBe(
+      "http://localhost:5173/login?error=oauth_state_failed",
+    );
   });
 
   it("restores a valid next destination only after OAuth state validation", async () => {
@@ -184,7 +186,7 @@ describe("OAuth authentication", () => {
       .redirects(0);
 
     expect(response.status).toBe(302);
-    expect(response.headers.location).toBe("http://localhost:5173/login?error=oauth_failed");
+    expect(response.headers.location).toBe("http://localhost:5173/login?error=oauth_state_failed");
     expect(response.headers["set-cookie"]).toEqual(
       expect.arrayContaining([expect.stringContaining("oauth_state_github=;")]),
     );

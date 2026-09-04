@@ -52,14 +52,32 @@ const loginSchema = Joi.object({
   remember: Joi.boolean().optional().default(false),
 });
 
-const TOUR_KEYS = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
+//Schema for PATCH /api/v1/onboarding/step
+const TOUR_KEYS = ["dashboardPage", "profilePage", "lessonPage", "learningPath"];
 const updateOnboardingProgressSchema = Joi.object({
   tourKey: Joi.string()
     .valid(...TOUR_KEYS)
-    .optional(),
-  step: Joi.number().integer().min(0).optional(),
-  dismissed: Joi.boolean().strict().optional(),
-  markAllComplete: Joi.boolean().strict().optional(),
+    .optional()
+    .messages({
+      "any.only": `tourKey must be one of: ${TOUR_KEYS.join(",")}.`,
+    }),
+  step: Joi.number().integer().min(0).optional().messages({
+    "number.base": "Step must be a number.",
+    "number.integer": "Step must be an integer.",
+    "number.min": "Step cannot be a negative number.",
+  }),
+  status: Joi.string()
+    .valid("pending", "completed", "skipped")
+    .optional()
+    .messages({ "any.only": "Status must be pending, completed, or skipped." }),
+
+  dismissed: Joi.boolean().strict().optional().messages({
+    "boolean.base": "Dismissed must be a boolean value.",
+  }),
+  markAllComplete: Joi.boolean()
+    .strict()
+    .optional()
+    .messages({ "boolean.base": "markAllComplete must be a boolean value." }),
 });
 
 const moduleIdSchema = Joi.string().trim().min(1).required();

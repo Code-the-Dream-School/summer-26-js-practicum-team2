@@ -14,6 +14,7 @@ const requireAdmin = require("./middleware/requireAdmin");
 
 // Route imports
 const healthRoutes = require("./routes/health.routes");
+const adminRoutes = require("./routes/admin.routes");
 const userRoutes = require("./routes/user.routes");
 const oauthRoutes = require("./routes/oauth.routes");
 const lessonRoutes = require("./routes/lesson.routes");
@@ -23,7 +24,6 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
 const quizPublicRoutes = require("./routes/quizPublic.routes");
-const adminRoutes = require("./routes/admin.routes");
 const onboardingRoutes = require("./routes/onboarding.routes");
 
 // Create Express app
@@ -81,8 +81,8 @@ app.use("/api/v1/dashboard", jwtMiddleware, dashboardRoutes);
 app.use("/api/v1/profile", jwtMiddleware, profileRoutes);
 app.use("/api/v1/quizzes", quizPublicRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
-app.use("/api/v1/admin", jwtMiddleware, requireAdmin, adminRoutes);
 app.use("/api/v1/onboarding", onboardingRoutes);
+app.use("/api/v1/admin", jwtMiddleware, requireAdmin, adminRoutes);
 // Root route
 app.get("/", (req, res) => {
   // Redirect to the frontend application

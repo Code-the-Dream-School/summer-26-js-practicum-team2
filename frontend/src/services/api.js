@@ -5,6 +5,7 @@ const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const DASHBOARD_CACHE_KEY_PREFIX = "sprout.dashboard.";
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
+const ONBOARDING_BASE_PATH = `${API_BASE_URL}/api/v1/onboarding`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
 const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
@@ -99,6 +100,48 @@ export const logoutUser = (csrfToken) =>
   apiRequest("/logout", {
     method: "POST",
     csrfToken,
+  });
+
+export const beginOnboarding = () =>
+  apiRequest("", {
+    method: "GET",
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const getOnboardingState = () =>
+  apiRequest("", {
+    method: "GET",
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const toggleOnboardingWorkflow = ({ enabled, csrfToken }) =>
+  apiRequest("/toggle", {
+    method: "PATCH",
+    csrfToken,
+    body: { enabled },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const updateOnboardingProgress = ({
+  tourKey,
+  step,
+  status,
+  dismissed,
+  markAllComplete,
+  csrfToken,
+}) =>
+  apiRequest("/step", {
+    method: "PATCH",
+    csrfToken,
+    body: { tourKey, step, status, dismissed, markAllComplete },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const resetOnboardingProgress = (csrfToken) =>
+  apiRequest("/reset", {
+    method: "POST",
+    csrfToken,
+    basePath: ONBOARDING_BASE_PATH,
   });
 
 export const getCurrentUser = () => apiRequest("/me", { method: "GET" });

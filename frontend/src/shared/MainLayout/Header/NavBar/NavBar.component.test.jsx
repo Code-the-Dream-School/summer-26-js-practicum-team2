@@ -34,6 +34,7 @@ describe("NavBar", () => {
 
     const image = screen.getByAltText("M avatar");
     expect(image).toHaveAttribute("src", "https://example.com/maya.png");
+    expect(image).toHaveAttribute("referrerpolicy", "no-referrer");
 
     fireEvent.error(image);
 
