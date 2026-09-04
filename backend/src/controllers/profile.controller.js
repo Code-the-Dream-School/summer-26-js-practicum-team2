@@ -37,6 +37,7 @@ const getProfile = async (req, res, next) => {
         email: user.email,
         goals: user.goals ?? "",
         notifications: user.notifications ?? true,
+        leaderboard_opt_in: user.leaderboard_opt_in ?? false,
         xp: user.xp ?? 0,
         streak: motivation.streak.currentDays,
         avatar_url: user.avatar_url || null,
@@ -88,7 +89,7 @@ const updateProfile = async (req, res, next) => {
         errors: error.details.map((detail) => detail.message),
       });
     }
-    const { name, email, goals, notifications } = value;
+    const { name, email, goals, notifications, leaderboard_opt_in } = value;
     const user = await User.findById(req.user.id);
 
     if (!user || user.is_deleted) {
@@ -113,6 +114,10 @@ const updateProfile = async (req, res, next) => {
       user.notifications = notifications;
       hasUpdates = true;
     }
+    if (leaderboard_opt_in !== undefined) {
+      user.leaderboard_opt_in = leaderboard_opt_in;
+      hasUpdates = true;
+    }
     // Email changed
     if (email !== undefined && email !== user.email) {
       user.email = email;
@@ -134,6 +139,7 @@ const updateProfile = async (req, res, next) => {
         email: user.email,
         goals: user.goals,
         notifications: user.notifications,
+        leaderboard_opt_in: user.leaderboard_opt_in ?? false,
         xp: user.xp ?? 0,
         streak: motivation.streak.currentDays,
         avatar_url: user.avatar_url || null,

@@ -143,6 +143,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    leaderboard_opt_in: {
+      type: Boolean,
+      default: false,
+    },
     //Achievements
     xp: {
       type: Number,
