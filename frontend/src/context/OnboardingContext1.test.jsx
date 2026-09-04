@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { OnboardingProvider, useOnboarding } from "./OnboardingContext1";
+import { ONBOARDING_STEPS, OnboardingProvider, useOnboarding } from "./OnboardingContext1";
 import { AuthProvider } from "./AuthContext";
 import * as api from "../services/api";
 //import { useNavigate } from "react-router";
@@ -27,6 +27,13 @@ const UserTest = () => {
 };
 
 describe("OnboardingContext1 tests", () => {
+  it("sends the lesson tour through the last-lesson redirect", () => {
+    expect(ONBOARDING_STEPS[2]).toEqual({
+      page: "lessonPage",
+      route: "/learn/last-lesson",
+    });
+  });
+
   it(" sends API response, syncs with backend, simulates click and awaits state change", async () => {
     api.getOnboardingState.mockResolvedValueOnce({
       onboarding: { is_completed: false, started_at: "2026-01-01", current_step: 0 },

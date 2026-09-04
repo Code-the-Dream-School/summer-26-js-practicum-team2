@@ -6,21 +6,14 @@ import OnboardingOverlay from "../../features/onboarding1/OnboardingOverlay1.com
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
+import { getOnboardingPageName } from "../../features/onboarding1/onboarding.utils";
 
 function OnboardingWrapper() {
   const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
     useOnboarding();
   const location = useLocation();
 
-  const pageName = (() => {
-    if (location.pathname.includes("/dashboard") || location.pathname === "/") {
-      return "dashboardPage";
-    }
-    if (location.pathname.includes("/profile")) return "profilePage";
-    if (location.pathname.includes("/learn/last-lesson")) return "lessonPage";
-    if (location.pathname.includes("/learn")) return "learningPath";
-    return "";
-  })();
+  const pageName = getOnboardingPageName(location.pathname);
 
   return (
     <OnboardingOverlay

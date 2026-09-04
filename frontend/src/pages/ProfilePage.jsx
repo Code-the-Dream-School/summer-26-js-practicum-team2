@@ -205,6 +205,7 @@ export default function ProfilePage() {
               <img
                 src={savedAvatarUrl}
                 alt={`${savedDisplayName} avatar`}
+                referrerPolicy="no-referrer"
                 onError={() => setFailedAvatarUrl(savedAvatarUrl)}
                 className="h-full w-full object-cover"
               />

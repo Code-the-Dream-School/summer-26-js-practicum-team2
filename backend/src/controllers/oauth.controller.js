@@ -6,6 +6,7 @@ const OAUTH_PUBLIC_ERROR_CODES = Object.freeze({
   OAUTH_VERIFIED_EMAIL_REQUIRED: "oauth_email_required",
   OAUTH_TERMS_REQUIRED: "oauth_terms_required",
   OAUTH_PROVIDER_UNAVAILABLE: "oauth_unavailable",
+  OAUTH_STATE_INVALID: "oauth_state_failed",
 });
 
 const getOAuthFailureRedirect = (errorCode) => {

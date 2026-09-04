@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 //extract Token from AuthContext
 import { useAuthContext } from "../../context/AuthContext";
+import { ONBOARDING_STEPS } from "./onboarding.constants";
 
 import {
   resetOnboardingProgress as apiResetOnboarding,
@@ -12,12 +13,7 @@ import {
   getOnboardingState as apiGetOnboardingState,
 } from "../../services/api";
 
-export const ONBOARDING_STEPS = {
-  0: { page: "dashboardPage", route: "/dashboard" },
-  1: { page: "profilePage", route: "/profile" },
-  2: { page: "lessonPage", route: "/learn/last-lesson" },
-  3: { page: "learningPath", route: "/learn" },
-};
+export { ONBOARDING_STEPS } from "./onboarding.constants";
 
 export function useOnboarding() {
   const { csrfToken } = useAuthContext();

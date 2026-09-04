@@ -1,6 +1,7 @@
 import { createContext, use, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "./AuthContext";
+import { ONBOARDING_STEPS } from "../features/onboarding1/onboarding.constants";
 import {
   resetOnboardingProgress as apiResetOnboarding,
   updateOnboardingProgress as apiUpdateOnboardingProgress,
@@ -8,12 +9,7 @@ import {
   getOnboardingState as apiGetOnboardingState,
 } from "../services/api";
 
-export const ONBOARDING_STEPS = {
-  0: { page: "dashboardPage", route: "/dashboard" },
-  1: { page: "profilePage", route: "/profile" },
-  2: { page: "lessonPage", route: "/learn/last-lesson" },
-  3: { page: "learningPath", route: "/learn" },
-};
+export { ONBOARDING_STEPS } from "../features/onboarding1/onboarding.constants";
 
 const OnboardingContext = createContext(null);
 

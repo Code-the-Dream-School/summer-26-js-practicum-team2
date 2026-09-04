@@ -9,6 +9,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.7.1] - 2026-09-04
+
+### Added
+
+- Added focused regression coverage for mapping dashboard, profile, learning-path, lesson, and unrelated URLs to onboarding page names.
+
+### Changed
+
+- Centralized onboarding step and route definitions in a shared constants module so the context and standalone hook cannot drift apart.
+- Extracted onboarding page detection into a shared utility, preserving exact learning-path matching and nested lesson-route detection.
+- Added provider-scoped OAuth failure diagnostics without logging state values or other sensitive callback data.
+
+### Fixed
+
+- Fixed invalid, missing, expired, or reused OAuth state callbacks to return a specific sign-in-session error instead of the generic OAuth failure message.
+
+---
+
+## [0.7.0] - 2026-09-04
+
+### Added
+
+- Added an authenticated, four-step product tour across the dashboard, profile, first lesson, and learning path, with controls to start, skip, resume, and retake the tour.
+- Added persistent onboarding state and authenticated APIs for reading, resetting, enabling, disabling, and updating tour progress.
+- Added a 50 XP reward for completing every onboarding tour without skipping.
+- Added OAuth provider avatars to newly created and linked accounts, with initials displayed when an avatar is missing or fails to load.
+
+### Changed
+
+- Updated the current-user response with avatar, streak, and XP data used by shared account views.
+- Updated last-lesson navigation to open the first lesson when no saved or server-provided lesson path is available.
+- Updated externally hosted avatars to use a no-referrer request policy.
+
+### Fixed
+
+- Fixed sign-in for existing GitHub-linked accounts when GitHub does not return an email address on a later authorization.
+- Fixed OAuth avatar synchronization so returning users receive their current provider avatar.
+
+---
+
 ## [0.6.1] - 2026-09-03
 
 ### Changed

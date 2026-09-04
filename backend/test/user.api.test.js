@@ -109,6 +109,39 @@ describe("user API integration", () => {
     });
   });
 
+  it("returns the persisted avatar when hydrating an OAuth session", async () => {
+    const user = await User.create({
+      name: "OAuth Learner",
+      email: "oauth-avatar@example.com",
+      role: "learner",
+      tos_agreement: true,
+      email_verified_at: new Date(),
+      google_id: "google-avatar-user",
+      avatar_url: "https://lh3.googleusercontent.com/oauth-avatar",
+      xp: 75,
+    });
+    const token = jwt.sign(
+      { id: user._id, role: user.role, csrfToken: "oauth-csrf-token" },
+      process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here",
+    );
+
+    const response = await request(app)
+      .get("/api/v1/users/me")
+      .set("Cookie", `session_token=${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      csrfToken: "oauth-csrf-token",
+      user: {
+        id: user._id.toString(),
+        name: "OAuth Learner",
+        avatar_url: "https://lh3.googleusercontent.com/oauth-avatar",
+        xp: 75,
+        streak: 0,
+      },
+    });
+  });
+
   it("rejects duplicate registration and invalid payloads", async () => {
     const firstPayload = {
       name: "User One",
