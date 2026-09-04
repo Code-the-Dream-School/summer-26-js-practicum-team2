@@ -33,14 +33,6 @@ const parseAllowedOrigins = () => {
   return [...new Set([...configuredOrigins, ...fallbackOrigins])];
 };
 
-// Rate Limiting Configuration for Production But Not Development
-// Sets a limit of 200 requests per 15 minutes per IP address
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-
-  max: process.env.NODE_ENV === "production" ? 200 : 1000000,
-});
-
 // CORS Configuration
 const allowedOrigins = parseAllowedOrigins();
 const corsOptions = {
