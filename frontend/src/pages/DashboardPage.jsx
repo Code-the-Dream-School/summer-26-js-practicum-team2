@@ -29,8 +29,6 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardPage() {
-  // const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
-  //   useOnboarding();
   const { user, isAuthenticated } = useAuthContext();
   const { dashboard, isLoading, error } = useDashboardData({
     userId: user?.id,
@@ -62,22 +60,7 @@ export default function DashboardPage() {
 
   return (
     <section className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Onboarding Banner handles own
-
-      {/* {!hasCompleted && currentStep === 0 && ( */}
-
-      {/* {!hasCompleted && activePage === "dashboardPage" && (
-        <OnboardingOverlay
-          hasCompleted={hasCompleted}
-          //status ={status}
-          currentStep={currentStep}
-          activePage={activePage}
-          pageName="dashboardPage"
-          onNext={handleNextStep}
-          onStart={startOnboarding}
-          onSkip={skipOnboarding}
-        />
-      )} */} 
+     {/* this is where an indiv component for onboarding overlay would go */}
 
       {/* Main Dashboard Content */}
       <header className="space-y-1">
