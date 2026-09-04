@@ -4,15 +4,11 @@ import DashboardHero from "../features/dashboard/DashboardHero/DashboardHero.com
 import RecentActivityCard from "../features/dashboard/RecentActivityCard/RecentActivityCard.component";
 import UnitProgressRow from "../features/dashboard/UnitProgressRow/UnitProgressRow.component";
 import Button from "../shared/Button/Button.component";
-import Card from "../shared/Card/Card.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import { ROUTES } from "../app/router/routes";
 
 import useDashboardData from "../hooks/useDashboardData";
-
-//import { useOnboarding } from "../context/OnboardingContext1";
-//import OnboardingOverlay from "../features/onboarding1/OnboardingOverlay1.component"; //adeded aug 30
 
 function DashboardSkeleton() {
   return (
@@ -54,39 +50,30 @@ export default function DashboardPage() {
     );
   }
 
-  const { hero, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  const { hero, progress, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  if (units.length === 0) {
+    return (
+      <section className="space-y-6">
+        <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
+        <EmptyState
+          icon="🌱"
+          title="Content coming soon"
+          message="New lessons are being prepared. Check back soon for something new to explore."
+          action={
+            <Button as={Link} to={ROUTES.LEARN} variant="primary" className="px-5 py-2.5">
+              View learning path
+            </Button>
+          }
+        />
+      </section>
+    );
+  }
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;
 
   return (
-    <section className="p-6 max-w-4xl mx-auto space-y-6">
-     {/* this is where an indiv component for onboarding overlay would go */}
-
-      {/* Main Dashboard Content */}
-      <header className="space-y-1">
-        {/* <div className="flex justify-between items-center"> */}
-        <div>
-          <h1 className="text-2xl font-bold text-neutral-900"> Dashboard</h1>
-          <p className="text-neutral-600">Welcome! Here is an overview of your progress</p>
-        </div>
-      </header>
-      <DashboardHero hero={hero} />
-
-      <Card className="space-y-3">
-        <p className="text-small font-semibold uppercase tracking-wide text-primary">
-          Recommended next
-        </p>
-        <h2 className="font-heading text-h4 font-bold text-heading">{nextAction?.title}</h2>
-        <p className="text-neutral-600">{nextAction?.description}</p>
-        <Button
-          as={Link}
-          to={nextAction?.href || "/lessons"}
-          variant="primary"
-          className="px-5 py-2.5"
-        >
-          {nextAction?.ctaLabel || "Continue learning"}
-        </Button>
-      </Card>
+    <section className="space-y-6">
+      <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
 
       {hasNoProgress ? (
         <EmptyState

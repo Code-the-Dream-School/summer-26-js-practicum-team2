@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, use, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "./AuthContext";
 import {
@@ -122,13 +122,17 @@ export function OnboardingProvider({ children }) {
     skipOnboarding,
     handleNextStep,
   };
-  return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;
+  return <OnboardingContext value={value}>{children}</OnboardingContext>;
 }
 
 export function useOnboarding() {
-  const context = useContext(OnboardingContext);
+  const context = use(OnboardingContext);
   if (!context) {
     throw new Error("useOnboarding must be used within an OnboardingProvider");
   }
   return context;
+}
+
+export function useOptionalOnboarding() {
+  return use(OnboardingContext);
 }
