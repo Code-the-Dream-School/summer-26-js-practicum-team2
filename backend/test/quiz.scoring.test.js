@@ -63,7 +63,7 @@ describe("quiz submission grading (backend)", () => {
     expect(submitA.body.reviews).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          questionId: "1.1.2-q3",
+          questionId: "1.1.2-q2",
           isCorrect: false,
           correctChoiceIds: ["a"],
           explanation: expect.any(String),
