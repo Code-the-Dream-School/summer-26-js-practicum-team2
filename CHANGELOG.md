@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.7.2] - 2026-09-05
+
+### Added
+
+- Added focused component coverage for starting, displaying, and advancing the onboarding tour.
+- Added completed-onboarding fixtures to navigation and profile-avatar browser tests so the product tour does not interfere with unrelated workflows.
+
+### Changed
+
+- Consolidated the active onboarding provider, context hook, overlay, constants, and route utilities under a single feature directory.
+- Simplified the onboarding overlay copy and controls while preserving the dashboard prompt and page-specific tour steps.
+- Updated the shared application layout to use the consolidated onboarding implementation.
+- Updated continuous integration to run for pull requests targeting the `docs` branch.
+- Synchronized frontend and backend lockfile metadata with version `0.7.1`.
+
+### Removed
+
+- Removed the duplicate numbered onboarding context and obsolete commented-out learning-path and lesson-list implementations.
+
+---
+
 ## [0.7.1] - 2026-09-04
 
 ### Added
