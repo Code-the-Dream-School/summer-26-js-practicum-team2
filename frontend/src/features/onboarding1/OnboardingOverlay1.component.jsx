@@ -3,15 +3,15 @@
 const STEP_CONTENT = {
   0: {
     title: "Welcome to Sprout!",
-    text: "Your email has been successfully verified! Let's kick things off with a quick tour. Click 'Next Step' to hop straight over to your profile manager layout.",
+    text: "Your email has been successfully verified! This is your dashboard where you can see your achievements.Let's kick things off with a quick tour. Click 'Next Step' to hop straight over to your profile manager layout.",
   },
   1: {
     title: "Your Profile Page",
-    text: "This is where your achievements live. You can click your avatar section icon right here to upload a custom picture! Ready? Let's check out a sample lesson.",
+    text: "This is where your personal information live. You can update your avatar icon right here by updating your name, it will show the first letter of your name!",
   },
   2: {
-    title: "Sample Lesson Activity",
-    text: "Welcome to your first learning playground! Here you will go through small lessons followed by mini checks your knowledge from the lesson..",
+    title: "Lesson Page",
+    text: "Welcome to your first learning playground! Here you will go through small lessons followed by mini checks to test your knowledge from the lesson.",
   },
   3: {
     title: "Learning Path",
@@ -31,8 +31,6 @@ export default function OnboardingOverlay({
   // local state of checkbox to be false on mount
 
   //data persistent banner on dashboard if it's not completed with all pages
-
-  //const showCheckboxBanner = !hasCompleted && pageName === "dashboardPage"; (sept 2)
   const showCheckboxBanner = pageName === "dashboardPage";
   const tourContent = STEP_CONTENT[currentStep] || {};
   //render floating step popup if step is active and matches the current route
