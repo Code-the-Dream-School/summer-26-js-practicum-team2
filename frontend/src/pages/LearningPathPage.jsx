@@ -337,24 +337,6 @@ function LearningPathPage() {
               );
             })}
           </svg>
-          {/* Render learning path Onboarding overly
-         
-          <div>
-            {!hasCompleted && activePage === "learningPath" && (
-              <OnboardingOverlay
-                hasCompleted={hasCompleted}
-                //status ={status}
-                currentStep={currentStep}
-                //activePage="learningPath"
-                activePage={activePage}
-                pageName="learningPath"
-                onNext={handleNextStep}
-                onStart={startOnboarding}
-                onSkip={skipOnboarding}
-              />
-            )}
-          </div> */}
-
           {/* Rendering the learning path */}
           {learningPath.map((node, index) => {
             let status = "locked";

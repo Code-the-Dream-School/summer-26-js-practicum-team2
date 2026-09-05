@@ -31,7 +31,6 @@ function OnboardingWrapper() {
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
-  //add for admin update
   const isAdmin = user?.role === "admin";
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [currentModuleResources, setCurrentModuleResources] = useState({
