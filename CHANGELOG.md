@@ -9,6 +9,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added full profile management for viewing and updating account details, avatar URLs, goals, notification preferences, passwords, and account deletion requests
+- Added role-based administrator authorization with protected backend routes and frontend admin routing
+- Added atomic administrator bootstrap behavior that assigns the first successfully registered user the admin role
+- Added an administrator control panel for managing users, account status, roles, email verification, progress resets, and account deletion
+- Added admin user listing, Ban/Unban controls, role management, progress reset, email verification, and reversible account deletion actions
+- Added a 30-day account deletion lifecycle with scheduled deletion metadata and account reactivation support
+- Added MongoDB-backed lesson module storage and lesson content management
+- Added public lesson content APIs for signed-out lesson previews
+- Added server-side quiz answer checking without exposing answer keys to the frontend
+- Added admin module and nested lesson CRUD APIs with budgeting module seed support
+- Added duplicate module and lesson protection with lesson cache invalidation
+- Added an admin-only budgeting seed workflow for initializing runtime lesson content
+- Added a full lesson JSON editor for lesson metadata, micro-lessons, quizzes, and lesson content blocks
+- Added block-type controls for paragraph, callout, formula, list, quiz, table, and budget content
+- Added structured editing support for lists, character introductions, knowledge checks, tables, and budget summaries
+- Added backend and frontend regression coverage for profile management, account deletion, reactivation, administrator authorization, route guards, session invalidation, lesson content, and admin workflows
+- Added Postman coverage for administrator status, user management, module seeding, module CRUD, nested lesson CRUD, public lesson loading, and quiz answer checks
+- Added separate public, user, and admin Postman workflows with shared session and CSRF environment variables
+
+### Changed
+
+- Updated authentication to use database-backed user state and token-version checks when validating active sessions
+- Updated login behavior to route administrators to the admin panel and learners to the standard dashboard
+- Updated shared navigation to expose administrator links only to authorized users and make all navigation links accessible from the mobile menu
+- Prevented disabled, banned, and deleted users from signing in or continuing authenticated sessions
+- Updated account deletion to use an administrator-reviewed soft-deletion workflow with a recovery period
+- Updated signed-out lesson previews to load lesson content through the public lesson API instead of bundled frontend content
+- Updated lesson normalization to consume API-provided lesson payloads
+- Updated public and authenticated lesson responses to sanitize quiz answers and explanations
+- Updated quiz state to use correctness metadata returned by the server instead of calculating correctness from bundled answer data
+- Made learning-path module discovery database-driven instead of assuming the `cashFlow` module
+- Made dashboard next actions and empty states reflect the lesson modules currently available in the database
+- Updated unseeded learning-path states to use the shared `EmptyState` presentation and lesson artwork
+- Replaced admin panel action controls with the shared `Button` component
+- Updated Postman authentication workflows to share user and admin session and CSRF state
+- Updated Postman requests to correctly handle login cookies, logout sessions, dashboard events, and multipart lesson imports
+
+### Fixed
+
+- Fixed non-administrator access to protected administrator pages so unauthorized users return to the standard dashboard
+- Fixed account reactivation lookups so recently deleted users can be restored during the 30-day recovery period
+- Fixed profile deletion and administrator approval/rejection requests so frontend and backend API contracts remain aligned
+- Fixed soft-delete validation to accept the deletion state used by the admin panel
+- Fixed banned-account login handling to return an explicit account-banned message
+- Fixed administrator account actions so admins cannot perform destructive management actions against their own account
+- Fixed repeated administrator email verification attempts
+- Fixed duplicate lesson and module creation and ensured content caches are invalidated after administrative updates
+- Fixed Postman user login cookie capture, logout cookie handling, dashboard event requests, multipart import headers, and collection route coverage
+
+### Security
+
+- Added explicit administrator-role enforcement to all protected admin API routes
+- Added database-backed JWT version validation so password changes, account deletion, bans, and other account-state changes can invalidate existing sessions
+- Added banned-session enforcement so already authenticated users cannot continue using revoked accounts
+- Prevented administrators from targeting their own account with destructive management actions
+- Restricted account deletion approval and rejection to users with active pending deletion requests
+- Allowlisted administrator API response fields to prevent sensitive user data such as password hashes from being exposed
+- Stopped administrator deletion actions from returning complete user documents
+- Prevented public and authenticated lesson APIs from exposing quiz `correctResponse` or explanation data before answers are checked
+- Moved quiz correctness validation to the backend instead of trusting client-side lesson content
+
+### Removed
+
+- Removed the frontend dependency on bundled lesson content for signed-out lesson previews
+- Removed the `getSampleLesson` preview helper
+- Removed automatic runtime loading of lesson JSON files in favor of database-backed module discovery and administrative seeding
+- Removed the implicit `cashFlow` fallback from learning-path module discovery
+
+---
+
 ## [0.3.8] - 2026-09-01
 
 ### Added

@@ -28,4 +28,11 @@ const loginLimiter = rateLimiter({
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
 });
 
-module.exports = { registerLimiter, loginLimiter };
+// Rate Limiting Configuration
+// Sets a limit of 100 requests per 15 minutes per IP address
+const apiLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+module.exports = { registerLimiter, loginLimiter, apiLimiter };

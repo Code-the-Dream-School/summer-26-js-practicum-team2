@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import Button from "../../../Button/Button.component";
 
@@ -6,6 +6,7 @@ const primaryNavLinks = [{ label: "Home", href: "/" }];
 
 export default function NavBar({
   signedIn = false,
+  isAdmin = false,
   avatarLabel = "A",
   xp = 0,
   streak = 0,
@@ -14,10 +15,37 @@ export default function NavBar({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const [profileAvatarLabel, setProfileAvatarLabel] = useState(null);
+  const currentAvatarLabel =
+    profileAvatarLabel?.baseAvatarLabel === avatarLabel ? profileAvatarLabel.label : avatarLabel;
+
+  useEffect(() => {
+    const handleProfileUpdate = (event) => {
+      const user = event.detail?.user;
+      const name = user?.name || event.detail?.avatarLabel;
+
+      if (name && typeof name === "string") {
+        setProfileAvatarLabel({
+          baseAvatarLabel: avatarLabel,
+          label: name.trim().charAt(0).toUpperCase(),
+        });
+      }
+    };
+
+    window.addEventListener("sprout:profile-updated", handleProfileUpdate);
+    window.addEventListener("sprout:progress-updated", handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener("sprout:profile-updated", handleProfileUpdate);
+      window.removeEventListener("sprout:progress-updated", handleProfileUpdate);
+    };
+  }, [avatarLabel]);
+
   const authNavLinks = signedIn
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Learn", href: "/learn" },
+        ...(isAdmin ? [{ label: "Admin", href: "/admin/dashboard" }] : []),
       ]
     : [];
 
@@ -74,7 +102,7 @@ export default function NavBar({
             <li>
               <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
-                  <NavLink to="/profile">{avatarLabel}</NavLink>
+                  <NavLink to="/profile">{currentAvatarLabel}</NavLink>
                 </span>
                 <span className="text-sm font-semibold text-heading">{xp} XP</span>
                 <span className="text-sm text-neutral-600">{streak} day streak</span>
@@ -117,6 +145,7 @@ export default function NavBar({
 
       {isOpen ? (
         <div className="border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden">
+          {/* // <div className="max-h-[calc(100vh-5rem)] overflow-y-auto border-t border-neutral-200 bg-surface-app px-4 py-3 md:hidden shadow-lg"> */}
           <ul className="space-y-2">
             {mobileNavLinks.map((link) => (
               <li key={link.label}>

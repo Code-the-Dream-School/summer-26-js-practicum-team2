@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import { updateLessonProgress, restartLessonProgress } from "../../../services/api";
+import { completeLesson, updateLessonProgress, restartLessonProgress } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -78,6 +78,7 @@ export default function LearnFlow({
 
   const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);
+  const completionRequestRef = useRef(false);
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
   const [submissions, setSubmissions] = useState({});
   const [completedAttempts, setCompletedAttempts] = useState([]);
@@ -174,6 +175,21 @@ export default function LearnFlow({
   const hasQuiz = learnData.questions.length > 0;
   // Only a passing lesson unlocks the next one.
   const canContinue = !hasQuiz || gradedPassed;
+
+  useEffect(() => {
+    if (!isComplete || !canContinue || !canSyncProgress || completionRequestRef.current) {
+      return;
+    }
+
+    completionRequestRef.current = true;
+    completeLesson({
+      moduleId: learnData.moduleId,
+      lessonId: learnData.id,
+      csrfToken,
+    }).catch(() => {
+      completionRequestRef.current = false;
+    });
+  }, [canContinue, canSyncProgress, csrfToken, isComplete, learnData.id, learnData.moduleId]);
 
   const continuePath = learnData.nextLessonId
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
