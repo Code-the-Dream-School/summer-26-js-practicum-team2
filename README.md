@@ -44,6 +44,7 @@ first-paycheck recent grad.
 - Responsive UI (mobile & desktop)
 - Form validation and error handling
 - RESTful API integration
+- XP, badges, and streak rewards
 
 <!--
 ## 📸 Screenshots
