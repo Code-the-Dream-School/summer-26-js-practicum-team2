@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.7.2] - 2026-09-05
+
+### Changed
+
+- Updated dashboard, profile, and lesson onboarding descriptions and renamed the sample lesson tour heading to "Lesson Page".
+- Cleaned up onboarding comments and standardized formatting across onboarding code, validation, shared layout, and related tests.
+- Synchronized frontend and backend lockfile references to the root package's 0.7.1 version.
+
+### Fixed
+
+- Added completed-onboarding API fixtures to the mobile navigation and profile avatar end-to-end tests so those scenarios do not depend on live onboarding state.
+
+---
+
 ## [0.7.1] - 2026-09-04
 
 ### Added
