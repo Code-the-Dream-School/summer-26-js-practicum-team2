@@ -10,6 +10,7 @@ import * as api from "../services/api";
 import MainLayout from "../shared/MainLayout/MainLayout.component";
 
 vi.mock("../services/api", () => ({
+  getOnboardingState: vi.fn().mockResolvedValue({ onboarding: null }),
   restartLessonProgress: vi.fn(),
   startQuiz: vi.fn(),
   submitQuiz: vi.fn(),
