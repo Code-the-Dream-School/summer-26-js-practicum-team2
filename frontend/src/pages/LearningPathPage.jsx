@@ -6,6 +6,8 @@ import { getLesson, getLessonProgress } from "../services/api";
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
+// import Toast from "../shared/Toast/Toast.component";
+// import useRewardQueue from "../hooks/useRewardQueue";
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -26,6 +28,9 @@ function LearningPathPage() {
   const [progress, setProgress] = useState(null);
   const [currentModule, setCurrentModule] = useState(null);
   const [error, setError] = useState("");
+  //Toast state for rewards like badges, xp, and streaks
+  //const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
+  //addRewards(response.rewards);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -394,6 +399,12 @@ function LearningPathPage() {
           )}
         </div>
       </footer>
+      {/* <Toast
+        isOpen={hasToasts}
+        variant={currentToast?.variant ?? "default"}
+        message={currentToast?.message ?? ""}
+        onClose={closeToast}
+      /> */}
     </div>
   );
 }
