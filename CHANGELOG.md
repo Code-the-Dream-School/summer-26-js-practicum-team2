@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Added setup script for environment configuration and update package.json
+
+### Changed
+
+- Combines sync-shared-files into a single GitHub workflow file
+- Restored functionality from development-backup to optionally inject a port into both frontend and backend 
+
+### Removed
+
+- Removed kill-port as devDependency and removes the predev script
+
+---
+
 ## [0.3.3] - 2026-08-19
 
 ### Added
@@ -42,6 +59,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed lesson quiz scoring to use the total number of questions across all quizzes, preventing incorrect percentages and false "Fail" results
 
+## [0.3.2] - 2026-08-18
+
+### Added
+
+- Added content accuracy review policy document
+- Added accuracy review fields to budgeting lessons
+- Added lesson accuracy metadata test
+- Added content sign-off section to PR template for accuracy review
+- Added content accuracy checklist for review process
+- Added Content Accuracy section to README files
+- Backfilled lesson content with passing metadata when it was completed
+
+## [0.3.1] - 2026-08-18
+
+### Fixed
+
+- Fixed cross-site authentication between the Netlify frontend and Render backend by making session cookie security and `SameSite` settings configurable through environment variables.
+
 ---
 
 ## [0.3.0] - 2026-08-16
@@ -72,7 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed login rate limiter IP key generation
 - In backend/server.js, conditionally sets DNS override only outside of production to prevent the app from crashing in some environments
 - Allowed Vite to access shared lesson content by updating the vite.config.js file
-- Prevent invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined
+- Prevented invalid button props on link components by adding a type check in Button component and confirming isDisable is not undefined
 - Fixed Tailwind breakpoint class typo in CharacterIntro component
 - Fixed typo with duplicate JWT_SECRET is backend/.env.example
 - Improved lesson table rendering by safely handling missing module, table, and budget data, and by selecting the correct budget when a `budgetId` is provided instead of always defaulting to the first budget.
