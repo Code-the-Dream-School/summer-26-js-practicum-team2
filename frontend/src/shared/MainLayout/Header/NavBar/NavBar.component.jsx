@@ -8,6 +8,7 @@ export default function NavBar({
   signedIn = false,
   isAdmin = false,
   avatarLabel = "A",
+  avatarUrl = null,
   xp = 0,
   streak = 0,
   onLogout,
@@ -17,31 +18,8 @@ export default function NavBar({
   const mobileMenuId = useId();
   const menuToggleLabel = isOpen ? "Close navigation menu" : "Open navigation menu";
 
-  const [profileAvatarLabel, setProfileAvatarLabel] = useState(null);
-  const currentAvatarLabel =
-    profileAvatarLabel?.baseAvatarLabel === avatarLabel ? profileAvatarLabel.label : avatarLabel;
-
-  useEffect(() => {
-    const handleProfileUpdate = (event) => {
-      const user = event.detail?.user;
-      const name = user?.name || event.detail?.avatarLabel;
-
-      if (name && typeof name === "string") {
-        setProfileAvatarLabel({
-          baseAvatarLabel: avatarLabel,
-          label: name.trim().charAt(0).toUpperCase(),
-        });
-      }
-    };
-
-    window.addEventListener("sprout:profile-updated", handleProfileUpdate);
-    window.addEventListener("sprout:progress-updated", handleProfileUpdate);
-
-    return () => {
-      window.removeEventListener("sprout:profile-updated", handleProfileUpdate);
-      window.removeEventListener("sprout:progress-updated", handleProfileUpdate);
-    };
-  }, [avatarLabel]);
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState(null);
+  const showAvatarImage = Boolean(signedIn && avatarUrl && failedAvatarUrl !== avatarUrl);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -113,7 +91,18 @@ export default function NavBar({
             <li>
               <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-surface-raised px-3 py-2 shadow-sm">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-surface-inset font-semibold text-heading">
-                  <NavLink to="/profile">{currentAvatarLabel}</NavLink>
+                  <NavLink to="/profile">
+                    {showAvatarImage ? (
+                      <img
+                        src={avatarUrl}
+                        alt={`${avatarLabel} avatar`}
+                        onError={() => setFailedAvatarUrl(avatarUrl)}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      avatarLabel
+                    )}
+                  </NavLink>
                 </span>
                 <span className="text-sm font-semibold text-heading">{xp} XP</span>
                 <span className="text-sm text-neutral-600">{streak} day streak</span>
@@ -185,7 +174,16 @@ export default function NavBar({
                 className="flex items-center gap-3 border-b border-neutral-200 bg-surface-inset px-4 py-3 text-heading transition-colors hover:bg-surface-app"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-surface-raised font-semibold">
-                  {currentAvatarLabel}
+                  {showAvatarImage ? (
+                    <img
+                      src={avatarUrl}
+                      alt=""
+                      onError={() => setFailedAvatarUrl(avatarUrl)}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    avatarLabel
+                  )}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold">Profile</span>

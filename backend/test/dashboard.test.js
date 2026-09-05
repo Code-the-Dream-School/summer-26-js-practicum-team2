@@ -140,4 +140,30 @@ describe("dashboard endpoint", () => {
       label: "1 / 1 learning check",
     });
   });
+
+  it("uses the same quiz-attempt streak for profile and dashboard", async () => {
+    const { authHeader, userId } = await createAuthedUser("dashboard-profile-streak@example.com");
+    await seedDashboardModule();
+    const now = new Date();
+    await QuizAttempt.create({
+      user_id: userId,
+      module_id: "budgeting",
+      lesson_id: "1.1",
+      micro_lesson_id: "1.1.1",
+      attempt_number: 1,
+      started_at: now,
+      submitted_at: now,
+      score: 100,
+      passed: true,
+    });
+    await User.updateOne({ _id: userId }, { $set: { streak: 99 } });
+
+    const [dashboardResponse, profileResponse] = await Promise.all([
+      request(app).get("/api/v1/dashboard").set("Authorization", authHeader),
+      request(app).get("/api/v1/profile").set("Authorization", authHeader),
+    ]);
+
+    expect(dashboardResponse.body.hero.streak.currentDays).toBe(1);
+    expect(profileResponse.body.user.streak).toBe(1);
+  });
 });

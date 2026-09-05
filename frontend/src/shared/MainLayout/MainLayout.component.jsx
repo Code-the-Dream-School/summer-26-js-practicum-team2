@@ -32,6 +32,7 @@ export default function MainLayout() {
         signedIn={isAuthenticated}
         isAdmin={isAdmin}
         avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
+        avatarUrl={user?.avatar_url ?? null}
         xp={user?.xp ?? 0}
         streak={user?.streak ?? 0}
         onLogout={handleLogout}

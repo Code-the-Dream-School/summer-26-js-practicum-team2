@@ -3,10 +3,12 @@ const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
 const { issueSession } = require("../utils/session");
+const { getLearningMotivation } = require("../utils/learningStats");
 const {
   updateProfileSchema,
   changePasswordSchema,
   deleteAccountSchema,
+  avatarUrlSchema,
 } = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
@@ -24,9 +26,10 @@ const getProfile = async (req, res, next) => {
         .json({ message: "Not authenticated or account deactivated." });
     }
 
-    const progress = await UserProgress.findOne({ user_id: req.user.id }).sort({
-      updated_at: -1,
-    });
+    const [progress, motivation] = await Promise.all([
+      UserProgress.findOne({ user_id: req.user.id }).sort({ updated_at: -1 }),
+      getLearningMotivation(req.user.id),
+    ]);
     return res.status(StatusCodes.OK).json({
       user: {
         id: user._id,
@@ -35,7 +38,7 @@ const getProfile = async (req, res, next) => {
         goals: user.goals ?? "",
         notifications: user.notifications ?? true,
         xp: user.xp ?? 0,
-        streak: user.streak ?? 0,
+        streak: motivation.streak.currentDays,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
         current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
@@ -46,20 +49,25 @@ const getProfile = async (req, res, next) => {
     return next(error);
   }
 };
-//POST /api/v1/profile/avatar
-const uploadAvatar = async (req, res, next) => {
+// POST /api/v1/profile/avatar: URL avatars only; file uploads are not supported by this route.
+const setAvatarUrl = async (req, res, next) => {
   try {
+    const { error, value } = avatarUrlSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Validation error",
+        errors: error.details.map((detail) => detail.message),
+      });
+    }
     const user = await User.findById(req.user.id);
     if (!user || user.is_deleted) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No User found." });
     }
-    // check if filed uploaded was a url string
-    const uploadedUrl = req.file?.path || req.body?.avatar_url || null;
-    user.avatar_url = uploadedUrl;
+    user.avatar_url = value.avatar_url || null;
     await user.save();
 
     return res.status(StatusCodes.OK).json({
-      message: user.avatar_url ? "Avatar uploaded." : "Avatar set to default initial.",
+      message: user.avatar_url ? "Avatar URL saved." : "Avatar set to default initial.",
       avatar_url: user.avatar_url,
       avatar_initial: getFirstInitial(user.name, user.email),
     });
@@ -77,7 +85,7 @@ const updateProfile = async (req, res, next) => {
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Validation error",
-        error: error.details.map((detail) => detail.message),
+        errors: error.details.map((detail) => detail.message),
       });
     }
     const { name, email, goals, notifications } = value;
@@ -117,6 +125,7 @@ const updateProfile = async (req, res, next) => {
         .json({ message: "No items requested to be updated." });
     }
     await user.save();
+    const motivation = await getLearningMotivation(user._id);
     return res.status(StatusCodes.OK).json({
       message: "You have successfully updated your profile.",
       user: {
@@ -126,7 +135,7 @@ const updateProfile = async (req, res, next) => {
         goals: user.goals,
         notifications: user.notifications,
         xp: user.xp ?? 0,
-        streak: user.streak ?? 0,
+        streak: motivation.streak.currentDays,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
       },
@@ -148,7 +157,7 @@ const changePassword = async (req, res, next) => {
     });
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Error with validation",
+        message: "Validation error",
         errors: error.details.map((detail) => detail.message),
       });
     }
@@ -190,10 +199,11 @@ const changePassword = async (req, res, next) => {
 //POST /api/v1/profile/request-deletion for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
-    const { error, value } = deleteAccountSchema.validate(req.body);
+    const { error, value } = deleteAccountSchema.validate(req.body, { abortEarly: false });
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: error.details[0].message,
+        message: "Validation error",
+        errors: error.details.map((detail) => detail.message),
       });
     }
     const user = await User.findById(req.user.id);
@@ -230,5 +240,5 @@ module.exports = {
   updateProfile,
   changePassword,
   deleteAccount,
-  uploadAvatar,
+  setAvatarUrl,
 };

@@ -6,6 +6,8 @@ const User = require("../models/User.model.js");
 const AdminBootstrap = require("../models/AdminBootstrap.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { clearSessionCookie, issueSession } = require("../utils/session");
+const { isWithinReactivationGracePeriod, reactivateAccount } = require("../utils/accountDeletion");
+const { getLearningMotivation } = require("../utils/learningStats");
 const {
   registerSchema,
   loginSchema,
@@ -15,6 +17,29 @@ const {
 } = require("../validation/userValidation.js");
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
+const accountStateLookup = {
+  is_deleted: { $in: [true, false, null] },
+  is_archived: { $in: [true, false, null] },
+};
+
+const sendAccountStateError = (res, user) => {
+  if (user.is_disabled) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "This account has been banned.",
+      code: "ACCOUNT_DISABLED",
+    });
+    return true;
+  }
+  if (user.is_deleted || user.deleted_at) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "This account is unavailable.",
+      code: "ACCOUNT_DELETED",
+    });
+    return true;
+  }
+
+  return false;
+};
 
 //function register registers a new user document in MongoDB user story 2.1.6
 
@@ -99,12 +124,9 @@ const register = async (req, res, next) => {
 //POST reaactivate route /api/v1/users/reactivate
 const reactivate = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Email and password are needed." });
-    }
+    const body = validateRequest(res, loginSchema, req.body);
+    if (!body) return;
+    const { email, password } = body;
     const user = await User.findOne({
       email,
       is_deleted: { $in: [true, false] },
@@ -125,20 +147,11 @@ const reactivate = async (req, res, next) => {
       return res.status(StatusCodes.BAD_REQUEST).json({ message: "Account is active." });
     }
     //check if request is made within 30 day period to reactivate deleted account
-    const monthExpired = 30 * 24 * 3600 * 1000;
-    const timeSinceDeletedAcct = user.deleted_at
-      ? Date.now() - new Date(user.deleted_at).getTime()
-      : 0;
-    if (timeSinceDeletedAcct > monthExpired) {
+    if (!isWithinReactivationGracePeriod(user)) {
       return res.status(StatusCodes.GONE).json({ message: "Reactivation period has closed." });
     }
     //Restore user state of not deleted account
-    user.is_deleted = false;
-    user.is_archived = false;
-    user.deleted_at = null;
-    user.deletion_status = "none";
-    user.deletion_requested_at = null;
-    user.token_version = (user.token_version || 0) + 1;
+    reactivateAccount(user);
     await user.save();
 
     /*//remove ArchivedUser information
@@ -166,7 +179,10 @@ const login = async (req, res, next) => {
     //Joi gives the sanitized input and the value is the output
     const { email, password, remember } = value;
     // LOok up in mongo database
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email,
+      ...accountStateLookup,
+    });
     if (!user) {
       req.app.emit?.("login_failed", {
         email,
@@ -175,12 +191,6 @@ const login = async (req, res, next) => {
       });
 
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
-    }
-    if (user.is_disabled) {
-      return res.status(StatusCodes.FORBIDDEN).json({ message: "This account has been banned." });
-    }
-    if (user.deleted_at) {
-      return res.status(StatusCodes.FORBIDDEN).json({ message: "This account is unavailable." });
     }
     //compared hashed password
 
@@ -195,11 +205,14 @@ const login = async (req, res, next) => {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
 
+    if (sendAccountStateError(res, user)) return;
+
     if (!user.email_verified_at) {
       return res
         .status(StatusCodes.FORBIDDEN)
         .json({ message: "Please verify your email before logging in." });
     }
+    const motivation = await getLearningMotivation(user._id);
     const csrfToken = issueSession(res, user, { remember });
     req.app.emit?.("login_success", {
       userId: user._id,
@@ -215,6 +228,9 @@ const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        xp: user.xp ?? 0,
+        streak: motivation.streak.currentDays,
+        avatar_url: user.avatar_url || null,
       },
     });
   } catch (err) {
@@ -248,6 +264,7 @@ const verifyEmail = async (req, res, next) => {
     const user = await User.findOne({
       verification_token: token,
       verification_token_expires_at: { $gt: new Date() },
+      ...accountStateLookup,
     }).select("+verification_token");
     if (!user) {
       return res
@@ -260,6 +277,8 @@ const verifyEmail = async (req, res, next) => {
     user.verification_token = undefined;
     user.verification_token_expires_at = undefined;
     await user.save();
+
+    if (sendAccountStateError(res, user)) return;
 
     const csrfToken = issueSession(res, user);
 
@@ -333,6 +352,7 @@ const resetPassword = async (req, res, next) => {
     const user = await User.findOne({
       password_reset_token: token,
       password_reset_expires_at: { $gt: new Date() },
+      ...accountStateLookup,
     }).select("+password_reset_token");
 
     if (!user) {
@@ -346,6 +366,8 @@ const resetPassword = async (req, res, next) => {
     user.password_reset_expires_at = undefined;
     user.token_version = (user.token_version || 0) + 1;
     await user.save();
+
+    if (sendAccountStateError(res, user)) return;
 
     const csrfToken = issueSession(res, user);
 

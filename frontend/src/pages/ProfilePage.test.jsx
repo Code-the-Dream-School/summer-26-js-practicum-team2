@@ -3,7 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProfilePage from "./ProfilePage";
 import { useAuthContext } from "../context/AuthContext";
-import { changeProfilePassword, deleteProfile, getProfile, updateProfile } from "../services/api";
+import {
+  changeProfilePassword,
+  deleteProfile,
+  getProfile,
+  setProfileAvatarUrl,
+  updateProfile,
+} from "../services/api";
 
 vi.mock("../context/AuthContext", () => ({
   useAuthContext: vi.fn(),
@@ -13,6 +19,7 @@ vi.mock("../services/api", () => ({
   changeProfilePassword: vi.fn(),
   deleteProfile: vi.fn(),
   getProfile: vi.fn(),
+  setProfileAvatarUrl: vi.fn(),
   updateProfile: vi.fn(),
 }));
 
@@ -30,6 +37,7 @@ describe("ProfilePage", () => {
       notifications: true,
       xp: 125,
       streak: 3,
+      avatar_url: null,
     };
     refreshSession = vi.fn();
     useAuthContext.mockReturnValue({ csrfToken: "csrf-token", refreshSession });
@@ -44,6 +52,11 @@ describe("ProfilePage", () => {
       user: { ...profile },
     });
     deleteProfile.mockResolvedValue({ message: "Deletion request sent." });
+    setProfileAvatarUrl.mockImplementation(async ({ avatarUrl }) => {
+      profile = { ...profile, avatar_url: avatarUrl };
+      return { message: "Avatar URL saved.", avatar_url: avatarUrl };
+    });
+    window.localStorage.removeItem("sprout-quiz-feedback-preference");
   });
 
   it("saves identity, goals, and preferences with refreshed values and toasts", async () => {
@@ -116,5 +129,73 @@ describe("ProfilePage", () => {
     expect(screen.getByLabelText("Current Password")).toHaveValue("");
     expect(screen.getByLabelText("New Password")).toHaveValue("");
     expect(getProfile).toHaveBeenCalledTimes(2);
+  });
+
+  it("saves a URL avatar and refreshes the profile", async () => {
+    const user = userEvent.setup();
+    render(<ProfilePage />);
+
+    const avatarUrl = await screen.findByLabelText("Avatar image URL");
+    await user.type(avatarUrl, "https://example.com/maya.png");
+    await user.click(screen.getByRole("button", { name: "Save avatar" }));
+
+    await waitFor(() => {
+      expect(setProfileAvatarUrl).toHaveBeenCalledWith({
+        avatarUrl: "https://example.com/maya.png",
+        csrfToken: "csrf-token",
+      });
+    });
+    expect(await screen.findByRole("status")).toHaveTextContent("Avatar URL saved.");
+    expect(screen.getByLabelText("Avatar image URL")).toHaveValue("https://example.com/maya.png");
+  });
+
+  it("switches quiz feedback between instant and end-of-quiz modes", async () => {
+    const user = userEvent.setup();
+    render(<ProfilePage />);
+
+    expect(await screen.findByText("Feedback: Instant")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Toggle" }));
+
+    expect(screen.getByText("Feedback: At the end")).toBeInTheDocument();
+    expect(window.localStorage.getItem("sprout-quiz-feedback-preference")).toBe("end");
+  });
+
+  it("shows a retryable load error instead of placeholder profile details", async () => {
+    const user = userEvent.setup();
+    getProfile
+      .mockRejectedValueOnce(new Error("Profile service is unavailable."))
+      .mockResolvedValueOnce({ user: { ...profile } });
+
+    render(<ProfilePage />);
+
+    expect(
+      await screen.findByRole("heading", { name: "We could not load your profile" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Profile service is unavailable.")).toHaveLength(2);
+    expect(screen.queryByRole("heading", { name: "username" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Display Name")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+
+    expect(await screen.findByLabelText("Display Name")).toHaveValue("Maya");
+  });
+
+  it("displays detailed profile validation messages returned by the API utility", async () => {
+    const user = userEvent.setup();
+    updateProfile.mockRejectedValueOnce(
+      Object.assign(new Error("Validation error"), {
+        errors: ["Name must be at least 2 characters long."],
+      }),
+    );
+    render(<ProfilePage />);
+
+    const displayName = await screen.findByLabelText("Display Name");
+    await user.clear(displayName);
+    await user.type(displayName, "M");
+    await user.click(screen.getByRole("button", { name: "Save display name" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Name must be at least 2 characters long.",
+    );
   });
 });

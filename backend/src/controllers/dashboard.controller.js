@@ -5,6 +5,7 @@ const QuizAttempt = require("../models/QuizAttempt.model");
 const LessonModule = require("../models/LessonModule.model");
 const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
 const { getModule } = require("../utils/content");
+const { getLearningMotivation } = require("../utils/learningStats");
 const { dashboardEventSchema, validateRequest } = require("../validation/userValidation");
 
 const DASHBOARD_CACHE_TTL_MS = 30 * 1000;
@@ -85,56 +86,6 @@ function getNextAction(modules, progressByModule, units) {
       : "New lessons are being prepared. Check back soon.",
     ctaLabel: modules.length ? "Review a Quiz" : "View learning path",
     href: "/learn",
-  };
-}
-
-function getDateKey(date) {
-  return new Date(date).toISOString().slice(0, 10);
-}
-
-async function getMotivationData(userId) {
-  const passedAttempts = await QuizAttempt.find({
-    user_id: userId,
-    passed: true,
-    submitted_at: { $ne: null },
-  })
-    .select("submitted_at")
-    .lean();
-  const completedDays = new Set(passedAttempts.map((attempt) => getDateKey(attempt.submitted_at)));
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  const todayKey = getDateKey(today);
-  const completedToday = passedAttempts.filter(
-    (attempt) => getDateKey(attempt.submitted_at) === todayKey,
-  ).length;
-  const streakDate = new Date(today);
-
-  if (!completedDays.has(todayKey)) {
-    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
-  }
-
-  let currentDays = 0;
-  while (completedDays.has(getDateKey(streakDate))) {
-    currentDays += 1;
-    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
-  }
-
-  const dailyGoalCurrent = Math.min(completedToday, 1);
-  return {
-    streak: {
-      currentDays,
-      helperText:
-        currentDays > 0
-          ? `${currentDays}-day learning streak.`
-          : "Complete a learning check to begin your streak.",
-    },
-    dailyGoal: {
-      type: "learning_checks",
-      current: dailyGoalCurrent,
-      target: 1,
-      isMet: dailyGoalCurrent === 1,
-      label: `${dailyGoalCurrent} / 1 learning check`,
-    },
   };
 }
 
@@ -266,7 +217,7 @@ exports.getDashboard = async (req, res, next) => {
     const progress = buildOverallProgress(units);
     const nextAction = getNextAction(modules, progressByModule, units);
     const [motivation, recentActivity] = await Promise.all([
-      getMotivationData(userId),
+      getLearningMotivation(userId),
       getRecentActivity(userId, new Map(modules.map((module) => [module.id, module]))),
     ]);
     const payload = {

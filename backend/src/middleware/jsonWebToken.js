@@ -5,8 +5,14 @@ const User = require("../models/User.model");
 const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
-const send401 = (res) => {
-  return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
+const send401 = (
+  res,
+  { message = "No user is authenticated.", code = "SESSION_INVALIDATED" } = {},
+) => {
+  return res.status(StatusCodes.UNAUTHORIZED).json({
+    message,
+    ...(code ? { code } : {}),
+  });
 };
 
 const authenticateUser = async (req, res, next) => {
@@ -26,26 +32,30 @@ const authenticateUser = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findById(decoded.id).select(
-      "role is_disabled deleted_at token_version",
-    );
+    const user = await User.findOne({
+      _id: decoded.id,
+      is_deleted: { $in: [true, false, null] },
+      is_archived: { $in: [true, false, null] },
+    }).select("role is_disabled is_deleted deleted_at token_version");
     const tokenVersionInJwt = decoded.token_version ?? 0;
     if (!user || user.token_version !== tokenVersionInJwt) {
-      return send401(res);
+      return send401(res, { code: "SESSION_INVALIDATED" });
     }
 
     if (user.is_disabled) {
       res.clearCookie("session_token", { httpOnly: true, sameSite: "lax", path: "/" });
-      return res
-        .status(StatusCodes.FORBIDDEN)
-        .json({ message: "This account has been banned or disabled." });
+      return send401(res, {
+        message: "This account has been banned or disabled.",
+        code: "ACCOUNT_DISABLED",
+      });
     }
 
-    if (user.deleted_at) {
+    if (user.is_deleted || user.deleted_at) {
       res.clearCookie("session_token", { httpOnly: true, sameSite: "lax", path: "/" });
-      return res
-        .status(StatusCodes.FORBIDDEN)
-        .json({ message: "This account is scheduled for deletion." });
+      return send401(res, {
+        message: "This account is scheduled for deletion.",
+        code: "ACCOUNT_DELETED",
+      });
     }
 
     req.user = {

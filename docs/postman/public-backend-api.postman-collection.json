@@ -69,47 +69,6 @@
   ],
   "item": [
     {
-      "name": "Hello",
-      "item": [
-        {
-          "name": "GET Hello",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('GET /api/hello returns 200', function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "let responseJson = {};",
-                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
-                  "pm.test('GET /api/hello returns expected message', function () {",
-                  "  pm.expect(responseJson.message).to.eql('Hello World');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/hello",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "hello"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
       "name": "Lessons",
       "item": [
         {
@@ -142,17 +101,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/lessons/public/cashFlow/1.1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "lessons",
-                "public",
-                "cashFlow",
-                "1.1"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "public", "cashFlow", "1.1"]
             }
           },
           "response": []
@@ -203,15 +153,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/quizzes/check",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "quizzes",
-                "check"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "check"]
             }
           },
           "response": []

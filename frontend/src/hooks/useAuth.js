@@ -81,7 +81,7 @@ export function useAuth() {
             writeStoredAuth({ user, csrfToken }, isRemembered);
           }
         } catch (error) {
-          if (error.status === 401) {
+          if (error.authInvalidating) {
             clearStoredAuth();
             user = null;
             csrfToken = null;
@@ -115,15 +115,68 @@ export function useAuth() {
     });
   }, []);
 
+  useEffect(() => {
+    const handleProfileUpdated = (event) => {
+      const stored = readStoredAuth();
+      if (!stored?.user) return;
+      const detail = event.detail || {};
+      const hasAvatarUpdate = Object.hasOwn(detail, "avatarUrl");
+      if (!detail.user && !hasAvatarUpdate) return;
+      const isRemembered =
+        !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+      const user = {
+        ...stored.user,
+        ...detail.user,
+        ...(hasAvatarUpdate ? { avatar_url: detail.avatarUrl } : {}),
+      };
+
+      commitAuth({ user, csrfToken: stored.csrfToken }, isRemembered);
+    };
+
+    window.addEventListener("sprout:profile-updated", handleProfileUpdated);
+    return () => window.removeEventListener("sprout:profile-updated", handleProfileUpdated);
+  }, [commitAuth]);
+
   const refreshSession = useCallback(
     (payload) => {
       if (!payload?.user || !payload.csrfToken) return;
+      const stored = readStoredAuth();
       const isRemembered =
         !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
-      commitAuth(payload, isRemembered);
+      commitAuth({ ...payload, user: { ...stored?.user, ...payload.user } }, isRemembered);
     },
     [commitAuth],
   );
+
+  const syncProfileAfterProgress = useCallback(async () => {
+    const stored = readStoredAuth();
+    if (!stored?.user) return;
+    const isRemembered =
+      !sessionStorage.getItem(STORAGE_KEY) && Boolean(localStorage.getItem(STORAGE_KEY));
+
+    try {
+      const profile = await api.getProfile();
+      if (profile?.user) {
+        commitAuth(
+          { user: { ...stored.user, ...profile.user }, csrfToken: stored.csrfToken },
+          isRemembered,
+        );
+      }
+    } catch (error) {
+      if (error.authInvalidating) {
+        clearAuth();
+      }
+    }
+  }, [clearAuth, commitAuth]);
+
+  useEffect(() => {
+    const handleProgressUpdate = () => {
+      void syncProfileAfterProgress();
+    };
+
+    window.addEventListener("sprout:progress-updated", handleProgressUpdate);
+    return () => window.removeEventListener("sprout:progress-updated", handleProgressUpdate);
+  }, [syncProfileAfterProgress]);
 
   const clearError = useCallback(() => {
     dispatch({ type: actions.clearError });

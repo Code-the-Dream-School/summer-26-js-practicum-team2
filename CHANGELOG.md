@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.4.2] - 2026-09-02
+
+### Added
+
+- Added URL-based avatar management on the Profile page, with avatar images shown in the shared navigation and an initials fallback when an image cannot load.
+- Added a public quiz answer-check endpoint that returns correctness, correct choices, and an explanation only after a learner submits an answer.
+- Added a retry state when profile details cannot be loaded.
+
+### Changed
+
+- Updated account reactivation to use the normalized sign-in credentials, login rate limit, and shared account-deletion lifecycle handling.
+- Updated profile, dashboard, and shared navigation state to synchronize learner details and current streaks after profile or learning-progress changes.
+- Improved administrator user management filters and in-place updates, and disabled account actions that are not available for accounts scheduled for deletion.
+- Standardized profile avatars as validated HTTP(S) URLs rather than file uploads.
+- Updated global API rate limits to use production-specific limits while keeping development and test environments practical.
+
+### Fixed
+
+- Fixed stale learning streaks after missed days and kept profile and dashboard streak displays consistent.
+- Fixed authentication handling so normal authorization and CSRF errors do not clear local sign-in state; confirmed invalidated, disabled, and deleted accounts now use stable session error codes.
+- Fixed profile, password, deletion, and reactivation validation responses to return consistent structured errors.
+
+---
+
 ## [0.4.1] - 2026-09-02
 
 ### Added
@@ -39,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a 30-day account deletion lifecycle with scheduled deletion metadata and account reactivation support
 - Added MongoDB-backed lesson module storage and lesson content management
 - Added public lesson content APIs for signed-out lesson previews
-- Added server-side quiz answer checking without exposing answer keys to the frontend
+- Added server-side quiz answer checking with intentional immediate correct-choice and explanation feedback after an answer is submitted
 - Added admin module and nested lesson CRUD APIs with budgeting module seed support
 - Added duplicate module and lesson protection with lesson cache invalidation
 - Added an admin-only budgeting seed workflow for initializing runtime lesson content
@@ -59,7 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated account deletion to use an administrator-reviewed soft-deletion workflow with a recovery period
 - Updated signed-out lesson previews to load lesson content through the public lesson API instead of bundled frontend content
 - Updated lesson normalization to consume API-provided lesson payloads
-- Updated public and authenticated lesson responses to sanitize quiz answers and explanations
+- Updated public and authenticated lesson responses to sanitize quiz answers and explanations before the intentional immediate-feedback check request
 - Updated quiz state to use correctness metadata returned by the server instead of calculating correctness from bundled answer data
 - Made learning-path module discovery database-driven instead of assuming the `cashFlow` module
 - Made dashboard next actions and empty states reflect the lesson modules currently available in the database
@@ -89,15 +113,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Restricted account deletion approval and rejection to users with active pending deletion requests
 - Allowlisted administrator API response fields to prevent sensitive user data such as password hashes from being exposed
 - Stopped administrator deletion actions from returning complete user documents
-- Prevented public and authenticated lesson APIs from exposing quiz `correctResponse` or explanation data before answers are checked
+- Prevented public and authenticated lesson APIs from exposing quiz `correctResponse` or explanation data in initial lesson payloads; `POST /api/v1/quizzes/check` intentionally returns feedback after an answer is submitted
 - Moved quiz correctness validation to the backend instead of trusting client-side lesson content
 
 ### Removed
 
 - Removed the frontend dependency on bundled lesson content for signed-out lesson previews
 - Removed the `getSampleLesson` preview helper
-- Removed automatic runtime loading of lesson JSON files in favor of database-backed module discovery and administrative seeding
-- Removed the implicit `cashFlow` fallback from learning-path module discovery
+- Removed automatic runtime loading of arbitrary lesson JSON files in favor of MongoDB-backed module discovery and administrative seeding
+- Kept learning-path module discovery database-driven while allowing dashboard and direct `cashFlow` lesson requests to use bundled default content when MongoDB has not been seeded
 
 ---
 

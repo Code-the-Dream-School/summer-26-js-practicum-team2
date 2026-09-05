@@ -7,6 +7,12 @@ const LessonModule = require("../models/LessonModule.model");
 const { clearModuleCache } = require("../utils/content");
 const { hashPassword } = require("../utils/password");
 const {
+  getScheduledDeletionFields,
+  scheduleAccountDeletion,
+  isWithinReactivationGracePeriod,
+  reactivateAccount,
+} = require("../utils/accountDeletion");
+const {
   adminActionSchema,
   adminDisableSchema,
   adminDeleteSchema,
@@ -30,14 +36,20 @@ const safeUser = (user) => ({
   email_verified_at: user.email_verified_at,
   is_disabled: user.is_disabled,
   disabled_at: user.disabled_at,
+  is_deleted: user.is_deleted,
   deleted_at: user.deleted_at,
   deletion_scheduled_at: user.deletion_scheduled_at,
+  deletion_status: user.deletion_status,
   created_at: user.created_at,
 });
 
 const getTargetUser = async (userId) => {
   if (!mongoose.isValidObjectId(userId)) return null;
-  return User.findById(userId);
+  return User.findOne({
+    _id: userId,
+    is_deleted: { $in: [true, false, null] },
+    is_archived: { $in: [true, false, null] },
+  });
 };
 
 const countOtherActiveAdmins = (userId) =>
@@ -74,7 +86,10 @@ const listUsers = async (req, res, next) => {
   try {
     const query = validateRequest(res, adminUserQuerySchema, req.query);
     if (!query) return;
-    const filters = {};
+    const filters = {
+      is_deleted: { $in: [true, false, null] },
+      is_archived: { $ne: true },
+    };
     if (query.role) filters.role = query.role;
     if (query.emailVerified !== undefined) {
       filters.email_verified_at = query.emailVerified ? { $ne: null } : null;
@@ -88,7 +103,7 @@ const listUsers = async (req, res, next) => {
     const [users, total] = await Promise.all([
       User.find(filters)
         .select(
-          "name email role email_verified_at is_disabled disabled_at deleted_at deletion_scheduled_at created_at",
+          "name email role email_verified_at is_disabled disabled_at is_deleted deleted_at deletion_scheduled_at deletion_status created_at",
         )
         .sort({ role: 1, created_at: 1 })
         .skip((query.page - 1) * query.limit)
@@ -154,18 +169,35 @@ const getPendingDeleteAccount = async (req, res, next) => {
 const approveDeleteAccount = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    const user = await getTargetUser(userId);
+    if (!user || user.deletion_status !== "pending" || user.is_deleted) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "Deletion request is not pending.",
+      });
+    }
+    if (user._id.equals(req.user.id)) {
+      return res
+        .status(StatusCodes.CONFLICT)
+        .json({ message: "You cannot manage your own account." });
+    }
+    if (user.role === "admin") {
+      const otherActiveAdmins = await countOtherActiveAdmins(user._id);
+      if (otherActiveAdmins < 1) {
+        return res
+          .status(StatusCodes.CONFLICT)
+          .json({ message: "The last active admin cannot be deleted." });
+      }
+    }
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId, deletion_status: "pending", is_deleted: false },
+      { _id: user._id, deletion_status: "pending", is_deleted: false },
       {
-        $set: {
-          deletion_status: "approved",
-          deleted_at: new Date(),
-          is_deleted: true,
-          deletion_approved_by: req.user.id,
-        },
+        $set: getScheduledDeletionFields({
+          approvedBy: req.user.id,
+          deletionRequestedAt: user.deletion_requested_at,
+        }),
         $inc: { token_version: 1 },
       },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!updatedUser) {
       return res.status(StatusCodes.CONFLICT).json({
@@ -174,6 +206,7 @@ const approveDeleteAccount = async (req, res, next) => {
     }
     return res.status(StatusCodes.OK).json({
       message: "Account has been approved for deletion.",
+      user: safeUser(updatedUser),
     });
   } catch (error) {
     return next(error);
@@ -192,7 +225,7 @@ const rejectDeleteAccount = async (req, res, next) => {
           deletion_requested_at: null,
         },
       },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!updatedUser) {
       return res.status(StatusCodes.CONFLICT).json({
@@ -208,32 +241,16 @@ const rejectDeleteAccount = async (req, res, next) => {
 const reactivateUserAcct = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const user = await User.findOne({
-      _id: userId,
-      is_deleted: true,
-      is_archived: { $in: [true, false] },
-    });
-    if (!user) {
+    const user = await getTargetUser(userId);
+    if (!user || !user.is_deleted) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "No User is found." });
     }
-    if (!user.deleted_at) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "This user account is not eligible for reactivation.",
-      });
-    }
-    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-    const activeGracePeriod = Date.now() - new Date(user.deleted_at).getTime() <= thirtyDaysMs;
-    if (!activeGracePeriod) {
+    if (!isWithinReactivationGracePeriod(user)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Grace period to reactivate account has expired. Please register again.",
       });
     }
-    user.is_archived = false;
-    user.deletion_status = "none";
-    user.is_deleted = false;
-    user.deletion_requested_at = null;
-    user.deleted_at = null;
-    user.token_version = (user.token_version || 0) + 1;
+    reactivateAccount(user);
     await user.save();
 
     return res.status(StatusCodes.OK).json({
@@ -305,10 +322,16 @@ const setUserDeleted = async (req, res, next) => {
           .json({ message: "The last active admin cannot be deleted." });
       }
     }
-    target.deleted_at = body.deleted ? new Date() : null;
-    target.deletion_scheduled_at = target.deleted_at
-      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-      : null;
+    if (body.deleted) {
+      scheduleAccountDeletion(target, { approvedBy: req.user.id });
+    } else if (target.is_deleted || target.deleted_at) {
+      if (!isWithinReactivationGracePeriod(target)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Grace period to reactivate account has expired. Please register again.",
+        });
+      }
+      reactivateAccount(target);
+    }
     await target.save();
     return res.status(StatusCodes.OK).json(safeUser(target));
   } catch (error) {
@@ -350,8 +373,14 @@ const setUserDisabled = async (req, res, next) => {
     const body = validateRequest(res, adminDisableSchema, req.body);
     if (!body) return;
     const target = await getTargetUser(req.params.userId);
-    if (!target || target.deleted_at) {
+    if (!target) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+    }
+    if (target.is_deleted || target.deleted_at) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message:
+          "A deletion-scheduled account must be restored before its ban status can be changed.",
+      });
     }
     if (target._id.equals(req.user.id)) {
       return res
@@ -365,6 +394,9 @@ const setUserDisabled = async (req, res, next) => {
           .status(StatusCodes.CONFLICT)
           .json({ message: "The last active admin cannot be disabled." });
       }
+    }
+    if (target.is_disabled !== body.disabled) {
+      target.token_version = (target.token_version || 0) + 1;
     }
     target.is_disabled = body.disabled;
     target.disabled_at = target.is_disabled ? new Date() : null;

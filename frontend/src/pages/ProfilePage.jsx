@@ -1,13 +1,21 @@
 import { useState, useCallback, useEffect } from "react";
 
 import { useAuthContext } from "../context/AuthContext";
-import { changeProfilePassword, deleteProfile, getProfile, updateProfile } from "../services/api";
+import QuizFeedbackSetting from "../features/learn/Quiz/QuizFeedbackSetting/QuizFeedbackSetting.component";
+import {
+  changeProfilePassword,
+  deleteProfile,
+  getProfile,
+  setProfileAvatarUrl,
+  updateProfile,
+} from "../services/api";
 
 import Button from "../shared/Button/Button.component";
 import Input from "../shared/Input/Input.component";
 import Toast from "../shared/Toast/Toast.component";
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
+import EmptyState from "../shared/EmptyState/EmptyState.component";
 
 const errorMessage = (error) =>
   error.errors?.length ? error.errors.join(" ") : error.message || "Something went wrong.";
@@ -26,6 +34,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
 
   const [name, setName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [goals, setGoals] = useState("");
   const [notifications, setNotifications] = useState(true);
 
@@ -40,6 +49,7 @@ export default function ProfilePage() {
   });
   const [pending, setPending] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   const showToast = useCallback((message, variant = "default") => {
     setToastMessage({ isOpen: true, message, variant });
@@ -53,6 +63,7 @@ export default function ProfilePage() {
     if (!user) return;
     setProfile(user);
     setName(user.name ?? "");
+    setAvatarUrl(user.avatar_url ?? "");
     setGoals(user.goals ?? "");
     setNotifications(user.notifications ?? true);
   }, []);
@@ -63,15 +74,35 @@ export default function ProfilePage() {
     return user;
   }, [applyProfile]);
 
+  const retryProfile = useCallback(async () => {
+    setLoading(true);
+    setLoadError("");
+    try {
+      await reloadProfile();
+    } catch (error) {
+      const message = errorMessage(error);
+      setLoadError(message);
+      showToast(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [reloadProfile, showToast]);
+
   useEffect(() => {
     let active = true;
     getProfile()
       .then(({ user }) => {
-        if (!active) return;
-        applyProfile(user);
+        if (active) applyProfile(user);
       })
-      .catch((error) => active && showToast(errorMessage(error)))
-      .finally(() => active && setLoading(false));
+      .catch((error) => {
+        if (!active) return;
+        const message = errorMessage(error);
+        setLoadError(message);
+        showToast(message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
     return () => {
       active = false;
     };
@@ -108,6 +139,20 @@ export default function ProfilePage() {
     }
   };
 
+  const saveAvatar = async (event) => {
+    event.preventDefault();
+    setPending("avatar");
+    try {
+      const result = await setProfileAvatarUrl({ avatarUrl, csrfToken });
+      await reloadProfile();
+      showToast(result.message, "success");
+    } catch (error) {
+      showToast(errorMessage(error));
+    } finally {
+      setPending("");
+    }
+  };
+
   const requestDeleteAccount = async (event) => {
     event.preventDefault();
     setPending("delete");
@@ -125,7 +170,24 @@ export default function ProfilePage() {
     return <Skeleton />;
   }
 
-  const savedDisplayName = profile?.name || "username";
+  if (loadError || !profile) {
+    return (
+      <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <Toast {...toastMessage} onClose={closeToast} />
+        <EmptyState
+          title="We could not load your profile"
+          message={loadError || "Your profile details are not available right now."}
+          action={
+            <Button type="button" variant="primary" onClick={() => void retryProfile()}>
+              Retry
+            </Button>
+          }
+        />
+      </section>
+    );
+  }
+
+  const savedDisplayName = profile.name;
 
   return (
     <section className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -167,6 +229,25 @@ export default function ProfilePage() {
           </div>
           <Button type="submit" loading={pending === "identity"}>
             Save display name
+          </Button>
+        </form>
+      </Card>
+
+      <Card className="space-y-4">
+        <h2 className="font-heading text-h4 font-bold text-heading">Avatar</h2>
+        <form onSubmit={saveAvatar} className="max-w-md space-y-4">
+          <Input
+            id="profile-avatar-url"
+            type="url"
+            label="Avatar image URL"
+            value={avatarUrl}
+            disabled={pending === "avatar"}
+            onChange={(event) => setAvatarUrl(event.target.value)}
+            placeholder="https://example.com/avatar.png"
+          />
+          <p className="text-small text-neutral-600">Leave blank to use your initials.</p>
+          <Button type="submit" loading={pending === "avatar"}>
+            Save avatar
           </Button>
         </form>
       </Card>
@@ -217,6 +298,9 @@ export default function ProfilePage() {
               </span>
             </span>
           </label>
+          <div className="border-t border-neutral-200 pt-4">
+            <QuizFeedbackSetting />
+          </div>
           <Button type="submit" loading={pending === "preferences"}>
             Save preferences
           </Button>

@@ -60,6 +60,56 @@ describe("admin access boundary", () => {
     expect(response.body.users[0]).not.toHaveProperty("password_hash");
   });
 
+  test("keeps deletion-scheduled users visible for administrative follow-up", async () => {
+    const admin = await createUser("admin");
+    const target = await createUser();
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    const scheduled = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", deleted: true });
+    expect(scheduled.status).toBe(200);
+
+    const listed = await request(app).get("/api/v1/admin/users").set(auth);
+
+    expect(listed.status).toBe(200);
+    expect(listed.body.total).toBe(2);
+    expect(listed.body.users).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: target._id.toString(),
+          is_deleted: true,
+          deletion_status: "approved",
+          deleted_at: expect.any(String),
+          deletion_scheduled_at: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
+  test("explains why a scheduled account cannot be banned", async () => {
+    const admin = await createUser("admin");
+    const target = await createUser();
+    const auth = { Authorization: `Bearer ${tokenFor(admin._id, "admin")}` };
+
+    await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/deleted`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", deleted: true });
+
+    const response = await request(app)
+      .patch(`/api/v1/admin/users/${target._id}/disabled`)
+      .set(auth)
+      .send({ confirmation: "CONFIRM", disabled: true });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({
+      message:
+        "A deletion-scheduled account must be restored before its ban status can be changed.",
+    });
+  });
+
   test("allows admins to seed random learner accounts", async () => {
     const admin = await createUser("admin");
     const response = await request(app)
@@ -279,7 +329,7 @@ describe("admin access boundary", () => {
     expect(verifyAgain.status).toBe(409);
   });
 
-  test("blocks banned users from authenticated routes", async () => {
+  test("invalidates banned users' authenticated sessions", async () => {
     const user = await createUser("admin");
     user.is_disabled = true;
     await user.save();
@@ -288,8 +338,29 @@ describe("admin access boundary", () => {
       .get("/api/v1/admin/status")
       .set("Authorization", `Bearer ${tokenFor(user._id, "admin")}`);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
     expect(response.body.message).toContain("banned");
+    expect(response.body.code).toBe("ACCOUNT_DISABLED");
+  });
+
+  test.each([
+    ["an active account", {}],
+    ["a banned account", { is_disabled: true }],
+    ["a deleted account", { is_deleted: true, deleted_at: new Date() }],
+  ])("does not disclose the state of %s with an incorrect password", async (_, accountState) => {
+    const user = await createUser();
+    user.password_hash = await hashPassword("P@ssword123!");
+    user.email_verified_at = new Date();
+    Object.assign(user, accountState);
+    await user.save();
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password: "WrongPassword1!",
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ message: "Invalid email or password." });
   });
 
   test("shows banned users a banned message at login", async () => {
@@ -305,5 +376,46 @@ describe("admin access boundary", () => {
 
     expect(response.status).toBe(403);
     expect(response.body.message).toBe("This account has been banned.");
+    expect(response.body.code).toBe("ACCOUNT_DISABLED");
   });
+
+  test("shows deleted users an unavailable message at login", async () => {
+    const user = await createUser();
+    user.password_hash = await hashPassword("P@ssword123!");
+    user.is_deleted = true;
+    user.deleted_at = new Date();
+    await user.save();
+
+    const response = await request(app).post("/api/v1/users/login").send({
+      email: user.email,
+      password: "P@ssword123!",
+    });
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe("This account is unavailable.");
+    expect(response.body.code).toBe("ACCOUNT_DELETED");
+  });
+});
+test("invalidates an existing session when an administrator bans a user", async () => {
+  const admin = await createUser("admin");
+  const learner = await createUser();
+  const learnerToken = tokenFor(learner._id, learner.role);
+
+  const banned = await request(app)
+    .patch(`/api/v1/admin/users/${learner._id}/disabled`)
+    .set("Authorization", `Bearer ${tokenFor(admin._id, admin.role)}`)
+    .send({ disabled: true, confirmation: "CONFIRM" });
+
+  expect(banned.status).toBe(200);
+  expect(await User.findById(learner._id)).toMatchObject({
+    is_disabled: true,
+    token_version: 1,
+  });
+
+  const staleSession = await request(app)
+    .get("/api/v1/dashboard")
+    .set("Authorization", `Bearer ${learnerToken}`);
+
+  expect(staleSession.status).toBe(401);
+  expect(staleSession.body.code).toBe("SESSION_INVALIDATED");
 });

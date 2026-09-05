@@ -204,7 +204,7 @@ describe("write endpoint input validation", () => {
     expect(JSON.stringify(response.body)).not.toContain("explanation");
   });
 
-  test("checks a correct quiz answer without authentication", async () => {
+  test("intentionally reveals immediate feedback for a correct public quiz check", async () => {
     const response = await request(app).post("/api/v1/quizzes/check").send({
       moduleId: "cashFlow",
       microLessonId: "1.1.2",
@@ -220,7 +220,7 @@ describe("write endpoint input validation", () => {
     });
   });
 
-  test("checks an incorrect quiz answer and returns the correct choice", async () => {
+  test("intentionally reveals the correct choice and explanation after an incorrect public check", async () => {
     const response = await request(app).post("/api/v1/quizzes/check").send({
       moduleId: "cashFlow",
       microLessonId: "1.1.2",
@@ -344,7 +344,7 @@ describe("public lesson content endpoint", () => {
     expect(response.status).toBe(404);
   });
 
-  test("returns a lesson without requiring authentication", async () => {
+  test("falls back to the bundled Cash Flow lesson when MongoDB has no seeded modules", async () => {
     const response = await request(app).get("/api/v1/lessons/public/cashFlow/1.1");
 
     expect(response.status).toBe(200);
