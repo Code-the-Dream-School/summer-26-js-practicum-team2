@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
 import { registerSchema } from "../features/auth/schemas";
+import { getPasswordHelperText } from "../features/auth/passwordHelperText";
 import { pickPlaceholderIdentity } from "../features/auth/placeholderIdentities";
 import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
+import OAuthButtons from "../shared/OAuthButtons/OAuthButtons.component";
 
 export default function RegisterPage() {
   const { register: registerUser } = useAuthContext();
@@ -19,6 +21,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(registerSchema),
@@ -30,6 +33,13 @@ export default function RegisterPage() {
       tos: false,
     },
   });
+
+  const passwordValue = useWatch({
+    control,
+    name: "password",
+    defaultValue: "",
+  });
+  const passwordHelperText = getPasswordHelperText(passwordValue);
 
   const onSubmit = async (values) => {
     try {
@@ -91,7 +101,7 @@ export default function RegisterPage() {
             label="Password"
             type="password"
             autoComplete="new-password"
-            helperText="At least 8 characters with upper and lower case, a number, and a symbol."
+            helperText={passwordHelperText}
             disabled={isSubmitting}
             error={errors.password?.message}
             {...register("password")}
@@ -141,6 +151,13 @@ export default function RegisterPage() {
             </Link>
           </div>
         </form>
+
+        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
+          <span className="h-px flex-1 bg-neutral-200" />
+          or
+          <span className="h-px flex-1 bg-neutral-200" />
+        </div>
+        <OAuthButtons />
       </Card>
     </div>
   );

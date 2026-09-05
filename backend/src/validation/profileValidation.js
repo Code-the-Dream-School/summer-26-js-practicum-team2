@@ -14,9 +14,6 @@ const updateProfileSchema = Joi.object({
   goals: Joi.string().trim().max(500).allow("").optional().messages({
     "string.max": "Goals must be within 500 characters.",
   }),
-  theme: Joi.string().valid("Light", "Dark").optional().messages({
-    "any.only": "Theme must be either Light or Dark.",
-  }),
   notifications: Joi.boolean().optional().messages({
     "boolean.base": "Notifications setting must be true or false.",
   }),
@@ -53,4 +50,22 @@ const deleteAccountSchema = Joi.object({
   }),
 });
 
-module.exports = { updateProfileSchema, changePasswordSchema, deleteAccountSchema };
+const avatarUrlSchema = Joi.object({
+  avatar_url: Joi.string()
+    .trim()
+    .uri({ scheme: ["http", "https"] })
+    .allow(null, "")
+    .required()
+    .messages({
+      "any.required": "Avatar URL is required.",
+      "string.uri": "Avatar URL must use HTTP or HTTPS.",
+      "string.uriCustomScheme": "Avatar URL must use HTTP or HTTPS.",
+    }),
+});
+
+module.exports = {
+  updateProfileSchema,
+  changePasswordSchema,
+  deleteAccountSchema,
+  avatarUrlSchema,
+};

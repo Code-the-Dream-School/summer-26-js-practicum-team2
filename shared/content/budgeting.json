@@ -139,6 +139,8 @@
     {
       "id": "1.1",
       "title": "What is Cash Flow and a Budget?",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll understand what a budget is, why it's important, and how to calculate basic cash flow.",
       "estimatedMin": 5,
       "passingScore": 70,
@@ -149,6 +151,7 @@
           "microLessonContent": [
             {
               "type": "characterIntro",
+              "characterId": "abigail",
               "text": "Meet Abigail! Abigail is a single mom with twin 14-year-olds."
             },
             {
@@ -166,6 +169,7 @@
           "title": "What is a Budget?",
           "microLessonContent": [
             {
+              "characterId": "abigail",
               "type": "paragraph",
               "text": "Juggling everything going on in her life, Abigail feels like she isn't in control of her money."
             },
@@ -188,7 +192,7 @@
             {
               "type": "knowledgeCheck",
               "text": "Budgets involve two main categories: income and expenses.",
-              "id": "1.1.2-q2",
+              "id": "1.1.2-q1",
               "questionType": "multipleChoice",
               "question": "What is the purpose of a budget?",
               "answerChoices": [
@@ -205,7 +209,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.1.2-q3",
+              "id": "1.1.2-q2",
               "questionType": "trueFalse",
               "question": " True or False? You should create a budget to help you track where your money is going.",
               "answerChoices": [
@@ -220,7 +224,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.1.2-q4",
+              "id": "1.1.2-q3",
               "questionType": "multipleChoice",
               "question": "When creating a budget, what are the two main categories that you need to track?",
               "answerChoices": [
@@ -246,6 +250,7 @@
           "microLessonContent": [
             {
               "type": "characterIntro",
+              "characterId": "ramona",
               "text": "Meet Ramona! She is an 18-year-old college Freshman."
             },
             {
@@ -276,7 +281,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.1.3-q1",
+              "id": "1.1.4-q1",
               "questionType": "multipleChoice",
               "question": "How do you calculate cash flow?",
               "answerChoices": [
@@ -290,7 +295,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.1.3-q2",
+              "id": "1.1.4-q2",
               "questionType": "multipleChoice",
               "question": "Ramona earns $1,200 per month and spends $1,000 per month. How much does Ramona have at the end of each month?",
               "answerChoices": [
@@ -300,13 +305,13 @@
                 { "key": "d", "text": "$500" }
               ],
               "correctResponse": "a",
-              "explanation": "Ramona's Cash Flow monitors how much cash is moving into and out of Ramona's account. Within the same month, Ramona's Income( $1,200) - Ramona's Expenses ( $1000) = Ramona's Cash Flow ( $200). Ramona has more incoming money than outgoing money so Ramona has positive Cash Flow."
+              "explanation": "Ramona's Cash Flow monitors how much cash is moving into and out of Ramona's account. Within the same month, Ramona's Income($1,200) - Ramona's Expenses ($1,000) = Ramona's Cash Flow ($200). Ramona has more incoming money than outgoing money so Ramona has positive Cash Flow."
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.1.3-q3",
+              "id": "1.1.4-q3",
               "questionType": "multiSelect",
-              "question": "What are the two numbers you need to calculate cash flow (select all that apply)?",
+              "question": "What are the two numbers you need to calculate cash flow? Select all that apply.",
               "answerChoices": [
                 { "key": "a", "text": "Credit score" },
                 { "key": "b", "text": "Income" },
@@ -323,6 +328,8 @@
     {
       "id": "1.2",
       "title": "Income",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to identify different sources of income, calculate monthly income, and explain the difference between gross pay and net pay.",
       "estimatedMin": 5,
       "passingScore": 70,
@@ -333,13 +340,13 @@
           "microLessonContent": [
             {
               "type": "paragraph",
-              "text": "There are many different sources of income.Some common sources of income include:"
+              "text": "There are many different sources of income. Some common sources of income include:"
             },
             {
               "type": "unorderedList",
+              "intro": "There are many different sources of income. Some common sources of income include:",
               "items": [
                 "Paychecks from a job",
-
                 "Tips",
                 "Freelancing",
                 "Child Support",
@@ -351,7 +358,7 @@
             },
             {
               "type": "paragraph",
-              "text": "Abigail, our single mom of two, makes income as a Registered nurse and receives child support from her ex-husband. So, her two sources of income are her paychecks and monthly child support."
+              "text": "Abigail, our single mom of two, makes income as a Registered Nurse and receives child support from her ex-husband. So, her two sources of income are her paychecks and monthly child support."
             },
             {
               "type": "paragraph",
@@ -359,7 +366,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.2-q1",
+              "id": "1.2.1-q1",
               "questionType": "multipleChoice",
               "question": "What is an example of income?",
               "answerChoices": [
@@ -373,7 +380,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.2-q2",
+              "id": "1.2.1-q2",
               "questionType": "trueFalse",
               "question": "True or False? Income only includes the money you make from a job.",
               "answerChoices": [
@@ -389,9 +396,9 @@
 
             {
               "type": "knowledgeCheck",
-              "id": "1.2.2-q3",
+              "id": "1.2.1-q3",
               "questionType": "multiSelect",
-              "question": "Select Abigail's source(s) of income (select all that apply)",
+              "question": "Select Abigail's source(s) of income (select all that apply):",
               "answerChoices": [
                 { "key": "a", "text": "Car Payment" },
                 { "key": "b", "text": "Gasoline" },
@@ -429,7 +436,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q1",
+              "id": "1.2.2-q1",
               "questionType": "multiSelect",
               "question": "Select the most common pay frequencies for paychecks (select all that apply):",
               "answerChoices": [
@@ -443,7 +450,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q2",
+              "id": "1.2.2-q2",
               "questionType": "multipleChoice",
               "question": "How many paychecks does Abigail receive per year since she is paid on a bi-weekly basis?",
               "answerChoices": [
@@ -453,13 +460,13 @@
                 { "key": "d", "text": "30" }
               ],
               "correctResponse": "a",
-              "explanation": "Bi-weekly paychecks will total 26 paychecks per year. Semi-monthly paychecks will count towards 24 paychecks per year."
+              "explanation": "Bi-weekly paychecks will total to 26 paychecks per year. Semi-monthly paychecks will total to 24 paychecks per year."
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q3",
+              "id": "1.2.2-q3",
               "questionType": "trueFalse",
-              "question": "True or false? Semi-monthly paychecks are paid on the same 2 dates every month?",
+              "question": "True or false? Semi-monthly paychecks are paid on the same 2 dates every month.",
               "answerChoices": [
                 {
                   "key": "a",
@@ -472,7 +479,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.3-q4",
+              "id": "1.2.2-q4",
               "questionType": "multipleChoice",
               "question": "Let's help Abigail calculate her income.\n\nAbigail works a full-time job as a nurse at the local hospital. She makes $70,200 a year after taxes and deductions are taken out. What is her monthly income? (Hint: Divide total yearly income by 12 to get monthly income)",
               "answerChoices": [
@@ -496,19 +503,19 @@
             },
             {
               "type": "paragraph",
-              "text": "The total amount that Abigail sees on her paycheck of $3,462 is called her gross pay."
+              "text": "The total amount that Abigail sees on her paycheck of $3,462 is called her gross pay, which is her total income before taxes and deductions."
             },
             {
               "type": "paragraph",
-              "text": "Gross pay is the total amount of money earned in that pay period before any deductions. The $3,462 is her gross pay."
+              "text": "Gross pay is the total amount of money earned in that pay period before any deductions or taxes. The $3,462 is her gross pay."
             },
             {
               "type": "paragraph",
-              "text": "So then why did she receive $800 less in her bank account?"
+              "text": "So then why did she receive almost $800 less in her bank account?"
             },
             {
               "type": "paragraph",
-              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'. Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or retirement plans."
+              "text": "The $2,700 she received in her bank account is called her Net pay or 'take home pay'. Net pay is your gross total pay minus payroll deductions like taxes and any employer benefits that you pay into like health insurance or a retirement plan."
             },
             {
               "type": "formula",
@@ -516,7 +523,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q1",
+              "id": "1.2.3-q1",
               "questionType": "multipleChoice",
               "question": "Gross Pay is:",
               "answerChoices": [
@@ -539,7 +546,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q2",
+              "id": "1.2.3-q2",
               "questionType": "multipleChoice",
               "question": "Net pay is:",
               "answerChoices": [
@@ -556,7 +563,7 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q3",
+              "id": "1.2.3-q3",
               "questionType": "multipleChoice",
               "question": "If Ramona works 20 hours per week for $15 per hour, what is Ramona's gross pay for one week?",
               "answerChoices": [
@@ -570,17 +577,17 @@
             },
             {
               "type": "knowledgeCheck",
-              "id": "1.2.4-q4",
+              "id": "1.2.3-q4",
               "questionType": "multipleChoice",
               "question": "What is the correct formula for calculating your net pay?",
               "answerChoices": [
                 {
                   "key": "a",
-                  "text": "Payroll deductions - Gross Pay = Net Pay"
+                  "text": "Payroll Deductions - Gross Pay = Net Pay"
                 },
                 {
                   "key": "b",
-                  "text": "Gross Pay - Payroll deductions = Net Pay"
+                  "text": "Gross Pay - Payroll Deductions = Net Pay"
                 },
                 {
                   "key": "c",
@@ -592,7 +599,7 @@
                 }
               ],
               "correctResponse": "b",
-              "explanation": "Gross Pay - Payroll deductions = Net Pay. Net pay is your “take home pay”. It's your total pay (gross pay) minus the payroll deductions."
+              "explanation": "Gross Pay - Payroll Deductions = Net Pay. Net pay is your “take home pay”. It's your total pay (gross pay) minus the payroll deductions."
             }
           ]
         }
@@ -601,6 +608,8 @@
     {
       "id": "1.3",
       "title": "Understanding Needs vs Wants",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to identify the difference between needs and wants, as well as categorizing common expenses into each group.",
       "estimatedMin": 5,
       "passingScore": 70,
@@ -647,8 +656,8 @@
               "answerChoices": [
                 { "key": "a", "text": "Food" },
                 { "key": "b", "text": "Shelter" },
-                { "key": "c", "text": "Transportation to work" },
-                { "key": "d", "text": "a new boardgame" }
+                { "key": "c", "text": "Transportation to Work" },
+                { "key": "d", "text": "A New Boardgame" }
               ],
               "correctResponse": "d",
               "explanation": "Food, shelter, and transportation to work are all important for survival and are basic needs. A new boardgame is fun, but you will survive without it."
@@ -680,28 +689,30 @@
             },
             {
               "type": "paragraph",
-              "text": "Abigail lives in an apartment complex that has a gym and pool that's included in the price of rent. Her other expenses include: "
+              "text": "Abigail lives in an apartment complex that has a gym and pool that's included in the price of rent."
             },
 
             {
               "type": "unorderedList",
+              "intro": "Abigail's other expenses include:",
               "items": [
                 "Rent",
                 "Groceries",
                 "Rock Climbing Membership",
                 "Electricity Bill",
-                "Gas for the car"
+                "Gas for Her Car"
               ]
             },
             {
               "type": "paragraph",
-              "text": "Ramona lives on campus. Her room and board is covered by her student loans. She has access to a free gym on campus. Ramona's additional expenses include:"
+              "text": "Ramona lives on campus. Her room and board is covered by her student loans. She has access to a free gym on campus."
             },
             {
               "type": "unorderedList",
+              "intro": "Ramona's additional expenses include:",
               "items": [
                 "Groceries",
-                "Bowling league Fees",
+                "Bowling League Fees",
                 "College Textbooks",
                 "Concert Tickets"
               ]
@@ -710,7 +721,7 @@
               "type": "knowledgeCheck",
               "id": "1.3.2-q1",
               "questionType": "multipleChoice",
-              "question": "Which of Abigail's expenses is a want?",
+              "question": "Which of Abigail's expenses are a want?",
               "answerChoices": [
                 { "key": "a", "text": "Rent" },
                 { "key": "b", "text": "Groceries" },
@@ -727,6 +738,8 @@
     {
       "id": "1.4",
       "title": "Fixed vs Variable Expenses",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to identify the difference between fixed and variable expenses, as well as categorize common expenses into each type.",
       "estimatedMin": 10,
       "passingScore": 70,
@@ -744,11 +757,8 @@
               "budgetId": "abigail-basic-expenses"
             },
             {
-              "type": "paragraph",
-              "text": "Abigail notices that some expenses stay the same every month:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "Abigail notices that some expenses stay the same every month:",
               "items": ["Rent", "Car Payment"]
             },
             {
@@ -756,11 +766,8 @@
               "text": "These expenses are the same amount each month and don't change."
             },
             {
-              "type": "paragraph",
-              "text": "She also notices that some expenses change from month to month:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "Abigail also notices that some expenses change from month to month:",
               "items": ["Groceries", "Gasoline", "Electricity"]
             },
             {
@@ -776,7 +783,7 @@
               "text": "During the spring and fall, she doesn't need to run the heat or A/C as much, so her bill is much lower."
             },
             {
-              "type": "paragraph",
+              "type": "callout",
               "text": "Expenses that stay the same every month are called fixed expenses.\n\n\nExpenses that change from month to month are variable expenses."
             },
             {
@@ -840,6 +847,8 @@
     {
       "id": "1.5",
       "title": "Creating a Budget",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to create a basic budget by listing income and expenses, categorizing expenses, and calculating monthly cash flow.",
       "estimatedMin": 10,
       "passingScore": 70,
@@ -853,12 +862,12 @@
               "text": "Let's help Abigail put her budget together."
             },
             {
-              "type": "paragraph",
+              "type": "callout",
               "text": "The first step to creating a budget is adding up your monthly net income."
             },
             {
               "type": "paragraph",
-              "text": "For Abigail, she receives $5,800 after taxes and $1,230 for child support."
+              "text": "For Abigail, she receives $5,850 after taxes and $1,230 for child support."
             },
             {
               "type": "paragraph",
@@ -908,10 +917,10 @@
               "type": "knowledgeCheck",
               "id": "1.5.1-q3",
               "questionType": "multipleChoice",
-              "question": "Given Abigail's net income of $5,800 from nursing and $1,230 from child support, how much is Abigail's total monthly net income?",
+              "question": "Given Abigail's net income of $5,850 from nursing and $1,230 from child support, how much is Abigail's total monthly net income?",
               "answerChoices": [
                 { "key": "a", "text": "$4,570" },
-                { "key": "b", "text": "$7,030" },
+                { "key": "b", "text": "$7,080" },
                 {
                   "key": "c",
                   "text": "$6,030"
@@ -922,7 +931,7 @@
                 }
               ],
               "correctResponse": "b",
-              "explanation": "Abigail's total monthly net income is $7,030 because $5,800 + $1,230 = $7,030"
+              "explanation": "Abigail's total monthly net income is $7,080 because $5,850 + $1,230 = $7,080"
             }
           ]
         },
@@ -940,7 +949,11 @@
             },
             {
               "type": "paragraph",
-              "text": "If she's unsure of exactly how much she spent, she uses an estimate for now until she can track her spending to get a more accurate number."
+              "text": "To help Abigail get accurate numbers, she checks her bank statements and finds that she pays $40 every month for her children's sports activities."
+            },
+            {
+              "type": "callout",
+              "text": "If she's unsure of an expense or it varies each month, she can use an estimate until she tracks her spending more accurately."
             },
             {
               "type": "paragraph",
@@ -1102,30 +1115,30 @@
                 { "key": "d", "text": "Income - Expenses = Cash Flow" }
               ],
               "correctResponse": "d",
-              "explanation": "Cash flow is calculated by subtracting your expenses from your income to see how much money you have left over."
+              "explanation": "Income - Expenses = Cash Flow. Cash flow is calculated by subtracting your expenses from your income to see how much money you have left over."
             },
             {
               "type": "knowledgeCheck",
               "id": "1.5.2-q6",
               "questionType": "multipleChoice",
-              "question": "What would Abigail's cash flow be if her income totals to $7,030 and all her expenses total to $2,154?",
+              "question": "What would Abigail's cash flow be if her income totals to $7,080 and all her expenses total to $2,154?",
               "answerChoices": [
                 {
                   "key": "a",
-                  "text": "-$4,876"
+                  "text": "-$4,926"
                 },
                 {
                   "key": "b",
-                  "text": "$4,876"
+                  "text": "$4,926"
                 },
                 {
                   "key": "c",
-                  "text": "$11,906"
+                  "text": "$9,234"
                 },
-                { "key": "d", "text": "-$11,906" }
+                { "key": "d", "text": "-$9,234" }
               ],
               "correctResponse": "b",
-              "explanation": "Abigail's cash flow is $4,876 because $7,030 (income) - $2,154 (expenses) = $4,876."
+              "explanation": "Abigail's cash flow is $4,876 because $7,080 (income) - $2,154 (expenses) = $4,926."
             },
             {
               "type": "paragraph",
@@ -1150,6 +1163,8 @@
     {
       "id": "1.6",
       "title": "Tracking Your Expenses",
+      "accuracy_reviewed_by": "BytesOfStrength",
+      "accuracy_reviewed_at": "2026-08-01",
       "learningGoal": "By the end of this lesson, you'll be able to track your expenses, compare your spending to your budget, and make adjustments based on your spending habits.",
       "estimatedMin": 10,
       "passingScore": 70,
@@ -1163,16 +1178,13 @@
               "text": "Now that Abigail has her budget, the next step is to track her spending over the next 2 months to see if her budget is accurate and learn about her spending habits."
             },
             {
-              "type": "paragraph",
-              "text": "There's several different ways that Abigail can track her spending including:"
-            },
-            {
               "type": "unorderedList",
+              "intro": "There's several different ways that Abigail can track her spending including:",
               "items": ["Pen and Paper", "Spreadsheets", "An App"]
             },
             {
               "type": "paragraph",
-              "text": "Abigail decides that the best method that works for her is an app on her phone."
+              "text": "Abigail decides that the best method for her is an app on her phone."
             },
             {
               "type": "paragraph",
@@ -1180,6 +1192,14 @@
             },
             {
               "type": "paragraph",
+              "text": "Her categories include things like:"
+            },
+            {
+              "type": "unorderedList",
+              "items": ["Groceries", "Gasoline", "Rock Climbing Membership"]
+            },
+            {
+              "type": "callout",
               "text": "The key to expense tracking is consistency and choosing a tracking method that works best for you."
             },
             {
@@ -1265,7 +1285,7 @@
             },
             {
               "type": "paragraph",
-              "text": "Abigail compares her budget line by line with her spending that she's been tracking in her app."
+              "text": "Abigail compares her budget line by line with her categorized spending that she's been tracking in her app."
             },
             {
               "type": "paragraph",
@@ -1277,7 +1297,7 @@
             },
             {
               "type": "paragraph",
-              "text": "She also notices that she's not using the rock climbing membership as much as she thought she would, so she decides to cancel her monthly fee for now."
+              "text": "She also notices that she's not using the rock climbing membership as much as she thought she would, so she decides to cancel her monthly membership for now."
             },
             {
               "type": "callout",
@@ -1357,6 +1377,104 @@
           ]
         }
       ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "APR (Annual Percentage Rate)",
+      "definition": "The cost of borrowing money on a yearly basis, expressed as a percentage rate."
+    },
+    {
+      "term": "Budget",
+      "definition": "A plan that outlines what money you expect to earn or receive (your income) and how you will save it or spend it (your expenses) for a given period of time; also called a spending plan."
+    },
+    {
+      "term": "Compound interest",
+      "definition": "When you earn interest on both the money you save and the interest you earn."
+    },
+    {
+      "term": "Credit",
+      "definition": "Borrowing money, or having the right to borrow money, to buy something. Usually it means you're using a credit card, but it might also mean that you got a loan"
+    },
+    {
+      "term": "Debt",
+      "definition": "Money you owe another person or a business."
+    },
+    {
+      "term": "Earned income",
+      "definition": "Money made from working for someone who pays you or from running a business or farm. This includes all the income, wages, and tips you get from working."
+    },
+    {
+      "term": "Fixed expenses",
+      "definition": "Expenses, like bills, that must be paid each month and generally cost the same amount. Some fixed expenses, like a utility bill, may also be variable because the amount changes each month depending on usage."
+    },
+    {
+      "term": "Income",
+      "definition": "Money earned or received such as wages or salaries, tips, commissions, contracted pay, government transfer payments, dividends on investments, tax refunds, gifts, and inheritances."
+    },
+    {
+      "term": "Needs",
+      "definition": "Basic things people must have to survive (such as food, clothing, and shelter), resources they may need to do their jobs (such as reliable transportation and the tools of the trade), and resources to help build and protect their money and property so they can meet future needs (such as emergency savings and insurance)."
+    },
+    {
+      "term": "Principal",
+      "definition": "In the lending context, principal is the amount of money that you originally received from the lender and agreed to pay back on the loan with interest. In the investment context, it is the amount of money you contribute with the expectation of receiving income."
+    },
+    {
+      "term": "Savings",
+      "definition": "Money you have set aside in a secure place, such as in a bank account, that you can use for future emergencies or to make specific purchases."
+    },
+    {
+      "term": "Variable expenses",
+      "definition": "Expenses that change in amount from month to month."
+    },
+    {
+      "term": "Wants",
+      "definition": "Upgrades and other things that would be nice to have but aren't necessary for living, income, or protecting what you have."
+    }
+  ],
+  "worksCited": [
+    {
+      "id": "adp-nc-paycheck-calculator",
+      "title": "North Carolina Paycheck Calculator",
+      "author": "ADP",
+      "citation": "ADP. \"North Carolina Paycheck Calculator.\"",
+      "url": "https://www.adp.com/resources/tools/calculators/states/north-carolina-salary-paycheck-calculator.aspx"
+    },
+    {
+      "id": "ivey-glen-apartment-community",
+      "title": "Ivey Glen Apartment Community",
+      "author": "Apartments.com",
+      "citation": "Apartments.com. \"Ivey Glen Apartment Community.\"",
+      "url": "https://www.apartments.com/ivey-glen-apartment-community-graham-nc/n1fre0m/"
+    },
+    {
+      "id": "cfpb-youth-glossary",
+      "title": "Youth Financial Education Glossary",
+      "author": "Consumer Financial Protection Bureau (CFPB)",
+      "citation": "Consumer Financial Protection Bureau. \"Youth Financial Education Glossary.\"",
+      "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/glossary/#b"
+    },
+    {
+      "id": "fnb-financial-literacy",
+      "title": "Financial Literacy",
+      "author": "First National Bank (FNB)",
+      "citation": "First National Bank (FNB). \"Financial Literacy.\" Udemy.",
+      "url": "https://www.udemy.com/course/fnb-financial-literacy/"
+    },
+    {
+      "id": "mit-living-wage-calculator",
+      "title": "Living Wage Calculator",
+      "author": "Massachusetts Institute of Technology (MIT)",
+      "citation": "Massachusetts Institute of Technology. \"Living Wage Calculator.\"",
+      "url": "https://livingwage.mit.edu/"
+    },
+    {
+      "id": "nc-child-support-calculator",
+      "title": "North Carolina Child Support Guidelines",
+      "author": "North Carolina Department of Health and Human Services (NCDHHS)",
+      "citation": "North Carolina Department of Health and Human Services. \"North Carolina Child Support Guidelines.\"",
+      "url": "https://ncchildsupport.ncdhhs.gov/ecoa/index.jsp?timeout=true"
     }
   ]
 }

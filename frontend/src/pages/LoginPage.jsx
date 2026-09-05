@@ -4,14 +4,17 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
 import { loginSchema } from "../features/auth/schemas";
+import { getPostLoginDestination } from "../utils/postLoginRouting";
 import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
+import OAuthButtons from "../shared/OAuthButtons/OAuthButtons.component";
 
 export default function LoginPage() {
   const { login } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const next = new URLSearchParams(location.search).get("next");
 
   const {
     register,
@@ -25,21 +28,37 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     try {
-      await login(values);
       // Return users to the protected page they originally requested, when available.
-      const next = new URLSearchParams(location.search).get("next");
-      navigate(next || ROUTES.DASHBOARD, { replace: true });
+      const { user } = await login(values);
+      const destination = getPostLoginDestination({ user, next });
+      navigate(destination, { replace: true });
     } catch (err) {
       // Display authentication failures in the form rather than leaving the page.
       setError("root", { message: err.message });
     }
   };
 
+  const oauthErrorMessages = {
+    oauth_failed: "That sign-in attempt didn't work. Please try again.",
+    oauth_email_required:
+      "We need a verified email address from your sign-in provider to create your Sprout account.",
+    oauth_terms_required: "Please agree to the Terms of Service and Privacy Policy to continue.",
+    oauth_unavailable:
+      "That sign-in provider is not available right now. Please choose another option.",
+  };
+  const oauthError = oauthErrorMessages[new URLSearchParams(location.search).get("error")];
+
   return (
     <div className="mx-auto max-w-md py-8">
       <Card>
         <h1 className="font-heading text-h2 font-bold text-heading">Login</h1>
         <p className="mt-1 text-small text-neutral-600">Log in to keep growing your streak.</p>
+
+        {oauthError && (
+          <p role="alert" className="mt-4 text-small font-medium text-danger">
+            {oauthError}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-6 flex flex-col gap-4">
           <Input
@@ -73,6 +92,13 @@ export default function LoginPage() {
             Log in
           </Button>
         </form>
+
+        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
+          <span className="h-px flex-1 bg-neutral-200" />
+          or
+          <span className="h-px flex-1 bg-neutral-200" />
+        </div>
+        <OAuthButtons next={next} />
 
         <div className="mt-4 flex items-center justify-between text-small">
           <Link to={ROUTES.REGISTER} className="text-primary underline hover:text-primary-hover">

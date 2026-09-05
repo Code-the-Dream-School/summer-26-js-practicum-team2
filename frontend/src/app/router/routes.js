@@ -3,6 +3,7 @@ export const ROUTES = {
   LOGIN: "/login",
   REGISTER: "/register",
   VERIFY_EMAIL: "/verify",
+  OAUTH_CALLBACK: "/oauth/callback",
   PASSWORD_RESET: "/reset-password",
   DASHBOARD: "/dashboard",
   PROFILE: "/profile",
@@ -11,6 +12,7 @@ export const ROUTES = {
   LEARN_LESSON: "/learn/:moduleId/:lessonId",
   PRIVACY: "/privacy",
   TERMS: "/terms",
+  ADMIN_DASHBOARD: "/admin/dashboard",
 };
 
 // Link target, not a <Route path> — the query string opts into the unauthenticated preview.
@@ -21,12 +23,14 @@ const TITLES = {
   [ROUTES.LOGIN]: "Log in — Sprout",
   [ROUTES.REGISTER]: "Create an account — Sprout",
   [ROUTES.VERIFY_EMAIL]: "Verify your email — Sprout",
+  [ROUTES.OAUTH_CALLBACK]: "Signing you in — Sprout",
   [ROUTES.PASSWORD_RESET]: "Reset your password — Sprout",
   [ROUTES.DASHBOARD]: "Dashboard — Sprout",
   [ROUTES.PROFILE]: "Profile — Sprout",
   [ROUTES.LEARN]: "Learning path — Sprout",
   [ROUTES.PRIVACY]: "Privacy policy — Sprout",
   [ROUTES.TERMS]: "Terms of service — Sprout",
+  [ROUTES.ADMIN_DASHBOARD]: "Admin Dashboard - Sprout",
 };
 
 export function getRouteTitle(pathname) {

@@ -15,8 +15,19 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     password_hash: {
+      // Optional because OAuth users (Google/GitHub) never set a local password.
       type: String,
-      required: [true, "Password is required"],
+      default: null,
+    },
+    google_id: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    github_id: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     email_verified_at: {
       type: Date,
@@ -45,6 +56,22 @@ const userSchema = new mongoose.Schema(
       enum: ["learner", "admin"],
       default: "learner",
     },
+    is_disabled: {
+      type: Boolean,
+      default: false,
+    },
+    disabled_at: {
+      type: Date,
+      default: null,
+    },
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
+    deletion_scheduled_at: {
+      type: Date,
+      default: null,
+    },
     tos_agreement: {
       type: Boolean,
       required: true,
@@ -59,7 +86,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    //profile
+    //profile//
     avatar_url: {
       type: String,
       default: null,
@@ -67,11 +94,6 @@ const userSchema = new mongoose.Schema(
     goals: {
       type: String,
       default: "",
-    },
-    theme: {
-      type: String,
-      enum: ["Light", "Dark"],
-      default: "Light",
     },
     notifications: {
       type: Boolean,
@@ -91,16 +113,48 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    deleted_at: {
-      type: Date,
-      default: null, // Tracks when deletion occurs
+    //archival status
+    is_archived: { type: Boolean, default: false },
+    archived_at: { type: Date, default: null },
+
+    //admin verification for deletion
+    deletion_status: {
+      type: String,
+      enum: ["none", "pending", "approved", "denied"],
+      default: "none",
     },
+    deletion_requested_at: {
+      type: Date,
+      default: null,
+    },
+    deletion_approved_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    reactivation_token: { type: String, select: false },
+    reactivation_expires_at: { type: Date },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   },
 );
+//auto middleware: excludes archived/deleted users from normal search queries. hides the users marked is_archived. $ne: true in MongoDB means not equal to : true
+userSchema.pre(/^find/, function () {
+  const queryFilter = this.getFilter();
+  const multipleExclusionConditions = {};
 
+  if (queryFilter.is_archived === undefined) {
+    multipleExclusionConditions.is_archived = { $ne: true };
+  }
+  if (queryFilter.is_deleted === undefined) {
+    multipleExclusionConditions.is_deleted = { $ne: true };
+  }
+  if (Object.keys(multipleExclusionConditions).length > 0) {
+    this.find(multipleExclusionConditions);
+  }
+});
+/* ====== Removed archivedUserSchema because we created a flag directly in the user Schema
 const archivedUserSchema = new mongoose.Schema(
   {
     original_user_id: {
@@ -119,9 +173,12 @@ const archivedUserSchema = new mongoose.Schema(
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   },
-);
+);*/
+userSchema.index({ deletion_status: 1 });
+userSchema.index({ reactivation_token: 1 });
 
 const User = mongoose.model("User", userSchema);
-const ArchivedUser = mongoose.model("ArchivedUser", archivedUserSchema);
+//const ArchivedUser = mongoose.model("ArchivedUser", archivedUserSchema);
 
-module.exports = { User, ArchivedUser };
+//module.exports = { User, ArchivedUser };
+module.exports = User;
