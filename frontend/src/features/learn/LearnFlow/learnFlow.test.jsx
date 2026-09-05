@@ -7,6 +7,12 @@ import * as api from "../../../services/api";
 
 // Mock the quiz and progress API functions so the tests do not make real requests.
 vi.mock("../../../services/api", () => ({
+  checkQuizAnswer: vi.fn().mockResolvedValue({
+    isCorrect: true,
+    correctChoiceIds: ["a"],
+    explanation: "Cash flow describes money moving in and out.",
+  }),
+  completeLesson: vi.fn().mockResolvedValue({}),
   startQuiz: vi.fn(),
   submitQuiz: vi.fn(),
   updateLessonProgress: vi.fn(),

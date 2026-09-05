@@ -97,7 +97,11 @@ describe("quiz reducer", () => {
 
     expect(active).toMatchObject({ attemptId: "attempt-1", status: "active", answers: {} });
     expect(answered.answers["question-1"]).toEqual(["a"]);
-    expect(reviewed.reviews["question-1"]).toEqual({ isCorrect: true, explanation: "Correct." });
+    expect(reviewed.reviews["question-1"]).toEqual({
+      isCorrect: true,
+      explanation: "Correct.",
+      correctChoiceIds: [],
+    });
     expect(changed.answers["question-1"]).toEqual(["a"]);
   });
 

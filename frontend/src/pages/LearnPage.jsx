@@ -47,7 +47,6 @@ export default function LearnPage() {
     beaver: dabbingBeaverImg,
   };
 
-  // Wait for storage hydration before deciding to redirect
   if (isHydrating) {
     return (
       <section className="mx-auto max-w-2xl px-2 py-12 sm:px-4 sm:py-16">
