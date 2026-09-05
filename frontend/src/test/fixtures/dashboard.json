@@ -5,25 +5,20 @@
     "greeting": "Welcome back, Abigail",
     "statusText": "Nice pace. Your next lesson is ready when you are.",
     "streak": {
-      "currentDays": 1,
-      "helperText": "1-day learning streak."
+      "currentDays": 0,
+      "helperText": "Streak tracking is coming soon."
     },
     "dailyGoal": {
-      "type": "learning_checks",
-      "current": 1,
+      "type": "lessons",
+      "current": 0,
       "target": 1,
-      "isMet": true,
-      "label": "1 / 1 learning check"
+      "isMet": false,
+      "label": "Coming soon"
     },
     "primaryAction": {
       "label": "Continue Income",
       "href": "/learn/cashFlow/1.2"
     }
-  },
-  "progress": {
-    "completedLessons": 1,
-    "totalLessons": 4,
-    "overallPercent": 25
   },
   "nextAction": {
     "title": "Income",

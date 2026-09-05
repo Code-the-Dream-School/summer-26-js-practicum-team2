@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useReducer } from "react";
 import quizReducer, { actions, initialState } from "../reducers/quiz.reducer";
-import { checkQuizAnswer, startQuiz, submitQuiz } from "../services/api";
+import { startQuiz, submitQuiz } from "../services/api";
+import { scoreQuizAttempt } from "../utils/quizScoring";
 
 export function useQuiz({
   questions = [],
@@ -42,29 +43,21 @@ export function useQuiz({
     dispatch({ type: actions.selectChoice, questionId, choiceIds });
   }, []);
 
-  const checkAnswer = useCallback(
-    async (question, choiceIds) => {
-      try {
-        const result = await checkQuizAnswer({
-          moduleId,
-          microLessonId: question.lessonStepId,
-          questionId: question.id,
-          choiceIds,
-        });
+  const checkAnswer = useCallback((question, choiceIds) => {
+    // Score one question independently so feedback can be shown immediately.
+    const { passed } = scoreQuizAttempt({
+      questions: [question],
+      answers: [{ questionId: question.id, choiceIds }],
+      passThreshold: 1,
+    });
 
-        dispatch({
-          type: actions.revealAnswer,
-          questionId: question.id,
-          isCorrect: result.isCorrect,
-          explanation: result.explanation,
-          correctChoiceIds: result.correctChoiceIds,
-        });
-      } catch (error) {
-        dispatch({ type: actions.submitFailure, errorMessage: error.message });
-      }
-    },
-    [moduleId],
-  );
+    dispatch({
+      type: actions.revealAnswer,
+      questionId: question.id,
+      isCorrect: passed,
+      explanation: question.explanation,
+    });
+  }, []);
 
   const goToNextQuestion = useCallback(() => dispatch({ type: actions.nextQuestion }), []);
   const goToPreviousQuestion = useCallback(() => dispatch({ type: actions.previousQuestion }), []);
@@ -72,18 +65,21 @@ export function useQuiz({
 
   const submit = useCallback(
     async (microLessonId, lessonQuestions) => {
+      // Calculate a local result first so read-only quizzes behave like submitted ones.
+      const localResult = scoreQuizAttempt({
+        questions: lessonQuestions,
+        answers: lessonQuestions.map((question) => ({
+          questionId: question.id,
+          choiceIds: quizState.answers[question.id] ?? [],
+        })),
+        passThreshold,
+      });
+
       if (isReadOnly || !csrfToken) {
-        const correctCount = lessonQuestions.filter(
-          (question) => quizState.reviews[question.id]?.isCorrect,
-        ).length;
-        const percentage = Math.round((correctCount / Math.max(lessonQuestions.length, 1)) * 100);
-        const missed = lessonQuestions
-          .filter((question) => !quizState.reviews[question.id]?.isCorrect)
-          .map((question) => question.id);
         const offlineResult = {
-          score: percentage,
-          passed: percentage >= passThreshold * 100,
-          missed,
+          score: localResult.percentage,
+          passed: localResult.passed,
+          missed: localResult.missed,
         };
         dispatch({ type: actions.submitSuccess, result: offlineResult });
         return offlineResult;
@@ -110,15 +106,7 @@ export function useQuiz({
         return null;
       }
     },
-    [
-      csrfToken,
-      isReadOnly,
-      moduleId,
-      passThreshold,
-      quizState.answers,
-      quizState.attemptId,
-      quizState.reviews,
-    ],
+    [csrfToken, isReadOnly, moduleId, passThreshold, quizState.answers, quizState.attemptId],
   );
 
   return useMemo(

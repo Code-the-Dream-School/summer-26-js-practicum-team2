@@ -1,12 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
-import { getLesson, getLessonModules, getLessonProgress } from "../services/api";
+import { DEFAULT_LESSON_ID, DEFAULT_MODULE_ID } from "../hooks/useLessonContent";
+import { getLesson, getLessonProgress } from "../services/api";
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
-import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -37,26 +36,11 @@ function LearningPathPage() {
 
     async function loadLearningPath() {
       try {
-        const modulePayload = await getLessonModules();
-        const firstModuleId = modulePayload.modules?.[0]?.id;
-        if (!firstModuleId) {
-          if (isActive)
-            setError(
-              "No lesson modules have been seeded yet. Ask an admin to seed or import lessons.",
-            );
-          return;
-        }
-
-        const progressPayload = await getLessonProgress(firstModuleId);
-        const firstLessonId =
-          progressPayload.currentLessonId || modulePayload.modules[0].firstLessonId;
-        if (!firstLessonId) {
-          if (isActive) setError("The selected module does not contain any lessons yet.");
-          return;
-        }
+        // The saved progress tells us which module and lesson to load the content for.
+        const progressPayload = await getLessonProgress(DEFAULT_MODULE_ID);
         const lessonPayload = await getLesson(
-          progressPayload.currentModule || firstModuleId,
-          firstLessonId,
+          progressPayload.currentModule || DEFAULT_MODULE_ID,
+          progressPayload.currentLessonId || DEFAULT_LESSON_ID,
         );
 
         if (!isActive) {
@@ -228,22 +212,6 @@ function LearningPathPage() {
   }
 
   if (error) {
-    const isContentEmpty =
-      error.includes("No lesson modules") || error.includes("does not contain any lessons");
-
-    if (isContentEmpty) {
-      return (
-        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-          <EmptyState
-            className="border-primary/20 bg-surface-inset py-16"
-            icon={<img src={dabbingBeaverImg} alt="" className="h-14 w-14 object-contain" />}
-            title="Content coming soon"
-            message="New lessons are being prepared. Check back soon for something new to explore."
-          />
-        </div>
-      );
-    }
-
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <p className="text-sm font-medium text-danger">{error}</p>

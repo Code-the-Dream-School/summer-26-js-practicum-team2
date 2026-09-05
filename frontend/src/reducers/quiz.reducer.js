@@ -47,7 +47,6 @@ export default function quizReducer(state = initialState, action) {
           [action.questionId]: {
             isCorrect: action.isCorrect,
             explanation: action.explanation,
-            correctChoiceIds: action.correctChoiceIds ?? [],
           },
         },
       };

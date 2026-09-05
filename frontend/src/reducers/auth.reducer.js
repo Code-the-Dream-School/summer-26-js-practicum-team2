@@ -5,7 +5,6 @@ export const actions = {
   endRequest: "endRequest",
   commitAuth: "commitAuth",
   clearAuth: "clearAuth",
-  updateCsrfToken: "updateCsrfToken",
   setError: "setError",
   clearError: "clearError",
 };
@@ -51,9 +50,6 @@ export default function authReducer(state = initialState, action) {
     // Logout - clear user and token
     case actions.clearAuth:
       return { ...state, user: null, csrfToken: null, isSubmitting: false };
-
-    case actions.updateCsrfToken:
-      return { ...state, csrfToken: action.csrfToken ?? state.csrfToken };
 
     // Set error message from failed auth request
     case actions.setError:

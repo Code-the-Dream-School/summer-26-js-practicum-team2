@@ -7,24 +7,9 @@ import * as api from "../../../services/api";
 
 // Mock the quiz and progress API functions so the tests do not make real requests.
 vi.mock("../../../services/api", () => ({
-  checkQuizAnswer: vi.fn().mockResolvedValue({
-    isCorrect: true,
-    correctChoiceIds: ["a"],
-    explanation: "Cash flow describes money moving in and out.",
-  }),
-  completeLesson: vi.fn().mockResolvedValue({}),
   startQuiz: vi.fn(),
   submitQuiz: vi.fn(),
   updateLessonProgress: vi.fn(),
-}));
-
-vi.mock("../Quiz/encouragingCopy", () => ({
-  getEncouragingPhrase: () => "Keep going",
-  getEncouragingWord: () => "Nice answer",
-  getQuizCompletionPhrase: (passed) =>
-    passed ? "You passed this quiz." : "Keep practicing and try again.",
-  getQuizCompletionWord: (passed) => (passed ? "Excellent" : "Try again"),
-  getAllCaughtUpPhrase: () => "You are all caught up.",
 }));
 
 // Use a small lesson with one step and one question so the test can focus on the basic learn flow.
@@ -111,99 +96,10 @@ describe("learn flow", () => {
 
     // A passing preview should show the score and encourage the visitor to register.
     expect(screen.getByText(/Score: 100% — Pass/)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Excellent" })).toBeInTheDocument();
-    expect(screen.getByText("You passed this quiz.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Register to keep learning" })).toHaveAttribute(
       "href",
       "/register",
     );
-  });
-
-  it("uses checked-answer feedback when reviewing a redacted public question", async () => {
-    const user = userEvent.setup();
-    const redactedLearnData = {
-      ...learnData,
-      questions: learnData.questions.map((question) => ({
-        ...question,
-        correctChoiceIds: [],
-        explanation: undefined,
-      })),
-    };
-
-    render(
-      <MemoryRouter>
-        <LearnFlow
-          learnData={redactedLearnData}
-          characterImages={{}}
-          guideImage="guide.png"
-          isReadOnly
-        />
-      </MemoryRouter>,
-    );
-
-    await user.click(screen.getByRole("button", { name: "Quick check" }));
-    await user.click(screen.getByRole("radio", { name: /Money moving in and out/i }));
-    await user.click(screen.getByRole("button", { name: "Check answer" }));
-    await user.click(screen.getByRole("button", { name: "View results" }));
-    await user.click(screen.getByRole("button", { name: "Review Answers" }));
-
-    expect(screen.getByAltText("Correct answer")).toBeInTheDocument();
-    expect(screen.queryByAltText("Incorrect answer")).not.toBeInTheDocument();
-    expect(
-      screen.getByText(/Explanation: Cash flow describes money moving in and out/),
-    ).toBeInTheDocument();
-  });
-
-  it("uses submitted feedback for end-of-quiz review", async () => {
-    const user = userEvent.setup();
-    const redactedLearnData = {
-      ...learnData,
-      questions: learnData.questions.map((question) => ({
-        ...question,
-        correctChoiceIds: [],
-        explanation: undefined,
-      })),
-    };
-
-    window.localStorage.setItem("sprout-quiz-feedback-preference", "end");
-    api.updateLessonProgress.mockResolvedValue({});
-    api.startQuiz.mockResolvedValue({ attemptId: "attempt-1" });
-    api.submitQuiz.mockResolvedValue({
-      score: 100,
-      passed: true,
-      missed: [],
-      reviews: [
-        {
-          questionId: "question-1",
-          isCorrect: true,
-          correctChoiceIds: ["a"],
-          explanation: "Cash flow describes money moving in and out.",
-        },
-      ],
-    });
-
-    render(
-      <MemoryRouter>
-        <LearnFlow
-          learnData={redactedLearnData}
-          characterImages={{}}
-          guideImage="guide.png"
-          csrfToken="csrf-1"
-        />
-      </MemoryRouter>,
-    );
-
-    await user.click(screen.getByRole("button", { name: "Quick check" }));
-    await user.click(screen.getByRole("radio", { name: /Money moving in and out/i }));
-    await user.click(screen.getByRole("button", { name: "View results" }));
-    await user.click(screen.getByRole("button", { name: "Review Answers" }));
-
-    expect(api.checkQuizAnswer).not.toHaveBeenCalled();
-    expect(screen.getByAltText("Correct answer")).toBeInTheDocument();
-    expect(screen.queryByAltText("Incorrect answer")).not.toBeInTheDocument();
-    expect(
-      screen.getByText(/Explanation: Cash flow describes money moving in and out/),
-    ).toBeInTheDocument();
   });
 
   it("syncs progress and submits the quiz for an authenticated learner", async () => {

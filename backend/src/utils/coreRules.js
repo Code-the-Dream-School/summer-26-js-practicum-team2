@@ -84,19 +84,11 @@ function calculateStreakStatus({ activeDates = [], today = new Date(), freezeBal
   const yesterday = new Date(`${todayKey}T00:00:00Z`);
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
   const yesterdayKey = toDateKey(yesterday);
-  const twoDaysAgo = new Date(yesterday);
-  twoDaysAgo.setUTCDate(twoDaysAgo.getUTCDate() - 1);
-  const twoDaysAgoKey = toDateKey(twoDaysAgo);
 
   const sortedDates = [...activeSet].sort();
   const lastActiveDate = sortedDates.filter((dateKey) => dateKey <= todayKey).at(-1) || null;
-  const freezeUsed =
-    freezeBalance > 0 && !activeSet.has(todayKey) && lastActiveDate === twoDaysAgoKey;
 
-  const currentStreak =
-    lastActiveDate === todayKey || lastActiveDate === yesterdayKey || freezeUsed
-      ? getConsecutiveRunLength(activeSet, lastActiveDate)
-      : 0;
+  const currentStreak = lastActiveDate ? getConsecutiveRunLength(activeSet, lastActiveDate) : 0;
   const longestStreak = sortedDates.reduce((max, dateKey) => {
     let streak = 1;
     let cursor = new Date(`${dateKey}T00:00:00Z`);
@@ -109,6 +101,11 @@ function calculateStreakStatus({ activeDates = [], today = new Date(), freezeBal
     return Math.max(max, streak);
   }, 0);
 
+  const freezeUsed =
+    freezeBalance > 0 &&
+    !activeSet.has(todayKey) &&
+    !!lastActiveDate &&
+    lastActiveDate !== yesterdayKey;
   const freezesRemaining = Math.max(0, freezeBalance - (freezeUsed ? 1 : 0));
 
   return {

@@ -1,23 +1,49 @@
-const LessonModule = require("../models/LessonModule.model");
-const defaultModule = require("../../../shared/content/budgeting.json");
+const path = require("node:path");
+const fs = require("node:fs");
 
+// shared/content lives outside the backend package, alongside it in the repo root.
+const CONTENT_ROOT = path.resolve(__dirname, "../../../shared/content");
+
+const readJson = (relativeFile) => {
+  const fullPath = path.join(CONTENT_ROOT, relativeFile);
+  return JSON.parse(fs.readFileSync(fullPath, "utf8"));
+};
+
+let manifestCache = null;
 let moduleCache = new Map();
 
-const getModule = async (moduleId) => {
+const getManifest = () => {
+  if (!manifestCache) {
+    manifestCache = readJson("manifest.json");
+  }
+  return manifestCache;
+};
+
+// Look a module up in the manifest, then load the JSON file the manifest points at.
+const getModule = (moduleId) => {
   if (moduleCache.has(moduleId)) {
     return moduleCache.get(moduleId);
   }
 
-  const databaseModule = await LessonModule.findOne({ id: moduleId }).lean();
-  const moduleData = databaseModule || (moduleId === defaultModule.id ? defaultModule : null);
-  if (moduleData) {
-    moduleCache.set(moduleId, moduleData);
+  const manifest = getManifest();
+  const learningPath = manifest.learningPaths?.[0];
+  const moduleMeta = learningPath?.modules?.find((mod) => mod.id === moduleId);
+  if (!moduleMeta) {
+    return null;
   }
-  return moduleData;
+
+  try {
+    const moduleData = readJson(moduleMeta.file);
+    moduleCache.set(moduleId, moduleData);
+    return moduleData;
+  } catch {
+    // Manifest lists a module whose content file is missing or malformed.
+    return null;
+  }
 };
 
-const getLesson = async (moduleId, lessonId) => {
-  const moduleData = await getModule(moduleId);
+const getLesson = (moduleId, lessonId) => {
+  const moduleData = getModule(moduleId);
   if (!moduleData) {
     return null;
   }
@@ -25,38 +51,8 @@ const getLesson = async (moduleId, lessonId) => {
 };
 
 const clearCache = () => {
+  manifestCache = null;
   moduleCache = new Map();
 };
 
-const clearModuleCache = (moduleId) => {
-  moduleCache.delete(moduleId);
-};
-
-const sanitizeLessonData = (lessonData) => {
-  const sanitizedLesson = JSON.parse(JSON.stringify(lessonData));
-
-  for (const microLesson of sanitizedLesson.microLessons || []) {
-    for (const contentItem of microLesson.microLessonContent || []) {
-      if (contentItem.type === "knowledgeCheck") {
-        delete contentItem.correctResponse;
-        delete contentItem.explanation;
-      }
-    }
-  }
-
-  return sanitizedLesson;
-};
-
-const sanitizeModuleData = (moduleData) => ({
-  ...moduleData,
-  lessons: (moduleData.lessons || []).map(sanitizeLessonData),
-});
-
-module.exports = {
-  getModule,
-  getLesson,
-  sanitizeLessonData,
-  sanitizeModuleData,
-  clearCache,
-  clearModuleCache,
-};
+module.exports = { getManifest, getModule, getLesson, clearCache };

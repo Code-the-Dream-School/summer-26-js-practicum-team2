@@ -15,7 +15,6 @@ vi.mock("../context/AuthContext", () => ({
 // Mock the lesson APIs so these tests can control the progress and lesson data.
 vi.mock("../services/api", () => ({
   getLesson: vi.fn(),
-  getLessonModules: vi.fn(),
   getLessonProgress: vi.fn(),
 }));
 
@@ -55,10 +54,6 @@ describe("learning path page", () => {
 
     // Mock scrollIntoView since it is not available in the test browser environment.
     HTMLElement.prototype.scrollIntoView = vi.fn();
-
-    api.getLessonModules.mockResolvedValue({
-      modules: [{ id: "cashFlow", firstLessonId: "1.1" }],
-    });
 
     // Start with the first step completed and the second step as the learner's current position.
     api.getLessonProgress.mockResolvedValue({

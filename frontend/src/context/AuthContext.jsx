@@ -5,12 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const auth = useAuth();
-  const isAdmin = auth.user?.role === "admin";
-  const value = {
-    ...auth,
-    isAdmin,
-  };
-  return <AuthContext value={value}>{children}</AuthContext>;
+  return <AuthContext value={auth}>{children}</AuthContext>;
 }
 
 export function useAuthContext() {

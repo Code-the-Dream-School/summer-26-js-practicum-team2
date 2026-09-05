@@ -25,30 +25,16 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     try {
+      await login(values);
       // Return users to the protected page they originally requested, when available.
-      const { user } = await login(values);
       const next = new URLSearchParams(location.search).get("next");
-      //REMOVE lines 33 to 38 due to admin routes
-      //     navigate(next || ROUTES.DASHBOARD, { replace: true });
-      //   } catch (err) {
-      //     // Display authentication failures in the form rather than leaving the page.
-      //     setError("root", { message: err.message });
-      //   }
-      // };
-      if (next) {
-        navigate(next, { replace: true });
-        return;
-      }
-      //Automatic route based on role of user
-      if (user?.role === "admin") {
-        navigate(ROUTES.ADMIN_DASHBOARD, { replace: true });
-      } else {
-        navigate(ROUTES.DASHBOARD, { replace: true });
-      }
-    } catch (error) {
-      setError("root", { message: error.message });
+      navigate(next || ROUTES.DASHBOARD, { replace: true });
+    } catch (err) {
+      // Display authentication failures in the form rather than leaving the page.
+      setError("root", { message: err.message });
     }
   };
+
   return (
     <div className="mx-auto max-w-md py-8">
       <Card>

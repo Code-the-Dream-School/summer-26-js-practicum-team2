@@ -59,5 +59,5 @@ const userProgressSchema = new mongoose.Schema(
 );
 //one progress document per user per module
 userProgressSchema.index({ user_id: 1, module_id: 1 }, { unique: true });
-userProgressSchema.index({ user_id: 1, updated_at: -1 });
+
 module.exports = mongoose.model("UserProgress", userProgressSchema);
