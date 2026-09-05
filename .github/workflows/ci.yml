@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - development
+      - main
   workflow_dispatch:
 
 jobs:
@@ -29,10 +30,29 @@ jobs:
         run: npm --prefix frontend run lint
 
       - name: Run frontend test checks
-        run: npm --prefix frontend run test
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm --prefix frontend run test 2>&1 | tee frontend/test-results/vitest-output.txt
+
+      - name: Upload frontend test artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-report
+          path: frontend/test-results
+          if-no-files-found: warn
 
       - name: Run frontend build checks
         run: npm --prefix frontend run build
+
+      - name: Upload frontend build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-report
+          path: frontend/dist
+          if-no-files-found: warn
 
   backend:
     name: Backend checks
@@ -55,10 +75,58 @@ jobs:
       - name: Run backend lint checks
         run: npm --prefix backend run lint
 
-      - name: Run backend test checks
-        run: npm --prefix backend run test
+      - name: Run backend coverage-enforced test checks
+        run: npm --prefix backend run test:coverage
+
+      - name: Upload backend coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/coverage
+          if-no-files-found: warn
 
       - name: Run backend syntax checks
         run: |
           node --check backend/server.js
           node --check backend/src/app.js
+
+  e2e:
+    name: Browser journey checks
+    runs-on: ubuntu-latest
+    needs: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser journey checks
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn

@@ -1,6 +1,8 @@
 import { useId } from "react";
 import Card from "../../../shared/Card/Card.component";
 import LessonGuideCharacter from "../LessonGuideCharacter/LessonGuideCharacter.component";
+import ExpandableWhy from "./ExpandableWhy/ExpandableWhy.component";
+import { getEncouragingPhrase, getEncouragingWord } from "./encouragingCopy";
 
 function QuizComponent({
   question,
@@ -14,6 +16,7 @@ function QuizComponent({
   characterVariant = "beaver",
   characterImage,
   characterAlt = "Lesson guide",
+  reviewMode = false,
 }) {
   const allowsMultiple = question?.type === "multiSelect";
   const promptId = useId();
@@ -52,11 +55,11 @@ function QuizComponent({
       >
         {question.choices.map((choice) => {
           const isSelected = selectedChoiceIds.includes(choice.id);
-          const isCorrectChoice = question.correctChoiceIds.includes(choice.id);
+          const isCorrectChoice = reviewAnswer?.correctChoiceIds?.includes(choice.id);
           const variant =
             reviewAnswer && isSelected ? (reviewAnswer.isCorrect ? "success" : "danger") : "choice";
           const selectedIcon = reviewAnswer
-            ? isSelected && reviewAnswer.isCorrect
+            ? isSelected && isCorrectChoice
               ? rightAnswerIcon
               : isSelected
                 ? wrongAnswerIcon
@@ -95,22 +98,28 @@ function QuizComponent({
           );
         })}
       </div>
-      {reviewAnswer ? (
+      {reviewAnswer && reviewMode ? (
         <LessonGuideCharacter
           variant={characterVariant}
           imageSrc={characterImage}
           imageAlt={characterAlt}
-          bubbleText={
-            reviewAnswer.isCorrect
-              ? "Nice work! You got it."
-              : "Almost there — let us take another look."
-          }
+        >
+          <div className="space-y-3">
+            <ExpandableWhy explanation={reviewAnswer.explanation} />
+          </div>
+        </LessonGuideCharacter>
+      ) : reviewAnswer ? (
+        <LessonGuideCharacter
+          variant={characterVariant}
+          imageSrc={characterImage}
+          imageAlt={characterAlt}
+          bubbleText={getEncouragingPhrase(reviewAnswer.isCorrect)}
         >
           <div className="space-y-3">
             <p className="font-semibold text-heading">
-              {reviewAnswer.isCorrect ? "Correct!" : "Try again!"}
+              {getEncouragingWord(reviewAnswer.isCorrect)}!
             </p>
-            <p className="text-foreground">Explanation: {reviewAnswer.explanation}</p>
+            <ExpandableWhy explanation={reviewAnswer.explanation} />
           </div>
         </LessonGuideCharacter>
       ) : null}

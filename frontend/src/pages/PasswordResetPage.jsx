@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
 import { confirmResetSchema, requestResetSchema } from "../features/auth/schemas";
+import { getPasswordHelperText } from "../features/auth/passwordHelperText";
 import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
@@ -63,7 +64,10 @@ function RequestResetForm() {
       </form>
 
       {notice && (
-        <p className="mt-4 break-all rounded-xl bg-primary-alt/30 p-3 text-small text-heading">
+        <p
+          role="status"
+          className="mt-4 break-all rounded-xl bg-primary-alt/30 p-3 text-small text-heading"
+        >
           {notice}
         </p>
       )}
@@ -79,11 +83,19 @@ function ConfirmResetForm({ token }) {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(confirmResetSchema),
     defaultValues: { password: "" },
   });
+
+  const passwordValue = useWatch({
+    control,
+    name: "password",
+    defaultValue: "",
+  });
+  const passwordHelperText = getPasswordHelperText(passwordValue);
 
   const onSubmit = async ({ password }) => {
     try {
@@ -103,7 +115,7 @@ function ConfirmResetForm({ token }) {
           label="New password"
           type="password"
           autoComplete="new-password"
-          helperText="At least 8 characters with upper and lower case, a number, and a symbol."
+          helperText={passwordHelperText}
           disabled={isSubmitting}
           error={errors.password?.message}
           {...register("password")}

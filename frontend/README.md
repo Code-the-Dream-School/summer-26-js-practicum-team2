@@ -57,9 +57,9 @@ Avoid putting fetch logic directly in UI-heavy components.
 ❌ Bad:
 
 ```jsx
-function Hello() {
+function LessonPreview() {
   useEffect(() => {
-    fetch('/api/hello').then(...)
+    fetch("/api/v1/lessons/public/cashFlow/1.1").then(...)
   }, []);
 }
 ```
@@ -67,17 +67,17 @@ function Hello() {
 ✅ Better:
 
 ```js
-// services/helloApi.js
-export const getHello = async () => {
-  const res = await fetch("/api/hello");
+// services/lessonApi.js
+export const getPublicLesson = async () => {
+  const res = await fetch("/api/v1/lessons/public/cashFlow/1.1");
   return res.json();
 };
 ```
 
 ```jsx
-function Hello() {
+function LessonPreview() {
   useEffect(() => {
-    getHello().then(setMessage);
+    getPublicLesson().then(setLesson);
   }, []);
 }
 ```
