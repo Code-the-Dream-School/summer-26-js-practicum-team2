@@ -167,19 +167,19 @@ function LearnFlow({
       //Toast notifications for badges, xp, and streaks earned
       const newToasts = [];
 
-      (response?.rewards?.xp ?? []).forEach((reward) => {
-        const messages = {
-          quiz_pass: `⭐ +${reward.amount} XP for passing your first quiz!`,
-          quiz_perfect: `🎯 +${reward.amount} XP for a perfect score!`,
-          lesson_complete: `📚 +${reward.amount} XP for completing a lesson!`,
-          onboarding_complete: `🌱 +${reward.amount} XP for completing onboarding!`,
-        };
+      // (response?.rewards?.xp ?? []).forEach((reward) => {
+      //   const messages = {
+      //     quiz_pass: `⭐ +${reward.amount} XP for passing your first quiz!`,
+      //     quiz_perfect: `🎯 +${reward.amount} XP for a perfect score!`,
+      //     lesson_complete: `📚 +${reward.amount} XP for completing a lesson!`,
+      //     onboarding_complete: `🌱 +${reward.amount} XP for completing onboarding!`,
+      //   };
 
-        newToasts.push({
-          variant: "xp",
-          message: messages[reward.type],
-        });
-      });
+      //   newToasts.push({
+      //     variant: "xp",
+      //     message: messages[reward.type],
+      //   });
+      // });
 
       if (response?.rewards?.streak?.streakAwarded) {
         newToasts.push({
@@ -196,6 +196,8 @@ function LearnFlow({
       });
 
       setRewardToastQueue((current) => [...current, ...newToasts]);
+
+      console.log("TOASTS Array:", newToasts);
 
       //clearDashboardCache(auth.user.id);
 
@@ -242,6 +244,28 @@ function LearnFlow({
     }
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
+
+    console.log("QUIZ SUBMISSION:", submission);
+
+    if (submission?.rewards?.xp?.length) {
+      const xpToasts = submission.rewards.xp.map((reward) => {
+        const messages = {
+          quiz_pass: `⭐ +${reward.amount} XP for passing your first quiz!`,
+          quiz_perfect: `🎯 +${reward.amount} XP for a perfect score!`,
+          lesson_complete: `📚 +${reward.amount} XP for completing a lesson!`,
+          onboarding_complete: `🌱 +${reward.amount} XP for completing onboarding!`,
+        };
+
+        return {
+          variant: "xp",
+          message: messages[reward.type],
+        };
+      });
+
+      console.log("XP TOASTS:", xpToasts);
+
+      setRewardToastQueue((current) => [...current, ...xpToasts]);
+    }
 
     if (submission) {
       setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));

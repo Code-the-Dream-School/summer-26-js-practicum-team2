@@ -434,6 +434,7 @@ exports.submitQuiz = async (req, res, next) => {
         }
       }
     }
+
     invalidateDashboardCache(userId);
     return res.status(StatusCodes.OK).json({
       score: attempt.score,

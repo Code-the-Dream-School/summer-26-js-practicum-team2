@@ -94,14 +94,6 @@ exports.completeMicroLesson = async (req, res, next) => {
       module_id: moduleId,
     });
 
-    console.log("CURRENT COMPLETED LESSONS", progress?.completed_micro_lessons);
-
-    console.log(
-      "CURRENT COMPLETED MICRO LESSONS LENGTH",
-      progress?.completed_micro_lessons?.length,
-    );
-
-    console.log("INCOMING LESSON", microLessonId);
     const alreadyCompleted = progress?.completed_micro_lessons?.includes(microLessonId) || false;
 
     const updatedProgress = await UserProgress.findOneAndUpdate(
@@ -122,8 +114,6 @@ exports.completeMicroLesson = async (req, res, next) => {
         new: true,
       },
     );
-
-    console.log("LESSON COMPLETE CHECK", microLessonId, alreadyCompleted);
 
     let streakAward = null;
 
