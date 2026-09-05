@@ -197,13 +197,26 @@ const updateOnboardingProgress = async (req, res, next) => {
       });
     }
 
+    const rewards = {
+      xp: [],
+      badges: [],
+      streak: null,
+    };
+
+    if (xpAwarded > 0) {
+      rewards.xp.push({
+        type: "onboarding_complete",
+        amount: xpAwarded,
+      });
+    }
+
     return res.status(StatusCodes.OK).json({
       success: true,
       message:
         xpAwarded > 0
           ? `You completed the tour. You earned ${xpAwarded} XP.`
           : "Onboarding progress updated with success.",
-      xpAwarded,
+      rewards,
       onboarding: user.onboarding,
     });
   } catch (err) {

@@ -31,6 +31,8 @@ export default function DashboardPage() {
     userId: user?.id,
     isAuthenticated,
   });
+  //For onbaording xp if user lands on this page once onboarding is complete
+  // const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
 
   if (isLoading && !dashboard) {
     return <DashboardSkeleton />;
@@ -55,6 +57,9 @@ export default function DashboardPage() {
 
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;
+
+  //For onbaording xp award if user lands on this page once onboarding is complete  
+  // //addRewards(response.rewards);
 
   return (
     <section className="space-y-6">
