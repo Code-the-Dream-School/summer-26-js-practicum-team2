@@ -142,3 +142,37 @@ describe("lesson progress regression coverage (backend)", () => {
     expect(records).toHaveLength(1);
   });
 });
+
+describe("micro-lesson completion rewards", () => {
+  it("rejects completion before passing a knowledge check", async () => {
+    const { authHeader, userId } = await createAuthedUser("completion-check@example.com");
+    const response = await request(app)
+      .post("/api/v1/lessons/complete")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "cashFlow", microLessonId: "1.1.2" });
+    expect(response.status).toBe(409);
+    expect(await UserProgress.countDocuments({ user_id: userId })).toBe(0);
+  });
+  it("awards a streak and badge only on the first reading completion", async () => {
+    const LessonModule = require("../src/models/LessonModule.model");
+    await LessonModule.create({
+      id: "reading",
+      title: "Reading",
+      lessons: [{ id: "reading.1", microLessons: [{ id: "reading.1.1", microLessonContent: [] }] }],
+    });
+    const { authHeader } = await createAuthedUser("completion-rewards@example.com");
+    const complete = () =>
+      request(app)
+        .post("/api/v1/lessons/complete")
+        .set("Authorization", authHeader)
+        .send({ moduleId: "reading", microLessonId: "reading.1.1" });
+    const first = await complete();
+    expect(first.status).toBe(200);
+    expect(first.body.rewards.streak.streakAwarded).toBe(true);
+    expect(first.body.rewards.badges).toHaveLength(1);
+    const second = await complete();
+    expect(second.status).toBe(200);
+    expect(second.body.rewards.streak).toBeNull();
+    expect(second.body.rewards.badges).toEqual([]);
+  });
+});

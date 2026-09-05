@@ -42,6 +42,7 @@ export default function useDashboardData({ userId, isAuthenticated }) {
 
   const fetchDashboard = useCallback(
     async ({ force = false } = {}) => {
+      console.log("FETCH DASHBOARD CALLED", { force });
       // Reset local state when there is no authenticated user context.
       if (!isAuthenticated || !userId) {
         setDashboard(null);
@@ -66,6 +67,7 @@ export default function useDashboardData({ userId, isAuthenticated }) {
 
       try {
         const payload = await getDashboard();
+
         setDashboard(payload);
         cacheDashboard(userId, payload);
         return payload;
@@ -88,6 +90,7 @@ export default function useDashboardData({ userId, isAuthenticated }) {
     if (!userId) return undefined;
 
     const handleProgressUpdate = () => {
+      console.log("DASHBOARD REFRESH EVENT RECEIVED");
       window.sessionStorage.removeItem(getCacheKey(userId));
       fetchDashboard({ force: true });
     };

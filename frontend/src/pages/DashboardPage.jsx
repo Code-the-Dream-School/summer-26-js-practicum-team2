@@ -30,6 +30,8 @@ export default function DashboardPage() {
     userId: user?.id,
     isAuthenticated,
   });
+  //For onbaording xp if user lands on this page once onboarding is complete
+  // const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
 
   if (isLoading && !dashboard) {
     return <DashboardSkeleton />;
@@ -50,11 +52,25 @@ export default function DashboardPage() {
     );
   }
 
-  const { hero, progress, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  const {
+    hero,
+    xp,
+    badges,
+    progress,
+    nextAction,
+    units = [],
+    recentActivity = [],
+  } = dashboard || {};
   if (units.length === 0) {
     return (
       <section className="space-y-6">
-        <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
+        <DashboardHero
+          hero={hero}
+          nextAction={nextAction}
+          overallProgress={progress}
+          xp={xp?.total ?? 0}
+          badges={badges}
+        />
         <EmptyState
           icon="🌱"
           title="Content coming soon"
@@ -71,9 +87,18 @@ export default function DashboardPage() {
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const hasNoProgress = completedLessons === 0;
 
+  //For onbaording xp award if user lands on this page once onboarding is complete
+  // //addRewards(response.rewards);
+
   return (
     <section className="space-y-6">
-      <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
+      <DashboardHero
+        hero={hero}
+        nextAction={nextAction}
+        overallProgress={progress}
+        xp={xp?.total ?? 0}
+        badges={badges}
+      />
 
       {hasNoProgress ? (
         <EmptyState

@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuthContext();
   const [isRegistered, setIsRegistered] = useState(false);
   const placeholder = useMemo(() => pickPlaceholderIdentity(), []);
+  const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
   const {
     register,
@@ -30,6 +31,7 @@ export default function RegisterPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      timezone: detectedTimezone,
       tos: false,
     },
   });

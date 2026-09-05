@@ -3,7 +3,12 @@ import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import { completeLesson, updateLessonProgress, restartLessonProgress } from "../../../services/api";
+import {
+  completeMicroLesson,
+  completeLesson,
+  updateLessonProgress,
+  restartLessonProgress,
+} from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -193,7 +198,7 @@ export default function LearnFlow({
     setIsComplete(true);
   }
 
-  function goForward() {
+  async function goForward() {
     if (chunkIndex < chunks.length - 1) {
       setChunkIndex((current) => current + 1);
       return;
@@ -206,6 +211,17 @@ export default function LearnFlow({
       return;
     }
 
+    if (canSyncProgress) {
+      try {
+        await completeMicroLesson({
+          moduleId: learnData.moduleId,
+          microLessonId: currentMicroLessonId,
+          csrfToken,
+        });
+      } catch {
+        // Allow reading to continue if completion cannot be saved.
+      }
+    }
     advanceStep();
   }
 

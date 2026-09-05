@@ -222,7 +222,9 @@ export default function ProfilePage() {
         <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-surface-app px-4 py-3 shadow-inner">
           <Stat label="XP Points:" value={` ${(profile?.xp ?? 0).toLocaleString()}`} />
           <div className="h-8 w-px bg-neutral-200" />
-          <Stat label="Streak:" value={` ${profile?.streak ?? 0} days`} />
+          <Stat label="Streak:" value={` ${profile?.current_streak ?? 0} days`} />
+          <Stat label="Longest Streak:" value={` ${profile?.longest_streak ?? 0} days`} />
+          <Stat label="Total Days:" value={` ${profile?.active_learning_days ?? 0} days`} />
         </div>
       </header>
 

@@ -98,6 +98,7 @@ const userSchema = new mongoose.Schema(
     onboarding: {
       is_completed: { type: Boolean, default: false },
       current_step: { type: Number, default: 0 },
+      xp_awarded: { type: Boolean, default: false },
       started_at: {
         type: Date,
         default: null,
@@ -147,9 +148,27 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
     streak: {
-      type: Number,
-      default: 0,
+      current: {
+        type: Number,
+        default: 0,
+      },
+      longest: {
+        type: Number,
+        default: 0,
+      },
+      active_learning_days: {
+        type: Number,
+        default: 0,
+      },
+      last_active_date: {
+        type: Date,
+        default: null,
+      },
     },
+    earned_badges: [
+      { badge_id: { type: String, required: true }, awarded_at: { type: Date, default: Date.now } },
+    ],
+    timezone: { type: String, default: "UTC" },
     // Soft-deleted accounts
     is_deleted: {
       type: Boolean,

@@ -7,7 +7,7 @@ const {
   toggleOnboardingWorkflow,
 } = require("../controllers/onboarding.controller");
 
-const jwtMiddleware = require("../middleware/jsonWebToken");
+const { authenticateUser: jwtMiddleware } = require("../middleware/jsonWebToken");
 
 router.use(jwtMiddleware);
 

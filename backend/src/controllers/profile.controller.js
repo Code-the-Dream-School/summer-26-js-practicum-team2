@@ -3,13 +3,15 @@ const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
 const { issueSession } = require("../utils/session");
-const { getLearningMotivation } = require("../utils/learningStats");
 const {
   updateProfileSchema,
   changePasswordSchema,
   deleteAccountSchema,
   avatarUrlSchema,
 } = require("../validation/profileValidation");
+const { getUserXpTotal } = require("../services/xp.service");
+const { getLearningMotivation } = require("../utils/learningStats");
+const { getDisplayStreak } = require("../utils/streaks");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -26,10 +28,14 @@ const getProfile = async (req, res, next) => {
         .json({ message: "Not authenticated or account deactivated." });
     }
 
-    const [progress, motivation] = await Promise.all([
-      UserProgress.findOne({ user_id: req.user.id }).sort({ updated_at: -1 }),
-      getLearningMotivation(req.user.id),
-    ]);
+    const progress = await UserProgress.findOne({ user_id: req.user.id }).sort({
+      updated_at: -1,
+    });
+
+    const xpTotal = await getUserXpTotal(req.user.id);
+    const motivation = await getLearningMotivation(req.user.id);
+    const currentStreak = Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak));
+
     return res.status(StatusCodes.OK).json({
       user: {
         id: user._id,
@@ -37,12 +43,16 @@ const getProfile = async (req, res, next) => {
         email: user.email,
         goals: user.goals ?? "",
         notifications: user.notifications ?? true,
-        xp: user.xp ?? 0,
-        streak: motivation.streak.currentDays,
+        xp: xpTotal,
+        streak: currentStreak,
+        current_streak: currentStreak,
+        longest_streak: user.streak?.longest ?? 0,
+        active_learning_days: user.streak?.active_learning_days ?? 0,
+        timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
         current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
-        badges: progress?.earned_badges || [],
+        badges: user.earned_badges || [],
       },
     });
   } catch (error) {
@@ -88,7 +98,7 @@ const updateProfile = async (req, res, next) => {
         errors: error.details.map((detail) => detail.message),
       });
     }
-    const { name, email, goals, notifications } = value;
+    const { name, email, goals, notifications, timezone } = value;
     const user = await User.findById(req.user.id);
 
     if (!user || user.is_deleted) {
@@ -96,6 +106,7 @@ const updateProfile = async (req, res, next) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: " User not found or user deleted account. " });
     }
+
     let hasUpdates = false;
     if (name !== undefined) {
       user.name = name;
@@ -119,13 +130,23 @@ const updateProfile = async (req, res, next) => {
       user.email_verified_at = null;
       hasUpdates = true;
     }
+
+    if (timezone !== undefined) {
+      user.timezone = timezone;
+      hasUpdates = true;
+    }
+
     if (!hasUpdates) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No items requested to be updated." });
     }
+
     await user.save();
-    const motivation = await getLearningMotivation(user._id);
+    const xpTotal = await getUserXpTotal(req.user.id);
+    const motivation = await getLearningMotivation(req.user.id);
+    const currentStreak = Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak));
+
     return res.status(StatusCodes.OK).json({
       message: "You have successfully updated your profile.",
       user: {
@@ -134,8 +155,11 @@ const updateProfile = async (req, res, next) => {
         email: user.email,
         goals: user.goals,
         notifications: user.notifications,
-        xp: user.xp ?? 0,
-        streak: motivation.streak.currentDays,
+        xp: xpTotal,
+        streak: currentStreak,
+        current_streak: currentStreak,
+        longest_streak: user.streak?.longest ?? 0,
+        timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
       },

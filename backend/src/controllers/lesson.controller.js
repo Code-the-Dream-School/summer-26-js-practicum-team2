@@ -16,6 +16,8 @@ const {
   lessonImportSchema,
   validateRequest,
 } = require("../validation/userValidation");
+const { updateUserStreak } = require("../services/streak.service");
+const { awardEligibleBadges } = require("../services/badge.service");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -146,6 +148,90 @@ exports.getLessonProgress = async (req, res, next) => {
   }
 };
 
+// POST /api/v1/lessons/complete
+exports.completeMicroLesson = async (req, res, next) => {
+  try {
+    const { moduleId = DEFAULT_MODULE_ID, microLessonId } = req.body ?? {};
+    if (
+      typeof moduleId !== "string" ||
+      typeof microLessonId !== "string" ||
+      !microLessonId.trim()
+    ) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "A moduleId and microLessonId are required." });
+    }
+    const moduleData = await getModule(moduleId);
+    const micro = moduleData?.lessons
+      ?.flatMap((lesson) => lesson.microLessons || [])
+      .find((item) => item.id === microLessonId);
+    if (!micro) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Micro-lesson not found." });
+    }
+    if (micro.microLessonContent?.some((item) => item.type === "knowledgeCheck")) {
+      const passedAttempt = await QuizAttempt.exists({
+        user_id: req.user.id,
+        module_id: moduleId,
+        micro_lesson_id: microLessonId,
+        passed: true,
+        submitted_at: { $ne: null },
+      });
+      if (!passedAttempt) {
+        return res
+          .status(StatusCodes.CONFLICT)
+          .json({ message: "Pass every knowledge check before completing this micro-lesson." });
+      }
+    }
+
+    const progress = await UserProgress.findOne({
+      user_id: req.user.id,
+      module_id: moduleId,
+    });
+
+    const alreadyCompleted = progress?.completed_micro_lessons?.includes(microLessonId) || false;
+
+    const updatedProgress = await UserProgress.findOneAndUpdate(
+      {
+        user_id: req.user.id,
+        module_id: moduleId,
+      },
+      {
+        $addToSet: {
+          completed_micro_lessons: microLessonId,
+        },
+        $set: {
+          current_micro_lesson_id: microLessonId,
+        },
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      },
+    );
+
+    let streakAward = null;
+
+    //If this is first completion, udpate the streak and award the badge
+    if (!alreadyCompleted) {
+      streakAward = await updateUserStreak(req.user.id);
+    }
+
+    const awardedBadges = await awardEligibleBadges(req.user.id);
+
+    invalidateDashboardCache(req.user.id);
+
+    return res.status(StatusCodes.OK).json({
+      progress: shapeProgress(updatedProgress),
+      rewards: {
+        streak: streakAward,
+        badges: awardedBadges,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // PATCH /api/v1/lessons/progress
 // Body: { moduleId, lessonId, microLessonId, currentChunkIndex }
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
@@ -194,6 +280,8 @@ exports.updateLessonProgress = async (req, res, next) => {
       { $set: update },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
+
+    invalidateDashboardCache(req.user.id);
 
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
   } catch (error) {

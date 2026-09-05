@@ -122,20 +122,23 @@ export const toggleOnboardingWorkflow = ({ enabled, csrfToken }) =>
     basePath: ONBOARDING_BASE_PATH,
   });
 
-export const updateOnboardingProgress = ({
+export const updateOnboardingProgress = async ({
   tourKey,
   step,
   status,
   dismissed,
   markAllComplete,
   csrfToken,
-}) =>
-  apiRequest("/step", {
+}) => {
+  const response = await apiRequest("/step", {
     method: "PATCH",
     csrfToken,
     body: { tourKey, step, status, dismissed, markAllComplete },
     basePath: ONBOARDING_BASE_PATH,
   });
+  notifyDashboardProgressChanged({ rewards: response?.rewards });
+  return response;
+};
 
 export const resetOnboardingProgress = (csrfToken) =>
   apiRequest("/reset", {
@@ -417,8 +420,12 @@ export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
     body: { type, ...payload },
     basePath: DASHBOARD_BASE_PATH,
   });
-  notifyDashboardProgressChanged();
+  notifyDashboardProgressChanged({ rewards: response?.rewards });
   return response;
+};
+
+export const clearDashboardCache = (userId) => {
+  window.sessionStorage.removeItem(`sprout.dashboard.${userId}`);
 };
 
 export const getLesson = (moduleId, lessonId) =>
@@ -489,6 +496,22 @@ export const checkQuizAnswer = ({ moduleId, microLessonId, questionId, choiceIds
     basePath: QUIZZES_BASE_PATH,
   });
 
+//User completes microlesson
+export const completeMicroLesson = async ({ moduleId, microLessonId, csrfToken }) => {
+  const response = await apiRequest("/complete", {
+    method: "POST",
+    csrfToken,
+    body: {
+      moduleId,
+      microLessonId,
+    },
+    basePath: LESSONS_BASE_PATH,
+  });
+
+  notifyDashboardProgressChanged({ rewards: response?.rewards });
+  return response;
+};
+
 export const getQuizProgress = () =>
   apiRequest("/progress", {
     method: "GET",
@@ -517,6 +540,6 @@ export const submitQuiz = async (microLessonId, { attemptId, moduleId, answers, 
     basePath: QUIZZES_BASE_PATH,
   });
 
-  notifyDashboardProgressChanged();
+  notifyDashboardProgressChanged({ rewards: response?.rewards });
   return response;
 };

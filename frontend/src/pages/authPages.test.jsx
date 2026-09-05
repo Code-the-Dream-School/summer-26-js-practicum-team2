@@ -243,6 +243,7 @@ describe("auth pages", () => {
         password: "SecurePass123!",
         confirmPassword: "SecurePass123!",
         tos: true,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     });
 

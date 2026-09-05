@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router";
 import { useAuthContext } from "../../context/AuthContext";
 import { OnboardingProvider, useOnboarding } from "../../context/OnboardingContext1";
@@ -7,6 +7,9 @@ import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
 import { getOnboardingPageName } from "../../features/onboarding1/onboarding.utils";
+
+import useRewardQueue from "../../hooks/useRewardQueue";
+import Toast from "../Toast/Toast.component";
 
 function OnboardingWrapper() {
   const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =
@@ -30,6 +33,12 @@ function OnboardingWrapper() {
 
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
+  const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
+  useEffect(() => {
+    const handleRewards = (event) => addRewards(event.detail?.rewards);
+    window.addEventListener("sprout:progress-updated", handleRewards);
+    return () => window.removeEventListener("sprout:progress-updated", handleRewards);
+  }, [addRewards]);
   //add for admin update
   const isAdmin = user?.role === "admin";
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -62,7 +71,7 @@ export default function MainLayout() {
           avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
           avatarUrl={user?.avatar_url ?? null}
           xp={user?.xp ?? 0}
-          streak={user?.streak ?? 0}
+          streak={user?.current_streak ?? user?.streak ?? 0}
           onLogout={handleLogout}
           isSigningOut={isSigningOut}
         />
@@ -74,6 +83,7 @@ export default function MainLayout() {
           glossary={currentModuleResources.glossary}
           worksCited={currentModuleResources.worksCited}
         />
+        <Toast isOpen={hasToasts} {...currentToast} onClose={closeToast} />
         <ConsentBanner />
       </div>
     </OnboardingProvider>

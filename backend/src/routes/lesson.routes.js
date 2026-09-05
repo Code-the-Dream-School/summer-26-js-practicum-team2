@@ -6,6 +6,7 @@ const {
   completeLesson,
   restartLessonProgress,
   getLessonModules,
+  completeMicroLesson,
 } = require("../controllers/lesson.controller");
 
 const router = express.Router();
@@ -23,6 +24,8 @@ router.post("/progress/complete", completeLesson);
 
 //PATCH /api/v1/lessons/progress/restart
 router.patch("/progress/restart", restartLessonProgress);
+//POST /api/v1/lessons/complete
+router.post("/complete", completeMicroLesson);
 
 // Declared last so "/progress" is not swallowed by the :moduleId param.
 // GET /api/v1/lessons/:moduleId/:lessonId

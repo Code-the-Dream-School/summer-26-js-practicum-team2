@@ -37,6 +37,7 @@ vi.mock("../../../utils/quizScoring", () => ({
 
 // Route progress calls through shared mocks so we can check what LearnFlow sends to the API.
 vi.mock("../../../services/api", () => ({
+  completeMicroLesson: vi.fn().mockResolvedValue({}),
   completeLesson: (...args) => completeLessonMock(...args),
   updateLessonProgress: (...args) => updateLessonProgressMock(...args),
   restartLessonProgress: (...args) => restartLessonProgressMock(...args),

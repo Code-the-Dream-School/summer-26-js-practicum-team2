@@ -3,8 +3,10 @@ const { updateOnboardingProgressSchema } = require("../validation/userValidation
 const User = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
 
-//Configure XP reward per completed page tour
-const TOUR_XP_REWARD = 50;
+const { calculateXpDelta } = require("../utils/coreRules");
+const XpEvent = require("../models/XpEvent.model");
+const { getXpEarnedToday } = require("../services/xp.service");
+const { invalidateDashboardCache } = require("./dashboard.controller");
 
 const TOUR_KEYS = ["dashboardPage", "profilePage", "lessonPage", "learningPath"];
 
@@ -39,6 +41,7 @@ const toggleOnboardingWorkflow = async (req, res, next) => {
     if (enabled) {
       user.onboarding = {
         is_completed: false,
+        xp_awarded: user.onboarding.xp_awarded ?? false,
         current_step: 0,
         started_at: new Date(),
         completed_at: null,
@@ -63,6 +66,7 @@ const toggleOnboardingWorkflow = async (req, res, next) => {
     //update mongo database object fields have changed
     user.markModified("onboarding");
     await user.save();
+    invalidateDashboardCache(userId);
 
     return res.status(StatusCodes.OK).json({
       success: true,
@@ -170,8 +174,22 @@ const updateOnboardingProgress = async (req, res, next) => {
       user.onboarding.completed_at = new Date();
       //points awards for full complete onboarding with zero skipping
 
-      if (noSkippedTours) {
-        xpAwarded = TOUR_XP_REWARD;
+      if (noSkippedTours && !user.onboarding.xp_awarded) {
+        const currentTotal = await getXpEarnedToday(userId);
+        xpAwarded = calculateXpDelta({
+          eventType: "onboarding_complete",
+          isFirstTime: true,
+          currentTotal,
+        }).amount;
+        if (xpAwarded > 0) {
+          user.onboarding.xp_awarded = true;
+          await XpEvent.create({
+            user_id: userId,
+            event_type: "onboarding_complete",
+            amount: xpAwarded,
+            reference_id: "onboarding",
+          });
+        }
         await UserProgress.findOneAndUpdate(
           { user_id: userId },
           { $inc: { xp: xpAwarded } },
@@ -181,6 +199,7 @@ const updateOnboardingProgress = async (req, res, next) => {
     }
     user.markModified("onboarding");
     await user.save();
+    invalidateDashboardCache(userId);
     return res.status(StatusCodes.OK).json({
       success: true,
       message:
@@ -188,6 +207,11 @@ const updateOnboardingProgress = async (req, res, next) => {
           ? `You completed the tour. You earned ${xpAwarded} XP.`
           : "Onboarding progress has been updated.",
       xpAwarded,
+      rewards: {
+        xp: xpAwarded > 0 ? [{ type: "onboarding_complete", amount: xpAwarded }] : [],
+        badges: [],
+        streak: null,
+      },
       onboarding: user.onboarding,
       statistics: {
         allCompleted: noSkippedTours,
@@ -212,6 +236,7 @@ const resetOnboardingProgress = async (req, res, next) => {
     //reset onboarding subdocument
     user.onboarding = {
       is_completed: false,
+      xp_awarded: user.onboarding?.xp_awarded ?? false,
       started_at: null,
       completed_at: null,
       tours: createDefaultTours(),
@@ -219,6 +244,7 @@ const resetOnboardingProgress = async (req, res, next) => {
     user.markModified("onboarding");
     //save the user infor in the database
     await user.save();
+    invalidateDashboardCache(userId);
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Onboarding tour was reset successfully.",

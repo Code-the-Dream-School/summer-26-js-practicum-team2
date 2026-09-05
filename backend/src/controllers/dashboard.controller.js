@@ -7,6 +7,8 @@ const { buildLearningPath, pickCurrentNode } = require("../utils/learningPath");
 const { getModule } = require("../utils/content");
 const { getLearningMotivation } = require("../utils/learningStats");
 const { dashboardEventSchema, validateRequest } = require("../validation/userValidation");
+const { getUserXpTotal } = require("../services/xp.service");
+const { getDisplayStreak } = require("../utils/streaks");
 
 const DASHBOARD_CACHE_TTL_MS = 30 * 1000;
 const DEFAULT_MODULE_ID = "cashFlow";
@@ -89,31 +91,36 @@ function getNextAction(modules, progressByModule, units) {
   };
 }
 
-function getHero(userName, units, nextAction, motivation) {
+function getHero(user, units, nextAction, motivation) {
   const totalLessons = units.reduce((sum, unit) => sum + unit.totalLessons, 0);
   const completedLessons = units.reduce((sum, unit) => sum + unit.completedLessons, 0);
   const isNewUser = completedLessons === 0;
   const isAllCaughtUp = totalLessons > 0 && completedLessons >= totalLessons;
   let state = "in_progress";
-  let greeting = `Welcome back, ${userName}`;
+  let greeting = `Welcome back, ${user.name || "Learner"}`;
   let statusText = "Nice pace. Your next lesson is ready when you are.";
 
   if (isNewUser) {
     state = "new_user";
-    greeting = `Welcome, ${userName}`;
+    greeting = `Welcome, ${user.name}`;
     statusText = "Start with one short lesson and get your first win today.";
   } else if (isAllCaughtUp) {
     state = "all_caught_up";
-    greeting = `You're caught up, ${userName}`;
+    greeting = `You're caught up, ${user.name}`;
     statusText = "Great work finishing every lesson. A quick review can keep the habit warm.";
   }
 
   return {
     state,
-    displayName: userName,
+    displayName: user.name || "Learner",
     greeting,
     statusText,
-    streak: motivation.streak,
+    streak: {
+      ...motivation.streak,
+      currentDays: Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak)),
+      longestDays: user.streak?.longest ?? 0,
+      activeLearningDays: user.streak?.active_learning_days ?? 0,
+    },
     dailyGoal: motivation.dailyGoal,
     primaryAction: { label: nextAction.ctaLabel, href: nextAction.href },
   };
@@ -198,10 +205,11 @@ exports.getDashboard = async (req, res, next) => {
         .json(cached.payload);
     }
 
-    const user = await User.findById(userId).select("name");
+    const user = await User.findById(userId).select("name streak timezone earned_badges");
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
     }
+    const xpTotal = await getUserXpTotal(userId);
 
     const databaseModules = await LessonModule.find({}).lean();
     const defaultModule = databaseModules.length === 0 ? await getModule(DEFAULT_MODULE_ID) : null;
@@ -221,9 +229,13 @@ exports.getDashboard = async (req, res, next) => {
       getRecentActivity(userId, new Map(modules.map((module) => [module.id, module]))),
     ]);
     const payload = {
-      hero: getHero(user.name || "Learner", units, nextAction, motivation),
+      hero: getHero(user, units, nextAction, motivation),
       progress,
       nextAction,
+      xp: {
+        total: xpTotal,
+      },
+      badges: user.earned_badges || [],
       units,
       recentActivity,
       meta: {

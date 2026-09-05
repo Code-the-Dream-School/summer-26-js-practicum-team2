@@ -7,6 +7,8 @@ const AdminBootstrap = require("../models/AdminBootstrap.model.js");
 const { hashPassword, comparePassword } = require("../utils/password.js");
 const { clearSessionCookie, issueSession } = require("../utils/session");
 const { isWithinReactivationGracePeriod, reactivateAccount } = require("../utils/accountDeletion");
+const { getUserXpTotal } = require("../services/xp.service");
+const { getDisplayStreak } = require("../utils/streaks");
 const { getLearningMotivation } = require("../utils/learningStats");
 const {
   registerSchema,
@@ -59,7 +61,7 @@ const register = async (req, res, next) => {
     }
     //3. Check if user exists already using JOI userValidation )
 
-    const { name, email, password } = value;
+    const { name, email, password, timezone } = value;
 
     // using Mongoose  to figure out if the user already exists
     const previousUser = await User.findOne({ email });
@@ -79,6 +81,7 @@ const register = async (req, res, next) => {
       role: "learner",
       tos_agreement: true,
       tos_agreement_at: new Date(),
+      timezone: timezone || "UTC",
       email_verified_at: null,
       verification_token: verificationToken,
       verification_token_expires_at: tokenExpiresAt,
@@ -230,8 +233,8 @@ const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        xp: user.xp ?? 0,
-        streak: motivation.streak.currentDays,
+        xp: await getUserXpTotal(user._id),
+        streak: Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak)),
         avatar_url: user.avatar_url || null,
       },
     });
@@ -403,8 +406,8 @@ const getCurrentUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        xp: user.xp ?? 0,
-        streak: motivation.streak.currentDays,
+        xp: await getUserXpTotal(user._id),
+        streak: Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak)),
         avatar_url: user.avatar_url || null,
       },
     });
