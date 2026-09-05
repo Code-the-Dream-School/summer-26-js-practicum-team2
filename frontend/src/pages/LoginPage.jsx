@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
 import { loginSchema } from "../features/auth/schemas";
+import { getPostLoginDestination } from "../utils/postLoginRouting";
 import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const { login } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const next = new URLSearchParams(location.search).get("next");
 
   const {
     register,
@@ -26,10 +28,10 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     try {
-      await login(values);
       // Return users to the protected page they originally requested, when available.
-      const next = new URLSearchParams(location.search).get("next");
-      navigate(next || ROUTES.DASHBOARD, { replace: true });
+      const { user } = await login(values);
+      const destination = getPostLoginDestination({ user, next });
+      navigate(destination, { replace: true });
     } catch (err) {
       // Display authentication failures in the form rather than leaving the page.
       setError("root", { message: err.message });
@@ -96,7 +98,7 @@ export default function LoginPage() {
           or
           <span className="h-px flex-1 bg-neutral-200" />
         </div>
-        <OAuthButtons />
+        <OAuthButtons next={next} />
 
         <div className="mt-4 flex items-center justify-between text-small">
           <Link to={ROUTES.REGISTER} className="text-primary underline hover:text-primary-hover">

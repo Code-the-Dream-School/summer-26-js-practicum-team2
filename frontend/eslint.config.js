@@ -30,11 +30,6 @@ export default defineConfig([
       reactRefresh.configs.vite(), // Modern object config format
       eslintReact.configs.recommended, // Modern ESLint 10 React rules
     ],
-
-    plugins: {
-      react: eslintReact,
-    },
-
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

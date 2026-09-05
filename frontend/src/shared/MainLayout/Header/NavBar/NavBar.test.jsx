@@ -15,11 +15,13 @@ describe("NavBar", () => {
     );
 
     // The mobile menu should start closed for a signed-out visitor
-    const toggle = screen.getByRole("button", { name: "Toggle navigation menu" });
+    const toggle = screen.getByRole("button", { name: "Open navigation menu" });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAttribute("aria-controls");
+    expect(screen.getByRole("button", { name: "Close navigation menu" })).toBeInTheDocument();
 
     // Clicking a mobile navigation link should close the menu again
     const loginLinks = screen.getAllByRole("link", { name: "Login" });
@@ -38,11 +40,14 @@ describe("NavBar", () => {
     );
 
     // Keyboard users should be able to open the menu with Enter
-    const toggle = screen.getByRole("button", { name: "Toggle navigation menu" });
+    const toggle = screen.getByRole("button", { name: "Open navigation menu" });
     toggle.focus();
     await user.keyboard("{Enter}");
 
     expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
   });
 });

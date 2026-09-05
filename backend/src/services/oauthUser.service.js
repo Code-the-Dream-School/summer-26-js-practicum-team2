@@ -32,7 +32,28 @@ const selectVerifiedEmail = (emails) => {
   return emailEntry ? emailEntry.value.trim().toLowerCase() : null;
 };
 
-const findOrCreateOAuthUser = async ({ provider, providerId, name, emails, tosAccepted }) => {
+const selectProviderAvatar = (photos) => {
+  if (!Array.isArray(photos)) return null;
+
+  const photoUrl = photos.find((entry) => typeof entry?.value === "string")?.value.trim();
+  if (!photoUrl) return null;
+
+  try {
+    const parsedUrl = new URL(photoUrl);
+    return ["http:", "https:"].includes(parsedUrl.protocol) ? parsedUrl.toString() : null;
+  } catch {
+    return null;
+  }
+};
+
+const findOrCreateOAuthUser = async ({
+  provider,
+  providerId,
+  name,
+  emails,
+  photos,
+  tosAccepted,
+}) => {
   const providerField = getProviderField(provider);
   const normalizedProviderId = typeof providerId === "string" ? providerId.trim() : "";
   if (!normalizedProviderId) {
@@ -40,6 +61,7 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, emails, tosAc
   }
 
   const email = selectVerifiedEmail(emails);
+  const avatarUrl = selectProviderAvatar(photos);
   if (!email) {
     throw new OAuthUserError(
       "OAUTH_VERIFIED_EMAIL_REQUIRED",
@@ -48,7 +70,13 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, emails, tosAc
   }
 
   const providerUser = await User.findOne({ [providerField]: normalizedProviderId });
-  if (providerUser) return providerUser;
+  if (providerUser) {
+    if (avatarUrl && providerUser.avatar_url !== avatarUrl) {
+      providerUser.avatar_url = avatarUrl;
+      await providerUser.save();
+    }
+    return providerUser;
+  }
 
   const emailUser = await User.findOne({ email });
   if (emailUser) {
@@ -60,6 +88,7 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, emails, tosAc
     }
 
     emailUser[providerField] = normalizedProviderId;
+    if (avatarUrl) emailUser.avatar_url = avatarUrl;
     await emailUser.save();
     return emailUser;
   }
@@ -79,11 +108,13 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, emails, tosAc
     tos_agreement: true,
     tos_agreement_at: new Date(),
     email_verified_at: new Date(),
+    avatar_url: avatarUrl,
   });
 };
 
 module.exports = {
   OAuthUserError,
   findOrCreateOAuthUser,
+  selectProviderAvatar,
   selectVerifiedEmail,
 };

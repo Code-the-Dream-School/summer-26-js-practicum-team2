@@ -52,6 +52,13 @@ supports:
 Both the route parameter and body are validated before grading or database
 access.
 
+## Immediate Quiz Feedback
+
+`POST /api/v1/quizzes/check` accepts a required `microLessonId`, `questionId`, and `choiceIds`,
+with an optional `moduleId` that defaults to `cashFlow`. This is an intentional immediate-feedback
+endpoint: once a caller submits an answer, its response includes `isCorrect`, `correctChoiceIds`,
+and `explanation`.
+
 ## Password Recovery
 
 `POST /api/v1/users/forgot-password`
@@ -65,6 +72,9 @@ access.
 
 Registration and login retain their existing validation behavior. Password
 recovery uses Joi's sanitized values for database queries and password hashing.
+
+`POST /api/v1/users/reactivate` uses the same normalized email and password validation as login,
+and is protected by the login credential rate limiter.
 
 ## Dashboard Events
 

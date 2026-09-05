@@ -23,8 +23,12 @@ vi.mock("../context/AuthContext", () => ({
 
 vi.mock("../services/api", () => ({
   getOAuthProviders: mockGetOAuthProviders,
-  getOAuthUrl: (provider, tosAccepted = false) =>
-    `/api/v1/auth/${provider}${tosAccepted ? "?tos=true" : ""}`,
+  getOAuthUrl: (provider, tosAccepted = false, next) => {
+    const query = new URLSearchParams();
+    if (tosAccepted) query.set("tos", "true");
+    if (next) query.set("next", next);
+    return `/api/v1/auth/${provider}${query.size ? `?${query}` : ""}`;
+  },
 }));
 
 describe("auth pages", () => {
@@ -126,6 +130,21 @@ describe("auth pages", () => {
     );
   });
 
+  it("passes the requested destination into the real OAuth start URL", async () => {
+    render(
+      <MemoryRouter initialEntries={["/login?next=%2Flearn%2FcashFlow%2F1.1"]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole("link", { name: "Continue with Google" })).toHaveAttribute(
+      "href",
+      "/api/v1/auth/google?next=%2Flearn%2FcashFlow%2F1.1",
+    );
+  });
+
   it("hydrates the OAuth session and redirects to the dashboard", async () => {
     mockAuth.completeOAuthLogin.mockResolvedValue({ id: "oauth-user" });
 
@@ -142,6 +161,36 @@ describe("auth pages", () => {
       expect(mockAuth.completeOAuthLogin).toHaveBeenCalledTimes(1);
       expect(screen.getByText("Dashboard page")).toBeInTheDocument();
     });
+  });
+
+  it("redirects an OAuth admin to the admin dashboard when next is absent", async () => {
+    mockAuth.completeOAuthLogin.mockResolvedValue({ id: "admin-user", role: "admin" });
+
+    render(
+      <MemoryRouter initialEntries={["/oauth/callback"]}>
+        <Routes>
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/admin/dashboard" element={<div>Admin dashboard</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Admin dashboard")).toBeInTheDocument();
+  });
+
+  it("falls back to the normal dashboard for an unsafe OAuth next destination", async () => {
+    mockAuth.completeOAuthLogin.mockResolvedValue({ id: "learner-user", role: "learner" });
+
+    render(
+      <MemoryRouter initialEntries={["/oauth/callback?next=https%3A%2F%2Fexample.com"]}>
+        <Routes>
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/dashboard" element={<div>Dashboard page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Dashboard page")).toBeInTheDocument();
   });
 
   it("shows an error when OAuth session hydration fails", async () => {
@@ -229,6 +278,24 @@ describe("auth pages", () => {
     // The registration conflict should be shown as an error for the email field.
     await waitFor(() => {
       expect(screen.getByText("That email is already in use.")).toBeInTheDocument();
+    });
+  });
+
+  it("OAuth preserves a valid next destination for learner users", async () => {
+    mockAuth.completeOAuthLogin.mockResolvedValue({ id: "learner-user", role: "learner" });
+
+    render(
+      <MemoryRouter initialEntries={["/oauth/callback?next=%2Flearn%2FcashFlow%2F1.1"]}>
+        <Routes>
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/learn/cashFlow/1.1" element={<div>Lesson page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(mockAuth.completeOAuthLogin).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("Lesson page")).toBeInTheDocument();
     });
   });
 });

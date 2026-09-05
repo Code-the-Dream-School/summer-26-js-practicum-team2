@@ -22,7 +22,10 @@ const completeOAuthLogin = (req, res) => {
 
   issueAuthenticatedSession({ req, res, user });
 
-  return res.redirect(`${CLIENT_URL}/oauth/callback`);
+  const callbackUrl = new URL("/oauth/callback", CLIENT_URL);
+  if (req.oauth?.next) callbackUrl.searchParams.set("next", req.oauth.next);
+
+  return res.redirect(callbackUrl.toString());
 };
 
 const oauthFailureRedirect = getOAuthFailureRedirect();

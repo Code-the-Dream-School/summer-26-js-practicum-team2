@@ -136,6 +136,40 @@ describe("OAuth authentication", () => {
     expect(reusedResponse.headers.location).toBe("http://localhost:5173/login?error=oauth_failed");
   });
 
+  it("restores a valid next destination only after OAuth state validation", async () => {
+    const agent = request.agent(app);
+    await agent.get("/api/v1/auth/google").query({ next: "/learn/cashFlow/1.1" }).redirects(0);
+    const state = passport.authenticate.mock.calls[0][1].state;
+
+    const callbackResponse = await agent
+      .get("/api/v1/auth/google/callback")
+      .query({ state, code: "provider-code", next: "https://provider.example/unsafe" })
+      .redirects(0);
+
+    expect(callbackResponse.headers.location).toBe(
+      "http://localhost:5173/oauth/callback?next=%2Flearn%2FcashFlow%2F1.1",
+    );
+    expect(callbackResponse.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringContaining("oauth_next_google=;")]),
+    );
+  });
+
+  it.each(["https://example.com/phishing", "//example.com/phishing", "/\\example.com/phishing"])(
+    "does not preserve unsafe next destination %s",
+    async (next) => {
+      const agent = request.agent(app);
+      await agent.get("/api/v1/auth/github").query({ next }).redirects(0);
+      const state = passport.authenticate.mock.calls[0][1].state;
+
+      const callbackResponse = await agent
+        .get("/api/v1/auth/github/callback")
+        .query({ state, code: "provider-code" })
+        .redirects(0);
+
+      expect(callbackResponse.headers.location).toBe("http://localhost:5173/oauth/callback");
+    },
+  );
+
   it.each([
     ["missing", undefined],
     ["mismatched", "unexpected-state"],
