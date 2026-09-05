@@ -2,9 +2,11 @@ function Table({ content, module }) {
   // Check if the module is available
   if (!module) return <div>Module not found</div>;
   // Check if the content is available
-  const tableId = content?.tableId || content.budgetId;
+  const tableId = content?.tableId ?? content?.budgetId;
   // If tableId is not provided, default to the first table in the module
-  const table = module.tables?.find((table) => table.tableId === tableId);
+  const table = tableId
+    ? module.tables?.find((item) => item.tableId === tableId)
+    : module.tables?.[0];
 
   if (!table) {
     return <div>Table not found</div>;
