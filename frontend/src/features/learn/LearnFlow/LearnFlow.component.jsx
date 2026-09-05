@@ -29,8 +29,8 @@ import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.componen
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
 
-import Toast from "../shared/Toast/Toast.component";
-import useRewardQueue from "../hooks/useRewardQueue";
+import Toast from "../../../shared/Toast/Toast.component";
+import useRewardQueue from "../../../hooks/useRewardQueue";
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
