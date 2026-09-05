@@ -23,4 +23,5 @@ POST   /api/v1/quizzes/1.1.2/submit
 GET    /api/v1/lessons/cashFlow/1.1
 GET    /api/v1/lessons/progress?moduleId=cashFlow
 PATCH  /api/v1/lessons/progress
+PATCH  /api/v1/lessons/progress/restart
 ```
