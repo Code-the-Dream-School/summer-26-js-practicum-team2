@@ -4,6 +4,7 @@ const variantClasses = {
   default: "border-neutral-300 bg-surface-input text-foreground",
   success: "border-primary bg-primary text-on-primary",
   badge: "border-primary-alt bg-surface-inset text-heading",
+  xp: "border-yellow-400 bg-yellow-100 text-yellow-900",
 };
 
 export default function Toast({
@@ -27,7 +28,7 @@ export default function Toast({
     return () => {
       clearTimeout(timer);
     };
-  }, [isOpen, duration, onClose]);
+  }, [isOpen, variant, message, duration, onClose]);
 
   // Don't show anything if the toast is closed
   if (!isOpen) return null;

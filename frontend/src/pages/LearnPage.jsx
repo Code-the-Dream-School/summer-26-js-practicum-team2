@@ -28,6 +28,7 @@ import ramonaImg from "../assets/ramona.webp";
 import rightAnswerIcon from "../assets/right_answer.svg";
 import wrongAnswerIcon from "../assets/wrong_answer.svg";
 import Toast from "../shared/Toast/Toast.component";
+import useRewardQueue from "../hooks/useRewardQueue";
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
@@ -69,7 +70,7 @@ function LearnFlow({
   const [submissions, setSubmissions] = useState({});
 
   //Toast state for rewards like badges, xp, and streaks
-  const [rewardToastQueue, setRewardToastQueue] = useState([]);
+  const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
 
   const currentStep = lessonSteps[stepIndex];
   const chunks = currentStep?.content ?? [];
@@ -152,8 +153,6 @@ function LearnFlow({
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
 
-  const rewardToast = rewardToastQueue[0];
-
   async function advanceStep() {
     if (!isReadOnly && currentMicroLessonId) {
       const response = await completeMicroLesson({
@@ -165,39 +164,8 @@ function LearnFlow({
       console.log("Rewards:", response.rewards);
 
       //Toast notifications for badges, xp, and streaks earned
-      const newToasts = [];
 
-      // (response?.rewards?.xp ?? []).forEach((reward) => {
-      //   const messages = {
-      //     quiz_pass: `⭐ +${reward.amount} XP for passing your first quiz!`,
-      //     quiz_perfect: `🎯 +${reward.amount} XP for a perfect score!`,
-      //     lesson_complete: `📚 +${reward.amount} XP for completing a lesson!`,
-      //     onboarding_complete: `🌱 +${reward.amount} XP for completing onboarding!`,
-      //   };
-
-      //   newToasts.push({
-      //     variant: "xp",
-      //     message: messages[reward.type],
-      //   });
-      // });
-
-      if (response?.rewards?.streak?.streakAwarded) {
-        newToasts.push({
-          variant: "streak",
-          message: `🔥 ${response.rewards.streak.currentStreak}-day streak!`,
-        });
-      }
-
-      (response?.rewards?.badges ?? []).forEach((badge) => {
-        newToasts.push({
-          variant: "badge",
-          message: `New Badge Earned: ${badge.icon} ${badge.title} - ${badge.description}`,
-        });
-      });
-
-      setRewardToastQueue((current) => [...current, ...newToasts]);
-
-      console.log("TOASTS Array:", newToasts);
+      addRewards(response.rewards);
 
       //clearDashboardCache(auth.user.id);
 
@@ -216,10 +184,6 @@ function LearnFlow({
     }
 
     setIsComplete(true);
-  }
-
-  function handleToastClose() {
-    setRewardToastQueue((current) => current.slice(1));
   }
 
   function goForward() {
@@ -245,27 +209,12 @@ function LearnFlow({
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
 
+    addRewards(submission?.rewards);
+
     console.log("QUIZ SUBMISSION:", submission);
-
-    if (submission?.rewards?.xp?.length) {
-      const xpToasts = submission.rewards.xp.map((reward) => {
-        const messages = {
-          quiz_pass: `⭐ +${reward.amount} XP for passing your first quiz!`,
-          quiz_perfect: `🎯 +${reward.amount} XP for a perfect score!`,
-          lesson_complete: `📚 +${reward.amount} XP for completing a lesson!`,
-          onboarding_complete: `🌱 +${reward.amount} XP for completing onboarding!`,
-        };
-
-        return {
-          variant: "xp",
-          message: messages[reward.type],
-        };
-      });
-
-      console.log("XP TOASTS:", xpToasts);
-
-      setRewardToastQueue((current) => [...current, ...xpToasts]);
-    }
+    console.log("QUIZ REWARDS:", submission?.rewards);
+    console.log("QUIZ XP:", submission?.rewards?.xp);
+    console.log("QUIZ XP LENGTH:", submission?.rewards?.xp?.length);
 
     if (submission) {
       setSubmissions((current) => ({ ...current, [currentMicroLessonId]: submission }));
@@ -339,6 +288,12 @@ function LearnFlow({
             )}
           </div>
         </Card>
+        <Toast
+          isOpen={hasToasts}
+          variant={currentToast?.variant ?? "default"}
+          message={currentToast?.message ?? ""}
+          onClose={closeToast}
+        />
       </section>
     );
   }
@@ -452,10 +407,10 @@ function LearnFlow({
         )}
       </Card>
       <Toast
-        isOpen={rewardToastQueue.length > 0}
-        variant={rewardToast?.variant ?? "default"}
-        message={rewardToast?.message ?? ""}
-        onClose={handleToastClose}
+        isOpen={hasToasts}
+        variant={currentToast?.variant ?? "default"}
+        message={currentToast?.message ?? ""}
+        onClose={closeToast}
       />
     </section>
   );
