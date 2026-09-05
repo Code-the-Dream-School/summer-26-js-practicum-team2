@@ -24,6 +24,9 @@ import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.componen
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
 
+import Toast from "../shared/Toast/Toast.component";
+import useRewardQueue from "../hooks/useRewardQueue";
+
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
     return {
@@ -52,8 +55,12 @@ export default function LearnFlow({
   savedProgress = null,
   csrfToken,
   isReadOnly = false,
+  refreshProfile,
 }) {
   const { lessonSteps } = learnData;
+
+  //Toast state for rewards like badges, xp, and streaks
+  const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
 
   const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
   const [chunkIndex, setChunkIndex] = useState(() => {
@@ -182,7 +189,28 @@ export default function LearnFlow({
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
 
-  function advanceStep() {
+  async function advanceStep() {
+    if (!isReadOnly && currentMicroLessonId) {
+      const response = await completeMicroLesson({
+        moduleId: learnData.moduleId,
+        microLessonId: currentMicroLessonId,
+        csrfToken,
+      });
+
+      console.log("Rewards:", response.rewards);
+
+      //Toast notifications for badges, xp, and streaks earned
+
+      addRewards(response.rewards);
+
+      //clearDashboardCache(auth.user.id);
+      await refreshProfile();
+
+      console.log("DISPATCHING DASHBOARD REFRESH EVENT");
+
+      notifyDashboardProgressChanged();
+    }
+
     if (!isLastStep) {
       setStepIndex((current) => current + 1);
       setChunkIndex(0);
@@ -273,12 +301,20 @@ export default function LearnFlow({
 
   if (isComplete && isReviewing) {
     return (
-      <QuizReview
-        attempts={completedAttempts}
-        onDone={() => setIsReviewing(false)}
-        rightAnswerIcon={rightAnswerIcon}
-        wrongAnswerIcon={wrongAnswerIcon}
-      />
+      <>
+        <QuizReview
+          attempts={completedAttempts}
+          onDone={() => setIsReviewing(false)}
+          rightAnswerIcon={rightAnswerIcon}
+          wrongAnswerIcon={wrongAnswerIcon}
+        />
+        <Toast
+          isOpen={hasToasts}
+          variant={currentToast?.variant ?? "default"}
+          message={currentToast?.message ?? ""}
+          onClose={closeToast}
+        />
+      </>
     );
   }
 
@@ -339,6 +375,12 @@ export default function LearnFlow({
             )}
           </div>
         </Card>
+        <Toast
+          isOpen={hasToasts}
+          variant={currentToast?.variant ?? "default"}
+          message={currentToast?.message ?? ""}
+          onClose={closeToast}
+        />
       </section>
     );
   }
@@ -466,6 +508,12 @@ export default function LearnFlow({
           </>
         )}
       </Card>
+      <Toast
+        isOpen={hasToasts}
+        variant={currentToast?.variant ?? "default"}
+        message={currentToast?.message ?? ""}
+        onClose={closeToast}
+      />
     </section>
   );
 }
