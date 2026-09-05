@@ -1,0 +1,55 @@
+{
+  "hero": {
+    "state": "in_progress",
+    "displayName": "Abigail",
+    "greeting": "Welcome back, Abigail",
+    "statusText": "Nice pace. Your next lesson is ready when you are.",
+    "streak": {
+      "currentDays": 1,
+      "helperText": "1-day learning streak."
+    },
+    "dailyGoal": {
+      "type": "learning_checks",
+      "current": 1,
+      "target": 1,
+      "isMet": true,
+      "label": "1 / 1 learning check"
+    },
+    "primaryAction": {
+      "label": "Continue Income",
+      "href": "/learn/cashFlow/1.2"
+    }
+  },
+  "progress": {
+    "completedLessons": 1,
+    "totalLessons": 4,
+    "overallPercent": 25
+  },
+  "nextAction": {
+    "title": "Income",
+    "description": "Pick up where you left off.",
+    "ctaLabel": "Continue Income",
+    "href": "/learn/cashFlow/1.2"
+  },
+  "units": [
+    {
+      "id": "cashFlow",
+      "name": "Budgeting and Cash Flow Basics",
+      "completedLessons": 1,
+      "totalLessons": 4,
+      "totalMicroLessons": 14,
+      "progressPercent": 25
+    }
+  ],
+  "recentActivity": [
+    {
+      "id": "attempt-1",
+      "label": "Passed quiz: What is a Budget? (100%)",
+      "timeLabel": "8/14/2026, 2:05:00 PM"
+    }
+  ],
+  "meta": {
+    "cachedForMs": 30000,
+    "generatedAt": "2026-08-14T14:05:00.000Z"
+  }
+}

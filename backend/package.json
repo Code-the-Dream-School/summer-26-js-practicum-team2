@@ -1,23 +1,88 @@
 {
-  "name": "basic-backend-api",
-  "version": "1.1.0",
-  "description": "Node + Express backend API",
+  "name": "sprout-backend",
+  "version": "0.0.0",
+  "description": "This is the backend code for a financial literacy app created for Code the Dream's Summer Practicum 2026",
+  "keywords": [
+    "backend",
+    "mongodb",
+    "cloud",
+    "financial-literacy",
+    "collab",
+    "team",
+    "group"
+  ],
+  "homepage": "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2#readme",
+  "bugs": {
+    "url": "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2.git"
+  },
+  "license": "ISC",
+  "author": "kwishart24,berenicerojas,BytesOfStrength,mnichols08",
   "main": "server.js",
+  "type": "commonjs",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
+    "dev": "nodemon server",
+    "start": "node server",
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:coverage": "cross-env NODE_ENV=test jest --runInBand --coverage",
+    "lint": "eslint . --max-warnings 0 && echo 'Backend ESLint checks passed successfully'",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.5",
-    "helmet": "^7.1.0",
-    "morgan": "^1.10.0",
-    "express-rate-limit": "^7.3.0",
-    "mongoose": "^8.4.0",
-    "pg": "^8.11.5"
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "helmet": "^8.3.0",
+    "http-status-codes": "^2.3.0",
+    "joi": "^18.2.5",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.4",
+    "morgan": "^1.12.0",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "multer": "^2.2.0",
+    "sprout": "file:.."
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "@eslint/js": "^10.0.1",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.9.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.11.0",
+    "jest": "^30.5.0",
+    "mongodb-memory-server": "^11.2.0",
+    "nodemon": "^3.0.3",
+    "prettier": "3.9.6",
+    "supertest": "^7.1.4"
+  },
+  "overrides": {
+    "glob": "^13.0.6",
+    "test-exclude": "^8.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/test/**/*.test.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 85,
+        "branches": 60,
+        "functions": 90,
+        "lines": 85
+      }
+    }
+  },
+  "allowScripts": {
+    "mongodb-memory-server@10.4.3": true,
+    "unrs-resolver@1.12.2": true
   }
 }
