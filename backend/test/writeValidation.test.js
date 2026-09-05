@@ -28,6 +28,11 @@ const expectValidationError = (response) => {
   expect(response.body.errors.length).toBeGreaterThan(0);
 };
 
+const expectRequiredFieldError = (response, message) => {
+  expect(response.status).toBe(400);
+  expect(response.body.message).toBe(message);
+};
+
 describe("write endpoint input validation", () => {
   test("accepts supported password policy variants while rejecting weak passwords", () => {
     expect(passwordSchema.validate("YxNqSSe9uqCCVAEx").error).toBeUndefined();
@@ -65,7 +70,7 @@ describe("write endpoint input validation", () => {
       .set(authHeader())
       .send({ moduleId: "cashFlow" });
 
-    expectValidationError(response);
+    expectRequiredFieldError(response, "lessonId or microLessonId is required.");
   });
 
   test("rejects invalid lesson progress module IDs", async () => {
@@ -81,15 +86,13 @@ describe("write endpoint input validation", () => {
     // Leave out the required microLessonId before the request reaches quiz logic.
     const response = await request(app).post("/api/v1/quizzes/start").set(authHeader()).send({});
 
-    expectValidationError(response);
-    expect(response.body.errors.join(" ")).toContain("required");
+    expectRequiredFieldError(response, "microLessonId is required.");
   });
 
   test("rejects quiz starts with a missing request body", async () => {
     const response = await request(app).post("/api/v1/quizzes/start").set(authHeader());
 
-    expectValidationError(response);
-    expect(response.body.errors.join(" ")).toContain("required");
+    expectRequiredFieldError(response, "microLessonId is required.");
   });
 
   test("rejects invalid quiz submission route parameters before grading", async () => {

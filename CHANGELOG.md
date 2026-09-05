@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.3.8] - 2026-09-01
+
+### Added
+
+- Added core rule utilities and corresponding tests for XP awards and caps, streak/freeze status, and lesson-unlock gating.
+- Added backend API integration, contract, and negative-path coverage for authentication, password reset, logout/CSRF protection, lesson and dashboard progress, quiz persistence and submission, middleware/error responses, security headers, and rate limiting.
+- Added shared backend authentication and request helpers to reduce repeated Authorization and session-plus-CSRF setup across integration tests.
+- Added backend coverage enforcement through `test:coverage` with global Jest coverage thresholds.
+- Added frontend regression and unit coverage for authentication, dashboard caching and refresh, lesson loading and navigation, learning-path state, quiz interactions and review flows, reducers, shared components, accessibility behavior, consent analytics, and email verification.
+- Added Playwright end-to-end testing with Chromium, including browser smoke coverage for protected-route redirects and keyboard navigation through the responsive mobile menu.
+- Added CI artifacts for frontend test output, frontend builds, backend coverage, and Playwright reports/results to improve failure diagnostics.
+- Added a keyboard-accessible "Skip to content" link and main-content target to the shared application layout.
+
+### Changed
+
+- Updated CI pull-request triggers from `docs` to `main`.
+- Updated backend CI to enforce coverage thresholds and added browser journey checks to the CI pipeline.
+- Updated email-verification errors to use alert semantics so they are announced by assistive technology.
+- Updated formatting and test-result ignore configuration for generated coverage, build, and Playwright artifacts.
+
+### Fixed
+
+- Fixed the Express error-handler middleware contract to accept `next` and forward errors when response headers have already been sent.
+
+---
+
 ## [0.3.7] - 2026-08-25
 
 ### Added
