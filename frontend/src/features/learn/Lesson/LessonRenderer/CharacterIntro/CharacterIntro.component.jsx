@@ -13,14 +13,6 @@ function CharacterIntro({ content }) {
     imageSrc = ramonaImage;
   }
 
-  //   const character = module.characters.find(
-  //     (character) => character.characterId === content.characterId,
-  //   )
-
-  //   if (!character) {
-  //     return <div>Character not found</div>
-  //   }
-
   return (
     <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm items-center text-center md:text-left">
       <div className="mb-5 text-sm font-semibold uppercase tracking-wide text-blue-600">

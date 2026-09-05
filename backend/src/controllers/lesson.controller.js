@@ -111,7 +111,7 @@ exports.updateLessonProgress = async (req, res, next) => {
     const progressRecord = await UserProgress.findOneAndUpdate(
       { user_id: req.user.id, module_id: moduleId },
       { $set: update },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
 
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));

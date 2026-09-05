@@ -11,12 +11,12 @@ const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 
 //we want  sameSite cookies to be lax as per userStory 2.1
-const getCookieOptions = (_req, maxAge) => ({
+const getCookieOptions = (req, maxAge) => ({
   httpOnly: true,
-  secure: process.env.COOKIE_SECURE === "true",
-  sameSite: process.env.COOKIE_SAME_SITE || "lax",
+  secure: process.env.NODE_ENV === "production", // only when HTTPS is available
+  sameSite: "lax",
   path: "/",
-  ...(maxAge !== undefined ? { maxAge } : {}),
+  maxAge,
 });
 
 //function register registers a new user document in MongoDB user story 2.1.6
