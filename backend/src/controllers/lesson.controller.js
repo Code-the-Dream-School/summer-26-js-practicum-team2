@@ -88,11 +88,9 @@ exports.getLessonProgress = async (req, res, next) => {
 // Saves the caller's current position so it can be resumed later. Completion state is untouched.
 exports.updateLessonProgress = async (req, res, next) => {
   try {
-    const requestBody = req.body ?? {};
-    if (
-      typeof requestBody.lessonId === "undefined" &&
-      typeof requestBody.microLessonId === "undefined"
-    ) {
+    const { lessonId, microLessonId } = req.body ?? {};
+
+    if (!lessonId && !microLessonId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "lessonId or microLessonId is required.",
       });
@@ -100,7 +98,13 @@ exports.updateLessonProgress = async (req, res, next) => {
 
     const validatedBody = validateRequest(res, lessonProgressSchema, req.body);
     if (!validatedBody) return;
-    const { moduleId, lessonId, microLessonId, currentChunkIndex } = validatedBody;
+
+    const {
+      moduleId = DEFAULT_MODULE_ID,
+      lessonId: validatedLessonId,
+      microLessonId: validatedMicroLessonId,
+      currentChunkIndex,
+    } = validatedBody;
 
     if (!getModule(moduleId)) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -109,11 +113,11 @@ exports.updateLessonProgress = async (req, res, next) => {
     }
 
     const update = {};
-    if (lessonId) {
-      update.course_lesson_id = lessonId;
+    if (validatedLessonId) {
+      update.course_lesson_id = validatedLessonId;
     }
-    if (microLessonId) {
-      update.current_micro_lesson_id = microLessonId;
+    if (validatedMicroLessonId) {
+      update.current_micro_lesson_id = validatedMicroLessonId;
     }
     if (typeof currentChunkIndex === "number") {
       update.current_chunk_index = currentChunkIndex;

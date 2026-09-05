@@ -49,9 +49,9 @@ describe("quiz submission grading (backend)", () => {
         attemptId: startA.body.attemptId,
         moduleId: "cashFlow",
         answers: {
-          "1.1.2-q1": ["d"],
-          "1.1.2-q2": ["b"], // wrong; correct answer is "a"
-          "1.1.2-q3": ["a"],
+          "1.1.2-q2": ["d"],
+          "1.1.2-q3": ["b"], // wrong; correct answer is "a"
+          "1.1.2-q4": ["a"],
         },
       });
 
@@ -73,9 +73,9 @@ describe("quiz submission grading (backend)", () => {
         attemptId: startB.body.attemptId,
         moduleId: "cashFlow",
         answers: {
-          "1.1.4-q1": ["c"],
-          "1.1.4-q2": ["a"],
-          "1.1.4-q3": ["b", "d"],
+          "1.1.3-q1": ["c"],
+          "1.1.3-q2": ["a"],
+          "1.1.3-q3": ["b", "d"],
         },
       });
 

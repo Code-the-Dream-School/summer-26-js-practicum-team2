@@ -90,7 +90,9 @@ describe("auth form password policy UX", () => {
     await user.type(screen.getByLabelText("Email"), "taylor@example.com");
     await user.type(screen.getByLabelText("Password"), "VeryLongPasswordWithoutDigits");
     await user.type(screen.getByLabelText("Confirm password"), "VeryLongPasswordWithoutDigits");
-    await user.click(screen.getByRole("checkbox"));
+    await user.click(
+      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
+    );
     await user.click(screen.getByRole("button", { name: "Create account" }));
 
     expect(

@@ -1,7 +1,4 @@
-import { useState } from "react";
-import { NavLink, useLocation } from "react-router";
-import GlossaryModal from "../../../features/learn/GlossaryModal/GlossaryModal.component.jsx";
-import glossaryIcon from "../../../assets/glossary_icon.svg";
+import { NavLink } from "react-router";
 
 const footerNavLinks = [
   { label: "Home", to: "/" },
@@ -13,15 +10,9 @@ const footerNavLinks = [
   },
 ];
 
-export default function Footer({ glossary = [], worksCited = [] }) {
-  const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
-  const [copyrightYear] = useState(() => new Date().getFullYear());
-  const location = useLocation();
+const copyrightYear = new Date().getFullYear();
 
-  const showGlossary = /^\/learn\/[^/]+\/[^/]+/.test(location.pathname);
-  const glossaryList = Array.isArray(glossary) ? glossary : [];
-  const worksCitedList = Array.isArray(worksCited) ? worksCited : [];
-
+export default function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-surface-app/90 px-4 py-8 text-sm text-neutral-600 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 text-center">
@@ -57,29 +48,8 @@ export default function Footer({ glossary = [], worksCited = [] }) {
           build knowledge, but consult a qualified professional for personal financial decisions.
         </p>
 
-        {showGlossary && (
-          <button
-            type="button"
-            onClick={() => setIsGlossaryOpen(true)}
-            aria-label="Open glossary and references"
-            title="Open glossary and references"
-            className="fixed right-3 top-1/2 z-40 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border-2 border-heading bg-surface-raised shadow-md transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:right-6"
-          >
-            <img src={glossaryIcon} alt="" aria-hidden="true" className="h-6 w-6" />
-          </button>
-        )}
-
-        {showGlossary && (
-          <GlossaryModal
-            isOpen={isGlossaryOpen}
-            onClose={() => setIsGlossaryOpen(false)}
-            glossary={glossaryList}
-            worksCited={worksCitedList}
-          />
-        )}
-
         <p className="text-xs text-neutral-400">
-          &copy; {copyrightYear} Sprout — Code the Dream Summer Practicum '26 | Counting Cents and
+          &copy; {copyrightYear} Sprout — Code the Dream Summer Practicum 2026 Counting Cents and
           Making Sense.
         </p>
       </div>

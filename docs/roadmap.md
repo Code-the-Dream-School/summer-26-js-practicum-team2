@@ -3,12 +3,12 @@
 ## Known Issues and Limitations
 
 - Limited role-based access control
-- No automated tests yet
+- OAuth sign-in requires Google and GitHub credentials in each deployed environment
 - Performance optimizations pending
 
 ## Future Improvements
 
-- Add automated testing (Jest, Supertest)
+- Expand regression and cross-browser test coverage
 - Improve security and validation
 - Add caching and performance improvements
 - Dockerize the application

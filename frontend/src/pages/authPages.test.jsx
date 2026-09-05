@@ -3,11 +3,17 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import LoginPage from "./LoginPage";
+import OAuthCallbackPage from "./OAuthCallbackPage";
 import RegisterPage from "./RegisterPage";
+
+const { mockGetOAuthProviders } = vi.hoisted(() => ({
+  mockGetOAuthProviders: vi.fn(),
+}));
 
 const mockAuth = {
   login: vi.fn(),
   register: vi.fn(),
+  completeOAuthLogin: vi.fn(),
 };
 
 // Use mocked auth functions so these tests can focus on the page behavior.
@@ -15,10 +21,17 @@ vi.mock("../context/AuthContext", () => ({
   useAuthContext: () => mockAuth,
 }));
 
+vi.mock("../services/api", () => ({
+  getOAuthProviders: mockGetOAuthProviders,
+  getOAuthUrl: (provider, tosAccepted = false) =>
+    `/api/v1/auth/${provider}${tosAccepted ? "?tos=true" : ""}`,
+}));
+
 describe("auth pages", () => {
   beforeEach(() => {
     // Reset the auth mocks before each test so calls do not carry over.
     vi.clearAllMocks();
+    mockGetOAuthProviders.mockResolvedValue({ google: true, github: true });
   });
 
   it("logs in and redirects to the requested next page", async () => {
@@ -80,6 +93,76 @@ describe("auth pages", () => {
     });
   });
 
+  it("explains when an OAuth provider cannot supply a verified email", () => {
+    render(
+      <MemoryRouter initialEntries={["/login?error=oauth_email_required"]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "We need a verified email address from your sign-in provider",
+    );
+  });
+
+  it("links the social sign-in buttons to their backend provider routes", async () => {
+    render(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole("link", { name: "Continue with Google" })).toHaveAttribute(
+      "href",
+      "/api/v1/auth/google",
+    );
+    expect(screen.getByRole("link", { name: "Continue with GitHub" })).toHaveAttribute(
+      "href",
+      "/api/v1/auth/github",
+    );
+  });
+
+  it("hydrates the OAuth session and redirects to the dashboard", async () => {
+    mockAuth.completeOAuthLogin.mockResolvedValue({ id: "oauth-user" });
+
+    render(
+      <MemoryRouter initialEntries={["/oauth/callback"]}>
+        <Routes>
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/dashboard" element={<div>Dashboard page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(mockAuth.completeOAuthLogin).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("Dashboard page")).toBeInTheDocument();
+    });
+  });
+
+  it("shows an error when OAuth session hydration fails", async () => {
+    mockAuth.completeOAuthLogin.mockRejectedValue(new Error("OAuth session expired."));
+
+    render(
+      <MemoryRouter initialEntries={["/oauth/callback"]}>
+        <Routes>
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+          <Route path="/login" element={<div>Login page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Sign-in didn't work" })).toBeInTheDocument();
+    });
+    expect(screen.getByText("OAuth session expired.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to login" })).toHaveAttribute("href", "/login");
+  });
+
   it("registers a user and shows the verification message on success", async () => {
     const user = userEvent.setup();
 
@@ -98,7 +181,9 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^email$/i), "new@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
-    await user.click(screen.getByRole("checkbox"));
+    await user.click(
+      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
+    );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     // Make sure registration receives the values entered in the form.
@@ -136,7 +221,9 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^email$/i), "taken@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
-    await user.click(screen.getByRole("checkbox"));
+    await user.click(
+      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
+    );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     // The registration conflict should be shown as an error for the email field.

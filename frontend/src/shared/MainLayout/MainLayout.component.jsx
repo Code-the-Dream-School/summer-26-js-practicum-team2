@@ -8,10 +8,6 @@ import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.comp
 export default function MainLayout() {
   const { isAuthenticated, user, logout } = useAuthContext();
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const [currentModuleResources, setCurrentModuleResources] = useState({
-    glossary: [],
-    worksCited: [],
-  });
 
   const handleLogout = async () => {
     setIsSigningOut(true);
@@ -37,12 +33,9 @@ export default function MainLayout() {
         isSigningOut={isSigningOut}
       />
       <main id="main-content" className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Outlet context={setCurrentModuleResources} />
+        <Outlet />
       </main>
-      <Footer
-        glossary={currentModuleResources.glossary}
-        worksCited={currentModuleResources.worksCited}
-      />
+      <Footer />
       <ConsentBanner />
     </div>
   );

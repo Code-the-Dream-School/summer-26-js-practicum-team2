@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { StatusCodes } = require("http-status-codes");
 const { sendVerificationEmail } = require("../utils/sendEmail.js");
@@ -12,18 +11,13 @@ const {
   resetPasswordSchema,
   validateRequest,
 } = require("../validation/userValidation.js");
-const JWT_SECRET = process.env.JWT_SECRET || "do_not_forget_to_set_a_secret_here";
+const {
+  getAuthenticationFailure,
+  getSessionCookieOptions,
+  issueAuthenticatedSession,
+} = require("../utils/authSession.js");
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
-
-//we want  sameSite cookies to be lax as per userStory 2.1
-const getCookieOptions = (_req, maxAge) => ({
-  httpOnly: true,
-  secure: process.env.COOKIE_SECURE === "true",
-  sameSite: process.env.COOKIE_SAME_SITE || "lax",
-  path: "/",
-  ...(maxAge !== undefined ? { maxAge } : {}),
-});
 
 //function register registers a new user document in MongoDB user story 2.1.6
 
@@ -133,29 +127,13 @@ const login = async (req, res, next) => {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid email or password." });
     }
 
-    if (!user.email_verified_at) {
+    const authenticationFailure = getAuthenticationFailure(user);
+    if (authenticationFailure) {
       return res
-        .status(StatusCodes.FORBIDDEN)
-        .json({ message: "Please verify your email before logging in." });
+        .status(authenticationFailure.status)
+        .json({ message: authenticationFailure.message });
     }
-    //Cookie time: and JWT expires 14Days default, 30Days if remember = true as per user story 2.1
-    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
-    const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
-    const maxAge = remember ? THIRTY_DAYS : FOURTEEN_DAYS;
-    const tokenExpiry = remember ? "30d" : "14d";
-
-    //Sign JWT Token
-    const csrfToken = crypto.randomUUID();
-    const token = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-      expiresIn: tokenExpiry,
-    });
-    // HttpOnly session cookies
-    res.cookie("session_token", token, getCookieOptions(req, maxAge));
-    req.app.emit?.("login_success", {
-      userId: user._id,
-      email: user.email,
-      ip: req.ip,
-    });
+    const { csrfToken } = issueAuthenticatedSession({ req, res, user, remember });
 
     return res.status(StatusCodes.OK).json({
       message: "Login successful!",
@@ -176,7 +154,7 @@ const login = async (req, res, next) => {
 //L8 clear cookies from most active session after user logs out so user's cookies cannot be used inappropriately
 
 const logout = async (req, res) => {
-  const { ...cookieOptions } = getCookieOptions(req);
+  const { ...cookieOptions } = getSessionCookieOptions();
   const hasSessionCookie = Boolean(req.cookies?.session_token);
   res.clearCookie("session_token", cookieOptions);
 
@@ -212,19 +190,7 @@ const verifyEmail = async (req, res, next) => {
     user.verification_token_expires_at = undefined;
     await user.save();
 
-    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
-    const csrfToken = crypto.randomUUID();
-    const sessionToken = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-      expiresIn: "14d",
-    });
-
-    res.cookie("session_token", sessionToken, getCookieOptions(req, FOURTEEN_DAYS));
-
-    req.app.emit?.("login_success", {
-      userId: user._id,
-      email: user.email,
-      ip: req.ip,
-    });
+    const { csrfToken } = issueAuthenticatedSession({ req, res, user });
 
     return res.status(StatusCodes.OK).json({
       message: "Email verified successfully. You are now signed in.",
@@ -303,17 +269,37 @@ const resetPassword = async (req, res, next) => {
     user.password_reset_expires_at = undefined;
     await user.save();
 
-    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
-    const csrfToken = crypto.randomUUID();
-    const sessionToken = jwt.sign({ id: user._id, role: user.role, csrfToken }, JWT_SECRET, {
-      expiresIn: "14d",
+    const { csrfToken } = issueAuthenticatedSession({
+      req,
+      res,
+      user,
+      emitLoginEvent: false,
     });
-
-    res.cookie("session_token", sessionToken, getCookieOptions(req, FOURTEEN_DAYS));
 
     return res.status(StatusCodes.OK).json({
       message: "Password reset successful. You are now signed in.",
       csrfToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// GET /users/me - lets the SPA hydrate auth state after an OAuth redirect (no JSON body returned by that flow).
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
+    }
+    return res.status(StatusCodes.OK).json({
+      csrfToken: req.user.csrfToken,
       user: {
         id: user._id,
         name: user.name,
@@ -333,4 +319,5 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getCurrentUser,
 };

@@ -5,23 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- ## [Unreleased] -->
-
-<!-- --- -->
-
-## [0.5.0] - 2026-09-02
+## [0.6.0] - 2026-09-02
 
 ### Added
 
-- Added module-level glossary terms, definitions, and Works Cited sources for the budgeting curriculum.
-- Added a floating Glossary and References action throughout lesson routes, with alphabetical term browsing, filtering, source links, and clear empty states.
-- Added unit, integration, API-contract, and Playwright coverage for glossary resources, empty states, focus restoration, responsive layout, and unchanged lesson progress and quiz submission.
+- Added Google and GitHub social sign-in with provider availability detection and account linking.
+- Added lesson resume controls that return learners to their saved lesson position.
+- Added direct OAuth account-linking coverage and an OAuth provider availability endpoint for the sign-in UI.
 
 ### Changed
 
-- Updated the lesson layout to pass the active module's glossary and Works Cited data to the footer instead of falling back to budgeting content.
-- Updated glossary search to use the shared accessible input component and accessible controls for switching between glossary and reference views.
-- Updated quiz scoring test fixtures to match the current micro-lesson question identifiers.
+- Updated API and development setup documentation with OAuth configuration and sign-in details.
+
+### Fixed
+
+- Hardened Google and GitHub sign-in with verified-email selection, explicit Terms acknowledgement for new accounts, and one-time OAuth state validation.
+- Restored the required User email contract and sparse provider ID behavior so ordinary accounts do not collide on OAuth indexes.
 
 ---
 
@@ -47,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed error handler middleware signature to include next parameter
 - Fixed the Express error-handler middleware contract to accept `next` and forward errors when response headers have already been sent.
 
 ---
