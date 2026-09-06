@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.8.1] - 2026-09-05
+
+### Changed
+
+- Removed the duplicate reward toast rendering from the lesson flow so micro-lesson badge and streak notifications appear only once.
+- Renamed the onboarding context, hook, and overlay modules to drop the legacy `1` suffix.
+- Sourced XP from `UserProgress` in the user API integration tests to match the canonical XP model.
+
+### Removed
+
+- Deleted commented-out code, stale editor notes, and leftover debug logging across the onboarding, quiz, badge, dashboard, and learning path modules.
+
+### Fixed
+
+- Repaired the onboarding context test suite, which imported a renamed module that no longer existed and therefore never ran.
+
+---
+
 ## [0.8.0] - 2026-09-05
 
 ### Added
