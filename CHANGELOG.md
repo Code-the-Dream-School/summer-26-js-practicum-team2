@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.7.4] - 2026-09-05
+
+### Added
+
+- Added a confirmed self-service action for learners to reset their lesson progress from the Profile page.
+
+### Changed
+
+- Updated completed onboarding tours to offer a dashboard retake action instead of an always-visible setup checkbox.
+- Updated onboarding skip behavior to disable the workflow and return learners to the dashboard.
+
+### Fixed
+
+- Fixed onboarding state initialization for tours that have not started and prevented the home route from being treated as the dashboard tour.
+
+---
+
 ## [0.7.3] - 2026-09-05
 
 ### Added
