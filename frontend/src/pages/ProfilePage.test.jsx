@@ -171,7 +171,9 @@ describe("ProfilePage", () => {
 
     await user.click(resetButton);
     await waitFor(() => expect(resetProfileProgress).toHaveBeenCalledWith("csrf-token"));
-    expect(window.confirm).toHaveBeenCalledWith("Reset all lesson progress? This cannot be undone.");
+    expect(window.confirm).toHaveBeenCalledWith(
+      "Reset all lesson progress? This cannot be undone.",
+    );
     expect(await screen.findByRole("status")).toHaveTextContent("Your progress has been reset.");
     expect(getProfile).toHaveBeenCalledTimes(2);
   });
