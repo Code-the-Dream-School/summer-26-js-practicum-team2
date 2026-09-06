@@ -7,6 +7,7 @@ import {
   changeProfilePassword,
   deleteProfile,
   getProfile,
+  resetProfileProgress,
   setProfileAvatarUrl,
   updateProfile,
 } from "../services/api";
@@ -19,6 +20,7 @@ vi.mock("../services/api", () => ({
   changeProfilePassword: vi.fn(),
   deleteProfile: vi.fn(),
   getProfile: vi.fn(),
+  resetProfileProgress: vi.fn(),
   setProfileAvatarUrl: vi.fn(),
   updateProfile: vi.fn(),
 }));
@@ -52,6 +54,7 @@ describe("ProfilePage", () => {
       user: { ...profile },
     });
     deleteProfile.mockResolvedValue({ message: "Deletion request sent." });
+    resetProfileProgress.mockResolvedValue({ message: "Your progress has been reset." });
     setProfileAvatarUrl.mockImplementation(async ({ avatarUrl }) => {
       profile = { ...profile, avatar_url: avatarUrl };
       return { message: "Avatar URL saved.", avatar_url: avatarUrl };
@@ -155,6 +158,22 @@ describe("ProfilePage", () => {
       "referrerpolicy",
       "no-referrer",
     );
+  });
+
+  it("resets progress only after confirmation and refreshes the profile", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
+    render(<ProfilePage />);
+
+    const resetButton = await screen.findByRole("button", { name: "Reset my progress" });
+    await user.click(resetButton);
+    expect(resetProfileProgress).not.toHaveBeenCalled();
+
+    await user.click(resetButton);
+    await waitFor(() => expect(resetProfileProgress).toHaveBeenCalledWith("csrf-token"));
+    expect(window.confirm).toHaveBeenCalledWith("Reset all lesson progress? This cannot be undone.");
+    expect(await screen.findByRole("status")).toHaveTextContent("Your progress has been reset.");
+    expect(getProfile).toHaveBeenCalledTimes(2);
   });
 
   it("renders the user's initial when no avatar image is saved", async () => {
