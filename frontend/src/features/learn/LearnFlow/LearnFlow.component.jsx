@@ -30,9 +30,6 @@ import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.componen
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
 
-import Toast from "../../../shared/Toast/Toast.component";
-import useRewardQueue from "../../../hooks/useRewardQueue";
-
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
     return {
@@ -64,9 +61,6 @@ export default function LearnFlow({
   refreshProfile,
 }) {
   const { lessonSteps } = learnData;
-
-  //Toast state for rewards like badges, xp, and streaks
-  const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
 
   const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
   const [chunkIndex, setChunkIndex] = useState(() => {
@@ -203,9 +197,7 @@ export default function LearnFlow({
           microLessonId: currentMicroLessonId,
           csrfToken,
         });
-        addRewards(response.rewards);
         await refreshProfile?.();
-        notifyDashboardProgressChanged();
       } catch {
         // Reward persistence must not prevent the learner from advancing.
       }
@@ -308,12 +300,6 @@ export default function LearnFlow({
           rightAnswerIcon={rightAnswerIcon}
           wrongAnswerIcon={wrongAnswerIcon}
         />
-        <Toast
-          isOpen={hasToasts}
-          variant={currentToast?.variant ?? "default"}
-          message={currentToast?.message ?? ""}
-          onClose={closeToast}
-        />
       </>
     );
   }
@@ -375,12 +361,6 @@ export default function LearnFlow({
             )}
           </div>
         </Card>
-        <Toast
-          isOpen={hasToasts}
-          variant={currentToast?.variant ?? "default"}
-          message={currentToast?.message ?? ""}
-          onClose={closeToast}
-        />
       </section>
     );
   }
@@ -508,12 +488,6 @@ export default function LearnFlow({
           </>
         )}
       </Card>
-      <Toast
-        isOpen={hasToasts}
-        variant={currentToast?.variant ?? "default"}
-        message={currentToast?.message ?? ""}
-        onClose={closeToast}
-      />
     </section>
   );
 }
