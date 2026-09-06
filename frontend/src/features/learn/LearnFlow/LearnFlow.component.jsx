@@ -8,7 +8,6 @@ import {
   completeLesson,
   updateLessonProgress,
   restartLessonProgress,
-  notifyDashboardProgressChanged,
 } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
@@ -192,7 +191,7 @@ export default function LearnFlow({
   async function advanceStep() {
     if (canSyncProgress && currentMicroLessonId) {
       try {
-        const response = await completeMicroLesson({
+        await completeMicroLesson({
           moduleId: learnData.moduleId,
           microLessonId: currentMicroLessonId,
           csrfToken,
