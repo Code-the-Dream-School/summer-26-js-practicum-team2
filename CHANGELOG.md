@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.7.3] - 2026-09-05
+
+### Added
+
+- Added API integration coverage for onboarding progress updates and tour completion behavior.
+
+### Changed
+
+- Consolidated the frontend onboarding context, overlay, constants, and utilities under the shared onboarding feature.
+- Simplified protected routing by supporting role checks through the shared protected route.
+- Reused shared request validation for profile, avatar, password, and account-deletion endpoints.
+- Reduced the long-password minimum from 16 to 15 characters across frontend and backend validation.
+
+### Removed
+
+- Removed the obsolete onboarding implementation, duplicate role-protected route, stale learning-path tour markup, and commented-out code from related backend and lesson-rendering files.
+
+---
+
 ## [0.7.2] - 2026-09-05
 
 ### Changed
