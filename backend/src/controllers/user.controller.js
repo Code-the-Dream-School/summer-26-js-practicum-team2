@@ -155,10 +155,6 @@ const reactivate = async (req, res, next) => {
     reactivateAccount(user);
     await user.save();
 
-    /*//remove ArchivedUser information
-    if (ArchivedUser) {
-      await ArchivedUser.deleteOne({ original_user_id: user._id });
-    }*/
     return res.status(StatusCodes.OK).json({ message: "Account is reactivated. Please log in." });
   } catch (error) {
     return next(error);
@@ -395,6 +391,7 @@ const getCurrentUser = async (req, res, next) => {
     if (!user) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No user is authenticated." });
     }
+    const motivation = await getLearningMotivation(user._id);
     return res.status(StatusCodes.OK).json({
       csrfToken: req.user.csrfToken,
       user: {
@@ -402,6 +399,9 @@ const getCurrentUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        xp: user.xp ?? 0,
+        streak: motivation.streak.currentDays,
+        avatar_url: user.avatar_url || null,
       },
     });
   } catch (err) {

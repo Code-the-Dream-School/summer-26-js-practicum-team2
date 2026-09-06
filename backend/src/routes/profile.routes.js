@@ -9,6 +9,8 @@ router.get("/", profileController.getProfile);
 router.patch("/", profileController.updateProfile);
 // POST /api/v1/profile/avatar (validated HTTP(S) URL)
 router.post("/avatar", profileController.setAvatarUrl);
+// POST /api/v1/profile/progress/reset
+router.post("/progress/reset", profileController.resetProgress);
 // POST /api/v1/profile/password
 router.post("/password", profileController.changePassword);
 // POST  /api/v1/profile/request-deletion Soft delete account

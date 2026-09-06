@@ -85,7 +85,17 @@ const validateOAuthState = (provider, failureRedirect) => (req, res, next) => {
 
   clearOAuthCookies(res, provider);
   if (!statesMatch(expectedState, receivedState)) {
-    return res.redirect(failureRedirect);
+    if (process.env.NODE_ENV !== "test") {
+      console.error(`[oauth:${provider}] State validation failed`, {
+        hasStateCookie: typeof expectedState === "string",
+        hasCallbackState: typeof receivedState === "string",
+      });
+    }
+    return res.redirect(
+      typeof failureRedirect === "function"
+        ? failureRedirect("OAUTH_STATE_INVALID")
+        : failureRedirect,
+    );
   }
 
   req.oauth = { ...req.oauth, tosAccepted, next: isSafeLocalPath(nextPath) ? nextPath : undefined };

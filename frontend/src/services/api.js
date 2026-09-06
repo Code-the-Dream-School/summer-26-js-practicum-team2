@@ -5,6 +5,7 @@ const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
 const DASHBOARD_CACHE_KEY_PREFIX = "sprout.dashboard.";
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
+const ONBOARDING_BASE_PATH = `${API_BASE_URL}/api/v1/onboarding`;
 const PROFILE_BASE_PATH = `${API_BASE_URL}/api/v1/profile`;
 const ADMIN_BASE_PATH = `${API_BASE_URL}/api/v1/admin`;
 const CSRF_METHODS = new Set(["POST", "PATCH", "DELETE", "PUT"]);
@@ -101,6 +102,48 @@ export const logoutUser = (csrfToken) =>
     csrfToken,
   });
 
+export const beginOnboarding = () =>
+  apiRequest("", {
+    method: "GET",
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const getOnboardingState = () =>
+  apiRequest("", {
+    method: "GET",
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const toggleOnboardingWorkflow = ({ enabled, csrfToken }) =>
+  apiRequest("/toggle", {
+    method: "PATCH",
+    csrfToken,
+    body: { enabled },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const updateOnboardingProgress = ({
+  tourKey,
+  step,
+  status,
+  dismissed,
+  markAllComplete,
+  csrfToken,
+}) =>
+  apiRequest("/step", {
+    method: "PATCH",
+    csrfToken,
+    body: { tourKey, step, status, dismissed, markAllComplete },
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
+export const resetOnboardingProgress = (csrfToken) =>
+  apiRequest("/reset", {
+    method: "POST",
+    csrfToken,
+    basePath: ONBOARDING_BASE_PATH,
+  });
+
 export const getCurrentUser = () => apiRequest("/me", { method: "GET" });
 
 // Full-page navigation targets — the browser must follow the OAuth provider's redirect chain,
@@ -188,6 +231,14 @@ export const setProfileAvatarUrl = async ({ avatarUrl, csrfToken }) => {
   notifyProfileChange({ avatarUrl: response?.avatar_url || null });
   return response;
 };
+
+export const resetProfileProgress = (csrfToken) =>
+  apiRequest("/progress/reset", {
+    method: "POST",
+    body: { confirmation: "CONFIRM" },
+    csrfToken,
+    basePath: PROFILE_BASE_PATH,
+  });
 
 export const getAdminUsers = ({ page, limit, role, emailVerified, search } = {}) => {
   const params = new URLSearchParams();

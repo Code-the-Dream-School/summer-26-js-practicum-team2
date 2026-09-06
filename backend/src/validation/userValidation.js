@@ -5,14 +5,14 @@ const SHORT_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9\
 
 const passwordSchema = Joi.alternatives()
   .try(
-    Joi.string().trim().min(16).pattern(LONG_PASSWORD_PATTERN),
+    Joi.string().trim().min(15).pattern(LONG_PASSWORD_PATTERN),
     Joi.string().trim().min(8).pattern(SHORT_PASSWORD_PATTERN),
   )
   .required()
   .messages({
     "string.empty": "Password is required.",
     "alternatives.match":
-      "Password must be at least 16 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
+      "Password must be at least 15 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
     "any.required": "Password is required.",
   });
 
@@ -50,6 +50,34 @@ const loginSchema = Joi.object({
   }),
   // new for front end requirement of remember me
   remember: Joi.boolean().optional().default(false),
+});
+
+//Schema for PATCH /api/v1/onboarding/step
+const TOUR_KEYS = ["dashboardPage", "profilePage", "lessonPage", "learningPath"];
+const updateOnboardingProgressSchema = Joi.object({
+  tourKey: Joi.string()
+    .valid(...TOUR_KEYS)
+    .optional()
+    .messages({
+      "any.only": `tourKey must be one of: ${TOUR_KEYS.join(",")}.`,
+    }),
+  step: Joi.number().integer().min(0).optional().messages({
+    "number.base": "Step must be a number.",
+    "number.integer": "Step must be an integer.",
+    "number.min": "Step cannot be a negative number.",
+  }),
+  status: Joi.string()
+    .valid("pending", "completed", "skipped")
+    .optional()
+    .messages({ "any.only": "Status must be pending, completed, or skipped." }),
+
+  dismissed: Joi.boolean().strict().optional().messages({
+    "boolean.base": "Dismissed must be a boolean value.",
+  }),
+  markAllComplete: Joi.boolean()
+    .strict()
+    .optional()
+    .messages({ "boolean.base": "markAllComplete must be a boolean value." }),
 });
 
 const moduleIdSchema = Joi.string().trim().min(1).required();
@@ -211,4 +239,5 @@ module.exports = {
   adminModuleUpdateSchema,
   adminLessonSchema,
   validateRequest,
+  updateOnboardingProgressSchema,
 };

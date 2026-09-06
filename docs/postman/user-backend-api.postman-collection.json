@@ -1400,6 +1400,62 @@
           "response": []
         },
         {
+          "name": "Reset My Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /profile/progress/reset returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let responseJson = {};",
+                  "try { responseJson = pm.response.json(); } catch (e) { responseJson = {}; }",
+                  "pm.test('Progress reset confirms success', function () {",
+                  "  pm.expect(responseJson.message).to.eql('Your progress has been reset.');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmation\": \"CONFIRM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/progress/reset",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "progress", "reset"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Login With Changed Password",
           "event": [
             {

@@ -38,6 +38,12 @@ test("saving a display name updates the header avatar", async ({ page }) => {
       body: JSON.stringify({ user: profile }),
     });
   });
+  await page.route("**/api/v1/onboarding", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ onboarding: { is_completed: true } }),
+    }),
+  );
 
   await page.goto("/profile");
 

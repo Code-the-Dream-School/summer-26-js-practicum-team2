@@ -63,9 +63,14 @@ const avatarUrlSchema = Joi.object({
     }),
 });
 
+const resetProgressSchema = Joi.object({
+  confirmation: Joi.string().valid("CONFIRM").required(),
+});
+
 module.exports = {
   updateProfileSchema,
   changePasswordSchema,
   deleteAccountSchema,
   avatarUrlSchema,
+  resetProgressSchema,
 };

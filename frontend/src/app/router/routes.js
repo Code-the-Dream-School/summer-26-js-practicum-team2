@@ -16,7 +16,8 @@ export const ROUTES = {
 };
 
 // Link target, not a <Route path> — the query string opts into the unauthenticated preview.
-export const SAMPLE_LESSON_LINK = "/learn/cashFlow/1.1?sample=true";
+export const FIRST_LESSON_LINK = "/learn/cashFlow/1.1";
+export const SAMPLE_LESSON_LINK = `${FIRST_LESSON_LINK}?sample=true`;
 
 const TITLES = {
   [ROUTES.HOME]: "Sprout — Counting Cents and Making Sense",

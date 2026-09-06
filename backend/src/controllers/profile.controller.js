@@ -1,3 +1,4 @@
+const { validateRequest } = require("../validation/userValidation");
 const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
@@ -9,6 +10,7 @@ const {
   changePasswordSchema,
   deleteAccountSchema,
   avatarUrlSchema,
+  resetProgressSchema,
 } = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
@@ -52,13 +54,8 @@ const getProfile = async (req, res, next) => {
 // POST /api/v1/profile/avatar: URL avatars only; file uploads are not supported by this route.
 const setAvatarUrl = async (req, res, next) => {
   try {
-    const { error, value } = avatarUrlSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, avatarUrlSchema, req.body);
+    if (!value) return;
     const user = await User.findById(req.user.id);
     if (!user || user.is_deleted) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No User found." });
@@ -76,18 +73,24 @@ const setAvatarUrl = async (req, res, next) => {
   }
 };
 
+//POST /api/v1/profile/progress/reset
+const resetProgress = async (req, res, next) => {
+  try {
+    const value = validateRequest(res, resetProgressSchema, req.body);
+    if (!value) return;
+
+    await UserProgress.deleteMany({ user_id: req.user.id });
+    return res.status(StatusCodes.OK).json({ message: "Your progress has been reset." });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 //PATCH /api/v1/profile
 const updateProfile = async (req, res, next) => {
   try {
-    const { error, value } = updateProfileSchema.validate(req.body, {
-      abortEarly: false,
-    });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, updateProfileSchema, req.body);
+    if (!value) return;
     const { name, email, goals, notifications } = value;
     const user = await User.findById(req.user.id);
 
@@ -105,10 +108,6 @@ const updateProfile = async (req, res, next) => {
       user.goals = goals;
       hasUpdates = true;
     }
-    /*if (theme !== undefined) {
-      user.theme = theme;
-      hasUpdates = true;
-    }*/
     if (notifications !== undefined) {
       user.notifications = notifications;
       hasUpdates = true;
@@ -152,15 +151,8 @@ const updateProfile = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   try {
     //Validate password input using changePasswordSchema
-    const { error, value } = changePasswordSchema.validate(req.body, {
-      abortEarly: false,
-    });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, changePasswordSchema, req.body);
+    if (!value) return;
 
     const { currentPassword, newPassword } = value;
     const user = await User.findById(req.user.id).select("+password_hash");
@@ -199,13 +191,8 @@ const changePassword = async (req, res, next) => {
 //POST /api/v1/profile/request-deletion for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
-    const { error, value } = deleteAccountSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, deleteAccountSchema, req.body);
+    if (!value) return;
     const user = await User.findById(req.user.id);
     if (!user || user.is_deleted || user.is_archived) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
@@ -241,4 +228,5 @@ module.exports = {
   changePassword,
   deleteAccount,
   setAvatarUrl,
+  resetProgress,
 };

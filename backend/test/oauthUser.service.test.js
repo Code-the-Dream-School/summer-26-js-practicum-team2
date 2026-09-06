@@ -87,6 +87,21 @@ describe("OAuth user service", () => {
     expect(await User.countDocuments()).toBe(1);
   });
 
+  it("allows an existing GitHub account to sign in when GitHub omits email data", async () => {
+    const existingUser = await createLocalUser({ github_id: "github-provider-id" });
+
+    const user = await findOrCreateOAuthUser({
+      provider: "github",
+      providerId: "github-provider-id",
+      name: "GitHub User",
+      emails: undefined,
+      tosAccepted: false,
+    });
+
+    expect(user._id.toString()).toBe(existingUser._id.toString());
+    expect(await User.countDocuments()).toBe(1);
+  });
+
   it("links a verified provider email to an existing Sprout account", async () => {
     const existingUser = await createLocalUser();
 

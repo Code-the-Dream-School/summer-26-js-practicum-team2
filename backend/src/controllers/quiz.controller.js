@@ -293,9 +293,6 @@ exports.submitQuiz = async (req, res, next) => {
 
     // save attempt record
     if (passed) {
-      /*REMOVE AUGUST 10console.log(
-        `[Event: quiz_pass] User ${userId} passed quiz ${microLessonId}`,
-      );*/
       const updatedProgress = await UserProgress.findOneAndUpdate(
         { user_id: userId, module_id: moduleId },
         {
