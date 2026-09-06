@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Changed
+
+- Consolidated duplicate frontend test coverage for the main layout, navbar, and dashboard hook into single canonical suites without changing behavior.
+
+---
+
 ## [0.7.4] - 2026-09-05
 
 ### Added
