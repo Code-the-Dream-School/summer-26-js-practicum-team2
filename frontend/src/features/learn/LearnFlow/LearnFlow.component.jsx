@@ -3,12 +3,7 @@ import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import {
-  completeMicroLesson,
-  completeLesson,
-  updateLessonProgress,
-  restartLessonProgress,
-} from "../../../services/api";
+import { completeLesson, updateLessonProgress, restartLessonProgress } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -28,9 +23,6 @@ import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.componen
 
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
-
-import Toast from "../../../shared/Toast/Toast.component";
-import useRewardQueue from "../../../hooks/useRewardQueue";
 
 function resolveCharacter(characterId, characterImages, guideImage) {
   if (!characterId) {
@@ -60,12 +52,8 @@ export default function LearnFlow({
   savedProgress = null,
   csrfToken,
   isReadOnly = false,
-  refreshProfile,
 }) {
   const { lessonSteps } = learnData;
-
-  //Toast state for rewards like badges, xp, and streaks
-  const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
 
   const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
   const [chunkIndex, setChunkIndex] = useState(() => {
@@ -194,28 +182,7 @@ export default function LearnFlow({
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
 
-  async function advanceStep() {
-    if (!isReadOnly && currentMicroLessonId) {
-      const response = await completeMicroLesson({
-        moduleId: learnData.moduleId,
-        microLessonId: currentMicroLessonId,
-        csrfToken,
-      });
-
-      console.log("Rewards:", response.rewards);
-
-      //Toast notifications for badges, xp, and streaks earned
-
-      addRewards(response.rewards);
-
-      //clearDashboardCache(auth.user.id);
-      await refreshProfile();
-
-      console.log("DISPATCHING DASHBOARD REFRESH EVENT");
-
-      notifyDashboardProgressChanged();
-    }
-
+  function advanceStep() {
     if (!isLastStep) {
       setStepIndex((current) => current + 1);
       setChunkIndex(0);
@@ -226,7 +193,7 @@ export default function LearnFlow({
     setIsComplete(true);
   }
 
-  async function goForward() {
+  function goForward() {
     if (chunkIndex < chunks.length - 1) {
       setChunkIndex((current) => current + 1);
       return;
@@ -239,17 +206,6 @@ export default function LearnFlow({
       return;
     }
 
-    if (canSyncProgress) {
-      try {
-        await completeMicroLesson({
-          moduleId: learnData.moduleId,
-          microLessonId: currentMicroLessonId,
-          csrfToken,
-        });
-      } catch {
-        // Allow reading to continue if completion cannot be saved.
-      }
-    }
     advanceStep();
   }
 
@@ -317,20 +273,12 @@ export default function LearnFlow({
 
   if (isComplete && isReviewing) {
     return (
-      <>
-        <QuizReview
-          attempts={completedAttempts}
-          onDone={() => setIsReviewing(false)}
-          rightAnswerIcon={rightAnswerIcon}
-          wrongAnswerIcon={wrongAnswerIcon}
-        />
-        <Toast
-          isOpen={hasToasts}
-          variant={currentToast?.variant ?? "default"}
-          message={currentToast?.message ?? ""}
-          onClose={closeToast}
-        />
-      </>
+      <QuizReview
+        attempts={completedAttempts}
+        onDone={() => setIsReviewing(false)}
+        rightAnswerIcon={rightAnswerIcon}
+        wrongAnswerIcon={wrongAnswerIcon}
+      />
     );
   }
 
@@ -391,12 +339,6 @@ export default function LearnFlow({
             )}
           </div>
         </Card>
-        <Toast
-          isOpen={hasToasts}
-          variant={currentToast?.variant ?? "default"}
-          message={currentToast?.message ?? ""}
-          onClose={closeToast}
-        />
       </section>
     );
   }
@@ -524,12 +466,6 @@ export default function LearnFlow({
           </>
         )}
       </Card>
-      <Toast
-        isOpen={hasToasts}
-        variant={currentToast?.variant ?? "default"}
-        message={currentToast?.message ?? ""}
-        onClose={closeToast}
-      />
     </section>
   );
 }
