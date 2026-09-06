@@ -6,6 +6,7 @@ import {
   changeProfilePassword,
   deleteProfile,
   getProfile,
+  resetProfileProgress,
   setProfileAvatarUrl,
   updateProfile,
 } from "../services/api";
@@ -161,6 +162,21 @@ export default function ProfilePage() {
       const result = await deleteProfile({ email: deleteEmail, csrfToken });
       showToast(result.message || "Request for account deletion sent to admin.", "success");
       setDeleteEmail("");
+    } catch (error) {
+      showToast(errorMessage(error));
+    } finally {
+      setPending("");
+    }
+  };
+
+  const requestResetProgress = async () => {
+    if (!window.confirm("Reset all lesson progress? This cannot be undone.")) return;
+
+    setPending("reset-progress");
+    try {
+      const result = await resetProfileProgress(csrfToken);
+      await reloadProfile();
+      showToast(result.message || "Your progress has been reset.", "success");
     } catch (error) {
       showToast(errorMessage(error));
     } finally {
@@ -381,6 +397,21 @@ export default function ProfilePage() {
             {pending === "delete" ? "Submitting request.." : "Request Account Deletion"}
           </Button>
         </form>
+
+        <div className="border-t border-danger/20 pt-4">
+          <p className="text-sm text-neutral-600">
+            Reset lesson progress while keeping your profile.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-3 border border-danger/40 text-danger hover:bg-danger/10"
+            disabled={pending === "reset-progress"}
+            onClick={() => void requestResetProgress()}
+          >
+            {pending === "reset-progress" ? "Resetting progress..." : "Reset my progress"}
+          </Button>
+        </div>
       </div>
     </section>
   );
