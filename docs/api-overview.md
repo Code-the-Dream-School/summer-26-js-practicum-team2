@@ -61,6 +61,7 @@ creates the normal HTTP-only session cookie and redirects to `/oauth/callback`. 
 redirect to safe login error codes such as `oauth_failed`, `oauth_email_required`,
 `oauth_terms_required`, or `oauth_unavailable`; these routes rely on external provider redirects
 and are not intended for Postman requests.
+
 ## Deployment Health Check
 
 `GET /health` is a public, unrate-limited process health endpoint for Render. It returns
