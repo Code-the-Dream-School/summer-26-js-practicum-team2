@@ -89,7 +89,7 @@ The dashboard cache is invalidated only after the event passes validation.
 
 Passwords must satisfy one of these rules:
 
-- At least 16 characters with uppercase, lowercase, and numeric characters; or
+- At least 15 characters with uppercase, lowercase, and numeric characters; or
 - At least 8 characters with uppercase, lowercase, numeric, and special
   characters.
 

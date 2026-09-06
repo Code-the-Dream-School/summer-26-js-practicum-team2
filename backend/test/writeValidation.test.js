@@ -57,6 +57,7 @@ describe("write endpoint input validation", () => {
   });
 
   test("accepts supported password policy variants while rejecting weak passwords", () => {
+    expect(passwordSchema.validate("YxNqSSe9uqCCVAE").error).toBeUndefined();
     expect(passwordSchema.validate("YxNqSSe9uqCCVAEx").error).toBeUndefined();
     expect(passwordSchema.validate("StrongPass1!").error).toBeUndefined();
     expect(passwordSchema.validate("longpasswordwithoutnumber").error).toBeDefined();
