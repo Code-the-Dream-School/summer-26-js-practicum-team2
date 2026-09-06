@@ -143,6 +143,7 @@ export default function LearnPage() {
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
+      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
     />
   );

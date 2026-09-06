@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed learning-path node navigation so selecting a micro-lesson opens that exact micro-lesson instead of resuming a different saved step.
+
+---
+
 ## [0.7.1] - 2026-09-04
 
 ### Added
