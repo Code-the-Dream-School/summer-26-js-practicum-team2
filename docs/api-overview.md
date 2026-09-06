@@ -25,6 +25,7 @@ POST   /api/v1/quizzes/1.1.2/submit
 GET    /api/v1/profile
 PATCH  /api/v1/profile
 POST   /api/v1/profile/avatar
+POST   /api/v1/profile/progress/reset
 POST   /api/v1/profile/password
 POST   /api/v1/profile/request-deletion
 
