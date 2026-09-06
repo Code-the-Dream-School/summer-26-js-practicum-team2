@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import OnboardingOverlay from "./OnboardingOverlay1.component";
+import OnboardingOverlay from "./OnboardingOverlay.component";
 import ProfilePage from "../../pages/ProfilePage";
 import { describe, it, expect, vi } from "vitest";
 

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router";
 import { useAuthContext } from "../../context/AuthContext";
-import { OnboardingProvider, useOnboarding } from "../../context/OnboardingContext1";
-import OnboardingOverlay from "../../features/onboarding1/OnboardingOverlay1.component";
+import { OnboardingProvider, useOnboarding } from "../../context/OnboardingContext";
+import OnboardingOverlay from "../../features/onboarding/OnboardingOverlay.component";
 import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
-import { getOnboardingPageName } from "../../features/onboarding1/onboarding.utils";
+import { getOnboardingPageName } from "../../features/onboarding/onboarding.utils";
 
 function OnboardingWrapper() {
   const { currentStep, hasCompleted, activePage, startOnboarding, skipOnboarding, handleNextStep } =

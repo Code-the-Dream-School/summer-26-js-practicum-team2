@@ -1,5 +1,4 @@
 // src/features/onboarding/OnboardingOverlay.component.jsx
-//import {useState, useEffect} from "react";
 const STEP_CONTENT = {
   0: {
     title: "Welcome to Sprout!",
@@ -34,8 +33,6 @@ export default function OnboardingOverlay({
   const showCheckboxBanner = pageName === "dashboardPage";
   const tourContent = STEP_CONTENT[currentStep] || {};
   //render floating step popup if step is active and matches the current route
-  // const tourContent = currentStep !== null ? STEP_CONTENT[currentStep] : null; remove tourContent Sept 2
-  //const showTourPopup = tourContent && activePage === pageName;
   const showTourPopup = currentStep !== null && activePage === pageName && !hasCompleted;
 
   const isTourActive = currentStep !== null && currentStep >= 0 && !hasCompleted;
@@ -87,7 +84,6 @@ export default function OnboardingOverlay({
           <p className="mt-2 text-xs text-neutral-600 leading-relaxed">{tourContent.text}</p>
 
           <div className="mt-4 flex justify-end gap-2">
-            {/* </div><div className="mt-4 flex justify-end gap-2"> */}
             <button
               onClick={onSkip}
               className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors"
