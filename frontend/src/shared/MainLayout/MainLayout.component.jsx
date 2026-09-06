@@ -32,7 +32,7 @@ function OnboardingWrapper() {
 }
 
 export default function MainLayout() {
-  const { isAuthenticated, user, logout } = useAuthContext();
+  const { isAuthenticated, user, xpTotal, logout } = useAuthContext();
   const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
   useEffect(() => {
     const handleRewards = (event) => addRewards(event.detail?.rewards);
@@ -70,8 +70,8 @@ export default function MainLayout() {
           isAdmin={isAdmin}
           avatarLabel={user?.name?.charAt(0)?.toUpperCase() || "A"}
           avatarUrl={user?.avatar_url ?? null}
-          xp={user?.xp ?? 0}
-          streak={user?.current_streak ?? user?.streak ?? 0}
+          xp={xpTotal}
+          streak={user?.streak ?? 0}
           onLogout={handleLogout}
           isSigningOut={isSigningOut}
         />

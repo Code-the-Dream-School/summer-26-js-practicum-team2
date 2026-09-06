@@ -142,11 +142,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    //Achievements
-    xp: {
-      type: Number,
-      default: 0,
-    },
     streak: {
       current: {
         type: Number,

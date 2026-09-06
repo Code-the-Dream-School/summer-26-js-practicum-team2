@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const XpEvent = require("../models/XpEvent.model");
+const UserProgress = require("../models/UserProgress.model");
 const User = require("../models/User.model");
 
 const getUserXpTotal = async (userId) => {
@@ -7,7 +8,7 @@ const getUserXpTotal = async (userId) => {
     return 0;
   }
 
-  const result = await XpEvent.aggregate([
+  const result = await UserProgress.aggregate([
     {
       $match: {
         user_id: new mongoose.Types.ObjectId(userId),
@@ -17,37 +18,32 @@ const getUserXpTotal = async (userId) => {
       $group: {
         _id: null,
         totalXp: {
-          $sum: "$amount",
+          $sum: "$xp",
         },
       },
     },
   ]);
 
-  // Preserve XP earned before rewards were recorded as events. New awards only update the event ledger and UserProgress.
-  const user = await User.findById(userId).select("xp");
-  return (user?.xp ?? 0) + (result[0]?.totalXp || 0);
+  return result[0]?.totalXp || 0;
 };
 
 async function getXpEarnedToday(userId) {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return 0;
   }
-  const user = await User.findById(userId).select("timezone");
 
+  const user = await User.findById(userId).select("timezone");
   const timezone = user?.timezone || "UTC";
 
-  //Current date in the user's timezone
+  // Current date in the user's timezone.
   const now = new Date();
-
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   });
-
   const dateString = formatter.format(now);
-
   const startOfDay = new Date(`${dateString}T00:00:00`);
   const endOfDay = new Date(`${dateString}T23:59:59.999`);
 

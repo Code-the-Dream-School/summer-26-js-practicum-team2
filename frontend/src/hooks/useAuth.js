@@ -251,6 +251,7 @@ export function useAuth() {
       ...authState,
       isAuthenticated: Boolean(user),
       profile: user,
+      xpTotal: user?.xp ?? 0,
       refreshProfile: syncProfileAfterProgress,
       register,
       login,
