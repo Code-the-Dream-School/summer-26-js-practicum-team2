@@ -1,8 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { ONBOARDING_STEPS, OnboardingProvider, useOnboarding } from "./OnboardingContext1";
+import { ONBOARDING_STEPS, OnboardingProvider, useOnboarding } from "./OnboardingContext";
 import { AuthProvider } from "./AuthContext";
 import * as api from "../services/api";
-//import { useNavigate } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("../services/api");
@@ -26,7 +25,7 @@ const UserTest = () => {
   );
 };
 
-describe("OnboardingContext1 tests", () => {
+describe("OnboardingContext tests", () => {
   it("sends the lesson tour through the last-lesson redirect", () => {
     expect(ONBOARDING_STEPS[2]).toEqual({
       page: "lessonPage",

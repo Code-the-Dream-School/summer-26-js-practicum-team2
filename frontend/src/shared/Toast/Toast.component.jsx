@@ -40,7 +40,6 @@ export default function Toast({
     <div
       className={`fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center gap-3 rounded-lg border px-4 py-3 shadow-lg sm:bottom-6 ${styles} ${className}`}
     >
-      {/* Toast message */}
       <div
         role="status"
         aria-live="polite"
@@ -50,10 +49,8 @@ export default function Toast({
         {message}
       </div>
 
-      {/* Optional action */}
       {action && <div className="shrink-0">{action}</div>}
 
-      {/* Close button */}
       {showCloseButton && (
         <button
           type="button"

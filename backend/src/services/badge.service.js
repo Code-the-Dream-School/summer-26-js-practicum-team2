@@ -6,7 +6,6 @@ async function awardEligibleBadges(userId) {
   const user = await User.findById(userId);
 
   if (!user) {
-    console.log("NO USER FOUND");
     return [];
   }
 
@@ -19,17 +18,9 @@ async function awardEligibleBadges(userId) {
   //Create array of user's existing badges
   const existingBadgeIds = new Set((user.earned_badges || []).map((badge) => badge.badge_id));
 
-  console.log("CHECKING BADGES FOR", userId);
-
   //FIRST_STEPS BADGE
   //Check if they've completed this microlesson before
   const completedMicroLessons = progress?.completed_micro_lessons?.length || 0;
-
-  console.log(
-    "FIRST STEPS CHECK",
-    completedMicroLessons,
-    existingBadgeIds.has(BADGES.FIRST_STEPS.id),
-  );
 
   if (completedMicroLessons >= 1 && !existingBadgeIds.has(BADGES.FIRST_STEPS.id)) {
     user.earned_badges.push({
@@ -41,11 +32,6 @@ async function awardEligibleBadges(userId) {
   }
 
   //LEARNING MACHINE BADGE
-  console.log(
-    "LEARNING MACHINE CHECK",
-    completedMicroLessons,
-    existingBadgeIds.has(BADGES.LEARNING_MACHINE.id),
-  );
   if (completedMicroLessons >= 10 && !existingBadgeIds.has(BADGES.LEARNING_MACHINE.id)) {
     user.earned_badges.push({
       badge_id: BADGES.LEARNING_MACHINE.id,
@@ -66,8 +52,6 @@ async function awardEligibleBadges(userId) {
     awarded.push(BADGES.WEEK_STREAK);
   }
   await user.save();
-
-  console.log("AWARDED BADGES", awarded);
 
   return awarded;
 }

@@ -1,13 +1,10 @@
-// src/features/onboarding/useOnboarding.js
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-//extract Token from AuthContext
 import { useAuthContext } from "../../context/AuthContext";
 import { ONBOARDING_STEPS } from "./onboarding.constants";
 
 import {
   resetOnboardingProgress as apiResetOnboarding,
-  //toggleOnboardingWorkflow as apiToggleOnboarding,
   updateOnboardingProgress as apiUpdateOnboardingProgress,
   beginOnboarding as apiBeginOnboarding,
   getOnboardingState as apiGetOnboardingState,
@@ -19,7 +16,6 @@ export function useOnboarding() {
   const { csrfToken } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(null); //when you are waiting for user's response
   const navigate = useNavigate();
-  // const [activePage, setActivePage] = useState("dashboard");
 
   const [hasCompleted, setHasCompleted] = useState(() => {
     const status = localStorage.getItem("sprout_onboarding_complete");
@@ -56,8 +52,6 @@ export function useOnboarding() {
   }, []);
 
   const startOnboarding = async () => {
-    console.log("startOnboarding called");
-    console.log("Current Auth Token:", csrfToken);
     setCurrentStep(0);
     localStorage.setItem("sprout_onboarding_complete", "false");
     setHasCompleted(false);
@@ -100,20 +94,6 @@ export function useOnboarding() {
       localStorage.setItem("sprout_onboarding_complete", "false");
       setHasCompleted(false);
       navigate("/dashboard");
-
-      //Commenting out lines 148 to 151 with apiToggleOnboarding since it may have been forcing all unvisited keys as skipped preventing to try onboarding later. may later figure out logic to track user who do a an absolute skip all to all onboarding tours
-
-      // try {
-      //   await apiToggleOnboarding({
-      //     enabled: false,
-      //     csrfToken,
-      //     // await fetch("/api/v1/onboarding/toggle", {
-      //   method: "PATCH",
-      //   credentials: "include",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //});
     } catch (err) {
       console.error("Failed to skip onboarding session:", err);
     }

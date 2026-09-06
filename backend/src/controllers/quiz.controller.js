@@ -64,8 +64,6 @@ const getQuestionsFromLesson = async (moduleId, microLessonId) => {
   }
   return [];
 };
-//Get user progress . Fetch logged-in user's progress document req.user.id
-//if no progress record exists yet, it creates a new UserProgress doc immediately before returning a 200 Ok
 
 // get all micro-lesson IDS that belong to a specific lesson ID
 const getMicroLessonIdsForLesson = async (moduleId, lessonId) => {
@@ -89,7 +87,6 @@ exports.getUserProgress = async (req, res, next) => {
         module_id: "cashFlow",
       });
     }
-    //return res.status(StatusCodes.OK).json(progressRecord);
     return res.status(StatusCodes.OK).json({
       ...progressRecord.toObject(),
       xp: xpTotal,
@@ -345,10 +342,6 @@ exports.submitQuiz = async (req, res, next) => {
 
     // save attempt record & update xp for passing quiz for first time
     if (passed) {
-      /*REMOVE AUGUST 10console.log(
-        `[Event: quiz_pass] User ${userId} passed quiz ${microLessonId}`,
-      );*/
-
       //Checking if this microLesson is completed
       const existingProgress = await UserProgress.findOne({
         user_id: userId,
