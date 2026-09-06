@@ -5,6 +5,83 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!-- ## [Unreleased] -->
+
+<!-- --- -->
+
+## [0.7.3] - 2026-09-05
+
+### Added
+
+- Added API integration coverage for onboarding progress updates and tour completion behavior.
+
+### Changed
+
+- Consolidated the frontend onboarding context, overlay, constants, and utilities under the shared onboarding feature.
+- Simplified protected routing by supporting role checks through the shared protected route.
+- Reused shared request validation for profile, avatar, password, and account-deletion endpoints.
+- Reduced the long-password minimum from 16 to 15 characters across frontend and backend validation.
+
+### Removed
+
+- Removed the obsolete onboarding implementation, duplicate role-protected route, stale learning-path tour markup, and commented-out code from related backend and lesson-rendering files.
+
+---
+
+## [0.7.2] - 2026-09-05
+
+### Changed
+
+- Updated dashboard, profile, and lesson onboarding descriptions and renamed the sample lesson tour heading to "Lesson Page".
+- Cleaned up onboarding comments and standardized formatting across onboarding code, validation, shared layout, and related tests.
+- Synchronized frontend and backend lockfile references to the root package's 0.7.1 version.
+
+### Fixed
+
+- Added completed-onboarding API fixtures to the mobile navigation and profile avatar end-to-end tests so those scenarios do not depend on live onboarding state.
+
+---
+
+## [0.7.1] - 2026-09-04
+
+### Added
+
+- Added focused regression coverage for mapping dashboard, profile, learning-path, lesson, and unrelated URLs to onboarding page names.
+
+### Changed
+
+- Centralized onboarding step and route definitions in a shared constants module so the context and standalone hook cannot drift apart.
+- Extracted onboarding page detection into a shared utility, preserving exact learning-path matching and nested lesson-route detection.
+- Added provider-scoped OAuth failure diagnostics without logging state values or other sensitive callback data.
+
+### Fixed
+
+- Fixed invalid, missing, expired, or reused OAuth state callbacks to return a specific sign-in-session error instead of the generic OAuth failure message.
+
+---
+
+## [0.7.0] - 2026-09-04
+
+### Added
+
+- Added an authenticated, four-step product tour across the dashboard, profile, first lesson, and learning path, with controls to start, skip, resume, and retake the tour.
+- Added persistent onboarding state and authenticated APIs for reading, resetting, enabling, disabling, and updating tour progress.
+- Added a 50 XP reward for completing every onboarding tour without skipping.
+- Added OAuth provider avatars to newly created and linked accounts, with initials displayed when an avatar is missing or fails to load.
+
+### Changed
+
+- Updated the current-user response with avatar, streak, and XP data used by shared account views.
+- Updated last-lesson navigation to open the first lesson when no saved or server-provided lesson path is available.
+- Updated externally hosted avatars to use a no-referrer request policy.
+
+### Fixed
+
+- Fixed sign-in for existing GitHub-linked accounts when GitHub does not return an email address on a later authorization.
+- Fixed OAuth avatar synchronization so returning users receive their current provider avatar.
+
+---
+
 ## [0.6.1] - 2026-09-03
 
 ### Changed

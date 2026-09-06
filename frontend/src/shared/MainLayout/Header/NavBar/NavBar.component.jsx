@@ -96,6 +96,7 @@ export default function NavBar({
                       <img
                         src={avatarUrl}
                         alt={`${avatarLabel} avatar`}
+                        referrerPolicy="no-referrer"
                         onError={() => setFailedAvatarUrl(avatarUrl)}
                         className="h-8 w-8 rounded-full object-cover"
                       />
@@ -178,6 +179,7 @@ export default function NavBar({
                     <img
                       src={avatarUrl}
                       alt=""
+                      referrerPolicy="no-referrer"
                       onError={() => setFailedAvatarUrl(avatarUrl)}
                       className="h-10 w-10 rounded-full object-cover"
                     />

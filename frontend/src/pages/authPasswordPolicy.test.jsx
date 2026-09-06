@@ -59,10 +59,10 @@ describe("auth form password policy UX", () => {
       ),
     ).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Password"), "YxNqSSe9uqCCVAEx");
+    await user.type(screen.getByLabelText("Password"), "YxNqSSe9uqCCVAE");
 
     expect(
-      screen.getByText("Use 16+ characters with upper and lower case letters plus a number."),
+      screen.getByText("Use 15+ characters with upper and lower case letters plus a number."),
     ).toBeInTheDocument();
 
     registerView.unmount();
@@ -75,10 +75,10 @@ describe("auth form password policy UX", () => {
       ),
     ).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("New password"), "YxNqSSe9uqCCVAEx");
+    await user.type(screen.getByLabelText("New password"), "YxNqSSe9uqCCVAE");
 
     expect(
-      screen.getByText("Use 16+ characters with upper and lower case letters plus a number."),
+      screen.getByText("Use 15+ characters with upper and lower case letters plus a number."),
     ).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("auth form password policy UX", () => {
 
     expect(
       await screen.findByText(
-        "Password must be at least 16 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
+        "Password must be at least 15 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
       ),
     ).toBeInTheDocument();
     expect(registerUser).not.toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe("auth form password policy UX", () => {
 
     expect(
       await screen.findByText(
-        "Password must be at least 16 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
+        "Password must be at least 15 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
       ),
     ).toBeInTheDocument();
 
