@@ -10,6 +10,7 @@ const {
   changePasswordSchema,
   deleteAccountSchema,
   avatarUrlSchema,
+  resetProgressSchema,
 } = require("../validation/profileValidation");
 
 //Get first initial from  name from user model or email
@@ -67,6 +68,19 @@ const setAvatarUrl = async (req, res, next) => {
       avatar_url: user.avatar_url,
       avatar_initial: getFirstInitial(user.name, user.email),
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+//POST /api/v1/profile/progress/reset
+const resetProgress = async (req, res, next) => {
+  try {
+    const value = validateRequest(res, resetProgressSchema, req.body);
+    if (!value) return;
+
+    await UserProgress.deleteMany({ user_id: req.user.id });
+    return res.status(StatusCodes.OK).json({ message: "Your progress has been reset." });
   } catch (error) {
     return next(error);
   }
@@ -214,4 +228,5 @@ module.exports = {
   changePassword,
   deleteAccount,
   setAvatarUrl,
+  resetProgress,
 };
