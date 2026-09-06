@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.8.0] - 2026-09-05
+
+### Added
+
+- Added reward toasts for XP, streak, and badge updates earned while completing micro-lessons.
+- Added regression coverage for UserProgress XP totals, legacy numeric streak migration, and failed micro-lesson completion persistence.
+
+### Changed
+
+- Made UserProgress the canonical source for user XP totals across profile and navigation views.
+- Removed the obsolete User XP field and duplicate `current_streak` profile response field.
+- Refreshed profile and dashboard data after micro-lesson reward updates.
+
+### Fixed
+
+- Migrated legacy numeric streak values before updating streak details, preventing MongoDB nested-field update errors.
+- Prevented failed micro-lesson reward persistence from trapping learners in an endless quiz loop.
+
+---
+
 ## [0.7.2] - 2026-09-05
 
 ### Added
