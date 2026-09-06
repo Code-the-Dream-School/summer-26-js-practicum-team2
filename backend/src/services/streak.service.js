@@ -13,10 +13,32 @@ function getDayKey(date, timeZone) {
 //Updating the streaks and active learning days once a microlesson has been completed
 const updateUserStreak = async (userId) => {
   //check for user
-  const user = await User.findById(userId);
+  let user = await User.findById(userId);
 
   if (!user) {
     return;
+  }
+
+  const storedUser = await User.collection.findOne(
+    { _id: user._id },
+    { projection: { streak: 1 } },
+  );
+  if (typeof storedUser?.streak === "number") {
+    const legacyStreak = Math.max(0, storedUser.streak);
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          streak: {
+            current: legacyStreak,
+            longest: legacyStreak,
+            active_learning_days: 0,
+            last_active_date: null,
+          },
+        },
+      },
+    );
+    user = await User.findById(userId);
   }
 
   const timeZone = user.timezone || "UTC";
