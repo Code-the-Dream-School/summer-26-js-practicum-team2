@@ -155,10 +155,6 @@ const reactivate = async (req, res, next) => {
     reactivateAccount(user);
     await user.save();
 
-    /*//remove ArchivedUser information
-    if (ArchivedUser) {
-      await ArchivedUser.deleteOne({ original_user_id: user._id });
-    }*/
     return res.status(StatusCodes.OK).json({ message: "Account is reactivated. Please log in." });
   } catch (error) {
     return next(error);

@@ -124,9 +124,7 @@ const updateOnboardingProgress = async (req, res, next) => {
 
     //Specific tour updates
     if (tourKey) {
-      // const validTourKeys = ["dashboardPage", "learningPath", "lessonPage", "profilePage"];
       if (!TOUR_KEYS.includes(tourKey)) {
-        //if (!validTourKeys.includes(tourKey)) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           message: `No tourKey found. Need to include one of ${TOUR_KEYS.join(",")}`,
         });
@@ -141,7 +139,6 @@ const updateOnboardingProgress = async (req, res, next) => {
         dismissed: false,
       };
       const getStepStatus = status || (dismissed ? "skipped" : currentTour.status || "pending");
-      //const completedTour = currentTour.status === "completed";
 
       if (typeof step === "number") {
         currentTour.step = step;
@@ -160,7 +157,6 @@ const updateOnboardingProgress = async (req, res, next) => {
     const totalToursDecided = TOUR_KEYS.every(
       (key) => tours[key] && ["completed", "skipped"].includes(tours[key].status),
     );
-    // let xpAwarded = 0;
     //Award XP on first time step completion so no prior completions count
     const noSkippedTours = TOUR_KEYS.every((key) => tours[key]?.status === "completed");
     const allDismissed = TOUR_KEYS.every(

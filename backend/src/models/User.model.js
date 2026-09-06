@@ -196,31 +196,9 @@ userSchema.pre(/^find/, function () {
     this.find(multipleExclusionConditions);
   }
 });
-/* ====== Removed archivedUserSchema because we created a flag directly in the user Schema
-const archivedUserSchema = new mongoose.Schema(
-  {
-    original_user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
-    name: { type: String },
-    email: { type: String },
-    role: { type: String },
-    deleted_at: {
-      type: Date,
-      default: Date.now,
-      expires: 2592000, //MongoDB automatically deletes this document 30Days after deleted_at
-    },
-  },
-  {
-    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
-);*/
 userSchema.index({ deletion_status: 1 });
 userSchema.index({ reactivation_token: 1 });
 
 const User = mongoose.model("User", userSchema);
-//const ArchivedUser = mongoose.model("ArchivedUser", archivedUserSchema);
 
-//module.exports = { User, ArchivedUser };
 module.exports = User;
