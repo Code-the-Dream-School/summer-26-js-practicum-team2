@@ -50,19 +50,23 @@ export default function LearnFlow({
   characterImages,
   guideImage,
   savedProgress = null,
+  selectedMicroLessonId,
   csrfToken,
   isReadOnly = false,
 }) {
   const { lessonSteps } = learnData;
+  const selectedStepIndex = lessonSteps.findIndex((step) => step.id === selectedMicroLessonId);
+  const initialStepIndex =
+    selectedStepIndex >= 0 ? selectedStepIndex : getResumeIndex(lessonSteps, savedProgress);
 
-  const [stepIndex, setStepIndex] = useState(() => getResumeIndex(lessonSteps, savedProgress));
+  const [stepIndex, setStepIndex] = useState(initialStepIndex);
   const [chunkIndex, setChunkIndex] = useState(() => {
-    const resumeIndex = getResumeIndex(lessonSteps, savedProgress);
-    const resumedStep = lessonSteps[resumeIndex];
+    const initialStep = lessonSteps[initialStepIndex];
     const savedChunkIndex = savedProgress?.currentChunkIndex;
 
-    if (!Number.isInteger(savedChunkIndex) || savedChunkIndex < 0) return 0;
-    return Math.min(savedChunkIndex, Math.max(countChunks(resumedStep) - 1, 0));
+    if (selectedStepIndex >= 0 || !Number.isInteger(savedChunkIndex) || savedChunkIndex < 0)
+      return 0;
+    return Math.min(savedChunkIndex, Math.max(countChunks(initialStep) - 1, 0));
   });
   const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);

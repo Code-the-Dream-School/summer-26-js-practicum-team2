@@ -136,6 +136,19 @@ describe("LearnFlow regressions", () => {
     expect(screen.getByText('Welcome Back! Resuming "Step Two"')).toBeInTheDocument();
   });
 
+  it("opens the micro-lesson selected from the learning path", () => {
+    renderLearnFlow({
+      selectedMicroLessonId: "1.1.1",
+      savedProgress: {
+        currentLessonId: "1.1",
+        currentMicroLessonId: "1.1.2",
+        currentChunkIndex: 0,
+      },
+    });
+
+    expect(screen.getByText("Step One")).toBeInTheDocument();
+  });
+
   it("does not show resume banner on a fresh start", () => {
     // With no saved progress, the lesson should behave like a new visit.
     renderLearnFlow({ savedProgress: null });
