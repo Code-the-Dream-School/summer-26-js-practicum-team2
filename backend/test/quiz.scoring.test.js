@@ -114,6 +114,39 @@ describe("quiz submission grading (backend)", () => {
     expect(scoresByMicroLesson["1.1.2"]).toBe(67);
     expect(scoresByMicroLesson["1.1.4"]).toBe(100);
   });
+
+  it("allows a new attempt immediately after the previous attempt is submitted", async () => {
+    const { authHeader } = await createAuthedUser();
+
+    const firstStart = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Authorization", authHeader)
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+    expect(firstStart.status).toBe(201);
+
+    const firstSubmit = await request(app)
+      .post("/api/v1/quizzes/1.1.2/submit")
+      .set("Authorization", authHeader)
+      .send({
+        attemptId: firstStart.body.attemptId,
+        moduleId: "cashFlow",
+        answers: {
+          "1.1.2-q1": ["d"],
+          "1.1.2-q2": ["a"],
+          "1.1.2-q3": ["a"],
+        },
+      });
+    expect(firstSubmit.status).toBe(200);
+
+    const retryStart = await request(app)
+      .post("/api/v1/quizzes/start")
+      .set("Authorization", authHeader)
+      .send({ microLessonId: "1.1.2", moduleId: "cashFlow" });
+
+    expect(retryStart.status).toBe(201);
+    expect(retryStart.body.attemptId).not.toBe(firstStart.body.attemptId);
+  });
+
   async function createCookieSession() {
     const user = await User.create({
       name: "Cookie Learner",
