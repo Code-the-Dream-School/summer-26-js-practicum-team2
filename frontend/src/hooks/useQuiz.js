@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import quizReducer, { actions, initialState } from "../reducers/quiz.reducer";
 import { checkQuizAnswer, startQuiz, submitQuiz } from "../services/api";
 
@@ -10,6 +10,13 @@ export function useQuiz({
   isReadOnly = false,
 }) {
   const [quizState, dispatch] = useReducer(quizReducer, initialState);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const currentQuestion = questions[quizState.questionIndex] ?? null;
   const selectedChoiceIds = useMemo(
@@ -103,10 +110,14 @@ export function useQuiz({
           answers: answerPayload,
           csrfToken,
         });
-        dispatch({ type: actions.submitSuccess, result: submission });
+        if (isMountedRef.current) {
+          dispatch({ type: actions.submitSuccess, result: submission });
+        }
         return submission;
       } catch (error) {
-        dispatch({ type: actions.submitFailure, errorMessage: error.message });
+        if (isMountedRef.current) {
+          dispatch({ type: actions.submitFailure, errorMessage: error.message });
+        }
         return null;
       }
     },

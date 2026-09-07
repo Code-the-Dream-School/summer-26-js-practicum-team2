@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.8.3] - 2026-09-07
+
+### Fixed
+
+- Resolved quiz submissions before skipping local quiz state updates after unmount, preventing rapid navigation from triggering React updates on unmounted components.
+
+---
+
 ## [0.8.2] - 2026-09-06
 
 ### Added
