@@ -132,7 +132,11 @@ exports.startQuiz = async (req, res, next) => {
       micro_lesson_id: microLessonId,
     }).sort({ createdAt: -1 });
 
-    if (latestAttempt && Date.now() - new Date(latestAttempt.createdAt).getTime() < 5000) {
+    if (
+      latestAttempt &&
+      !latestAttempt.submitted_at &&
+      Date.now() - new Date(latestAttempt.createdAt).getTime() < 5000
+    ) {
       return res.status(StatusCodes.CONFLICT).json({
         message: "Please wait 5 seconds before submitting an answer again.",
       });
