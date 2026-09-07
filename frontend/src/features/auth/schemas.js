@@ -41,6 +41,7 @@ export const registerSchema = z
     tos: z.boolean().refine((v) => v === true, {
       message: "Please accept the terms of service.",
     }),
+    timezone: z.string().optional(),
   })
   .refine((values) => values.password === values.confirmPassword, {
     message: "Passwords do not match.",

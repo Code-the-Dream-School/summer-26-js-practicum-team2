@@ -1,4 +1,3 @@
-// src/features/onboarding/OnboardingOverlay.component.jsx
 const STEP_CONTENT = {
   0: {
     title: "Welcome to Sprout!",

@@ -1178,6 +1178,61 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Complete Micro-Lesson Before Passing Its Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('POST /lessons/complete returns 409 until its check passes', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "const responseJson = pm.response.json();",
+                  "pm.test('Completion response explains the unmet checks', function () {",
+                  "  pm.expect(responseJson.message).to.include('Pass every knowledge check');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrfToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{sessionCookie}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"moduleId\": \"cashFlow\",\n  \"microLessonId\": \"1.1.2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lessons", "complete"]
+            }
+          },
+          "response": []
         }
       ]
     },

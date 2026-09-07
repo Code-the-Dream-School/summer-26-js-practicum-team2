@@ -3,7 +3,12 @@ import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import { completeLesson, updateLessonProgress, restartLessonProgress } from "../../../services/api";
+import {
+  completeMicroLesson,
+  completeLesson,
+  updateLessonProgress,
+  restartLessonProgress,
+} from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -52,6 +57,7 @@ export default function LearnFlow({
   savedProgress = null,
   csrfToken,
   isReadOnly = false,
+  refreshProfile,
 }) {
   const { lessonSteps } = learnData;
 
@@ -182,7 +188,20 @@ export default function LearnFlow({
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
 
-  function advanceStep() {
+  async function advanceStep() {
+    if (canSyncProgress && currentMicroLessonId) {
+      try {
+        await completeMicroLesson({
+          moduleId: learnData.moduleId,
+          microLessonId: currentMicroLessonId,
+          csrfToken,
+        });
+        await refreshProfile?.();
+      } catch {
+        // Reward persistence must not prevent the learner from advancing.
+      }
+    }
+
     if (!isLastStep) {
       setStepIndex((current) => current + 1);
       setChunkIndex(0);
@@ -193,7 +212,7 @@ export default function LearnFlow({
     setIsComplete(true);
   }
 
-  function goForward() {
+  async function goForward() {
     if (chunkIndex < chunks.length - 1) {
       setChunkIndex((current) => current + 1);
       return;
@@ -206,7 +225,7 @@ export default function LearnFlow({
       return;
     }
 
-    advanceStep();
+    void advanceStep();
   }
 
   async function advanceQuiz() {
@@ -236,7 +255,7 @@ export default function LearnFlow({
     ]);
 
     quiz.reset();
-    advanceStep();
+    void advanceStep();
   }
 
   function goBack() {
@@ -273,12 +292,14 @@ export default function LearnFlow({
 
   if (isComplete && isReviewing) {
     return (
-      <QuizReview
-        attempts={completedAttempts}
-        onDone={() => setIsReviewing(false)}
-        rightAnswerIcon={rightAnswerIcon}
-        wrongAnswerIcon={wrongAnswerIcon}
-      />
+      <>
+        <QuizReview
+          attempts={completedAttempts}
+          onDone={() => setIsReviewing(false)}
+          rightAnswerIcon={rightAnswerIcon}
+          wrongAnswerIcon={wrongAnswerIcon}
+        />
+      </>
     );
   }
 

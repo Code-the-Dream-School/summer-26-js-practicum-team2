@@ -156,7 +156,10 @@ describe("dashboard endpoint", () => {
       score: 100,
       passed: true,
     });
-    await User.updateOne({ _id: userId }, { $set: { streak: 99 } });
+    await User.updateOne(
+      { _id: userId },
+      { $set: { "streak.current": 99, "streak.last_active_date": new Date("2000-01-01") } },
+    );
 
     const [dashboardResponse, profileResponse] = await Promise.all([
       request(app).get("/api/v1/dashboard").set("Authorization", authHeader),

@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.8.1] - 2026-09-05
+
+### Changed
+
+- Removed the duplicate reward toast rendering from the lesson flow so micro-lesson badge and streak notifications appear only once.
+- Renamed the onboarding context, hook, and overlay modules to drop the legacy `1` suffix.
+- Sourced XP from `UserProgress` in the user API integration tests to match the canonical XP model.
+
+### Removed
+
+- Deleted commented-out code, stale editor notes, and leftover debug logging across the onboarding, quiz, badge, dashboard, and learning path modules.
+
+### Fixed
+
+- Repaired the onboarding context test suite, which imported a renamed module that no longer existed and therefore never ran.
+
+---
+
+## [0.8.0] - 2026-09-05
+
+### Added
+
+- Added reward toasts for XP, streak, and badge updates earned while completing micro-lessons.
+- Added regression coverage for UserProgress XP totals, legacy numeric streak migration, and failed micro-lesson completion persistence.
+
+### Changed
+
+- Made UserProgress the canonical source for user XP totals across profile and navigation views.
+- Removed the obsolete User XP field and duplicate `current_streak` profile response field.
+- Refreshed profile and dashboard data after micro-lesson reward updates.
+
+### Fixed
+
+- Migrated legacy numeric streak values before updating streak details, preventing MongoDB nested-field update errors.
+- Prevented failed micro-lesson reward persistence from trapping learners in an endless quiz loop.
+
+---
+
 ## [0.7.5] - 2026-09-06
 
 ### Changed
@@ -54,6 +92,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## [0.7.2] - 2026-09-05
+
+### Added
+
+- Add core rules implementation and corresponding tests for XP calculations and lesson unlocking
+
+---
+
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Implemented soft deletion, reactivation, and avatar upload updates
+- Integrated Joi validation for profile route
+- Added profile and account lifecycle tests to Postman collection
+- Added Postman collection tests for Express routes
 
 ### Changed
 

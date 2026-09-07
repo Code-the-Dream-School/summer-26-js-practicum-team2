@@ -3,6 +3,7 @@ const request = require("supertest");
 const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const UserProgress = require("../src/models/UserProgress.model");
 const QuizAttempt = require("../src/models/QuizAttempt.model");
 const { hashPassword } = require("../src/utils/password");
 const { withSessionCsrf } = require("./helpers/requestTestHelpers");
@@ -78,9 +79,13 @@ describe("user API integration", () => {
       role: "learner",
       tos_agreement: true,
       email_verified_at: new Date(),
-      xp: 125,
       streak: 99,
       avatar_url: "https://example.com/returning-learner.png",
+    });
+    await UserProgress.create({
+      user_id: user._id,
+      module_id: "cashFlow",
+      xp: 125,
     });
     const now = new Date();
     await QuizAttempt.create({
@@ -118,6 +123,10 @@ describe("user API integration", () => {
       email_verified_at: new Date(),
       google_id: "google-avatar-user",
       avatar_url: "https://lh3.googleusercontent.com/oauth-avatar",
+    });
+    await UserProgress.create({
+      user_id: user._id,
+      module_id: "cashFlow",
       xp: 75,
     });
     const token = jwt.sign(

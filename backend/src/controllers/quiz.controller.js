@@ -5,6 +5,11 @@ const EventEmitter = require("events");
 const quizEvents = new EventEmitter();
 //Event listeners for Quiz Cycle
 
+const { calculateXpDelta } = require("../utils/coreRules");
+const { updateUserStreak } = require("../services/streak.service");
+const { awardEligibleBadges } = require("../services/badge.service");
+const { getXpEarnedToday } = require("../services/xp.service");
+
 quizEvents.on("quiz_submit", ({ userId, microLessonId, score, attemptNumber }) => {
   console.log(
     `[Event: quiz_submit] User ${userId} submitted ${microLessonId} (Attempt #${attemptNumber}, Score: ${score}%)`,
@@ -31,6 +36,8 @@ const {
 
 //Import Status codes library http-status-codes
 const { StatusCodes } = require("http-status-codes");
+const XpEvent = require("../models/XpEvent.model");
+const { getUserXpTotal } = require("../services/xp.service");
 
 //Array comparison helper for single, multi-choice and multi-select questions
 const arraysMatch = (arr1 = [], arr2 = []) => {
@@ -57,8 +64,6 @@ const getQuestionsFromLesson = async (moduleId, microLessonId) => {
   }
   return [];
 };
-//Get user progress . Fetch logged-in user's progress document req.user.id
-//if no progress record exists yet, it creates a new UserProgress doc immediately before returning a 200 Ok
 
 // get all micro-lesson IDS that belong to a specific lesson ID
 const getMicroLessonIdsForLesson = async (moduleId, lessonId) => {
@@ -73,6 +78,8 @@ const getMicroLessonIdsForLesson = async (moduleId, lessonId) => {
 //GET /api/v1/quizzes/progress
 exports.getUserProgress = async (req, res, next) => {
   try {
+    const xpTotal = await getUserXpTotal(req.user.id);
+
     let progressRecord = await UserProgress.findOne({ user_id: req.user.id });
     if (!progressRecord) {
       progressRecord = await UserProgress.create({
@@ -80,7 +87,10 @@ exports.getUserProgress = async (req, res, next) => {
         module_id: "cashFlow",
       });
     }
-    return res.status(StatusCodes.OK).json(progressRecord);
+    return res.status(StatusCodes.OK).json({
+      ...progressRecord.toObject(),
+      xp: xpTotal,
+    });
   } catch (error) {
     return next(error);
   }
@@ -188,6 +198,9 @@ exports.checkAnswer = async (req, res, next) => {
 //Function: Submit quiz responses based on courseId, grades answers, logs the number of quiz attempts, updates lesson progress.
 
 exports.submitQuiz = async (req, res, next) => {
+  const xpRewards = [];
+  let streakReward = null;
+  let awardedBadges = [];
   try {
     const validatedParams = validateRequest(res, quizSubmissionParamsSchema, req.params);
     if (!validatedParams) return;
@@ -270,6 +283,42 @@ exports.submitQuiz = async (req, res, next) => {
     const passThreshold = 70;
     const passed = score >= passThreshold;
 
+    //Check if they've passed previously to award xp for only first pass
+    const previousPass = await QuizAttempt.findOne({
+      user_id: userId,
+      micro_lesson_id: microLessonId,
+      passed: true,
+    });
+
+    //Check if they've gotten a perfect score previously on this quiz
+    const previousPerfect = await QuizAttempt.findOne({
+      user_id: userId,
+      micro_lesson_id: microLessonId,
+      score: 100,
+    });
+
+    //Add xp for passing quiz
+
+    //Calculate user's current xp total for the day to make sure they don't exceed the daily cap
+
+    const currentTotal = await getXpEarnedToday(userId);
+
+    const quizPassXp = calculateXpDelta({
+      eventType: "quiz_pass",
+      currentTotal,
+      score,
+      isFirstPass: passed && !previousPass,
+    });
+
+    //Add xp for first perfect score on each quiz
+    const perfectXp = calculateXpDelta({
+      eventType: "quiz_perfect",
+      currentTotal: currentTotal + quizPassXp.amount,
+      score,
+      isPerfect: score === 100,
+      isFirstPerfect: !previousPerfect,
+    });
+
     //Emit events
     quizEvents.emit("quiz_submit", {
       userId,
@@ -291,21 +340,86 @@ exports.submitQuiz = async (req, res, next) => {
     attempt.answers = evaluatedAnswers;
     await attempt.save();
 
-    // save attempt record
+    // save attempt record & update xp for passing quiz for first time
     if (passed) {
+      //Checking if this microLesson is completed
+      const existingProgress = await UserProgress.findOne({
+        user_id: userId,
+        module_id: moduleId,
+      });
+
+      const alreadyCompletedMicro =
+        existingProgress?.completed_micro_lessons?.includes(microLessonId) || false;
+
+      const update = {
+        $addToSet: {
+          completed_micro_lessons: microLessonId,
+        },
+        // used by next action in dashboard to point Resume Course button to  user's latest lesson
+        $set: {
+          current_micro_lesson_id: microLessonId,
+        },
+      };
+
+      //increases UserProgress.xp
+      if (quizPassXp.amount > 0) {
+        update.$inc = {
+          xp: quizPassXp.amount,
+        };
+      }
+
+      //Add xp to XpEvent database for quiz pass
+      if (quizPassXp.amount > 0) {
+        await XpEvent.create({
+          user_id: userId,
+          event_type: "quiz_pass",
+          amount: quizPassXp.amount,
+          reference_id: microLessonId,
+        });
+      }
+
+      //award xp to send to frontend for Toast notification
+      if (quizPassXp.amount > 0) {
+        xpRewards.push({
+          type: "quiz_pass",
+          amount: quizPassXp.amount,
+        });
+      }
+
+      //increases UserProgress.xp
+      if (perfectXp.amount > 0) {
+        update.$inc = {
+          ...(update.$inc || {}),
+          xp: (update.$inc?.xp || 0) + perfectXp.amount,
+        };
+      }
+
+      //Add xp to XpEvent database for perfect quiz score
+      if (perfectXp.amount > 0) {
+        await XpEvent.create({
+          user_id: userId,
+          event_type: "quiz_perfect",
+          amount: perfectXp.amount,
+          reference_id: microLessonId,
+        });
+      }
+
+      if (perfectXp.amount > 0) {
+        xpRewards.push({
+          type: "quiz_perfect",
+          amount: perfectXp.amount,
+        });
+      }
+
       const updatedProgress = await UserProgress.findOneAndUpdate(
         { user_id: userId, module_id: moduleId },
-        {
-          $addToSet: {
-            completed_micro_lessons: microLessonId,
-          },
-          // used by next action in dashboard to point Resume Course button to  user's latest lesson
-          $set: {
-            current_micro_lesson_id: microLessonId,
-          },
-        },
+        update,
         { upsert: true, returnDocument: "after" },
       );
+      if (!alreadyCompletedMicro) {
+        streakReward = await updateUserStreak(userId);
+      }
+      awardedBadges = await awardEligibleBadges(userId);
       const allMicroLessonsIds = await getMicroLessonIdsForLesson(moduleId, lessonId);
       const userCompletedMicros = new Set(updatedProgress.completed_micro_lessons || []);
       const isLessonFullyCompleted =
@@ -314,16 +428,47 @@ exports.submitQuiz = async (req, res, next) => {
 
       // parent lesson will be considered complete only if all micro lessons are finished
       if (isLessonFullyCompleted) {
+        const alreadyCompleted = updatedProgress.completed_lessons?.includes(lessonId) || false;
+
+        const lessonXp = calculateXpDelta({
+          eventType: "lesson_complete",
+          currentTotal: currentTotal + quizPassXp.amount + perfectXp.amount,
+          isFirstTime: !alreadyCompleted,
+        });
+
         await UserProgress.findOneAndUpdate(
           { user_id: userId, module_id: moduleId },
           {
             $addToSet: {
               completed_lessons: lessonId,
             },
+            //increases UserProgress.xp
+            $inc: {
+              xp: lessonXp.amount,
+            },
           },
         );
+
+        //Update xp for lesson completion in XpEvent database
+        if (lessonXp.amount > 0) {
+          await XpEvent.create({
+            user_id: userId,
+            event_type: "lesson_complete",
+            amount: lessonXp.amount,
+            reference_id: lessonId,
+          });
+        }
+
+        //award xp for Toast notification to frontend for lesson completion
+        if (lessonXp.amount > 0) {
+          xpRewards.push({
+            type: "lesson_complete",
+            amount: lessonXp.amount,
+          });
+        }
       }
     }
+
     invalidateDashboardCache(userId);
     return res.status(StatusCodes.OK).json({
       score: attempt.score,
@@ -331,6 +476,11 @@ exports.submitQuiz = async (req, res, next) => {
       attempt_number: attempt.attempt_number,
       missed,
       reviews,
+      rewards: {
+        xp: xpRewards,
+        streak: streakReward,
+        badges: awardedBadges,
+      },
     });
   } catch (error) {
     return next(error);
