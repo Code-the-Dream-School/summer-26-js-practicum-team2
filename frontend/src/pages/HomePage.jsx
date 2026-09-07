@@ -123,7 +123,7 @@ export default function HomePage() {
             {
               step: 1,
               title: "Pick a Topic",
-              body: "Choose from modules covering Credit Cards, Emergency Funds, or Student Loans.",
+              body: "Choose from modules covering topics such as Budgeting, Credit Cards, or Savings.",
             },
             {
               step: 2,
