@@ -47,6 +47,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.5] - 2026-09-06
+
+### Changed
+
+- Consolidated duplicate frontend test coverage for the main layout, navbar, and dashboard hook into single canonical suites without changing behavior.
+
+---
+
+## [0.7.4] - 2026-09-05
+
+### Added
+
+- Added a confirmed self-service action for learners to reset their lesson progress from the Profile page.
+
+### Changed
+
+- Updated completed onboarding tours to offer a dashboard retake action instead of an always-visible setup checkbox.
+- Updated onboarding skip behavior to disable the workflow and return learners to the dashboard.
+
+### Fixed
+
+- Fixed onboarding state initialization for tours that have not started and prevented the home route from being treated as the dashboard tour.
+
+---
+
+## [0.7.3] - 2026-09-05
+
+### Added
+
+- Added API integration coverage for onboarding progress updates and tour completion behavior.
+
+### Changed
+
+- Consolidated the frontend onboarding context, overlay, constants, and utilities under the shared onboarding feature.
+- Simplified protected routing by supporting role checks through the shared protected route.
+- Reused shared request validation for profile, avatar, password, and account-deletion endpoints.
+- Reduced the long-password minimum from 16 to 15 characters across frontend and backend validation.
+
+### Removed
+
+- Removed the obsolete onboarding implementation, duplicate role-protected route, stale learning-path tour markup, and commented-out code from related backend and lesson-rendering files.
+
+---
+
 ## [0.7.2] - 2026-09-05
 
 ### Added

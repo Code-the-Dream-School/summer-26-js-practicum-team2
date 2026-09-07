@@ -5,14 +5,14 @@ const SHORT_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9\
 
 const passwordSchema = Joi.alternatives()
   .try(
-    Joi.string().trim().min(16).pattern(LONG_PASSWORD_PATTERN),
+    Joi.string().trim().min(15).pattern(LONG_PASSWORD_PATTERN),
     Joi.string().trim().min(8).pattern(SHORT_PASSWORD_PATTERN),
   )
   .required()
   .messages({
     "string.empty": "Password is required.",
     "alternatives.match":
-      "Password must be at least 16 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
+      "Password must be at least 15 characters long and include upper and lower case letters and a number, or at least 8 characters long and include upper and lower case letters, a number, and a special character.",
     "any.required": "Password is required.",
   });
 

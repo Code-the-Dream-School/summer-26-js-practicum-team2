@@ -235,6 +235,14 @@ export const setProfileAvatarUrl = async ({ avatarUrl, csrfToken }) => {
   return response;
 };
 
+export const resetProfileProgress = (csrfToken) =>
+  apiRequest("/progress/reset", {
+    method: "POST",
+    body: { confirmation: "CONFIRM" },
+    csrfToken,
+    basePath: PROFILE_BASE_PATH,
+  });
+
 export const getAdminUsers = ({ page, limit, role, emailVerified, search } = {}) => {
   const params = new URLSearchParams();
   if (page) params.set("page", page);

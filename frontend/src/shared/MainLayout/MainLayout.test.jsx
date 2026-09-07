@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Routes, Route } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import MainLayout from "./MainLayout.component";
 
@@ -16,11 +16,24 @@ describe("MainLayout", () => {
       </MemoryRouter>,
     );
 
-    // The skip link should point directly to the main content area for keyboard users.
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute(
       "href",
       "#main-content",
     );
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
+
+  it("renders the profile route content inside the layout", () => {
+    render(
+      <MemoryRouter initialEntries={["/profile"]}>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/profile" element={<div data-testid="profile">Profile</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId("profile")).toBeInTheDocument();
   });
 });

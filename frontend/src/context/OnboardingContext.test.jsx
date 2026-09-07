@@ -26,6 +26,26 @@ const UserTest = () => {
 };
 
 describe("OnboardingContext tests", () => {
+  it("persists completed onboarding using the value read on reload", async () => {
+    localStorage.removeItem("sprout_onboarding_complete");
+    api.getOnboardingState.mockResolvedValueOnce({
+      onboarding: { is_completed: true },
+    });
+    render(
+      <AuthProvider>
+        <OnboardingProvider>
+          <UserTest />
+        </OnboardingProvider>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(localStorage.getItem("sprout_onboarding_complete")).toBe("true");
+    });
+    expect(screen.getByTestId("syncStep")).toHaveTextContent("null");
+    localStorage.removeItem("sprout_onboarding_complete");
+  });
+
   it("sends the lesson tour through the last-lesson redirect", () => {
     expect(ONBOARDING_STEPS[2]).toEqual({
       page: "lessonPage",

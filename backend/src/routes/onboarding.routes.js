@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  beginOnboarding,
   getOnboardingState,
   updateOnboardingProgress,
   resetOnboardingProgress,
@@ -10,6 +11,9 @@ const {
 const { authenticateUser: jwtMiddleware } = require("../middleware/jsonWebToken");
 
 router.use(jwtMiddleware);
+
+//GET /api/v1/onboarding/begin Get initial default tour structure of the object
+router.get("/begin", beginOnboarding);
 
 //GET /api/v1/onboarding
 router.get("/", getOnboardingState);

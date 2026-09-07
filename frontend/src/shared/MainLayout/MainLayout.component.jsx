@@ -7,7 +7,6 @@ import Header from "./Header/Header.component";
 import Footer from "./Footer/Footer.component";
 import ConsentBanner from "../../features/legal/ConsentBanner/ConsentBanner.component";
 import { getOnboardingPageName } from "../../features/onboarding/onboarding.utils";
-
 import useRewardQueue from "../../hooks/useRewardQueue";
 import Toast from "../Toast/Toast.component";
 

@@ -26,47 +26,22 @@ export default function OnboardingOverlay({
   onStart,
   onSkip,
 }) {
-  //data persistent banner on dashboard if it's not completed with all pages
-  const showCheckboxBanner = pageName === "dashboardPage";
   const tourContent = STEP_CONTENT[currentStep] || {};
   //render floating step popup if step is active and matches the current route
   const showTourPopup = currentStep !== null && activePage === pageName && !hasCompleted;
 
-  const isTourActive = currentStep !== null && currentStep >= 0 && !hasCompleted;
-
-  const handleCheckboxChange = (e) => {
-    if (e.target.checked) {
-      onStart(); //triggers restart/begin onboarding
-    } else {
-      onSkip(); //triggers skip/disable unboarding
-    }
-  };
   return (
     <>
-      {showCheckboxBanner && (
-        <div className="w-full rounded-xl border border-neutral-200 bg-white p-4 shadow-sm mb-6">
-          <div className="flex items-center justify-between">
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isTourActive}
-                id="onboarding-say-yes"
-                onChange={handleCheckboxChange} // begins global start logic, reset step, and updates state
-                className="h-5 w-5 rounded border-neutral-300 text-primary focus:ring-primary cursor-pointer"
-              />
-              <span className="font-medium text-sm text-neutral-800">
-                {hasCompleted ? "Retake Sprout Tour" : "Would you like to tour Sprout?"}
-              </span>
-            </label>
-            {isTourActive && (
-              <button
-                onClick={onSkip}
-                className="text-xs text-neutral-500 hover:text-neutral-700 underline"
-              >
-                No thanks, skip
-              </button>
-            )}
-          </div>
+      {pageName === "dashboardPage" && hasCompleted && (
+        <div className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+          <span className="text-sm font-semibold text-heading">Need a refresher?</span>
+          <button
+            type="button"
+            onClick={onStart}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border-2 border-primary bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Retake tour
+          </button>
         </div>
       )}
 
@@ -78,18 +53,18 @@ export default function OnboardingOverlay({
             </span>
             <h4 className="font-heading text-sm font-bold text-heading">{tourContent.title}</h4>
           </div>
-          <p className="mt-2 text-xs text-neutral-600 leading-relaxed">{tourContent.text}</p>
+          <p className="mt-2 text-xs leading-relaxed text-neutral-600">{tourContent.text}</p>
 
           <div className="mt-4 flex justify-end gap-2">
             <button
               onClick={onSkip}
-              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors"
+              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark"
             >
               Skip
             </button>
             <button
               onClick={onNext}
-              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors"
+              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark"
             >
               {currentStep === 3 ? "Finish Tour" : "Next Step"}
             </button>
