@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Removed the commented-out onboarding overlay block from the learning path page.
+### Fixed
+
+- Fixed learning-path node navigation so selecting a micro-lesson opens that exact micro-lesson instead of resuming a different saved step.
 
 ---
 

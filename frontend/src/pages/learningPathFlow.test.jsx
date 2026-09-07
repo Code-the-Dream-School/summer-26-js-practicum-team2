@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import LearningPathPage from "./LearningPathPage";
 import * as api from "../services/api";
@@ -106,7 +106,7 @@ describe("learning path page", () => {
       <MemoryRouter initialEntries={["/learn"]}>
         <Routes>
           <Route path="/learn" element={<LearningPathPage />} />
-          <Route path="/learn/:moduleId/:lessonId" element={<div>Selected lesson</div>} />
+          <Route path="/learn/:moduleId/:lessonId" element={<SelectedLesson />} />
         </Routes>
       </MemoryRouter>,
     );
@@ -116,8 +116,13 @@ describe("learning path page", () => {
     await user.click(currentNode);
 
     // Clicking an available step should open its lesson and use the expected API data.
-    expect(screen.getByText("Selected lesson")).toBeInTheDocument();
+    expect(screen.getByText("Selected lesson: 1.1.2")).toBeInTheDocument();
     expect(api.getLessonProgress).toHaveBeenCalledWith("cashFlow");
     expect(api.getLesson).toHaveBeenCalledWith("cashFlow", "1.1");
   });
 });
+
+function SelectedLesson() {
+  const location = useLocation();
+  return <div>Selected lesson: {location.state?.microLessonId}</div>;
+}
