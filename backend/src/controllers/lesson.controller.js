@@ -50,6 +50,47 @@ exports.getLessonModules = async (req, res, next) => {
   }
 };
 
+// GET /api/v1/lessons/last
+// Returns the path to the learner's most recently touched, currently-unlocked lesson.
+exports.getLastLesson = async (req, res, next) => {
+  try {
+    const progressRecord = await UserProgress.findOne({ user_id: req.user.id })
+      .sort({ updated_at: -1 })
+      .lean();
+
+    if (!progressRecord) {
+      const firstModule = await getModule(DEFAULT_MODULE_ID);
+      const firstLessonId = firstModule?.lessons?.[0]?.id;
+      return res.status(StatusCodes.OK).json({
+        lastLessonPath:
+          firstModule && firstLessonId ? `/learn/${firstModule.id}/${firstLessonId}` : null,
+      });
+    }
+
+    const moduleData = await getModule(progressRecord.module_id);
+    const lessonSequence = (moduleData?.lessons || []).map((lesson) => lesson.id);
+    const unlocked = isLessonUnlocked({
+      lessonId: progressRecord.course_lesson_id,
+      lessonSequence,
+      completedLessons: progressRecord.completed_lessons || [],
+    });
+
+    // Never point the learner at a lesson their own progress hasn't actually unlocked.
+    const completedLessons = progressRecord.completed_lessons || [];
+    const fallbackLessonId =
+      lessonSequence[completedLessons.length] ||
+      lessonSequence[0] ||
+      progressRecord.course_lesson_id;
+    const lessonId = unlocked ? progressRecord.course_lesson_id : fallbackLessonId;
+
+    return res.status(StatusCodes.OK).json({
+      lastLessonPath: lessonId ? `/learn/${progressRecord.module_id}/${lessonId}` : null,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // GET /api/v1/lessons/:moduleId/:lessonId
 // Returns the module + lesson content along with the caller's progress, without mutating it.
 exports.getLesson = async (req, res, next) => {
