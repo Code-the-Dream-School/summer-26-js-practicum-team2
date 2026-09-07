@@ -43,4 +43,11 @@ describe("aggregateLessonScore", () => {
     expect(result.percentage).toBe(0);
     expect(result.passed).toBe(false);
   });
+
+  it("uses the server score when a perfect submission has no missed answers", () => {
+    const result = aggregateLessonScore([{ totalQuestions: 1, score: 100, passed: true }], 0.7);
+
+    expect(result.percentage).toBe(100);
+    expect(result.passed).toBe(true);
+  });
 });
