@@ -19,7 +19,7 @@ import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
 
 export default function LearnPage() {
-  const { isAuthenticated, isHydrating, csrfToken } = useAuthContext();
+  const { isAuthenticated, isHydrating, csrfToken, refreshProfile } = useAuthContext();
   const { moduleId, lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -145,6 +145,7 @@ export default function LearnPage() {
       savedProgress={progress}
       selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
+      refreshProfile={refreshProfile}
     />
   );
 }

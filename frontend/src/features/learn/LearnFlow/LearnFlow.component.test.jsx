@@ -6,6 +6,7 @@ import LearnFlow from "./LearnFlow.component";
 
 // Keep the progress requests mocked so these tests can focus on LearnFlow behavior.
 const completeLessonMock = vi.fn(() => Promise.resolve({}));
+const completeMicroLessonMock = vi.fn(() => Promise.resolve({}));
 const updateLessonProgressMock = vi.fn(() => Promise.resolve({}));
 const restartLessonProgressMock = vi.fn(() => Promise.resolve({}));
 
@@ -37,6 +38,7 @@ vi.mock("../../../utils/quizScoring", () => ({
 
 // Route progress calls through shared mocks so we can check what LearnFlow sends to the API.
 vi.mock("../../../services/api", () => ({
+  completeMicroLesson: (...args) => completeMicroLessonMock(...args),
   completeLesson: (...args) => completeLessonMock(...args),
   updateLessonProgress: (...args) => updateLessonProgressMock(...args),
   restartLessonProgress: (...args) => restartLessonProgressMock(...args),
@@ -119,6 +121,8 @@ describe("LearnFlow regressions", () => {
   beforeEach(() => {
     // Clear previous progress calls so each test starts with fresh mocks.
     completeLessonMock.mockClear();
+    completeMicroLessonMock.mockReset();
+    completeMicroLessonMock.mockResolvedValue({});
     updateLessonProgressMock.mockClear();
     restartLessonProgressMock.mockClear();
   });
@@ -210,6 +214,19 @@ describe("LearnFlow regressions", () => {
         currentChunkIndex: 0,
         csrfToken: "csrf-token",
       });
+    });
+  });
+
+  it("advances when micro-lesson completion persistence fails", async () => {
+    const user = userEvent.setup();
+    completeMicroLessonMock.mockRejectedValueOnce(new Error("Request failed"));
+
+    renderLearnFlow();
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Step Two")).toBeInTheDocument();
     });
   });
 

@@ -1,15 +1,16 @@
 import { createContext, use, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "./AuthContext";
-import { ONBOARDING_STEPS } from "../features/onboarding1/onboarding.constants";
+import { ONBOARDING_STEPS } from "../features/onboarding/onboarding.constants";
 import {
   resetOnboardingProgress as apiResetOnboarding,
   updateOnboardingProgress as apiUpdateOnboardingProgress,
   beginOnboarding as apiBeginOnboarding,
   getOnboardingState as apiGetOnboardingState,
+  toggleOnboardingWorkflow as apiToggleOnboardingWorkflow,
 } from "../services/api";
 
-export { ONBOARDING_STEPS } from "../features/onboarding1/onboarding.constants";
+export { ONBOARDING_STEPS } from "../features/onboarding/onboarding.constants";
 
 const OnboardingContext = createContext(null);
 
@@ -36,9 +37,11 @@ export function OnboardingProvider({ children }) {
           const onboarding = response.onboarding;
           const completed = Boolean(onboarding.is_completed);
           setHasCompleted(completed);
-          localStorage.setItem("sprout_onboarding_complete", completed ? " true" : "false");
+          localStorage.setItem("sprout_onboarding_complete", completed ? "true" : "false");
           if (!completed && onboarding.started_at) {
             setCurrentStep(onboarding.current_step ?? 0);
+          } else if (!completed && !onboarding.started_at) {
+            setCurrentStep(0);
           } else {
             setCurrentStep(null);
           }
@@ -75,15 +78,13 @@ export function OnboardingProvider({ children }) {
     }
   };
   const skipOnboarding = async () => {
-    const activeTourKey = ONBOARDING_STEPS[currentStep]?.page;
+    setCurrentStep(null);
+    localStorage.setItem("sprout_onboarding_complete", "true");
+    setHasCompleted(true);
+    navigate("/dashboard");
+
     try {
-      if (activeTourKey && currentStep !== null) {
-        await sendOnboardingStepToDB(activeTourKey, currentStep, "skipped", true);
-      }
-      setCurrentStep(null);
-      localStorage.setItem("sprout_onboarding_complete", "false");
-      setHasCompleted(false);
-      navigate("/dashboard");
+      await apiToggleOnboardingWorkflow({ enabled: false, csrfToken });
     } catch (err) {
       console.error("Failed to skip onboarding session:", err);
     }
@@ -114,7 +115,6 @@ export function OnboardingProvider({ children }) {
     hasCompleted,
     activePage: currentStep !== null ? ONBOARDING_STEPS[currentStep]?.page : null,
     startOnboarding,
-    //sendOnboardingStepToDB,
     skipOnboarding,
     handleNextStep,
   };
@@ -127,8 +127,4 @@ export function useOnboarding() {
     throw new Error("useOnboarding must be used within an OnboardingProvider");
   }
   return context;
-}
-
-export function useOptionalOnboarding() {
-  return use(OnboardingContext);
 }

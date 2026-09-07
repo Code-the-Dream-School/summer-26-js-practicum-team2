@@ -1,8 +1,6 @@
 //need to import mongoose
 const mongoose = require("mongoose");
 
-//present pageTourSchema for onboarding so userSchema can use it
-
 const pageTourSchema = new mongoose.Schema(
   {
     step: { type: Number, default: 0 },
@@ -100,6 +98,7 @@ const userSchema = new mongoose.Schema(
     onboarding: {
       is_completed: { type: Boolean, default: false },
       current_step: { type: Number, default: 0 },
+      xp_awarded: { type: Boolean, default: false },
       started_at: {
         type: Date,
         default: null,
@@ -143,15 +142,28 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    //Achievements
-    xp: {
-      type: Number,
-      default: 0,
-    },
     streak: {
-      type: Number,
-      default: 0,
+      current: {
+        type: Number,
+        default: 0,
+      },
+      longest: {
+        type: Number,
+        default: 0,
+      },
+      active_learning_days: {
+        type: Number,
+        default: 0,
+      },
+      last_active_date: {
+        type: Date,
+        default: null,
+      },
     },
+    earned_badges: [
+      { badge_id: { type: String, required: true }, awarded_at: { type: Date, default: Date.now } },
+    ],
+    timezone: { type: String, default: "UTC" },
     // Soft-deleted accounts
     is_deleted: {
       type: Boolean,
@@ -198,31 +210,9 @@ userSchema.pre(/^find/, function () {
     this.find(multipleExclusionConditions);
   }
 });
-/* ====== Removed archivedUserSchema because we created a flag directly in the user Schema
-const archivedUserSchema = new mongoose.Schema(
-  {
-    original_user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
-    name: { type: String },
-    email: { type: String },
-    role: { type: String },
-    deleted_at: {
-      type: Date,
-      default: Date.now,
-      expires: 2592000, //MongoDB automatically deletes this document 30Days after deleted_at
-    },
-  },
-  {
-    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
-);*/
 userSchema.index({ deletion_status: 1 });
 userSchema.index({ reactivation_token: 1 });
 
 const User = mongoose.model("User", userSchema);
-//const ArchivedUser = mongoose.model("ArchivedUser", archivedUserSchema);
 
-//module.exports = { User, ArchivedUser };
 module.exports = User;

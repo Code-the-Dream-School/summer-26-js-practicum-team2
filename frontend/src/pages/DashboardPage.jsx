@@ -50,11 +50,25 @@ export default function DashboardPage() {
     );
   }
 
-  const { hero, progress, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  const {
+    hero,
+    xp,
+    badges,
+    progress,
+    nextAction,
+    units = [],
+    recentActivity = [],
+  } = dashboard || {};
   if (units.length === 0) {
     return (
       <section className="space-y-6">
-        <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
+        <DashboardHero
+          hero={hero}
+          nextAction={nextAction}
+          overallProgress={progress}
+          xp={xp?.total ?? 0}
+          badges={badges}
+        />
         <EmptyState
           icon="🌱"
           title="Content coming soon"
@@ -73,7 +87,13 @@ export default function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
+      <DashboardHero
+        hero={hero}
+        nextAction={nextAction}
+        overallProgress={progress}
+        xp={xp?.total ?? 0}
+        badges={badges}
+      />
 
       {hasNoProgress ? (
         <EmptyState
