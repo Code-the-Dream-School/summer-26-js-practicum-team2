@@ -54,6 +54,15 @@ function countChunks(step) {
   return Math.max(step.content?.length ?? 0, 1);
 }
 
+function getSubmissionScore(submission) {
+  if (Number.isFinite(submission?.score)) return submission.score;
+
+  const totalQuestions = submission?.totalQuestions ?? 0;
+  return totalQuestions > 0
+    ? ((totalQuestions - (submission?.missed?.length ?? 0)) / totalQuestions) * 100
+    : 0;
+}
+
 export default function LearnFlow({
   learnData,
   characterImages,
@@ -244,6 +253,10 @@ export default function LearnFlow({
     }
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
+    if (!submission) {
+      return;
+    }
+
     const submissionReviews =
       submission?.reviews?.length > 0
         ? Object.fromEntries(
@@ -251,12 +264,22 @@ export default function LearnFlow({
           )
         : quiz.reviews;
 
-    if (submission) {
-      setSubmissions((current) => ({
-        ...current,
-        [currentMicroLessonId]: { ...submission, totalQuestions: currentStepQuestions.length },
-      }));
-    }
+    setSubmissions((current) => {
+      const nextSubmission = {
+        ...submission,
+        totalQuestions: currentStepQuestions.length,
+      };
+      const previousSubmission = current[currentMicroLessonId];
+
+      if (
+        previousSubmission &&
+        getSubmissionScore(previousSubmission) >= getSubmissionScore(nextSubmission)
+      ) {
+        return current;
+      }
+
+      return { ...current, [currentMicroLessonId]: nextSubmission };
+    });
 
     setCompletedAttempts((current) => [
       ...current,
@@ -297,6 +320,7 @@ export default function LearnFlow({
     setPhase("lesson");
     setIsComplete(false);
     setIsReviewing(false);
+    quiz.reset();
   }
 
   if (isComplete && isReviewing) {
