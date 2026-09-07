@@ -92,6 +92,11 @@ describe("learning path page", () => {
     expect(screen.getByRole("button", { name: /1\.1\.2: Keep going/i })).not.toBeDisabled();
     expect(screen.getByRole("button", { name: /1\.1\.3: Finish strong/i })).toBeDisabled();
     expect(screen.getByText("Tap a step to jump straight into the lesson.")).toBeInTheDocument();
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "center",
+      inline: "nearest",
+    });
   });
 
   it("navigates to the selected lesson", async () => {
