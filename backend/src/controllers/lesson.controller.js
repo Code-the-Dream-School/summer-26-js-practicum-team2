@@ -18,6 +18,7 @@ const {
 } = require("../validation/userValidation");
 const { updateUserStreak } = require("../services/streak.service");
 const { awardEligibleBadges } = require("../services/badge.service");
+const { isLessonUnlocked } = require("../utils/coreRules");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -73,6 +74,23 @@ exports.getLesson = async (req, res, next) => {
       user_id: req.user.id,
       module_id: moduleId,
     });
+
+    // A learner's saved position is always reachable, even if completion bookkeeping
+    // for earlier lessons (e.g. from older progress records) hasn't caught up.
+    const isCurrentPosition = progressRecord?.course_lesson_id === lessonId;
+    const lessonSequence = (moduleData.lessons || []).map((lesson) => lesson.id);
+    const unlocked =
+      isCurrentPosition ||
+      isLessonUnlocked({
+        lessonId,
+        lessonSequence,
+        completedLessons: progressRecord?.completed_lessons || [],
+      });
+    if (!unlocked) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: "Complete the previous lesson to unlock this one.",
+      });
+    }
 
     return res.status(StatusCodes.OK).json({
       moduleData: sanitizeModuleData(moduleData),
