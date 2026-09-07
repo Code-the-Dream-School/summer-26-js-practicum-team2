@@ -15,19 +15,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added a learning path header card with the module progress bar, percentage complete, guide artwork, and an encouraging trail summary.
 - Added regression coverage asserting the learning path scrolls the current lesson into view.
+- Added an authenticated endpoint that resumes learners at their most recently touched, currently unlocked lesson, with safe fallbacks for stale or missing progress.
+- Added regression coverage for lesson access guards and resume-path fallbacks.
 
 ### Changed
 
 - Replaced the straight arrow connectors between learning path nodes with curved, leafy vines that alternate direction along the trail.
 - Deferred the scroll to the current lesson until the asynchronously loaded node has rendered, and limited it to a single scroll per visit.
+- Changed the unavailable-lesson link to return learners to their current lesson instead of the home page.
 
 ### Removed
 
 - Removed the commented-out onboarding overlay block from the learning path page.
+
 ### Fixed
 
+- Prevented learners from loading locked lessons before completing the previous lesson while preserving access to their saved current position.
 - Fixed learning-path node navigation so selecting a micro-lesson opens that exact micro-lesson instead of resuming a different saved step.
 - Fixed the landing-page discrepancy so the homepage matches the intended design and presentation.
+
+---
+
 ## [0.8.3] - 2026-09-07
 
 ### Fixed
