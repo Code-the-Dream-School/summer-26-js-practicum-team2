@@ -25,6 +25,7 @@ POST   /api/v1/quizzes/1.1.2/submit
 GET    /api/v1/profile
 PATCH  /api/v1/profile
 POST   /api/v1/profile/avatar
+POST   /api/v1/profile/progress/reset
 POST   /api/v1/profile/password
 POST   /api/v1/profile/request-deletion
 
@@ -60,6 +61,7 @@ creates the normal HTTP-only session cookie and redirects to `/oauth/callback`. 
 redirect to safe login error codes such as `oauth_failed`, `oauth_email_required`,
 `oauth_terms_required`, or `oauth_unavailable`; these routes rely on external provider redirects
 and are not intended for Postman requests.
+
 ## Deployment Health Check
 
 `GET /health` is a public, unrate-limited process health endpoint for Render. It returns
