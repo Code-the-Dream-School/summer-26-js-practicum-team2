@@ -258,4 +258,32 @@ describe("learn flow", () => {
 
     expect(screen.getByText(/Score: 100% — Pass/)).toBeInTheDocument();
   });
+
+  it("stays on the quiz when submitting the answers fails", async () => {
+    const user = userEvent.setup();
+
+    api.updateLessonProgress.mockResolvedValue({});
+    api.startQuiz.mockResolvedValue({ attemptId: "attempt-1" });
+    api.submitQuiz.mockRejectedValue(new Error("Unable to save quiz attempt."));
+
+    render(
+      <MemoryRouter>
+        <LearnFlow
+          learnData={learnData}
+          characterImages={{}}
+          guideImage="guide.png"
+          csrfToken="csrf-1"
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Quick check" }));
+    await user.click(screen.getByRole("radio", { name: /Money moving in and out/i }));
+    await user.click(screen.getByRole("button", { name: "Check answer" }));
+    await user.click(screen.getByRole("button", { name: "View results" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Unable to save quiz attempt.");
+    expect(screen.queryByText(/Score: .*Fail/)).not.toBeInTheDocument();
+    expect(screen.getByText("What does cash flow describe?")).toBeInTheDocument();
+  });
 });

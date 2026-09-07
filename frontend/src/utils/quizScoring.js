@@ -82,13 +82,14 @@ export function aggregateLessonScore(submissions = [], passThreshold = 0.7) {
     0,
   );
 
-  const missedCount = normalizedSubmissions.reduce(
-    (total, submission) => total + (submission?.missed?.length ?? 0),
-    0,
-  );
+  const correctCount = normalizedSubmissions.reduce((total, submission) => {
+    if (Number.isFinite(submission?.score) && submission?.totalQuestions > 0) {
+      return total + Math.round((submission.score / 100) * submission.totalQuestions);
+    }
 
-  // The correct count is derived from the total and missed counts, and is clamped to zero.
-  const correctCount = Math.max(totalQuestions - missedCount, 0);
+    return total + Math.max(submission?.totalQuestions - (submission?.missed?.length ?? 0), 0);
+  }, 0);
+  const missedCount = Math.max(totalQuestions - correctCount, 0);
   // The final score is the ratio of correct answers to total questions, with a fallback to zero if there are no questions.
   const score = totalQuestions === 0 ? 0 : correctCount / totalQuestions;
   // The percentage is the score expressed as a whole number, and the pass/fail status is determined by the threshold.
