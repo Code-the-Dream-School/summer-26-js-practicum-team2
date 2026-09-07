@@ -5,6 +5,161 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!-- ## [Unreleased] -->
+
+<!-- --- -->
+
+## [0.8.1] - 2026-09-05
+
+### Changed
+
+- Removed the duplicate reward toast rendering from the lesson flow so micro-lesson badge and streak notifications appear only once.
+- Renamed the onboarding context, hook, and overlay modules to drop the legacy `1` suffix.
+- Sourced XP from `UserProgress` in the user API integration tests to match the canonical XP model.
+
+### Removed
+
+- Deleted commented-out code, stale editor notes, and leftover debug logging across the onboarding, quiz, badge, dashboard, and learning path modules.
+
+### Fixed
+
+- Repaired the onboarding context test suite, which imported a renamed module that no longer existed and therefore never ran.
+
+---
+
+## [0.8.0] - 2026-09-05
+
+### Added
+
+- Added reward toasts for XP, streak, and badge updates earned while completing micro-lessons.
+- Added regression coverage for UserProgress XP totals, legacy numeric streak migration, and failed micro-lesson completion persistence.
+
+### Changed
+
+- Made UserProgress the canonical source for user XP totals across profile and navigation views.
+- Removed the obsolete User XP field and duplicate `current_streak` profile response field.
+- Refreshed profile and dashboard data after micro-lesson reward updates.
+
+### Fixed
+
+- Migrated legacy numeric streak values before updating streak details, preventing MongoDB nested-field update errors.
+- Prevented failed micro-lesson reward persistence from trapping learners in an endless quiz loop.
+
+---
+
+## [0.7.5] - 2026-09-06
+
+### Changed
+
+- Consolidated duplicate frontend test coverage for the main layout, navbar, and dashboard hook into single canonical suites without changing behavior.
+
+---
+
+## [0.7.4] - 2026-09-05
+
+### Added
+
+- Added a confirmed self-service action for learners to reset their lesson progress from the Profile page.
+
+### Changed
+
+- Updated completed onboarding tours to offer a dashboard retake action instead of an always-visible setup checkbox.
+- Updated onboarding skip behavior to disable the workflow and return learners to the dashboard.
+
+### Fixed
+
+- Fixed onboarding state initialization for tours that have not started and prevented the home route from being treated as the dashboard tour.
+
+---
+
+## [0.7.3] - 2026-09-05
+
+### Added
+
+- Added API integration coverage for onboarding progress updates and tour completion behavior.
+
+### Changed
+
+- Consolidated the frontend onboarding context, overlay, constants, and utilities under the shared onboarding feature.
+- Simplified protected routing by supporting role checks through the shared protected route.
+- Reused shared request validation for profile, avatar, password, and account-deletion endpoints.
+- Reduced the long-password minimum from 16 to 15 characters across frontend and backend validation.
+
+### Removed
+
+- Removed the obsolete onboarding implementation, duplicate role-protected route, stale learning-path tour markup, and commented-out code from related backend and lesson-rendering files.
+
+---
+
+## [0.7.2] - 2026-09-05
+
+### Added
+
+- Add core rules implementation and corresponding tests for XP calculations and lesson unlocking
+
+---
+
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Implemented soft deletion, reactivation, and avatar upload updates
+- Integrated Joi validation for profile route
+- Added profile and account lifecycle tests to Postman collection
+- Added Postman collection tests for Express routes
+
+### Changed
+
+- Updated dashboard, profile, and lesson onboarding descriptions and renamed the sample lesson tour heading to "Lesson Page".
+- Cleaned up onboarding comments and standardized formatting across onboarding code, validation, shared layout, and related tests.
+- Synchronized frontend and backend lockfile references to the root package's 0.7.1 version.
+
+### Fixed
+
+- Added completed-onboarding API fixtures to the mobile navigation and profile avatar end-to-end tests so those scenarios do not depend on live onboarding state.
+
+---
+
+## [0.7.1] - 2026-09-04
+
+### Added
+
+- Added focused regression coverage for mapping dashboard, profile, learning-path, lesson, and unrelated URLs to onboarding page names.
+
+### Changed
+
+- Centralized onboarding step and route definitions in a shared constants module so the context and standalone hook cannot drift apart.
+- Extracted onboarding page detection into a shared utility, preserving exact learning-path matching and nested lesson-route detection.
+- Added provider-scoped OAuth failure diagnostics without logging state values or other sensitive callback data.
+
+### Fixed
+
+- Fixed invalid, missing, expired, or reused OAuth state callbacks to return a specific sign-in-session error instead of the generic OAuth failure message.
+
+---
+
+## [0.7.0] - 2026-09-04
+
+### Added
+
+- Added an authenticated, four-step product tour across the dashboard, profile, first lesson, and learning path, with controls to start, skip, resume, and retake the tour.
+- Added persistent onboarding state and authenticated APIs for reading, resetting, enabling, disabling, and updating tour progress.
+- Added a 50 XP reward for completing every onboarding tour without skipping.
+- Added OAuth provider avatars to newly created and linked accounts, with initials displayed when an avatar is missing or fails to load.
+
+### Changed
+
+- Updated the current-user response with avatar, streak, and XP data used by shared account views.
+- Updated last-lesson navigation to open the first lesson when no saved or server-provided lesson path is available.
+- Updated externally hosted avatars to use a no-referrer request policy.
+
+### Fixed
+
+- Fixed sign-in for existing GitHub-linked accounts when GitHub does not return an email address on a later authorization.
+- Fixed OAuth avatar synchronization so returning users receive their current provider avatar.
+
+---
+
 ## [0.6.1] - 2026-09-03
 
 ### Changed
