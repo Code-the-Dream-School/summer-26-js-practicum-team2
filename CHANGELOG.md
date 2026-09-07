@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed learning-path node navigation so selecting a micro-lesson opens that exact micro-lesson instead of resuming a different saved step.
 - Fixed the landing-page discrepancy so the homepage matches the intended design and presentation.
+## [0.8.3] - 2026-09-07
+
+### Fixed
+
+- Resolved quiz submissions before skipping local quiz state updates after unmount, preventing rapid navigation from triggering React updates on unmounted components.
 
 ---
 
