@@ -21,6 +21,95 @@ function validateAwardInput({ userId, eventType, sourceKey, requestedXp, occurre
   if (Number.isNaN(occurredAt.getTime())) throw new TypeError("A valid award date is required.");
 }
 
+function cannotUseTransactions(error) {
+  return error?.message?.includes(
+    "Transaction numbers are only allowed on a replica set member or mongos",
+  );
+}
+
+async function findExistingEvent({ userId, sourceKey, session }) {
+  const query = XpEvent.findOne({
+    user_id: userId,
+    source_key: sourceKey,
+  });
+
+  return session ? query.session(session) : query;
+}
+
+async function applyAward({
+  normalizedUserId,
+  normalizedSourceKey,
+  eventType,
+  requestedXp,
+  awardDate,
+  dayStart,
+  session,
+}) {
+  const existingEvent = await findExistingEvent({
+    userId: normalizedUserId,
+    sourceKey: normalizedSourceKey,
+    session,
+  });
+
+  if (existingEvent) {
+    return {
+      event: existingEvent,
+      duplicate: true,
+      capped: existingEvent.awarded_xp < existingEvent.requested_xp,
+    };
+  }
+
+  const dailyTotal = await DailyXpTotal.findOneAndUpdate(
+    { user_id: normalizedUserId, day_start: dayStart },
+    [
+      {
+        $set: {
+          user_id: normalizedUserId,
+          day_start: dayStart,
+          last_awarded_xp: {
+            $min: [
+              requestedXp,
+              {
+                $max: [0, { $subtract: [XP_CAP, { $ifNull: ["$xp_total", 0] }] }],
+              },
+            ],
+          },
+          xp_total: {
+            $min: [XP_CAP, { $add: [{ $ifNull: ["$xp_total", 0] }, requestedXp] }],
+          },
+        },
+      },
+    ],
+    {
+      upsert: true,
+      returnDocument: "after",
+      updatePipeline: true,
+      ...(session ? { session } : {}),
+    },
+  );
+  const awardedXp = dailyTotal.last_awarded_xp;
+  const [event] = await XpEvent.create(
+    [
+      {
+        user_id: normalizedUserId,
+        event_type: eventType,
+        source_key: normalizedSourceKey,
+        requested_xp: requestedXp,
+        awarded_xp: awardedXp,
+        occurred_at: awardDate,
+      },
+    ],
+    session ? { session } : undefined,
+  );
+
+  return {
+    event,
+    duplicate: false,
+    capped: awardedXp < requestedXp,
+    remainingToday: XP_CAP - dailyTotal.xp_total,
+  };
+}
+
 async function awardXp({ userId, eventType, sourceKey, requestedXp, occurredAt = new Date() }) {
   const awardDate = occurredAt instanceof Date ? new Date(occurredAt) : new Date(occurredAt);
   validateAwardInput({ userId, eventType, sourceKey, requestedXp, occurredAt: awardDate });
@@ -29,74 +118,32 @@ async function awardXp({ userId, eventType, sourceKey, requestedXp, occurredAt =
   const normalizedUserId = new mongoose.Types.ObjectId(userId);
   const dayStart = getUtcDayStart(awardDate);
   const session = await mongoose.startSession();
-  let result;
 
   try {
+    let result;
     await session.withTransaction(async () => {
-      const existingEvent = await XpEvent.findOne({
-        user_id: normalizedUserId,
-        source_key: normalizedSourceKey,
-      }).session(session);
-
-      if (existingEvent) {
-        result = {
-          event: existingEvent,
-          duplicate: true,
-          capped: existingEvent.awarded_xp < existingEvent.requested_xp,
-        };
-        return;
-      }
-
-      const dailyTotal = await DailyXpTotal.findOneAndUpdate(
-        { user_id: normalizedUserId, day_start: dayStart },
-        [
-          {
-            $set: {
-              user_id: normalizedUserId,
-              day_start: dayStart,
-              last_awarded_xp: {
-                $min: [
-                  requestedXp,
-                  {
-                    $max: [0, { $subtract: [XP_CAP, { $ifNull: ["$xp_total", 0] }] }],
-                  },
-                ],
-              },
-              xp_total: {
-                $min: [XP_CAP, { $add: [{ $ifNull: ["$xp_total", 0] }, requestedXp] }],
-              },
-            },
-          },
-        ],
-        {
-          upsert: true,
-          returnDocument: "after",
-          session,
-        },
-      );
-      const awardedXp = dailyTotal.last_awarded_xp;
-      const [event] = await XpEvent.create(
-        [
-          {
-            user_id: normalizedUserId,
-            event_type: eventType,
-            source_key: normalizedSourceKey,
-            requested_xp: requestedXp,
-            awarded_xp: awardedXp,
-            occurred_at: awardDate,
-          },
-        ],
-        { session },
-      );
-
-      result = {
-        event,
-        duplicate: false,
-        capped: awardedXp < requestedXp,
-        remainingToday: XP_CAP - dailyTotal.xp_total,
-      };
+      result = await applyAward({
+        normalizedUserId,
+        normalizedSourceKey,
+        eventType,
+        requestedXp,
+        awardDate,
+        dayStart,
+        session,
+      });
     });
+    return result;
   } catch (error) {
+    if (cannotUseTransactions(error)) {
+      return applyAward({
+        normalizedUserId,
+        normalizedSourceKey,
+        eventType,
+        requestedXp,
+        awardDate,
+        dayStart,
+      });
+    }
     if (error?.code === 11000) {
       const existingEvent = await XpEvent.findOne({
         user_id: normalizedUserId,
@@ -114,8 +161,6 @@ async function awardXp({ userId, eventType, sourceKey, requestedXp, occurredAt =
   } finally {
     await session.endSession();
   }
-
-  return result;
 }
 
 module.exports = { awardXp, getUtcDayStart };

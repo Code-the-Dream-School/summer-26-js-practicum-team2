@@ -6,6 +6,7 @@ import {
   changeProfilePassword,
   deleteProfile,
   getProfile,
+  resetProfileProgress,
   setProfileAvatarUrl,
   updateProfile,
 } from "../services/api";
@@ -169,6 +170,21 @@ export default function ProfilePage() {
       setPending("");
     }
   };
+
+  const requestResetProgress = async () => {
+    if (!window.confirm("Reset all lesson progress? This cannot be undone.")) return;
+
+    setPending("reset-progress");
+    try {
+      const result = await resetProfileProgress(csrfToken);
+      await reloadProfile();
+      showToast(result.message || "Your progress has been reset.", "success");
+    } catch (error) {
+      showToast(errorMessage(error));
+    } finally {
+      setPending("");
+    }
+  };
   if (loading) {
     return <Skeleton />;
   }
@@ -225,6 +241,8 @@ export default function ProfilePage() {
           <Stat label="XP Points:" value={` ${(profile?.xp ?? 0).toLocaleString()}`} />
           <div className="h-8 w-px bg-neutral-200" />
           <Stat label="Streak:" value={` ${profile?.streak ?? 0} days`} />
+          <Stat label="Longest Streak:" value={` ${profile?.longest_streak ?? 0} days`} />
+          <Stat label="Total Days:" value={` ${profile?.active_learning_days ?? 0} days`} />
         </div>
       </header>
 
@@ -404,6 +422,21 @@ export default function ProfilePage() {
             {pending === "delete" ? "Submitting request.." : "Request Account Deletion"}
           </Button>
         </form>
+
+        <div className="border-t border-danger/20 pt-4">
+          <p className="text-sm text-neutral-600">
+            Reset lesson progress while keeping your profile.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-3 border border-danger/40 text-danger hover:bg-danger/10"
+            disabled={pending === "reset-progress"}
+            onClick={() => void requestResetProgress()}
+          >
+            {pending === "reset-progress" ? "Resetting progress..." : "Reset my progress"}
+          </Button>
+        </div>
       </div>
     </section>
   );

@@ -201,6 +201,7 @@ export function useAuth() {
     async ({ email, password, remember = false }) => {
       const payload = await runRequest(() => api.loginUser({ email, password, remember }));
       commitAuth(payload, remember);
+
       return payload;
     },
     [runRequest, commitAuth],
@@ -249,6 +250,9 @@ export function useAuth() {
     () => ({
       ...authState,
       isAuthenticated: Boolean(user),
+      profile: user,
+      xpTotal: user?.xp ?? 0,
+      refreshProfile: syncProfileAfterProgress,
       register,
       login,
       logout,
@@ -262,6 +266,7 @@ export function useAuth() {
     [
       authState,
       user,
+      syncProfileAfterProgress,
       register,
       login,
       logout,

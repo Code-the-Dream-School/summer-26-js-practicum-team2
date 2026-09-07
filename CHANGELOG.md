@@ -9,6 +9,145 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.8.2] - 2026-09-06
+
+### Added
+
+- Added the onboarding flow for new users, including progress tracking, skip behavior, retakes, and API coverage.
+- Added a self-service profile action for resetting lesson progress.
+- Added Playwright, frontend, and backend regression coverage for quiz pass/fail results and retries.
+
+### Changed
+
+- Preserved the best score for each micro-lesson when learners retry a quiz.
+- Used the server-reported quiz score when calculating lesson results.
+- Allowed learners to start a new quiz attempt after submitting a previous attempt.
+- Consolidated duplicate frontend test suites and reused shared validation across profile and account endpoints.
+- Reduced the minimum long-password requirement from 16 to 15 characters.
+
+### Removed
+
+- Removed obsolete onboarding implementations, duplicate role-protection code, and stale related test files.
+
+### Fixed
+
+- Prevented failed quiz submissions from displaying a misleading `0% — Fail` result.
+- Reset stale quiz attempt state when learners start a lesson over.
+- Fixed onboarding initialization and route detection for new and completed tours.
+
+---
+
+## [0.8.1] - 2026-09-05
+
+### Changed
+
+- Removed the duplicate reward toast rendering from the lesson flow so micro-lesson badge and streak notifications appear only once.
+- Renamed the onboarding context, hook, and overlay modules to drop the legacy `1` suffix.
+- Sourced XP from `UserProgress` in the user API integration tests to match the canonical XP model.
+
+### Removed
+
+- Deleted commented-out code, stale editor notes, and leftover debug logging across the onboarding, quiz, badge, dashboard, and learning path modules.
+
+### Fixed
+
+- Repaired the onboarding context test suite, which imported a renamed module that no longer existed and therefore never ran.
+
+---
+
+## [0.8.0] - 2026-09-05
+
+### Added
+
+- Added reward toasts for XP, streak, and badge updates earned while completing micro-lessons.
+- Added regression coverage for UserProgress XP totals, legacy numeric streak migration, and failed micro-lesson completion persistence.
+
+### Changed
+
+- Made UserProgress the canonical source for user XP totals across profile and navigation views.
+- Removed the obsolete User XP field and duplicate `current_streak` profile response field.
+- Refreshed profile and dashboard data after micro-lesson reward updates.
+
+### Fixed
+
+- Migrated legacy numeric streak values before updating streak details, preventing MongoDB nested-field update errors.
+- Prevented failed micro-lesson reward persistence from trapping learners in an endless quiz loop.
+
+---
+
+## [0.7.5] - 2026-09-06
+
+### Changed
+
+- Consolidated duplicate frontend test coverage for the main layout, navbar, and dashboard hook into single canonical suites without changing behavior.
+
+---
+
+## [0.7.4] - 2026-09-05
+
+### Added
+
+- Added a confirmed self-service action for learners to reset their lesson progress from the Profile page.
+
+### Changed
+
+- Updated completed onboarding tours to offer a dashboard retake action instead of an always-visible setup checkbox.
+- Updated onboarding skip behavior to disable the workflow and return learners to the dashboard.
+
+### Fixed
+
+- Fixed onboarding state initialization for tours that have not started and prevented the home route from being treated as the dashboard tour.
+
+---
+
+## [0.7.3] - 2026-09-05
+
+### Added
+
+- Added API integration coverage for onboarding progress updates and tour completion behavior.
+
+### Changed
+
+- Consolidated the frontend onboarding context, overlay, constants, and utilities under the shared onboarding feature.
+- Simplified protected routing by supporting role checks through the shared protected route.
+- Reused shared request validation for profile, avatar, password, and account-deletion endpoints.
+- Reduced the long-password minimum from 16 to 15 characters across frontend and backend validation.
+
+### Removed
+
+- Removed the obsolete onboarding implementation, duplicate role-protected route, stale learning-path tour markup, and commented-out code from related backend and lesson-rendering files.
+
+---
+
+## [0.7.2] - 2026-09-05
+
+### Added
+
+- Add core rules implementation and corresponding tests for XP calculations and lesson unlocking
+
+---
+
+## [0.3.4] - 2026-08-19
+
+### Added
+
+- Implemented soft deletion, reactivation, and avatar upload updates
+- Integrated Joi validation for profile route
+- Added profile and account lifecycle tests to Postman collection
+- Added Postman collection tests for Express routes
+
+### Changed
+
+- Updated dashboard, profile, and lesson onboarding descriptions and renamed the sample lesson tour heading to "Lesson Page".
+- Cleaned up onboarding comments and standardized formatting across onboarding code, validation, shared layout, and related tests.
+- Synchronized frontend and backend lockfile references to the root package's 0.7.1 version.
+
+### Fixed
+
+- Added completed-onboarding API fixtures to the mobile navigation and profile avatar end-to-end tests so those scenarios do not depend on live onboarding state.
+
+---
+
 ## [0.7.1] - 2026-09-04
 
 ### Added

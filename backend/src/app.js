@@ -24,8 +24,8 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const leaderboardRoutes = require("./routes/leaderboard.routes");
 const profileRoutes = require("./routes/profile.routes");
 const quizRoutes = require("./routes/quiz.routes");
-const onboardingRoutes = require("./routes/onboarding.routes");
 const quizPublicRoutes = require("./routes/quizPublic.routes");
+const onboardingRoutes = require("./routes/onboarding.routes");
 
 // Create Express app
 const app = express();

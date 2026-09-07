@@ -3,7 +3,12 @@ import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
 import { getResumeIndex, titlesOverlap } from "../../../features/learn/normalizeLesson";
-import { completeLesson, updateLessonProgress, restartLessonProgress } from "../../../services/api";
+import {
+  completeMicroLesson,
+  completeLesson,
+  updateLessonProgress,
+  restartLessonProgress,
+} from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
 import {
@@ -45,6 +50,15 @@ function countChunks(step) {
   return Math.max(step.content?.length ?? 0, 1);
 }
 
+function getSubmissionScore(submission) {
+  if (Number.isFinite(submission?.score)) return submission.score;
+
+  const totalQuestions = submission?.totalQuestions ?? 0;
+  return totalQuestions > 0
+    ? ((totalQuestions - (submission?.missed?.length ?? 0)) / totalQuestions) * 100
+    : 0;
+}
+
 export default function LearnFlow({
   learnData,
   characterImages,
@@ -52,6 +66,7 @@ export default function LearnFlow({
   savedProgress = null,
   csrfToken,
   isReadOnly = false,
+  refreshProfile,
 }) {
   const { lessonSteps } = learnData;
 
@@ -182,7 +197,20 @@ export default function LearnFlow({
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
     : ROUTES.LEARN;
 
-  function advanceStep() {
+  async function advanceStep() {
+    if (canSyncProgress && currentMicroLessonId) {
+      try {
+        await completeMicroLesson({
+          moduleId: learnData.moduleId,
+          microLessonId: currentMicroLessonId,
+          csrfToken,
+        });
+        await refreshProfile?.();
+      } catch {
+        // Reward persistence must not prevent the learner from advancing.
+      }
+    }
+
     if (!isLastStep) {
       setStepIndex((current) => current + 1);
       setChunkIndex(0);
@@ -193,7 +221,7 @@ export default function LearnFlow({
     setIsComplete(true);
   }
 
-  function goForward() {
+  async function goForward() {
     if (chunkIndex < chunks.length - 1) {
       setChunkIndex((current) => current + 1);
       return;
@@ -206,7 +234,7 @@ export default function LearnFlow({
       return;
     }
 
-    advanceStep();
+    void advanceStep();
   }
 
   async function advanceQuiz() {
@@ -216,6 +244,10 @@ export default function LearnFlow({
     }
 
     const submission = await quiz.submit(currentMicroLessonId, currentStepQuestions);
+    if (!submission) {
+      return;
+    }
+
     const submissionReviews =
       submission?.reviews?.length > 0
         ? Object.fromEntries(
@@ -223,12 +255,22 @@ export default function LearnFlow({
           )
         : quiz.reviews;
 
-    if (submission) {
-      setSubmissions((current) => ({
-        ...current,
-        [currentMicroLessonId]: { ...submission, totalQuestions: currentStepQuestions.length },
-      }));
-    }
+    setSubmissions((current) => {
+      const nextSubmission = {
+        ...submission,
+        totalQuestions: currentStepQuestions.length,
+      };
+      const previousSubmission = current[currentMicroLessonId];
+
+      if (
+        previousSubmission &&
+        getSubmissionScore(previousSubmission) >= getSubmissionScore(nextSubmission)
+      ) {
+        return current;
+      }
+
+      return { ...current, [currentMicroLessonId]: nextSubmission };
+    });
 
     setCompletedAttempts((current) => [
       ...current,
@@ -236,7 +278,7 @@ export default function LearnFlow({
     ]);
 
     quiz.reset();
-    advanceStep();
+    void advanceStep();
   }
 
   function goBack() {
@@ -269,16 +311,19 @@ export default function LearnFlow({
     setPhase("lesson");
     setIsComplete(false);
     setIsReviewing(false);
+    quiz.reset();
   }
 
   if (isComplete && isReviewing) {
     return (
-      <QuizReview
-        attempts={completedAttempts}
-        onDone={() => setIsReviewing(false)}
-        rightAnswerIcon={rightAnswerIcon}
-        wrongAnswerIcon={wrongAnswerIcon}
-      />
+      <>
+        <QuizReview
+          attempts={completedAttempts}
+          onDone={() => setIsReviewing(false)}
+          rightAnswerIcon={rightAnswerIcon}
+          wrongAnswerIcon={wrongAnswerIcon}
+        />
+      </>
     );
   }
 

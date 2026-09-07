@@ -4,6 +4,7 @@ const variantClasses = {
   default: "border-neutral-300 bg-surface-input text-foreground",
   success: "border-primary bg-primary text-on-primary",
   badge: "border-primary-alt bg-surface-inset text-heading",
+  xp: "border-yellow-400 bg-yellow-100 text-yellow-900",
 };
 
 export default function Toast({
@@ -27,7 +28,7 @@ export default function Toast({
     return () => {
       clearTimeout(timer);
     };
-  }, [isOpen, duration, onClose]);
+  }, [isOpen, variant, message, duration, onClose]);
 
   // Don't show anything if the toast is closed
   if (!isOpen) return null;
@@ -39,7 +40,6 @@ export default function Toast({
     <div
       className={`fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center gap-3 rounded-lg border px-4 py-3 shadow-lg sm:bottom-6 ${styles} ${className}`}
     >
-      {/* Toast message */}
       <div
         role="status"
         aria-live="polite"
@@ -49,10 +49,8 @@ export default function Toast({
         {message}
       </div>
 
-      {/* Optional action */}
       {action && <div className="shrink-0">{action}</div>}
 
-      {/* Close button */}
       {showCloseButton && (
         <button
           type="button"

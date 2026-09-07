@@ -18,8 +18,10 @@ const updateProfileSchema = Joi.object({
     "boolean.base": "Notifications setting must be true or false.",
   }),
   leaderboard_opt_in: Joi.boolean().optional().messages({
-    "boolean.base": "Leaderboard setting must be true or false.",
+    "boolean.base": "Leaderboard opt-in must be true or false.",
   }),
+
+  timezone: Joi.string().trim().optional(),
 })
   .min(1) // request body must have at least one field to update
   .messages({
@@ -66,9 +68,14 @@ const avatarUrlSchema = Joi.object({
     }),
 });
 
+const resetProgressSchema = Joi.object({
+  confirmation: Joi.string().valid("CONFIRM").required(),
+});
+
 module.exports = {
   updateProfileSchema,
   changePasswordSchema,
   deleteAccountSchema,
   avatarUrlSchema,
+  resetProgressSchema,
 };

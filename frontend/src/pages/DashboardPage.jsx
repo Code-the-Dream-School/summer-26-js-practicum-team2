@@ -5,33 +5,12 @@ import LeaderboardCard from "../features/dashboard/LeaderboardCard/LeaderboardCa
 import RecentActivityCard from "../features/dashboard/RecentActivityCard/RecentActivityCard.component";
 import UnitProgressRow from "../features/dashboard/UnitProgressRow/UnitProgressRow.component";
 import Button from "../shared/Button/Button.component";
-import Card from "../shared/Card/Card.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import { ROUTES } from "../app/router/routes";
 
 import useDashboardData from "../hooks/useDashboardData";
 import useLeaderboardData from "../hooks/useLeaderboardData";
-
-function LeaderboardPanel({ leaderboard, isLoading, error, refresh }) {
-  if (isLoading && !leaderboard) {
-    return <Skeleton className="h-64 rounded-2xl border border-neutral-200 bg-surface-raised" />;
-  }
-
-  if (error && !leaderboard) {
-    return (
-      <Card className="space-y-3">
-        <h2 className="font-heading text-h4 font-bold text-heading">Weekly leaderboard</h2>
-        <p className="text-small text-neutral-600">{error}</p>
-        <Button type="button" onClick={() => void refresh()}>
-          Try leaderboard again
-        </Button>
-      </Card>
-    );
-  }
-
-  return <LeaderboardCard leaderboard={leaderboard} />;
-}
 
 function DashboardSkeleton() {
   return (
@@ -53,7 +32,10 @@ export default function DashboardPage() {
     userId: user?.id,
     isAuthenticated,
   });
-  const leaderboardState = useLeaderboardData({ userId: user?.id, isAuthenticated });
+  const { leaderboard } = useLeaderboardData({
+    userId: user?.id,
+    isAuthenticated,
+  });
 
   if (isLoading && !dashboard) {
     return <DashboardSkeleton />;
@@ -74,12 +56,26 @@ export default function DashboardPage() {
     );
   }
 
-  const { hero, progress, nextAction, units = [], recentActivity = [] } = dashboard || {};
+  const {
+    hero,
+    xp,
+    badges,
+    progress,
+    nextAction,
+    units = [],
+    recentActivity = [],
+  } = dashboard || {};
   if (units.length === 0) {
     return (
       <section className="space-y-6">
-        <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
-        <LeaderboardPanel {...leaderboardState} />
+        <DashboardHero
+          hero={hero}
+          nextAction={nextAction}
+          overallProgress={progress}
+          xp={xp?.total ?? 0}
+          badges={badges}
+        />
+        <LeaderboardCard leaderboard={leaderboard} />
         <EmptyState
           icon="🌱"
           title="Content coming soon"
@@ -98,8 +94,15 @@ export default function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <DashboardHero hero={hero} nextAction={nextAction} overallProgress={progress} />
-      <LeaderboardPanel {...leaderboardState} />
+      <DashboardHero
+        hero={hero}
+        nextAction={nextAction}
+        overallProgress={progress}
+        xp={xp?.total ?? 0}
+        badges={badges}
+      />
+
+      <LeaderboardCard leaderboard={leaderboard} />
 
       {hasNoProgress ? (
         <EmptyState

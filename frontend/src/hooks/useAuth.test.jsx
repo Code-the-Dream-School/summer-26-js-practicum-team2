@@ -175,6 +175,7 @@ describe("useAuth", () => {
 
     expect(result.current).toMatchObject({
       csrfToken: "new-csrf-token",
+      xpTotal: 125,
       user: expect.objectContaining({
         xp: 125,
         streak: 3,

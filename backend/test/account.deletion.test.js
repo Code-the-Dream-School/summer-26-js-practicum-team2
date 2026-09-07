@@ -4,6 +4,7 @@ const { useTestDb } = require("./setup");
 
 const app = require("../src/app");
 const User = require("../src/models/User.model");
+const UserProgress = require("../src/models/UserProgress.model");
 const { hashPassword } = require("../src/utils/password");
 
 useTestDb();
@@ -150,6 +151,29 @@ describe("account deletion workflow", () => {
       .send({ email: user.email });
 
     expect(duplicateRequest.status).toBe(409);
+  });
+
+  it("allows learners to reset their own progress with explicit confirmation", async () => {
+    const user = await createUser({ email: "profile-reset@example.com" });
+    const authorization = authHeader(user);
+    await UserProgress.create({ user_id: user._id, module_id: "cashFlow" });
+
+    const rejected = await request(app)
+      .post("/api/v1/profile/progress/reset")
+      .set("Authorization", authorization)
+      .send({ confirmation: "reset" });
+
+    expect(rejected.status).toBe(400);
+    expect(await UserProgress.countDocuments({ user_id: user._id })).toBe(1);
+
+    const reset = await request(app)
+      .post("/api/v1/profile/progress/reset")
+      .set("Authorization", authorization)
+      .send({ confirmation: "CONFIRM" });
+
+    expect(reset.status).toBe(200);
+    expect(reset.body.message).toBe("Your progress has been reset.");
+    expect(await UserProgress.countDocuments({ user_id: user._id })).toBe(0);
   });
 
   it("preserves detailed validation errors for malformed deletion requests", async () => {

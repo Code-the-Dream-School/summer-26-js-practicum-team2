@@ -1,15 +1,19 @@
+const { validateRequest } = require("../validation/userValidation");
 const User = require("../models/User.model");
 const UserProgress = require("../models/UserProgress.model");
 const { StatusCodes } = require("http-status-codes");
 const { comparePassword, hashPassword } = require("../utils/password");
 const { issueSession } = require("../utils/session");
-const { getLearningMotivation } = require("../utils/learningStats");
 const {
   updateProfileSchema,
   changePasswordSchema,
   deleteAccountSchema,
   avatarUrlSchema,
+  resetProgressSchema,
 } = require("../validation/profileValidation");
+const { getUserXpTotal } = require("../services/xp.service");
+const { getLearningMotivation } = require("../utils/learningStats");
+const { getDisplayStreak } = require("../utils/streaks");
 
 //Get first initial from  name from user model or email
 const getFirstInitial = (name, email) => {
@@ -26,10 +30,14 @@ const getProfile = async (req, res, next) => {
         .json({ message: "Not authenticated or account deactivated." });
     }
 
-    const [progress, motivation] = await Promise.all([
-      UserProgress.findOne({ user_id: req.user.id }).sort({ updated_at: -1 }),
-      getLearningMotivation(req.user.id),
-    ]);
+    const progress = await UserProgress.findOne({ user_id: req.user.id }).sort({
+      updated_at: -1,
+    });
+
+    const xpTotal = await getUserXpTotal(req.user.id);
+    const motivation = await getLearningMotivation(req.user.id);
+    const currentStreak = Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak));
+
     return res.status(StatusCodes.OK).json({
       user: {
         id: user._id,
@@ -37,13 +45,16 @@ const getProfile = async (req, res, next) => {
         email: user.email,
         goals: user.goals ?? "",
         notifications: user.notifications ?? true,
-        leaderboard_opt_in: user.leaderboard_opt_in ?? false,
-        xp: user.xp ?? 0,
-        streak: motivation.streak.currentDays,
+        xp: xpTotal,
+        streak: currentStreak,
+        longest_streak: user.streak?.longest ?? 0,
+        active_learning_days: user.streak?.active_learning_days ?? 0,
+        timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
+        leaderboard_opt_in: user.leaderboard_opt_in ?? false,
         current_lesson: progress?.current_micro_lesson_id || "Lesson 1",
-        badges: progress?.earned_badges || [],
+        badges: user.earned_badges || [],
       },
     });
   } catch (error) {
@@ -53,13 +64,8 @@ const getProfile = async (req, res, next) => {
 // POST /api/v1/profile/avatar: URL avatars only; file uploads are not supported by this route.
 const setAvatarUrl = async (req, res, next) => {
   try {
-    const { error, value } = avatarUrlSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, avatarUrlSchema, req.body);
+    if (!value) return;
     const user = await User.findById(req.user.id);
     if (!user || user.is_deleted) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No User found." });
@@ -77,19 +83,25 @@ const setAvatarUrl = async (req, res, next) => {
   }
 };
 
+//POST /api/v1/profile/progress/reset
+const resetProgress = async (req, res, next) => {
+  try {
+    const value = validateRequest(res, resetProgressSchema, req.body);
+    if (!value) return;
+
+    await UserProgress.deleteMany({ user_id: req.user.id });
+    return res.status(StatusCodes.OK).json({ message: "Your progress has been reset." });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 //PATCH /api/v1/profile
 const updateProfile = async (req, res, next) => {
   try {
-    const { error, value } = updateProfileSchema.validate(req.body, {
-      abortEarly: false,
-    });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
-    const { name, email, goals, notifications, leaderboard_opt_in } = value;
+    const value = validateRequest(res, updateProfileSchema, req.body);
+    if (!value) return;
+    const { name, email, goals, notifications, timezone, leaderboard_opt_in } = value;
     const user = await User.findById(req.user.id);
 
     if (!user || user.is_deleted) {
@@ -97,6 +109,7 @@ const updateProfile = async (req, res, next) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: " User not found or user deleted account. " });
     }
+
     let hasUpdates = false;
     if (name !== undefined) {
       user.name = name;
@@ -106,10 +119,6 @@ const updateProfile = async (req, res, next) => {
       user.goals = goals;
       hasUpdates = true;
     }
-    /*if (theme !== undefined) {
-      user.theme = theme;
-      hasUpdates = true;
-    }*/
     if (notifications !== undefined) {
       user.notifications = notifications;
       hasUpdates = true;
@@ -124,13 +133,23 @@ const updateProfile = async (req, res, next) => {
       user.email_verified_at = null;
       hasUpdates = true;
     }
+
+    if (timezone !== undefined) {
+      user.timezone = timezone;
+      hasUpdates = true;
+    }
+
     if (!hasUpdates) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No items requested to be updated." });
     }
+
     await user.save();
-    const motivation = await getLearningMotivation(user._id);
+    const xpTotal = await getUserXpTotal(req.user.id);
+    const motivation = await getLearningMotivation(req.user.id);
+    const currentStreak = Math.max(motivation.streak.currentDays, getDisplayStreak(user.streak));
+
     return res.status(StatusCodes.OK).json({
       message: "You have successfully updated your profile.",
       user: {
@@ -139,11 +158,13 @@ const updateProfile = async (req, res, next) => {
         email: user.email,
         goals: user.goals,
         notifications: user.notifications,
-        leaderboard_opt_in: user.leaderboard_opt_in ?? false,
-        xp: user.xp ?? 0,
-        streak: motivation.streak.currentDays,
+        xp: xpTotal,
+        streak: currentStreak,
+        longest_streak: user.streak?.longest ?? 0,
+        timezone: user.timezone,
         avatar_url: user.avatar_url || null,
         avatar_initial: getFirstInitial(user.name, user.email),
+        leaderboard_opt_in: user.leaderboard_opt_in ?? false,
       },
     });
   } catch (error) {
@@ -158,15 +179,8 @@ const updateProfile = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   try {
     //Validate password input using changePasswordSchema
-    const { error, value } = changePasswordSchema.validate(req.body, {
-      abortEarly: false,
-    });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, changePasswordSchema, req.body);
+    if (!value) return;
 
     const { currentPassword, newPassword } = value;
     const user = await User.findById(req.user.id).select("+password_hash");
@@ -205,13 +219,8 @@ const changePassword = async (req, res, next) => {
 //POST /api/v1/profile/request-deletion for soft deletion. items deleted are kept for 30 days in case user wants to reactivate
 const deleteAccount = async (req, res, next) => {
   try {
-    const { error, value } = deleteAccountSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
-    }
+    const value = validateRequest(res, deleteAccountSchema, req.body);
+    if (!value) return;
     const user = await User.findById(req.user.id);
     if (!user || user.is_deleted || user.is_archived) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
@@ -247,4 +256,5 @@ module.exports = {
   changePassword,
   deleteAccount,
   setAvatarUrl,
+  resetProgress,
 };

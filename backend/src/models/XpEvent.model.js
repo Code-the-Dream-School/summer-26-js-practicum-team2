@@ -2,14 +2,11 @@ const mongoose = require("mongoose");
 const { XP_CAP } = require("../utils/coreRules");
 const { getLeaderboardWeek } = require("../utils/leaderboardTime");
 
-const XP_EVENT_TYPES = [
-  "lesson_complete",
-  "quiz_pass",
-  "quiz_perfect",
-  "review_complete",
-  "daily_goal_met",
-  "onboarding_complete",
-];
+const XP_EVENT_TYPES = ["onboarding_complete", "lesson_complete", "quiz_pass", "quiz_perfect"];
+
+function getUtcDayStart(date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
 
 const xpEventSchema = new mongoose.Schema(
   {
@@ -20,24 +17,25 @@ const xpEventSchema = new mongoose.Schema(
     },
     event_type: {
       type: String,
-      enum: XP_EVENT_TYPES,
       required: true,
+      enum: XP_EVENT_TYPES,
     },
     source_key: {
       type: String,
-      trim: true,
       required: true,
+      trim: true,
     },
     requested_xp: {
       type: Number,
-      min: 0,
       required: true,
+      min: 0,
+      max: XP_CAP,
     },
     awarded_xp: {
       type: Number,
+      required: true,
       min: 0,
       max: XP_CAP,
-      required: true,
     },
     occurred_at: {
       type: Date,
@@ -54,26 +52,24 @@ const xpEventSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: { createdAt: "created_at", updatedAt: false },
+    timestamps: { createdAt: true, updatedAt: false },
   },
 );
 
-xpEventSchema.pre("validate", function () {
-  if (!this.occurred_at || Number.isNaN(this.occurred_at.getTime())) return;
-
-  this.day_start = new Date(
-    Date.UTC(
-      this.occurred_at.getUTCFullYear(),
-      this.occurred_at.getUTCMonth(),
-      this.occurred_at.getUTCDate(),
-    ),
-  );
-  this.week_start = getLeaderboardWeek(this.occurred_at).weekStart;
+xpEventSchema.pre("validate", function setTimeBuckets() {
+  const occurredAt =
+    this.occurred_at instanceof Date ? this.occurred_at : new Date(this.occurred_at);
+  if (!Number.isNaN(occurredAt.getTime())) {
+    this.occurred_at = occurredAt;
+    this.day_start = getUtcDayStart(occurredAt);
+    this.week_start = getLeaderboardWeek(occurredAt).weekStart;
+  }
 });
 
 xpEventSchema.index({ user_id: 1, source_key: 1 }, { unique: true });
 xpEventSchema.index({ user_id: 1, day_start: 1 });
 xpEventSchema.index({ week_start: 1, user_id: 1 });
+xpEventSchema.index({ created_at: -1 });
 
 const XpEvent = mongoose.model("XpEvent", xpEventSchema);
 
