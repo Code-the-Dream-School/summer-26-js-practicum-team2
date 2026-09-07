@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { afterEach, describe, expect, it } = require("@jest/globals");
 const User = require("../src/models/User.model");
 const WeeklyLeaderboard = require("../src/models/WeeklyLeaderboard.model");
+const weeklyLeaderboardService = require("../src/services/weeklyLeaderboard.service");
 const {
   getLeaderboardForUser,
   normalizeLimit,
@@ -19,6 +20,7 @@ describe("leaderboard read service", () => {
   it("returns no rankings and skips aggregation for an opted-out learner", async () => {
     mockCurrentUser({ leaderboard_opt_in: false });
     const aggregate = jest.spyOn(WeeklyLeaderboard, "aggregate");
+    const rollup = jest.spyOn(weeklyLeaderboardService, "rollupLeaderboardWeek");
 
     const result = await getLeaderboardForUser({
       userId: new mongoose.Types.ObjectId(),
@@ -32,6 +34,7 @@ describe("leaderboard read service", () => {
       entries: [],
       currentUser: null,
     });
+    expect(rollup).not.toHaveBeenCalled();
     expect(aggregate).not.toHaveBeenCalled();
   });
 
@@ -52,6 +55,9 @@ describe("leaderboard read service", () => {
       weeklyXp: 25,
       rank: 24,
     };
+    const rollup = jest
+      .spyOn(weeklyLeaderboardService, "rollupLeaderboardWeek")
+      .mockResolvedValue({});
     const aggregate = jest
       .spyOn(WeeklyLeaderboard, "aggregate")
       .mockResolvedValue([{ entries: [topEntry], currentUser: [currentEntry] }]);
@@ -66,6 +72,7 @@ describe("leaderboard read service", () => {
       entries: [topEntry],
       currentUser: currentEntry,
     });
+    expect(rollup).toHaveBeenCalledWith({ date: "2026-09-10T12:00:00.000Z" });
     const pipeline = aggregate.mock.calls[0][0];
     expect(pipeline).toEqual(
       expect.arrayContaining([

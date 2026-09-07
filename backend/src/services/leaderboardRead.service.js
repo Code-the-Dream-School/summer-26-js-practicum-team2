@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const WeeklyLeaderboard = require("../models/WeeklyLeaderboard.model");
 const { getLeaderboardWeek } = require("../utils/leaderboardTime");
+const weeklyLeaderboardService = require("./weeklyLeaderboard.service");
 
 const DEFAULT_LEADERBOARD_LIMIT = 20;
 const MAX_LEADERBOARD_LIMIT = 100;
@@ -37,6 +38,8 @@ async function getLeaderboardForUser({
       currentUser: null,
     };
   }
+
+  await weeklyLeaderboardService.rollupLeaderboardWeek({ date });
 
   const entryLimit = normalizeLimit(limit);
   const [leaderboard = { entries: [], currentUser: [] }] = await WeeklyLeaderboard.aggregate([

@@ -18,6 +18,9 @@ week on demand. It groups immutable XP events by learner and replaces each store
 rerunning the rollup is idempotent rather than adding the same XP again. A scheduler can safely run
 this rollup nightly and immediately before the weekly reset.
 
+`getLeaderboardForUser` runs that rollup before returning rankings to opted-in learners, so the
+dashboard can show current-week XP even before the nightly job runs.
+
 At the Monday boundary, `rotatePreviousLeaderboardWeek` in
 `backend/src/services/leaderboardReset.service.js` performs the reset in one transaction. It first
 finalizes the previous week's rollup, assigns final ranks only among eligible opted-in learners,
