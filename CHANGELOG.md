@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.8.2] - 2026-09-06
+
+### Added
+
+- Added the onboarding flow for new users, including progress tracking, skip behavior, retakes, and API coverage.
+- Added a self-service profile action for resetting lesson progress.
+- Added Playwright, frontend, and backend regression coverage for quiz pass/fail results and retries.
+
+### Changed
+
+- Preserved the best score for each micro-lesson when learners retry a quiz.
+- Used the server-reported quiz score when calculating lesson results.
+- Allowed learners to start a new quiz attempt after submitting a previous attempt.
+- Consolidated duplicate frontend test suites and reused shared validation across profile and account endpoints.
+- Reduced the minimum long-password requirement from 16 to 15 characters.
+
+### Removed
+
+- Removed obsolete onboarding implementations, duplicate role-protection code, and stale related test files.
+
+### Fixed
+
+- Prevented failed quiz submissions from displaying a misleading `0% — Fail` result.
+- Reset stale quiz attempt state when learners start a lesson over.
+- Fixed onboarding initialization and route detection for new and completed tours.
+
+---
+
 ## [0.8.1] - 2026-09-05
 
 ### Changed
