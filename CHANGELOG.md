@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Anchored the connecting vines to the node circles so the new labels do not shift the lines.
 - Selecting a learning path node now opens its details note instead of navigating straight into the lesson, and locked steps can be previewed rather than being unusable.
 - Reworded the learning path helper text to invite learners to preview a step before starting it.
+- Improved quiz answer feedback with clearer selected, correct, and incorrect answer highlighting.
 
 ### Removed
 

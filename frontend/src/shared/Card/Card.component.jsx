@@ -14,7 +14,7 @@ export default function Card({
     default: "border-neutral-200 bg-surface-raised shadow-sm",
     quiz: "border-neutral-200 bg-surface-inset shadow-md",
     choice: "border-neutral-200 bg-surface-input shadow-sm",
-    success: "border-success bg-surface-inset shadow-sm",
+    success: "border-success bg-success/20 shadow-sm",
     danger: "border-danger bg-warning shadow-sm",
   };
 
@@ -25,7 +25,7 @@ export default function Card({
   }
 
   if (selected) {
-    stateClasses = "border-primary bg-surface-inset shadow-md";
+    stateClasses = "border-primary bg-primary/15 shadow-md";
   }
 
   const isClickable = interactive && typeof onClick === "function";
