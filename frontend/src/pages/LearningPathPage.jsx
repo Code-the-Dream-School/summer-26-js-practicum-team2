@@ -5,6 +5,7 @@ import { getLesson, getLessonModules, getLessonProgress } from "../services/api"
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
+import Modal from "../shared/Modal/Modal.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 import abigailImg from "../assets/abigail.webp";
@@ -12,6 +13,12 @@ import ramonaImg from "../assets/ramona.webp";
 
 // Vertical distance between node centers, in rem.
 const NODE_SPACING_REM = 8.75;
+
+const statusCopy = {
+  current: { label: "You are here", action: "Continue this step" },
+  completed: { label: "Completed", action: "Review this step" },
+  locked: { label: "Locked", action: "Locked for now" },
+};
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -32,6 +39,7 @@ function LearningPathPage() {
   const [progress, setProgress] = useState(null);
   const [currentModule, setCurrentModule] = useState(null);
   const [error, setError] = useState("");
+  const [selectedStep, setSelectedStep] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -281,6 +289,12 @@ function LearningPathPage() {
     });
   }
 
+  function startSelectedStep() {
+    const step = selectedStep;
+    setSelectedStep(null);
+    openLesson(step?.node);
+  }
+
   if (error) {
     const isContentEmpty =
       error.includes("No lesson modules") || error.includes("does not contain any lessons");
@@ -510,7 +524,7 @@ function LearningPathPage() {
                   transform: "translateX(-50%)",
                 }}
                 tooltipText={`${node.microLessonTitle} - ${tooltipText}`}
-                onSelect={openLesson}
+                onSelect={() => setSelectedStep({ node, status, stepNumber: index + 1 })}
                 ref={(element) => {
                   nodeElementsRef.current[index] = element;
 
@@ -523,6 +537,80 @@ function LearningPathPage() {
           })}
         </div>
       </main>
+
+      <Modal
+        variant="postIt"
+        isOpen={Boolean(selectedStep)}
+        onClose={() => setSelectedStep(null)}
+        title={selectedStep?.node.microLessonTitle ?? ""}
+        description={
+          selectedStep
+            ? `Step ${selectedStep.stepNumber} of ${learningPath.length} · ${selectedStep.node.lessonTitle}`
+            : undefined
+        }
+        footer={
+          selectedStep ? (
+            <>
+              <Button variant="ghost" onClick={() => setSelectedStep(null)}>
+                Not now
+              </Button>
+              <Button
+                variant="primary"
+                disabled={selectedStep.status === "locked"}
+                onClick={startSelectedStep}
+              >
+                {statusCopy[selectedStep.status].action}
+              </Button>
+            </>
+          ) : null
+        }
+      >
+        {selectedStep ? (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 rounded-full bg-post-it-fold px-3 py-1 text-caption font-semibold text-post-it-text">
+                {statusCopy[selectedStep.status].label}
+              </span>
+              {selectedStep.node.lessonEstimatedMin ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-post-it-fold px-3 py-1 text-caption font-semibold text-post-it-text">
+                  ⏱ {selectedStep.node.lessonEstimatedMin} min
+                </span>
+              ) : null}
+              <span className="inline-flex items-center gap-1 rounded-full bg-post-it-fold px-3 py-1 text-caption font-semibold text-post-it-text">
+                📄 {selectedStep.node.microLessonContentCount} sections
+              </span>
+            </div>
+
+            {selectedStep.node.lessonGoal ? (
+              <div>
+                <p className="text-caption font-bold uppercase tracking-[0.14em] text-post-it-muted">
+                  What you will learn
+                </p>
+                <p className="mt-1 text-small leading-6 text-post-it-text">
+                  {selectedStep.node.lessonGoal}
+                </p>
+              </div>
+            ) : null}
+
+            {selectedStep.node.microLessonPreview ? (
+              <div>
+                <p className="text-caption font-bold uppercase tracking-[0.14em] text-post-it-muted">
+                  Sneak peek
+                </p>
+                <p className="mt-1 line-clamp-5 text-small leading-6 text-post-it-text">
+                  {selectedStep.node.microLessonPreview}
+                </p>
+              </div>
+            ) : null}
+
+            {selectedStep.status === "locked" ? (
+              <p className="text-caption font-medium text-post-it-muted">
+                Finish the earlier steps on the trail to unlock this one.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </Modal>
 
       <footer className="sticky bottom-0 mt-6 border-t border-learning-path-footer-border bg-learning-path-footer-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-[22rem] justify-end sm:max-w-[24rem] md:max-w-4xl lg:max-w-6xl">
