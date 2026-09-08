@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.9.0] - 2026-09-08
+ 
+### Added
+
+- Added a learning path header card with the module progress bar, percentage complete, guide artwork, and an encouraging trail summary.
+- Added regression coverage asserting the learning path scrolls the current lesson into view.
+- Added micro-lesson titles, estimated reading time, and completed, current, and locked status icons to each learning path node.
+- Added a post-it note variant to the shared modal for lightweight, playful detail panels.
+- Added a step details note on the learning path that shows the lesson goal, a content preview, section count, and a status-aware action for starting, resuming, or reviewing a step.
+- Added regression coverage for opening the step details note, including the locked-step explanation.
+- Added an authenticated endpoint that resumes learners at their most recently touched, currently unlocked lesson, with safe fallbacks for stale or missing progress.
+- Added regression coverage for lesson access guards and resume-path fallbacks.
+
+
+### Changed
+
+- Replaced the straight arrow connectors between learning path nodes with curved, leafy vines that alternate direction along the trail.
+- Deferred the scroll to the current lesson until the asynchronously loaded node has rendered, and limited it to a single scroll per visit.
+- Increased the spacing between learning path nodes so the new titles and reading times fit without overlapping.
+- Anchored the connecting vines to the node circles so the new labels do not shift the lines.
+- Selecting a learning path node now opens its details note instead of navigating straight into the lesson, and locked steps can be previewed rather than being unusable.
+- Reworded the learning path helper text to invite learners to preview a step before starting it.
+- Improved quiz answer feedback with clearer selected, correct, and incorrect answer highlighting.
+- Changed the unavailable-lesson link to return learners to their current lesson instead of the home page.
+
+### Removed
+
+- Removed the commented-out onboarding overlay block from the learning path page.
+- Removed the "start here" callout bubble from the first learning path node.
+
+### Fixed
+
+- Fixed learning-path node navigation so selecting a micro-lesson opens that exact micro-lesson instead of resuming a different saved step.
+- Fixed the landing-page discrepancy so the homepage matches the intended design and presentation.
+- Prevented learners from loading locked lessons before completing the previous lesson while preserving access to their saved current position.
+
+---
+
 ## [0.8.3] - 2026-09-07
 
 ### Fixed

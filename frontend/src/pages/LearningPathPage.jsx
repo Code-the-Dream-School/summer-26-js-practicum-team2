@@ -5,8 +5,20 @@ import { getLesson, getLessonModules, getLessonProgress } from "../services/api"
 import LearningPathNode from "../features/learn/LearningPathNode/LearningPathNode.component";
 import Button from "../shared/Button/Button.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
+import Modal from "../shared/Modal/Modal.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
 import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
+import abigailImg from "../assets/abigail.webp";
+import ramonaImg from "../assets/ramona.webp";
+
+// Vertical distance between node centers, in rem.
+const NODE_SPACING_REM = 8.75;
+
+const statusCopy = {
+  current: { label: "You are here", action: "Continue this step" },
+  completed: { label: "Completed", action: "Review this step" },
+  locked: { label: "Locked", action: "Locked for now" },
+};
 
 function getMicroLessonPreview(content = []) {
   return content
@@ -27,6 +39,7 @@ function LearningPathPage() {
   const [progress, setProgress] = useState(null);
   const [currentModule, setCurrentModule] = useState(null);
   const [error, setError] = useState("");
+  const [selectedStep, setSelectedStep] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -121,9 +134,18 @@ function LearningPathPage() {
     : Math.min(Math.max(savedIndex, lastCompletedIndex + 1), learningPath.length - 1);
 
   const currentNode = currentIndex >= 0 ? learningPath[currentIndex] : null;
+  const completedCount = learningPath.filter((node) =>
+    completedMicroLessons.has(node.microLessonId),
+  ).length;
+  const progressPercent = isModuleComplete
+    ? 100
+    : learningPath.length
+      ? Math.round((completedCount / learningPath.length) * 100)
+      : 0;
 
   // For scrolling to the current microLesson node in the learning path
   const currentNodeRef = useRef(null);
+  const hasScrolledToCurrentNodeRef = useRef(false);
 
   // Refs used for drawing the lines between each learning path node
   const pathContainerRef = useRef(null);
@@ -137,7 +159,7 @@ function LearningPathPage() {
   });
 
   // Calculate the height of the learning path container based on the number of nodes
-  const pathHeight = Math.max(learningPath.length * 5.9 + 2, 29);
+  const pathHeight = Math.max(learningPath.length * NODE_SPACING_REM + 3, 29);
 
   // Constants for the circle radius and the visible gap between nodes
   const circleRadius = 35;
@@ -164,8 +186,9 @@ function LearningPathPage() {
         if (!nodeElement) {
           return null;
         }
-        // Get the bounding rectangle of the node element to determine its size and position on the page.
-        const nodeRect = nodeElement.getBoundingClientRect();
+        // Measure the circle itself so the labels below it do not shift the vine anchor points.
+        const circleElement = nodeElement.querySelector("[data-node-circle]") ?? nodeElement;
+        const nodeRect = circleElement.getBoundingClientRect();
 
         // Calculate the center coordinates of the node element relative to the path container.
         return {
@@ -190,13 +213,19 @@ function LearningPathPage() {
     };
   }, [pathHeight]);
 
-  // Scroll to the current lesson when the page opens.
+  // Scroll once the asynchronously loaded current lesson has rendered.
   useEffect(() => {
-    currentNodeRef.current?.scrollIntoView({
+    if (currentIndex < 0 || !currentNodeRef.current || hasScrolledToCurrentNodeRef.current) {
+      return;
+    }
+
+    hasScrolledToCurrentNodeRef.current = true;
+    currentNodeRef.current.scrollIntoView({
       behavior: "smooth",
       block: "center",
+      inline: "nearest",
     });
-  }, []);
+  }, [currentIndex]);
   // Function to calculate the start and end points of the line connecting two nodes
   function getPathPoints(x1, y1, x2, y2, padding = circleRadius + visibleGap) {
     // Calculate the distance between the two points in the x and y directions
@@ -213,6 +242,39 @@ function LearningPathPage() {
     };
   }
 
+  function getVineGeometry(points, index) {
+    const xDistance = points.x2 - points.x1;
+    const yDistance = points.y2 - points.y1;
+    const length = Math.hypot(xDistance, yDistance) || 1;
+    const curveDirection = index % 2 === 0 ? 1 : -1;
+    const curve = Math.min(18, length * 0.12) * curveDirection;
+    const normalX = (-yDistance / length) * curve;
+    const normalY = (xDistance / length) * curve;
+
+    return {
+      path: `M ${points.x1} ${points.y1} C ${points.x1 + xDistance * 0.3 + normalX} ${
+        points.y1 + yDistance * 0.3 + normalY
+      }, ${points.x1 + xDistance * 0.7 + normalX} ${
+        points.y1 + yDistance * 0.7 + normalY
+      }, ${points.x2} ${points.y2}`,
+      angle: (Math.atan2(yDistance, xDistance) * 180) / Math.PI,
+      leaves: [
+        {
+          id: "early",
+          x: points.x1 + xDistance * 0.34 + normalX * 0.72,
+          y: points.y1 + yDistance * 0.34 + normalY * 0.72,
+          scale: 0.78,
+        },
+        {
+          id: "late",
+          x: points.x1 + xDistance * 0.68 + normalX * 0.72,
+          y: points.y1 + yDistance * 0.68 + normalY * 0.72,
+          scale: 0.92,
+        },
+      ],
+    };
+  }
+
   // Function to navigate to the selected lesson when a node is clicked
   function openLesson(node) {
     if (!node) {
@@ -225,6 +287,12 @@ function LearningPathPage() {
         microLessonId: node.microLessonId,
       },
     });
+  }
+
+  function startSelectedStep() {
+    const step = selectedStep;
+    setSelectedStep(null);
+    openLesson(step?.node);
   }
 
   if (error) {
@@ -258,14 +326,60 @@ function LearningPathPage() {
   return (
     <div className="min-h-screen bg-learning-path-surface text-learning-path-text">
       <main className="mx-auto flex min-h-screen max-w-[22rem] flex-col px-4 pb-28 pt-5 sm:max-w-[24rem] sm:px-6 md:max-w-4xl lg:max-w-6xl lg:px-8">
-        <div className="text-center">
-          <h1 className="text-[2.25rem] font-semibold leading-[1.04] tracking-tight text-learning-path-heading sm:text-[2.7rem]">
-            Learning:
-          </h1>
+        <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-white/70 px-5 pb-5 pt-7 text-center shadow-[0_18px_45px_rgba(20,73,61,0.1)] sm:px-8 md:min-h-52 md:px-48 md:py-8">
+          <div className="pointer-events-none absolute -left-8 -top-8 h-28 w-28 rounded-full bg-accent/15" />
+          <div className="pointer-events-none absolute -bottom-12 -right-8 h-36 w-36 rounded-full bg-circle-completed/20" />
 
-          <h2 className="mt-1 text-[2rem] font-semibold leading-[1.05] tracking-tight text-learning-path-heading sm:text-[2.35rem]">
+          <img
+            src={abigailImg}
+            alt=""
+            aria-hidden="true"
+            className="absolute -bottom-2 left-5 hidden w-28 drop-shadow-sm md:block lg:left-12 lg:w-32"
+          />
+          <img
+            src={ramonaImg}
+            alt=""
+            aria-hidden="true"
+            className="absolute -bottom-2 right-5 hidden w-28 drop-shadow-sm md:block lg:right-12 lg:w-32"
+          />
+
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            Your learning adventure
+          </p>
+          <h1 className="mt-2 font-heading text-[2rem] font-bold leading-tight tracking-tight text-learning-path-heading sm:text-[2.5rem]">
             Personal Finance
-          </h2>
+          </h1>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-learning-path-muted">
+            Follow the trail, grow your skills, and build money confidence one quick lesson at a
+            time.
+          </p>
+
+          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-full bg-white/80 p-2 pr-4 shadow-sm">
+            <img
+              src={dabbingBeaverImg}
+              alt="Sprout, your learning guide"
+              className="h-11 w-11 object-contain"
+            />
+            <div className="min-w-0 flex-1 text-left">
+              <div className="flex items-center justify-between gap-3 text-xs font-semibold text-learning-path-heading">
+                <span>{isModuleComplete ? "Trail complete!" : "Keep growing!"}</span>
+                <span>{progressPercent}%</span>
+              </div>
+              <div
+                role="progressbar"
+                aria-label="Module progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={progressPercent}
+                className="mt-1.5 h-2 overflow-hidden rounded-full bg-primary/15"
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-7 flex items-center gap-4">
@@ -280,8 +394,8 @@ function LearningPathPage() {
 
         <p className="mt-3 text-center text-sm leading-6 text-learning-path-muted">
           {isModuleComplete
-            ? "You are all caught up. Revisit any step to review it."
-            : "Tap a step to jump straight into the lesson."}
+            ? "You are all caught up. Tap any step to revisit what it covers."
+            : "Tap a step to peek at what is inside before you start."}
         </p>
 
         <div
@@ -289,27 +403,13 @@ function LearningPathPage() {
           className="relative mx-auto mt-5 w-full max-w-[18rem] md:max-w-[34rem] lg:max-w-[44rem]"
           style={{ height: `${pathHeight}rem` }}
         >
-          {/* Lines connecting the learning path nodes */}
+          {/* Leafy vines connecting the learning path nodes */}
           <svg
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
             viewBox={`0 0 ${svgSize.width} ${svgSize.height}`}
             fill="none"
           >
-            <defs>
-              <marker
-                id="learning-path-arrow"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="4"
-                markerHeight="4"
-                orient="auto-start-reverse"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-learning-path-line)" />
-              </marker>
-            </defs>
-
             {learningPath.slice(0, -1).map((node, index) => {
               const nextNode = learningPath[index + 1];
 
@@ -321,19 +421,56 @@ function LearningPathPage() {
               }
 
               const points = getPathPoints(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+              const vine = getVineGeometry(points, index);
 
               return (
-                <line
-                  key={`${node.microLessonId}-${nextNode.microLessonId}`}
-                  x1={points.x1}
-                  y1={points.y1}
-                  x2={points.x2}
-                  y2={points.y2}
-                  stroke="var(--color-learning-path-line)"
-                  strokeWidth="1.5"
-                  markerEnd="url(#learning-path-arrow)"
-                  strokeLinecap="round"
-                />
+                <g key={`${node.microLessonId}-${nextNode.microLessonId}`}>
+                  <path
+                    d={vine.path}
+                    stroke="var(--color-learning-path-line)"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    opacity="0.12"
+                  />
+                  <path
+                    d={vine.path}
+                    stroke="var(--color-learning-path-line)"
+                    strokeWidth="2.25"
+                    strokeLinecap="round"
+                  />
+                  {vine.leaves.map((leaf, leafIndex) => (
+                    <g
+                      key={leaf.id}
+                      transform={`translate(${leaf.x} ${leaf.y}) rotate(${
+                        vine.angle + (leafIndex === 0 ? -5 : 6)
+                      }) scale(${leaf.scale} ${leafIndex === 0 ? leaf.scale : -leaf.scale})`}
+                      fill="var(--color-learning-path-line)"
+                    >
+                      <path
+                        d="M 0 0 C -2 -4 -4 -7 -6 -10"
+                        fill="none"
+                        stroke="var(--color-learning-path-line)"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M -6 -9 C -11 -8 -15 -10 -18 -14 L -13 -15 L -16 -21 L -10 -19 L -8 -26 L -4 -20 L 1 -24 L 0 -17 L 6 -17 C 3 -12 -1 -9 -6 -9 Z"
+                        opacity="0.88"
+                        stroke="var(--color-learning-path-line)"
+                        strokeWidth="0.75"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M -6 -10 L -7 -20 M -7 -15 L -12 -18 M -7 -16 L -2 -20"
+                        fill="none"
+                        stroke="var(--color-learning-path-surface)"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                        opacity="0.55"
+                      />
+                    </g>
+                  ))}
+                </g>
               );
             })}
           </svg>
@@ -363,7 +500,7 @@ function LearningPathPage() {
               left = "clamp(68%, 70%, 72%)";
             }
 
-            const top = `${index * 5.9}rem`;
+            const top = `${index * NODE_SPACING_REM}rem`;
 
             let tooltipText = "Locked step. Finish the earlier lesson first.";
 
@@ -386,9 +523,8 @@ function LearningPathPage() {
                   top,
                   transform: "translateX(-50%)",
                 }}
-                showCallout={index === 0 && status === "current"}
                 tooltipText={`${node.microLessonTitle} - ${tooltipText}`}
-                onSelect={openLesson}
+                onSelect={() => setSelectedStep({ node, status, stepNumber: index + 1 })}
                 ref={(element) => {
                   nodeElementsRef.current[index] = element;
 
@@ -401,6 +537,80 @@ function LearningPathPage() {
           })}
         </div>
       </main>
+
+      <Modal
+        variant="postIt"
+        isOpen={Boolean(selectedStep)}
+        onClose={() => setSelectedStep(null)}
+        title={selectedStep?.node.microLessonTitle ?? ""}
+        description={
+          selectedStep
+            ? `Step ${selectedStep.stepNumber} of ${learningPath.length} · ${selectedStep.node.lessonTitle}`
+            : undefined
+        }
+        footer={
+          selectedStep ? (
+            <>
+              <Button variant="ghost" onClick={() => setSelectedStep(null)}>
+                Not now
+              </Button>
+              <Button
+                variant="primary"
+                disabled={selectedStep.status === "locked"}
+                onClick={startSelectedStep}
+              >
+                {statusCopy[selectedStep.status].action}
+              </Button>
+            </>
+          ) : null
+        }
+      >
+        {selectedStep ? (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 rounded-full bg-post-it-fold px-3 py-1 text-caption font-semibold text-post-it-text">
+                {statusCopy[selectedStep.status].label}
+              </span>
+              {selectedStep.node.lessonEstimatedMin ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-post-it-fold px-3 py-1 text-caption font-semibold text-post-it-text">
+                  ⏱ {selectedStep.node.lessonEstimatedMin} min
+                </span>
+              ) : null}
+              <span className="inline-flex items-center gap-1 rounded-full bg-post-it-fold px-3 py-1 text-caption font-semibold text-post-it-text">
+                📄 {selectedStep.node.microLessonContentCount} sections
+              </span>
+            </div>
+
+            {selectedStep.node.lessonGoal ? (
+              <div>
+                <p className="text-caption font-bold uppercase tracking-[0.14em] text-post-it-muted">
+                  What you will learn
+                </p>
+                <p className="mt-1 text-small leading-6 text-post-it-text">
+                  {selectedStep.node.lessonGoal}
+                </p>
+              </div>
+            ) : null}
+
+            {selectedStep.node.microLessonPreview ? (
+              <div>
+                <p className="text-caption font-bold uppercase tracking-[0.14em] text-post-it-muted">
+                  Sneak peek
+                </p>
+                <p className="mt-1 line-clamp-5 text-small leading-6 text-post-it-text">
+                  {selectedStep.node.microLessonPreview}
+                </p>
+              </div>
+            ) : null}
+
+            {selectedStep.status === "locked" ? (
+              <p className="text-caption font-medium text-post-it-muted">
+                Finish the earlier steps on the trail to unlock this one.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </Modal>
 
       <footer className="sticky bottom-0 mt-6 border-t border-learning-path-footer-border bg-learning-path-footer-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-[22rem] justify-end sm:max-w-[24rem] md:max-w-4xl lg:max-w-6xl">

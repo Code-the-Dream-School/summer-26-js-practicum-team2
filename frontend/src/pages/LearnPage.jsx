@@ -111,8 +111,8 @@ export default function LearnPage() {
         <Card className="space-y-5 p-7 sm:p-10">
           <h1 className="font-heading text-h3 font-bold text-heading">Lesson unavailable</h1>
           <p role="alert">{error || "This learning content could not be loaded."}</p>
-          <Link to={ROUTES.HOME} className="text-primary underline">
-            Back home
+          <Link to={ROUTES.LAST_LESSON} className="text-primary underline">
+            Current Lesson
           </Link>
         </Card>
       </section>
@@ -143,6 +143,7 @@ export default function LearnPage() {
       characterImages={characterImages}
       guideImage={dabbingBeaverImg}
       savedProgress={progress}
+      selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}
       refreshProfile={refreshProfile}
     />
