@@ -84,14 +84,22 @@ describe("learning path page", () => {
 
     // Wait for the learning path to finish loading before checking step states.
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /1\.1\.1: Start here/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Step 1: Start here/i })).toBeInTheDocument();
     });
 
-    // Completed and current steps should be available, while future steps stay locked.
-    expect(screen.getByRole("button", { name: /1\.1\.1: Start here/i })).not.toBeDisabled();
-    expect(screen.getByRole("button", { name: /1\.1\.2: Keep going/i })).not.toBeDisabled();
-    expect(screen.getByRole("button", { name: /1\.1\.3: Finish strong/i })).toBeDisabled();
-    expect(screen.getByText("Tap a step to jump straight into the lesson.")).toBeInTheDocument();
+    // Each step announces its own state so learners know what is done, current, and still locked.
+    expect(
+      screen.getByRole("button", { name: /Step 1: Start here\. Completed step/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /Step 2: Keep going\. Current step/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /Step 3: Finish strong\. Locked step/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByText("Tap a step to peek at what is inside before you start."),
+    ).toBeInTheDocument();
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({
       behavior: "smooth",
       block: "center",
@@ -99,7 +107,7 @@ describe("learning path page", () => {
     });
   });
 
-  it("navigates to the selected lesson", async () => {
+  it("shows step details in the note and navigates to the selected lesson", async () => {
     const user = userEvent.setup();
 
     render(
@@ -112,13 +120,40 @@ describe("learning path page", () => {
     );
 
     // Choose the learner's current step from the path.
-    const currentNode = await screen.findByRole("button", { name: /1\.1\.2: Keep going/i });
+    const currentNode = await screen.findByRole("button", { name: /Step 2: Keep going/i });
     await user.click(currentNode);
 
-    // Clicking an available step should open its lesson and use the expected API data.
+    // The note should preview the step before the learner commits to it.
+    expect(screen.getByRole("heading", { name: "Keep going" })).toBeInTheDocument();
+    expect(screen.getByText("Understand budgets.")).toBeInTheDocument();
+    expect(screen.getByText("Track your expenses.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Continue this step" }));
+
+    // Starting from the note should open the lesson and use the expected API data.
     expect(screen.getByText("Selected lesson: 1.1.2")).toBeInTheDocument();
     expect(api.getLessonProgress).toHaveBeenCalledWith("cashFlow");
     expect(api.getLesson).toHaveBeenCalledWith("cashFlow", "1.1");
+  });
+
+  it("explains why a locked step cannot be started yet", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/learn"]}>
+        <Routes>
+          <Route path="/learn" element={<LearningPathPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const lockedNode = await screen.findByRole("button", { name: /Step 3: Finish strong/i });
+    await user.click(lockedNode);
+
+    expect(
+      screen.getByText("Finish the earlier steps on the trail to unlock this one."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Locked for now" })).toBeDisabled();
   });
 });
 
