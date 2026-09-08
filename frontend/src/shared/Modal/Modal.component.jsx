@@ -1,5 +1,32 @@
 import { useEffect, useId, useRef } from "react";
 
+const variantStyles = {
+  default: {
+    dialog:
+      "max-w-xl rounded-3xl border border-neutral-200 bg-surface-app text-foreground shadow-xl backdrop:bg-neutral-800/50",
+    header: "flex items-start justify-between gap-4 border-b border-neutral-200 px-6 py-6",
+    title: "font-heading text-h4 font-bold text-heading",
+    description: "mt-1 text-small text-neutral-600",
+    closeButton:
+      "h-11 w-11 rounded-xl text-2xl text-heading hover:bg-surface-inset focus-visible:outline-focus",
+    body: "px-6 py-6",
+    footer:
+      "flex flex-wrap justify-end gap-3 border-t border-neutral-200 bg-surface-raised px-6 py-5",
+  },
+  postIt: {
+    dialog:
+      "animate-post-it-pop max-w-sm -rotate-1 rounded-[0.25rem] border border-post-it-border bg-post-it text-post-it-text shadow-[var(--shadow-post-it)] backdrop:bg-neutral-800/40",
+    header: "flex items-start justify-between gap-3 px-5 pb-2 pt-8",
+    title: "font-heading text-h4 font-bold text-post-it-text",
+    description: "mt-1 text-small text-post-it-muted",
+    closeButton:
+      "h-9 w-9 rounded-full text-xl text-post-it-muted hover:bg-post-it-fold focus-visible:outline-post-it-text",
+    body: "px-5 pb-5 pt-1",
+    footer:
+      "flex flex-wrap justify-end gap-3 border-t border-dashed border-post-it-border px-5 py-4",
+  },
+};
+
 export default function Modal({
   children,
   isOpen,
@@ -7,12 +34,15 @@ export default function Modal({
   title,
   description,
   footer,
+  variant = "default",
   closeOnBackdrop = true,
   showCloseButton = true,
   className = "",
 }) {
   const dialogRef = useRef(null);
   const previousFocusRef = useRef(null);
+
+  const styles = variantStyles[variant] ?? variantStyles.default;
 
   const titleId = useId();
   const descriptionId = useId();
@@ -90,16 +120,23 @@ export default function Modal({
       onCancel={handleCancel}
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
-      className={`fixed inset-0 z-50 m-auto max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-3xl border border-neutral-200 bg-surface-app p-0 text-foreground shadow-xl backdrop:bg-neutral-800/50 ${className}`}
+      className={`fixed inset-0 z-50 m-auto max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] overflow-y-auto p-0 ${styles.dialog} ${className}`}
     >
-      <header className="flex items-start justify-between gap-4 border-b border-neutral-200 px-6 py-6">
+      {variant === "postIt" && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-0 h-5 w-24 -translate-x-1/2 -rotate-2 rounded-sm bg-post-it-tape shadow-sm"
+        />
+      )}
+
+      <header className={styles.header}>
         <div>
-          <h2 id={titleId} className="font-heading text-h4 font-bold text-heading">
+          <h2 id={titleId} className={styles.title}>
             {title}
           </h2>
 
           {description && (
-            <p id={descriptionId} className="mt-1 text-small text-neutral-600">
+            <p id={descriptionId} className={styles.description}>
               {description}
             </p>
           )}
@@ -110,20 +147,16 @@ export default function Modal({
             type="button"
             aria-label="Close dialog"
             onClick={onClose}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl text-heading transition-colors hover:bg-surface-inset focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className={`inline-flex shrink-0 items-center justify-center transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${styles.closeButton}`}
           >
             ×
           </button>
         )}
       </header>
 
-      <div className="px-6 py-6">{children}</div>
+      <div className={styles.body}>{children}</div>
 
-      {footer && (
-        <footer className="flex flex-wrap justify-end gap-3 border-t border-neutral-200 bg-surface-raised px-6 py-5">
-          {footer}
-        </footer>
-      )}
+      {footer && <footer className={styles.footer}>{footer}</footer>}
     </dialog>
   );
 }
