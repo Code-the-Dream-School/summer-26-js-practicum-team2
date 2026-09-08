@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a post-it note variant to the shared modal for lightweight, playful detail panels.
 - Added a step details note on the learning path that shows the lesson goal, a content preview, section count, and a status-aware action for starting, resuming, or reviewing a step.
 - Added regression coverage for opening the step details note, including the locked-step explanation.
+- Added an authenticated endpoint that resumes learners at their most recently touched, currently unlocked lesson, with safe fallbacks for stale or missing progress.
+- Added regression coverage for lesson access guards and resume-path fallbacks.
+
 
 ### Changed
 
@@ -29,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Selecting a learning path node now opens its details note instead of navigating straight into the lesson, and locked steps can be previewed rather than being unusable.
 - Reworded the learning path helper text to invite learners to preview a step before starting it.
 - Improved quiz answer feedback with clearer selected, correct, and incorrect answer highlighting.
+- Changed the unavailable-lesson link to return learners to their current lesson instead of the home page.
 
 ### Removed
 
@@ -39,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed learning-path node navigation so selecting a micro-lesson opens that exact micro-lesson instead of resuming a different saved step.
 - Fixed the landing-page discrepancy so the homepage matches the intended design and presentation.
+- Prevented learners from loading locked lessons before completing the previous lesson while preserving access to their saved current position.
 
 ---
 
