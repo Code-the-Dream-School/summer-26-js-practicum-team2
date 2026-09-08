@@ -17,7 +17,7 @@ function LearningPathNode({ node, status, stepNumber, style, tooltipText, onSele
   const badge = statusBadge[status] ?? statusBadge.locked;
 
   return (
-    <div ref={ref} style={style} className="absolute flex flex-col items-center">
+    <div ref={ref} style={style} className="absolute flex w-36 flex-col items-center md:w-44">
       <div className="relative">
         <Button
           variant={variant}
@@ -36,6 +36,10 @@ function LearningPathNode({ node, status, stepNumber, style, tooltipText, onSele
           {badge.icon}
         </span>
       </div>
+
+      <p className="mt-2 line-clamp-2 px-1 text-center text-[0.72rem] font-semibold leading-4 text-learning-path-label">
+        {node.microLessonTitle}
+      </p>
     </div>
   );
 }
