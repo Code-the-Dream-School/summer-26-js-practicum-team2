@@ -394,8 +394,8 @@ function LearningPathPage() {
 
         <p className="mt-3 text-center text-sm leading-6 text-learning-path-muted">
           {isModuleComplete
-            ? "You are all caught up. Revisit any step to review it."
-            : "Tap a step to jump straight into the lesson."}
+            ? "You are all caught up. Tap any step to revisit what it covers."
+            : "Tap a step to peek at what is inside before you start."}
         </p>
 
         <div
