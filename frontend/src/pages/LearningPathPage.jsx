@@ -10,6 +10,9 @@ import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
 import abigailImg from "../assets/abigail.webp";
 import ramonaImg from "../assets/ramona.webp";
 
+// Vertical distance between node centers, in rem.
+const NODE_SPACING_REM = 8.75;
+
 function getMicroLessonPreview(content = []) {
   return content
     .filter(
@@ -148,7 +151,7 @@ function LearningPathPage() {
   });
 
   // Calculate the height of the learning path container based on the number of nodes
-  const pathHeight = Math.max(learningPath.length * 5.9 + 2, 29);
+  const pathHeight = Math.max(learningPath.length * NODE_SPACING_REM + 3, 29);
 
   // Constants for the circle radius and the visible gap between nodes
   const circleRadius = 35;
@@ -482,7 +485,7 @@ function LearningPathPage() {
               left = "clamp(68%, 70%, 72%)";
             }
 
-            const top = `${index * 5.9}rem`;
+            const top = `${index * NODE_SPACING_REM}rem`;
 
             let tooltipText = "Locked step. Finish the earlier lesson first.";
 
