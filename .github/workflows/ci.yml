@@ -7,11 +7,16 @@ on:
       - main
   workflow_dispatch:
 
+# This block explicitly tells GitHub's runner what the GITHUB_TOKEN can access.
+# It grants read access to pull the code, and write access to store actions assets securely.
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   frontend:
     name: Frontend checks
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,7 +62,6 @@ jobs:
   backend:
     name: Backend checks
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,7 +99,6 @@ jobs:
     name: Browser journey checks
     runs-on: ubuntu-latest
     needs: frontend
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -105,9 +108,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            frontend/package-lock.json
+          # Combined into a string sequence to prevent nested list parsing quirks
+          cache-dependency-path: "frontend/package-lock.json" 
 
       - name: Install root dependencies
         run: npm ci
