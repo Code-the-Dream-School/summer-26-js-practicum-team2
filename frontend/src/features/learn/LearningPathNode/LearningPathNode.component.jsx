@@ -18,7 +18,7 @@ function LearningPathNode({ node, status, stepNumber, style, tooltipText, onSele
 
   return (
     <div ref={ref} style={style} className="absolute flex w-36 flex-col items-center md:w-44">
-      <div className="relative">
+      <div data-node-circle className="relative">
         <Button
           variant={variant}
           disabled={status === "locked"}

@@ -178,8 +178,9 @@ function LearningPathPage() {
         if (!nodeElement) {
           return null;
         }
-        // Get the bounding rectangle of the node element to determine its size and position on the page.
-        const nodeRect = nodeElement.getBoundingClientRect();
+        // Measure the circle itself so the labels below it do not shift the vine anchor points.
+        const circleElement = nodeElement.querySelector("[data-node-circle]") ?? nodeElement;
+        const nodeRect = circleElement.getBoundingClientRect();
 
         // Calculate the center coordinates of the node element relative to the path container.
         return {
