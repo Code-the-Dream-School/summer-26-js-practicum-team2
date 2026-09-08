@@ -36,6 +36,15 @@
   --color-learning-path-label: #1f5a4c;
   --color-shadow: rgba(0, 0, 0, 0.16);
 
+  /* Post-it note modal */
+  --color-post-it: #fdf0a4;
+  --color-post-it-fold: #f6e07d;
+  --color-post-it-border: #e3cd6a;
+  --color-post-it-text: #4a3b12;
+  --color-post-it-muted: #6d5a22;
+  --color-post-it-tape: rgba(255, 255, 255, 0.72);
+  --shadow-post-it: 0 18px 34px rgba(74, 59, 18, 0.28);
+
   /* Status colors */
   --color-success: #18816a;
   --color-warning: #ffddd8;
@@ -131,4 +140,26 @@
 
 .animate-callout-pop {
   animation: callout-pop 0.28s ease-out;
+}
+
+@keyframes post-it-pop {
+  from {
+    opacity: 0;
+    transform: rotate(2deg) translateY(12px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1deg) translateY(0) scale(1);
+  }
+}
+
+.animate-post-it-pop {
+  animation: post-it-pop 0.26s cubic-bezier(0.22, 1.1, 0.4, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-callout-pop,
+  .animate-post-it-pop {
+    animation: none;
+  }
 }
