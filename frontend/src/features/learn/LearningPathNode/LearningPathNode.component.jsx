@@ -40,6 +40,12 @@ function LearningPathNode({ node, status, stepNumber, style, tooltipText, onSele
       <p className="mt-2 line-clamp-2 px-1 text-center text-[0.72rem] font-semibold leading-4 text-learning-path-label">
         {node.microLessonTitle}
       </p>
+
+      {node.lessonEstimatedMin ? (
+        <p className="text-[0.65rem] font-medium leading-4 text-learning-path-muted">
+          {node.lessonEstimatedMin} min read
+        </p>
+      ) : null}
     </div>
   );
 }
