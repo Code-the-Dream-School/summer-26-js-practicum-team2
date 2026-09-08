@@ -21,9 +21,9 @@ function LearningPathNode({ node, status, stepNumber, style, tooltipText, onSele
       <div data-node-circle className="relative">
         <Button
           variant={variant}
-          disabled={status === "locked"}
+          className={`transition-transform hover:scale-105 ${status === "locked" ? "opacity-70 grayscale" : ""}`}
           title={tooltipText || `${node.microLessonId}: ${node.microLessonTitle}`}
-          aria-label={`${node.microLessonId}: ${node.microLessonTitle}`}
+          aria-label={`Step ${stepNumber}: ${node.microLessonTitle}. ${badge.label}. Open details.`}
           onClick={() => onSelect?.(node)}
         >
           <span className="text-[1.25rem] font-bold leading-none">{stepNumber}</span>
