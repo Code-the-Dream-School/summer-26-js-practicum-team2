@@ -505,7 +505,6 @@ function LearningPathPage() {
                   top,
                   transform: "translateX(-50%)",
                 }}
-                showCallout={index === 0 && status === "current"}
                 tooltipText={`${node.microLessonTitle} - ${tooltipText}`}
                 onSelect={openLesson}
                 ref={(element) => {
