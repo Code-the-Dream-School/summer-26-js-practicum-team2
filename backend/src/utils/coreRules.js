@@ -47,7 +47,7 @@ function calculateXpDelta({
     return { amount: 0, capped: false, remaining: Math.max(0, XP_CAP - currentTotal) };
   }
 
-  if (eventType === "onboarding_complete" && (!isFirstTime)) {
+  if (eventType === "onboarding_complete" && !isFirstTime) {
     return { amount: 0, capped: false, remaining: Math.max(0, XP_CAP - currentTotal) };
   }
 
