@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthContext } from "../context/AuthContext";
 import {
   approveDeleteAccount,
@@ -49,6 +49,8 @@ export default function AdminDashboardPage() {
   const [selectedLessonId, setSelectedLessonId] = useState("");
   const [lessonJson, setLessonJson] = useState("");
   const [pendingAction, setPendingAction] = useState(null);
+  const [isRunningAction, setIsRunningAction] = useState(false);
+  const actionInFlightRef = useRef(false);
   const [state, setState] = useState({ isLoading: true, error: "", message: "" });
 
   const loadData = useCallback(async () => {
@@ -109,6 +111,10 @@ export default function AdminDashboardPage() {
   }
 
   async function runAction(action, successMessage, { applyResult, refresh = false } = {}) {
+    // The ref blocks repeat clicks that land before the disabled state renders.
+    if (actionInFlightRef.current) return null;
+    actionInFlightRef.current = true;
+    setIsRunningAction(true);
     try {
       const result = await action();
       await applyResult?.(result);
@@ -118,6 +124,9 @@ export default function AdminDashboardPage() {
     } catch (error) {
       setState((current) => ({ ...current, error: error.message }));
       return null;
+    } finally {
+      actionInFlightRef.current = false;
+      setIsRunningAction(false);
     }
   }
 
@@ -406,6 +415,7 @@ export default function AdminDashboardPage() {
             <Button
               variant="secondary"
               size="sm"
+              loading={isRunningAction}
               onClick={() =>
                 void runAction(() => seedAdminRandomUsers(csrfToken), "10 random users seeded.", {
                   applyResult: refreshUsers,
@@ -450,6 +460,7 @@ export default function AdminDashboardPage() {
                         size="sm"
                         className="min-h-8 px-2 py-1 text-xs underline"
                         disabled={
+                          isRunningAction ||
                           adminUser.id === currentUser?.id ||
                           Boolean(adminUser.is_deleted || adminUser.deleted_at)
                         }
@@ -468,6 +479,7 @@ export default function AdminDashboardPage() {
                         size="sm"
                         className="min-h-8 px-2 py-1 text-xs underline"
                         disabled={
+                          isRunningAction ||
                           adminUser.id === currentUser?.id ||
                           Boolean(adminUser.is_deleted || adminUser.deleted_at)
                         }
@@ -492,6 +504,7 @@ export default function AdminDashboardPage() {
                           size="sm"
                           className="min-h-8 px-2 py-1 text-xs underline"
                           disabled={
+                            isRunningAction ||
                             adminUser.id === currentUser?.id ||
                             Boolean(adminUser.is_deleted || adminUser.deleted_at)
                           }
@@ -523,7 +536,9 @@ export default function AdminDashboardPage() {
                               { applyResult: updateUserInList, refresh: false },
                             )
                           }
-                          disabled={Boolean(adminUser.is_deleted || adminUser.deleted_at)}
+                          disabled={
+                            isRunningAction || Boolean(adminUser.is_deleted || adminUser.deleted_at)
+                          }
                         >
                           {adminUser.role === "admin" ? "Demote" : "Promote"}
                         </Button>
@@ -532,7 +547,7 @@ export default function AdminDashboardPage() {
                         variant="ghost"
                         size="sm"
                         className="min-h-8 px-2 py-1 text-xs underline"
-                        disabled={adminUser.id === currentUser?.id}
+                        disabled={isRunningAction || adminUser.id === currentUser?.id}
                         onClick={() =>
                           void runAction(
                             () =>
@@ -553,7 +568,7 @@ export default function AdminDashboardPage() {
                           variant="ghost"
                           size="sm"
                           className="min-h-8 px-2 py-1 text-xs text-danger underline"
-                          disabled={adminUser.id === currentUser?.id}
+                          disabled={isRunningAction || adminUser.id === currentUser?.id}
                           onClick={() => {
                             if (window.confirm(`Permanently delete ${adminUser.email}?`)) {
                               void runAction(
@@ -590,6 +605,7 @@ export default function AdminDashboardPage() {
           <div className="flex flex-wrap gap-3">
             <Button
               variant="primary"
+              loading={isRunningAction}
               onClick={() =>
                 void runAction(
                   () => seedAdminBudgetingModule(csrfToken),
@@ -606,6 +622,7 @@ export default function AdminDashboardPage() {
                 className="sr-only"
                 type="file"
                 accept=".json,application/json"
+                disabled={isRunningAction}
                 onChange={(event) => {
                   const file = event.target.files?.[0];
                   if (file)
@@ -663,6 +680,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-wrap gap-3">
               <Button
                 variant="primary"
+                loading={isRunningAction}
                 onClick={() =>
                   void runAction(
                     () =>
@@ -684,6 +702,7 @@ export default function AdminDashboardPage() {
                 <Button
                   variant="ghost"
                   className="border border-danger text-danger"
+                  disabled={isRunningAction}
                   onClick={() => {
                     if (window.confirm("Delete this module?"))
                       void runAction(
@@ -709,6 +728,7 @@ export default function AdminDashboardPage() {
                   />
                   <Button
                     variant="primary"
+                    loading={isRunningAction}
                     onClick={() => {
                       const id = `${selectedModule.id}-lesson-${Date.now()}`;
                       void runAction(
@@ -746,6 +766,7 @@ export default function AdminDashboardPage() {
                       <Button
                         variant="ghost"
                         className="min-h-8 px-2 py-1 text-xs text-danger underline"
+                        disabled={isRunningAction}
                         onClick={() => {
                           if (window.confirm("Delete this lesson?"))
                             void runAction(
@@ -778,6 +799,7 @@ export default function AdminDashboardPage() {
                       </div>
                       <Button
                         variant="primary"
+                        loading={isRunningAction}
                         onClick={() => {
                           try {
                             const lesson = parseLessonJson();
