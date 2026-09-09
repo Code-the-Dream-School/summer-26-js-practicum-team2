@@ -1,12 +1,14 @@
-// MongoDB (Mongoose) connection scaffold
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+
+const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/summer-26-js-practicum-team2";
 
 const connectMongo = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB connected');
-  } catch (error) {
-    console.error('MongoDB connection error:', error.message);
+    const conn = await mongoose.connect(mongoUri);
+    console.log(`MongoDB connected to: ${conn.connection.host}/${conn.connection.name}`);
+    return conn;
+  } catch (err) {
+    console.error("MongoDB connection error:", err.message);
     process.exit(1);
   }
 };

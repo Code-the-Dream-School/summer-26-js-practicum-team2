@@ -1,0 +1,135 @@
+name: Sync shared files between docs and development
+
+on:
+  push:
+    branches:
+      - development
+      - docs
+    paths:
+      - .github/**
+      - docs/**
+      - .editorconfig
+      - .env.example
+      - .gitattributes
+      - .gitignore
+      - .nvmrc
+      - CHANGELOG.md
+      - CONTRIBUTORS.md
+      - LICENSE
+      - package-lock.json
+      - package.json
+      - README.md
+      - SUPPORT.md
+      - backend/package.json
+      - backend/package-lock.json
+      - frontend/package.json
+      - frontend/package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-shared-files-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  SYNC_PATHS: >-
+    .github
+    docs
+    .editorconfig
+    .env.example
+    .gitattributes
+    .gitignore
+    .nvmrc
+    CHANGELOG.md
+    CONTRIBUTORS.md
+    LICENSE
+    package-lock.json
+    package.json
+    README.md
+    SUPPORT.md
+    backend/package.json
+    backend/package-lock.json
+    frontend/package.json
+    frontend/package-lock.json
+
+jobs:
+  sync-shared-files:
+    name: Create sync PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Prepare sync branch changes
+        id: prepare
+        run: |
+          if [ "$GITHUB_REF_NAME" = "development" ]; then
+            SOURCE_BRANCH=development
+            TARGET_BRANCH=docs
+            SYNC_BRANCH=chore/sync-shared-files-from-development
+            COMMIT_MESSAGE="Sync shared files from development"
+          else
+            SOURCE_BRANCH=docs
+            TARGET_BRANCH=development
+            SYNC_BRANCH=chore/sync-shared-files-from-docs
+            COMMIT_MESSAGE="Sync shared files from docs"
+          fi
+
+          echo "source=$SOURCE_BRANCH" >> "$GITHUB_OUTPUT"
+          echo "target=$TARGET_BRANCH" >> "$GITHUB_OUTPUT"
+          echo "sync-branch=$SYNC_BRANCH" >> "$GITHUB_OUTPUT"
+          echo "commit-message=$COMMIT_MESSAGE" >> "$GITHUB_OUTPUT"
+
+          git fetch origin "$SOURCE_BRANCH" "$TARGET_BRANCH"
+          git switch "$TARGET_BRANCH"
+
+          read -r -a PATHS <<< "$SYNC_PATHS"
+          for path in "${PATHS[@]}"; do
+            if git cat-file -e "${{ github.sha }}:$path" 2>/dev/null; then
+              git restore --source "${{ github.sha }}" -- "$path"
+            fi
+          done
+
+          if git diff --quiet -- "${PATHS[@]}"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit sync change on PR branch
+        if: steps.prepare.outputs.changed == 'true'
+        run: |
+          read -r -a PATHS <<< "$SYNC_PATHS"
+          git switch -C "${{ steps.prepare.outputs.sync-branch }}"
+          git add -- "${PATHS[@]}"
+          git commit -m "${{ steps.prepare.outputs.commit-message }}"
+          git push --force-with-lease origin "${{ steps.prepare.outputs.sync-branch }}"
+
+      - name: Create or update sync PR
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE="Sync shared files from ${{ steps.prepare.outputs.source }}"
+          PR_BODY="Automated sync of shared files from ${{ steps.prepare.outputs.source }}."
+          PR_BODY+=$'\n\n'
+          PR_BODY+="Source commit: ${GITHUB_SHA}"
+
+          PR_NUMBER=$(gh pr list --repo "$GITHUB_REPOSITORY" --base "${{ steps.prepare.outputs.target }}" --head "${{ steps.prepare.outputs.sync-branch }}" --json number --jq '.[0].number // ""')
+
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --title "$PR_TITLE" --body "$PR_BODY" --add-label documentation --add-label changelog
+          else
+            gh pr create --repo "$GITHUB_REPOSITORY" --base "${{ steps.prepare.outputs.target }}" --head "${{ steps.prepare.outputs.sync-branch }}" --title "$PR_TITLE" --body "$PR_BODY" --label documentation --label changelog
+          fi

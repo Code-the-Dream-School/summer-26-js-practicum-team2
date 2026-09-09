@@ -1,0 +1,32 @@
+import { expect, test } from "./fixtures/network.js";
+
+test("learners can start Google or GitHub sign-in from the login page", async ({
+  page,
+}) => {
+  await page.route("**/api/v1/auth/providers", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ google: true, github: true }),
+    }),
+  );
+  await page.goto("/login");
+
+  await expect(
+    page.getByRole("link", { name: "Continue with Google" }),
+  ).toHaveAttribute("href", "/api/v1/auth/google?tos=true");
+  await expect(
+    page.getByRole("link", { name: "Continue with GitHub" }),
+  ).toHaveAttribute("href", "/api/v1/auth/github?tos=true");
+  await expect(page.getByText(/By logging in, you agree/)).toBeVisible();
+  await expect(page.getByText("or", { exact: true })).toHaveCount(1);
+});
+
+test("learners see a clear message after a failed provider sign-in", async ({
+  page,
+}) => {
+  await page.goto("/login?error=oauth_failed");
+
+  await expect(page.getByRole("alert")).toHaveText(
+    "That sign-in attempt didn't work. Please try again.",
+  );
+});
