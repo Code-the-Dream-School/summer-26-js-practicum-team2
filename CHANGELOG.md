@@ -9,8 +9,106 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [1.0.2] - 2026-09-09
+
+### Added
+
+- Added Playwright projects that emulate throttled networks and CPU so slow-connection glitches can be reproduced locally.
+- Added a learn flow latency end-to-end suite that injects per-endpoint API delays to catch slow-network races.
+- Added a `verify` script that formats, lints, and runs the unit and full end-to-end suites in one command.
+
+### Changed
+
+- Changed end-to-end runs to test a production build served by Vite preview instead of the development server.
+
+### Fixed
+
+- Prevented duplicate knowledge check, quiz result, and lesson completion submissions when a button is clicked twice on a slow connection.
+- Prevented duplicate admin dashboard requests and onboarding step syncs while a request is still in flight.
+
+---
+
+## [1.0.1] - 2026-09-09
+
+### Added
+
+- Added a branded 500 error page with a refresh call-to-action, shown via a top-level error boundary for uncaught render errors.
+- Added a rollback procedure doc covering Netlify and Render dashboard rollback plus a protected-branch PR-based git revert fallback.
+- Added a "Report a bug" link to the 404 and 500 pages, opening a pre-filled GitHub issue.
+
+---
+
+## [1.0.0] - 2026-09-09
+
+### Added
+
+- Added a progress-aware browser favicon that changes as authenticated learners complete more of the course.
+- Added an installable web app manifest, standalone display configuration, theme metadata, and a completed-plant app icon.
+- Added search engine metadata, Open Graph and Twitter sharing cards, canonical URL metadata, and WebApplication structured data.
+- Added regression coverage for progress favicon selection and authenticated end-to-end dashboard data fixtures.
+
+### Changed
+
+- Set the completed plant as the default favicon and installed-app icon for visitors and installed clients.
+
+### Fixed
+
+- Prevented signed-out visitors from requesting protected onboarding state and producing expected 401 console errors.
+- Updated end-to-end curriculum completion coverage for the dashboard continuation shown after the final lesson.
+
+---
+
+## [0.9.2] - 2026-09-09
+
+### Added
+
+- Added Playwright coverage for completing the full curriculum, including weighted quiz scoring and final-lesson persistence.
+- Added backend regression coverage for dashboard progress, final-quiz completion reconciliation, and idempotent quiz rewards.
+- Added frontend regression coverage for final-lesson dashboard navigation, completion saves, failed-quiz retries, and learning-path progress states.
+
+### Changed
+
+- Learning-path progress now uses completed lessons, matching the dashboard percentage and completion state.
+- Completing the final lesson now takes learners to the dashboard after progress is saved.
+- Failed final quizzes can be retried directly from the results screen.
+
+### Fixed
+
+- Restored aggregate lesson scoring so completion is based on the combined question score across the lesson's quizzes instead of requiring every individual quiz to pass.
+- Fixed final quiz passes not marking their parent lesson complete, which left completed learners at 83% progress.
+- Backfilled completed lessons for existing learners with a recorded passed final quiz.
+- Prevented stale dashboard responses after lesson completion by disabling dashboard response caching.
+- Prevented duplicate lesson XP when a passed final quiz is submitted again.
+
+---
+
+## [0.9.1] - 2026-09-09
+
+### Fixed
+
+- Fixed dashboard curriculum progress showing 67% after the learning path reached 100% by aligning lesson completion with completed micro-lessons and persisted module completion.
+- Fixed final lesson completion when a learner has passed every quiz but resumed from persisted micro-lesson progress. Lesson scoring now requires each knowledge check to pass and includes previously completed quiz micro-lessons.
+- Fixed a critical lesson-navigation regression that showed "Lesson unavailable" when learners advanced to the next lesson or opened their current lesson. Access checks now recognize saved lesson and micro-lesson progress, preserving access to previously reached lessons when older completion records are incomplete while keeping future lessons subject to unlock rules.
+- Aligned the "Current Lesson" destination with the learning path's step progress, preserving valid saved positions and falling back to an existing lesson when a saved lesson ID is no longer valid.
+- Prevented the "Continue" link from opening the next lesson before completion finishes saving.
+- Fixed completion of bundled lessons when modules have not been seeded in the database by using the same content lookup as lesson loading.
+
+### Added
+
+- Added a "Saving progress…" state and visible completion errors with a "Retry saving" action.
+- Added backend regression coverage for advancing across lesson boundaries, resuming stale progress, reviewing completed lessons, resolving current-lesson redirects, and completing bundled content.
+- Added frontend regression coverage for delayed completion saves and retrying failed saves before enabling the next lesson.
+
+### Changed
+
+- Upgraded Vitest and its V8 coverage package to 5.0.0 and updated Playwright, Jest, form handling, validation, database, rate-limiting, and lint dependencies.
+- Moved weekly Dependabot updates to Tuesday and grouped Vitest packages into a single dependency update.
+- Defined explicit CI token permissions and updated the browser-test dependency cache to use the frontend lockfile.
+
+---
+
 ## [0.9.0] - 2026-09-08
- 
+
 ### Added
 
 - Added a learning path header card with the module progress bar, percentage complete, guide artwork, and an encouraging trail summary.
@@ -21,7 +119,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added regression coverage for opening the step details note, including the locked-step explanation.
 - Added an authenticated endpoint that resumes learners at their most recently touched, currently unlocked lesson, with safe fallbacks for stale or missing progress.
 - Added regression coverage for lesson access guards and resume-path fallbacks.
-
 
 ### Changed
 
