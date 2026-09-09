@@ -51,6 +51,9 @@ export function useQuiz({
 
   const checkAnswer = useCallback(
     async (question, choiceIds) => {
+      // Marks the request in flight so a second click cannot resubmit it.
+      dispatch({ type: actions.submitStart });
+
       try {
         const result = await checkQuizAnswer({
           moduleId,

@@ -493,7 +493,8 @@ export default function LearnFlow({
                 <Button
                   variant="quiz"
                   className="min-w-40"
-                  disabled={quiz.selectedChoiceIds.length === 0}
+                  loading={quiz.status === "submitting"}
+                  disabled={quiz.selectedChoiceIds.length === 0 || quiz.status === "submitting"}
                   onClick={() => quiz.checkAnswer(quiz.currentQuestion, quiz.selectedChoiceIds)}
                 >
                   Check answer
