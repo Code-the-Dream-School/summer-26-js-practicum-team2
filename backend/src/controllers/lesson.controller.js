@@ -18,7 +18,7 @@ const {
 } = require("../validation/userValidation");
 const { updateUserStreak } = require("../services/streak.service");
 const { awardEligibleBadges } = require("../services/badge.service");
-const { isLessonUnlocked } = require("../utils/coreRules");
+const { getCurrentLessonId, isLessonAccessible } = require("../utils/learningPath");
 
 const DEFAULT_MODULE_ID = "cashFlow";
 
@@ -68,20 +68,7 @@ exports.getLastLesson = async (req, res, next) => {
     }
 
     const moduleData = await getModule(progressRecord.module_id);
-    const lessonSequence = (moduleData?.lessons || []).map((lesson) => lesson.id);
-    const unlocked = isLessonUnlocked({
-      lessonId: progressRecord.course_lesson_id,
-      lessonSequence,
-      completedLessons: progressRecord.completed_lessons || [],
-    });
-
-    // Never point the learner at a lesson their own progress hasn't actually unlocked.
-    const completedLessons = progressRecord.completed_lessons || [];
-    const fallbackLessonId =
-      lessonSequence[completedLessons.length] ||
-      lessonSequence[0] ||
-      progressRecord.course_lesson_id;
-    const lessonId = unlocked ? progressRecord.course_lesson_id : fallbackLessonId;
+    const lessonId = getCurrentLessonId(moduleData, progressRecord);
 
     return res.status(StatusCodes.OK).json({
       lastLessonPath: lessonId ? `/learn/${progressRecord.module_id}/${lessonId}` : null,
@@ -116,18 +103,7 @@ exports.getLesson = async (req, res, next) => {
       module_id: moduleId,
     });
 
-    // A learner's saved position is always reachable, even if completion bookkeeping
-    // for earlier lessons (e.g. from older progress records) hasn't caught up.
-    const isCurrentPosition = progressRecord?.course_lesson_id === lessonId;
-    const lessonSequence = (moduleData.lessons || []).map((lesson) => lesson.id);
-    const unlocked =
-      isCurrentPosition ||
-      isLessonUnlocked({
-        lessonId,
-        lessonSequence,
-        completedLessons: progressRecord?.completed_lessons || [],
-      });
-    if (!unlocked) {
+    if (!isLessonAccessible(moduleData, progressRecord, lessonId)) {
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "Complete the previous lesson to unlock this one.",
       });
