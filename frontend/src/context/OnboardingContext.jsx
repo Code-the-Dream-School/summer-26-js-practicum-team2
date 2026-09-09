@@ -1,4 +1,4 @@
-import { createContext, use, useState, useEffect } from "react";
+import { createContext, use, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "./AuthContext";
 import { ONBOARDING_STEPS } from "../features/onboarding/onboarding.constants";
@@ -18,6 +18,7 @@ export function OnboardingProvider({ children }) {
   const { csrfToken, isAuthenticated } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(null); //when you are waiting for user's response
   const navigate = useNavigate();
+  const stepSyncInFlightRef = useRef(false);
 
   const [hasCompleted, setHasCompleted] = useState(() => {
     const status = localStorage.getItem("sprout_onboarding_complete");
@@ -94,6 +95,10 @@ export function OnboardingProvider({ children }) {
     }
   };
   const handleNextStep = async () => {
+    // A second click while the step is syncing would resend the same step.
+    if (stepSyncInFlightRef.current) return;
+    stepSyncInFlightRef.current = true;
+
     const activeTourKey = ONBOARDING_STEPS[currentStep]?.page;
 
     try {
@@ -102,6 +107,8 @@ export function OnboardingProvider({ children }) {
       }
     } catch (err) {
       console.error("Failed to sync step to backend: ", err);
+    } finally {
+      stepSyncInFlightRef.current = false;
     }
     const nextStepIndex = currentStep + 1;
 
