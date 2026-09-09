@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ONBOARDING_STEPS, OnboardingProvider, useOnboarding } from "./OnboardingContext";
 import { AuthProvider } from "./AuthContext";
 import * as api from "../services/api";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../services/api");
 const mockNavigate = vi.fn();
@@ -26,6 +26,13 @@ const UserTest = () => {
 };
 
 describe("OnboardingContext tests", () => {
+  beforeEach(() => {
+    sessionStorage.setItem(
+      "sprout.auth",
+      JSON.stringify({ user: { id: "learner-1", name: "Learner" }, csrfToken: "test-csrf" }),
+    );
+  });
+
   it("persists completed onboarding using the value read on reload", async () => {
     localStorage.removeItem("sprout_onboarding_complete");
     api.getOnboardingState.mockResolvedValueOnce({
@@ -79,7 +86,7 @@ describe("OnboardingContext tests", () => {
         step: 0,
         status: "completed",
         dismissed: false,
-        csrfToken: null,
+        csrfToken: "test-csrf",
       });
     });
   });
