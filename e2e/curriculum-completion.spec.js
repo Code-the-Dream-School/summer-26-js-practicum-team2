@@ -110,6 +110,13 @@ async function prepareCurriculumSession(page) {
     }),
   );
 
+  await page.route("**/api/v1/dashboard", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ progress: { overallPercent: 0 } }),
+    }),
+  );
+
   // Mark onboarding complete so the test reaches the learning experience
   // without being redirected into the onboarding flow.
   await page.route("**/api/v1/onboarding", (route) =>
@@ -360,19 +367,23 @@ test("completes the curriculum with weighted quiz scoring and the final lesson",
     await page.getByRole("button", { name: "Finish lesson" }).click();
     await expectNoQuizCompletionError(page);
 
-    // The final lesson intentionally has no Continue link because there is no next lesson in the module.
+    // Intermediate lessons advance to the next lesson; the final lesson offers a dashboard continuation.
     if (lessonId !== lessonIds.at(-1)) {
       await expect(page.getByRole("link", { name: "Continue" })).toBeVisible();
       await page.getByRole("link", { name: "Continue" }).click();
     }
   }
 
-  // The exact end-of-curriculum copy can vary, so accept any supported message that clearly communicates that no lessons remain.
+  // The exact end-of-curriculum copy can vary, so accept any supported message that clearly communicates completion.
   await expect(
     page.getByText(
-      /reviewed every|all caught up|no more lessons|completed all available|up to date|all lessons are done|finished all the lessons|reached the end/i,
+      /reviewed every|all caught up|no more lessons|completed all available|up to date|all lessons are done|finished all the lessons|reached the end|current with your learning path/i,
     ),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Continue" })).toHaveAttribute(
+    "href",
+    "/dashboard",
+  );
 
   await expectNoQuizCompletionError(page);
 
