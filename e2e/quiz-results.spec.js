@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures/network.js";
 
 const lessonUrl = "/learn/quiz-results/1.1?sample=true";
 

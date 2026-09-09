@@ -42,6 +42,7 @@ export default function quizReducer(state = initialState, action) {
     case actions.revealAnswer:
       return {
         ...state,
+        status: "active",
         reviews: {
           ...state.reviews,
           [action.questionId]: {

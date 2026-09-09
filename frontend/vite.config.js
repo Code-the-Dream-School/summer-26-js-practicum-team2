@@ -6,17 +6,21 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, ".", "");
   const proxyPort = env.PORT || "8080";
+  const proxy = {
+    "/api": {
+      target: `http://localhost:${proxyPort}`,
+      changeOrigin: true,
+    },
+  };
 
   return {
     plugins: [react(), tailwindcss()],
     server: {
       fs: { allow: [".."] },
-      proxy: {
-        "/api": {
-          target: `http://localhost:${proxyPort}`,
-          changeOrigin: true,
-        },
-      },
+      proxy,
+    },
+    preview: {
+      proxy,
     },
   };
 });

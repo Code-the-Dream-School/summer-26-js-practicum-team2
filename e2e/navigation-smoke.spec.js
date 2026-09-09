@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/network.js";
 
 test("signed-out learners are redirected from protected routes", async ({
   page,

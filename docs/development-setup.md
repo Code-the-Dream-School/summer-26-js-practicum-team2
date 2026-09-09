@@ -160,6 +160,24 @@ Automated tests verify Sprout's OAuth routes, callback handling, and frontend st
 using real Google or GitHub accounts. Run `npm run test:backend`, `npm run test:frontend`,
 and `npm run test:e2e` to include their respective OAuth coverage.
 
+## End-to-End Testing
+
+Playwright builds the frontend and serves it with `vite preview`, so specs run against the same
+bundled output that ships to production. Set `E2E_DEV_SERVER=1` to run against the Vite dev server
+instead when iterating locally.
+
+```bash
+npm run test:e2e           # standard chromium run
+npm run test:e2e:slow      # slow 4G, fast 3G, and slow 3G emulation with CPU throttling
+npm run test:e2e:latency   # learn flow specs with per-endpoint API delays
+npm run test:e2e:all       # every project
+```
+
+Throttled projects emulate Chrome DevTools network conditions plus a CPU slowdown, which surfaces
+loading-state and race-condition bugs that only appear on slow connections. The latency project
+keeps the transport fast and instead delays individual mocked endpoints, so results stay
+deterministic.
+
 ## Available Scripts
 
 ### Root (run from project root)
@@ -167,15 +185,24 @@ and `npm run test:e2e` to include their respective OAuth coverage.
 ```bash
 npm run setup
 npm run dev
+npm run development:backend
+npm run development:frontend
 npm run lint
 npm run format
 npm run test
 npm run test:backend
 npm run test:frontend
 npm run test:e2e
+npm run test:e2e:slow
+npm run test:e2e:latency
+npm run test:e2e:all
+npm run verify
 npm run start:backend
 npm run build:frontend
 ```
+
+`npm run verify` is the pre-pull-request check: it formats, lints, runs the backend and frontend
+unit suites, and then runs every Playwright project.
 
 ### Frontend (run from frontend)
 

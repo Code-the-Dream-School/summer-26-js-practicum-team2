@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/network.js";
 
 test("saving a display name updates the header avatar", async ({ page }) => {
   // Mutable mock profile so the PATCH request can update the same data returned by subsequent mocked profile responses.
