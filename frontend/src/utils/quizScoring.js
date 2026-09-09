@@ -94,16 +94,7 @@ export function aggregateLessonScore(submissions = [], passThreshold = 0.7) {
   const score = totalQuestions === 0 ? 0 : correctCount / totalQuestions;
   // The percentage is the score expressed as a whole number, and the pass/fail status is determined by the threshold.
   const percentage = Math.round(score * 100);
-  // Lesson completion requires a passing attempt for every knowledge-check micro-lesson.
-  const passed =
-    normalizedSubmissions.length > 0 &&
-    normalizedSubmissions.every((submission) => {
-      if (typeof submission?.passed === "boolean") return submission.passed;
-      if (Number.isFinite(submission?.score)) {
-        return submission.score >= passThreshold * 100;
-      }
-      return (submission?.missed?.length ?? 0) === 0;
-    });
+  const passed = totalQuestions > 0 && score >= passThreshold;
 
   return { percentage, passed, totalQuestions, missedCount, correctCount };
 }
