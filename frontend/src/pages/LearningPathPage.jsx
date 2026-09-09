@@ -112,6 +112,8 @@ function LearningPathPage() {
   );
 
   const completedMicroLessons = new Set(progress?.completedMicroLessons ?? []);
+  const completedLessons = new Set(progress?.completedLessons ?? []);
+  const lessonIds = (currentModule?.lessons ?? []).map((lesson) => lesson.id);
 
   const savedIndex = learningPath.findIndex(
     (node) => node.microLessonId === progress?.currentMicroLessonId,
@@ -124,24 +126,22 @@ function LearningPathPage() {
     -1,
   );
 
-  // The last step being complete means there is nothing left to unlock in this module.
+  const completedLessonCount = lessonIds.filter((lessonId) =>
+    completedLessons.has(lessonId),
+  ).length;
+
   const isModuleComplete =
-    learningPath.length > 0 &&
-    (Boolean(progress?.isModuleCompleted) || lastCompletedIndex === learningPath.length - 1);
+    lessonIds.length > 0 &&
+    (Boolean(progress?.isModuleCompleted) || completedLessonCount === lessonIds.length);
 
   const currentIndex = isModuleComplete
     ? -1
     : Math.min(Math.max(savedIndex, lastCompletedIndex + 1), learningPath.length - 1);
 
   const currentNode = currentIndex >= 0 ? learningPath[currentIndex] : null;
-  const completedCount = learningPath.filter((node) =>
-    completedMicroLessons.has(node.microLessonId),
-  ).length;
-  const progressPercent = isModuleComplete
-    ? 100
-    : learningPath.length
-      ? Math.round((completedCount / learningPath.length) * 100)
-      : 0;
+  const progressPercent = lessonIds.length
+    ? Math.round((completedLessonCount / lessonIds.length) * 100)
+    : 0;
 
   // For scrolling to the current microLesson node in the learning path
   const currentNodeRef = useRef(null);

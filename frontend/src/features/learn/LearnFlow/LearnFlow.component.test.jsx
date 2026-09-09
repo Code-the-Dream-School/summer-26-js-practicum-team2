@@ -269,6 +269,35 @@ describe("LearnFlow regressions", () => {
     );
   });
 
+  it("links to the dashboard after saving the final lesson", async () => {
+    const user = userEvent.setup();
+    renderLearnFlow({ learnData: { ...baseLearnData, nextLessonId: null } });
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Finish lesson" }));
+
+    expect(await screen.findByRole("link", { name: "Continue" })).toHaveAttribute(
+      "href",
+      "/dashboard",
+    );
+  });
+
+  it("waits for final lesson persistence when the context CSRF token is unavailable", async () => {
+    const user = userEvent.setup();
+    const completion = Promise.withResolvers();
+    completeLessonMock.mockReturnValueOnce(completion.promise);
+    renderLearnFlow({ csrfToken: undefined, learnData: { ...baseLearnData, nextLessonId: null } });
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Finish lesson" }));
+
+    expect(screen.queryByRole("link", { name: "Continue" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Saving progress…" })).toBeDisabled();
+
+    await act(async () => completion.resolve({}));
+    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute("href", "/dashboard");
+  });
+
   it("shows completion errors and retries saving before enabling the next lesson", async () => {
     const user = userEvent.setup();
     completeLessonMock.mockRejectedValueOnce(new Error("Could not save progress."));

@@ -98,7 +98,7 @@ export default function LearnFlow({
   const chunks = currentStep?.content ?? [];
   const currentChunk = chunks[chunkIndex];
   const currentMicroLessonId = currentStep?.id;
-  const canSyncProgress = !isReadOnly && Boolean(csrfToken);
+  const canSyncProgress = !isReadOnly;
 
   const currentStepQuestions = useMemo(
     () => learnData.questions.filter((question) => question.lessonStepId === currentMicroLessonId),
@@ -181,18 +181,8 @@ export default function LearnFlow({
     learnData.passThreshold,
   );
   const hasQuiz = learnData.questions.length > 0;
-  const quizMicroLessonIds = new Set(learnData.questions.map((question) => question.lessonStepId));
-  const passedQuizMicroLessonIds = new Set([
-    ...(savedProgress?.completedMicroLessons ?? []),
-    ...Object.entries(submissions)
-      .filter(([, submission]) => submission?.passed)
-      .map(([microLessonId]) => microLessonId),
-  ]);
-  const allQuizMicroLessonsPassed = [...quizMicroLessonIds].every((microLessonId) =>
-    passedQuizMicroLessonIds.has(microLessonId),
-  );
   // Only a passing lesson unlocks the next one.
-  const canContinue = !hasQuiz || (gradedPassed && allQuizMicroLessonsPassed);
+  const canContinue = !hasQuiz || gradedPassed;
 
   const saveLessonCompletion = useCallback(() => {
     if (completionRequestRef.current) return;
@@ -223,9 +213,17 @@ export default function LearnFlow({
     void saveLessonCompletion();
   }
 
+  function retryQuiz() {
+    setIsComplete(false);
+    setIsReviewing(false);
+    quiz.reset();
+    quiz.begin(currentMicroLessonId);
+    setPhase("quiz");
+  }
+
   const continuePath = learnData.nextLessonId
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
-    : ROUTES.LEARN;
+    : ROUTES.DASHBOARD;
 
   async function advanceStep() {
     if (canSyncProgress && currentMicroLessonId) {
@@ -408,7 +406,7 @@ export default function LearnFlow({
                 Register to keep learning
               </Button>
             ) : canContinue ? (
-              canSyncProgress && completionStatus !== "saved" ? (
+              completionStatus !== "saved" ? (
                 <Button
                   variant="quiz"
                   disabled={completionStatus === "pending"}
@@ -422,8 +420,8 @@ export default function LearnFlow({
                 </Button>
               )
             ) : (
-              <Button as={Link} to={ROUTES.LEARN} variant="quizSecondary">
-                Back to learning path
+              <Button onClick={retryQuiz} variant="quizSecondary">
+                Try quiz again
               </Button>
             )}
           </div>

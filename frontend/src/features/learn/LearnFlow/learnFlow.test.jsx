@@ -120,6 +120,40 @@ describe("learn flow", () => {
     );
   });
 
+  it("lets a learner retry a failed final quiz", async () => {
+    const user = userEvent.setup();
+    api.updateLessonProgress.mockResolvedValue({});
+    api.checkQuizAnswer.mockResolvedValueOnce({
+      isCorrect: false,
+      correctChoiceIds: ["a"],
+      explanation: "Cash flow describes money moving in and out.",
+    });
+    api.startQuiz.mockResolvedValue({ attemptId: "attempt-1" });
+    api.submitQuiz.mockResolvedValueOnce({ score: 0, passed: false, missed: ["question-1"] });
+
+    render(
+      <MemoryRouter>
+        <LearnFlow
+          learnData={learnData}
+          characterImages={{}}
+          guideImage="guide.png"
+          csrfToken="csrf-1"
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Quick check" }));
+    await user.click(screen.getByRole("radio", { name: /A type of bank account/i }));
+    await user.click(screen.getByRole("button", { name: "Check answer" }));
+    await user.click(screen.getByRole("button", { name: "View results" }));
+
+    expect(await screen.findByRole("button", { name: "Try quiz again" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Try quiz again" }));
+
+    expect(screen.getByText("What does cash flow describe?")).toBeInTheDocument();
+    expect(api.startQuiz).toHaveBeenCalledTimes(2);
+  });
+
   it("uses checked-answer feedback when reviewing a redacted public question", async () => {
     const user = userEvent.setup();
     const redactedLearnData = {
