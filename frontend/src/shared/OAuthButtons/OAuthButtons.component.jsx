@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
-import { ROUTES } from "../../app/router/routes";
 import { getOAuthProviders, getOAuthUrl } from "../../services/api";
 import Button from "../Button/Button.component";
 
 export default function OAuthButtons({ next }) {
   const [providers, setProviders] = useState(null);
-  const [tosAccepted, setTosAccepted] = useState(false);
 
   useEffect(() => {
     let isCurrent = true;
@@ -33,35 +30,12 @@ export default function OAuthButtons({ next }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="flex items-start gap-3 text-small text-neutral-700">
-        <input
-          type="checkbox"
-          aria-label="Agree to Terms of Service and Privacy Policy"
-          checked={tosAccepted}
-          onChange={(event) => {
-            setTosAccepted(event.target.checked);
-          }}
-          className="mt-1 h-4 w-4 border-neutral-300 accent-primary"
-        />
-        <span>
-          I agree to the{" "}
-          <Link to={ROUTES.TERMS} className="font-semibold text-primary hover:underline">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link to={ROUTES.PRIVACY} className="font-semibold text-primary hover:underline">
-            Privacy Policy
-          </Link>
-          .
-        </span>
-      </label>
-
       <div className="flex flex-col gap-2">
         {availableProviders.map(([provider, label]) => (
           <Button
             key={provider}
             as="a"
-            href={getOAuthUrl(provider, tosAccepted, next)}
+            href={getOAuthUrl(provider, true, next)}
             variant="secondary"
           >
             Continue with {label}

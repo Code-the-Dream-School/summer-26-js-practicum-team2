@@ -9,6 +9,7 @@ import Card from "../shared/Card/Card.component";
 import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
 import OAuthButtons from "../shared/OAuthButtons/OAuthButtons.component";
+import { AuthTermsNotice } from "../pages/RegisterPage";
 
 export default function LoginPage() {
   const { login } = useAuthContext();
@@ -83,6 +84,7 @@ export default function LoginPage() {
             <input type="checkbox" className="accent-primary" {...register("remember")} />
             Keep me signed in for 30 days
           </label>
+          <AuthTermsNotice action="logging in" />
 
           {errors.root && (
             <p role="alert" className="text-small font-medium text-danger">
