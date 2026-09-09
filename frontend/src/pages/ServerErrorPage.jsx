@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import Button from "../shared/Button/Button.component";
+import { REPORT_BUG_LINK } from "../app/router/routes";
 
 export default function ServerErrorPage() {
   return (
@@ -13,6 +14,15 @@ export default function ServerErrorPage() {
         <Button onClick={() => window.location.reload()}>Refresh page</Button>
         <Button as={Link} to="/" variant="secondary">
           Take me home
+        </Button>
+        <Button
+          as="a"
+          href={REPORT_BUG_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="secondary"
+        >
+          Report a bug
         </Button>
       </div>
     </div>

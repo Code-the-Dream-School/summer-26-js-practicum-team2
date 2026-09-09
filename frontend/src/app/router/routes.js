@@ -19,6 +19,10 @@ export const ROUTES = {
 export const FIRST_LESSON_LINK = "/learn/cashFlow/1.1";
 export const SAMPLE_LESSON_LINK = `${FIRST_LESSON_LINK}?sample=true`;
 
+// External link for the "Report a bug" CTA on error pages (404/500).
+export const REPORT_BUG_LINK =
+  "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/issues/new?template=bug_report.md";
+
 const TITLES = {
   [ROUTES.HOME]: "Sprout — Counting Cents and Making Sense",
   [ROUTES.LOGIN]: "Log in — Sprout",

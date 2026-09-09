@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added a branded 500 error page with a refresh call-to-action, shown via a top-level error boundary for uncaught render errors.
 - Added a rollback procedure doc covering Netlify and Render dashboard rollback plus a protected-branch PR-based git revert fallback.
+- Added a "Report a bug" link to the 404 and 500 pages, opening a pre-filled GitHub issue.
 
 ---
 
