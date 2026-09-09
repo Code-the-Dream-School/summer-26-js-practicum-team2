@@ -1,5 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import LearnFlow from "./LearnFlow.component";
@@ -60,10 +61,10 @@ vi.mock("../Quiz/QuizReview/QuizReview.component", () => ({
 }));
 
 vi.mock("../../../shared/Button/Button.component", () => ({
-  default: ({ children, onClick, disabled }) => (
-    <button type="button" onClick={onClick} disabled={disabled}>
+  default: ({ children, onClick, disabled, loading, as: Component = "button", to }) => (
+    <Component onClick={onClick} disabled={disabled || loading} to={to}>
       {children}
-    </button>
+    </Component>
   ),
 }));
 
@@ -107,20 +108,23 @@ const baseLearnData = {
 // Keep the common LearnFlow setup in one place so each test only needs to pass what changes.
 function renderLearnFlow(props = {}) {
   return render(
-    <LearnFlow
-      learnData={baseLearnData}
-      characterImages={{ beaver: "/beaver.png" }}
-      guideImage="/guide.png"
-      csrfToken="csrf-token"
-      {...props}
-    />,
+    <MemoryRouter>
+      <LearnFlow
+        learnData={baseLearnData}
+        characterImages={{ beaver: "/beaver.png" }}
+        guideImage="/guide.png"
+        csrfToken="csrf-token"
+        {...props}
+      />
+    </MemoryRouter>,
   );
 }
 
 describe("LearnFlow regressions", () => {
   beforeEach(() => {
     // Clear previous progress calls so each test starts with fresh mocks.
-    completeLessonMock.mockClear();
+    completeLessonMock.mockReset();
+    completeLessonMock.mockResolvedValue({});
     completeMicroLessonMock.mockReset();
     completeMicroLessonMock.mockResolvedValue({});
     updateLessonProgressMock.mockClear();
@@ -244,5 +248,73 @@ describe("LearnFlow regressions", () => {
         csrfToken: "csrf-token",
       });
     });
+  });
+
+  it("waits for lesson completion to save before linking to the next lesson", async () => {
+    const user = userEvent.setup();
+    const completion = Promise.withResolvers();
+    completeLessonMock.mockReturnValueOnce(completion.promise);
+    renderLearnFlow();
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Finish lesson" }));
+
+    expect(screen.queryByRole("link", { name: "Continue" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Saving progress…" })).toBeDisabled();
+
+    await act(async () => completion.resolve({}));
+    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute(
+      "href",
+      "/learn/cashFlow/1.2",
+    );
+  });
+
+  it("links to the dashboard after saving the final lesson", async () => {
+    const user = userEvent.setup();
+    renderLearnFlow({ learnData: { ...baseLearnData, nextLessonId: null } });
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Finish lesson" }));
+
+    expect(await screen.findByRole("link", { name: "Continue" })).toHaveAttribute(
+      "href",
+      "/dashboard",
+    );
+  });
+
+  it("waits for final lesson persistence when the context CSRF token is unavailable", async () => {
+    const user = userEvent.setup();
+    const completion = Promise.withResolvers();
+    completeLessonMock.mockReturnValueOnce(completion.promise);
+    renderLearnFlow({ csrfToken: undefined, learnData: { ...baseLearnData, nextLessonId: null } });
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Finish lesson" }));
+
+    expect(screen.queryByRole("link", { name: "Continue" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Saving progress…" })).toBeDisabled();
+
+    await act(async () => completion.resolve({}));
+    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute("href", "/dashboard");
+  });
+
+  it("shows completion errors and retries saving before enabling the next lesson", async () => {
+    const user = userEvent.setup();
+    completeLessonMock.mockRejectedValueOnce(new Error("Could not save progress."));
+    renderLearnFlow();
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Finish lesson" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not save progress.");
+    expect(screen.queryByRole("link", { name: "Continue" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Retry saving" }));
+
+    expect(await screen.findByRole("link", { name: "Continue" })).toHaveAttribute(
+      "href",
+      "/learn/cashFlow/1.2",
+    );
+    expect(completeLessonMock).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

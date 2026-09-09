@@ -36,7 +36,14 @@ const refreshCsrfToken = (csrfToken) => {
 };
 
 async function apiRequest(path, options = {}, hasRetriedCsrf = false) {
-  const { method = "GET", body, csrfToken, headers = {}, basePath = USERS_BASE_PATH } = options;
+  const {
+    method = "GET",
+    body,
+    csrfToken,
+    headers = {},
+    basePath = USERS_BASE_PATH,
+    cache,
+  } = options;
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
   const requestCsrfToken = currentCsrfToken ?? csrfToken;
   const requestHeaders = {
@@ -52,6 +59,7 @@ async function apiRequest(path, options = {}, hasRetriedCsrf = false) {
   const response = await fetch(`${basePath}${path}`, {
     method,
     credentials: "include",
+    cache,
     headers: requestHeaders,
     body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
@@ -184,6 +192,7 @@ export const getDashboard = () =>
   apiRequest("", {
     method: "GET",
     basePath: DASHBOARD_BASE_PATH,
+    cache: "no-store",
   });
 
 export const getProfile = () =>

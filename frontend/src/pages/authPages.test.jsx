@@ -122,11 +122,20 @@ describe("auth pages", () => {
 
     expect(await screen.findByRole("link", { name: "Continue with Google" })).toHaveAttribute(
       "href",
-      "/api/v1/auth/google",
+      "/api/v1/auth/google?tos=true",
     );
     expect(screen.getByRole("link", { name: "Continue with GitHub" })).toHaveAttribute(
       "href",
-      "/api/v1/auth/github",
+      "/api/v1/auth/github?tos=true",
+    );
+    expect(screen.getByText(/By logging in, you agree/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute(
+      "href",
+      "/terms",
+    );
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+      "href",
+      "/privacy",
     );
   });
 
@@ -141,7 +150,7 @@ describe("auth pages", () => {
 
     expect(await screen.findByRole("link", { name: "Continue with Google" })).toHaveAttribute(
       "href",
-      "/api/v1/auth/google?next=%2Flearn%2FcashFlow%2F1.1",
+      "/api/v1/auth/google?tos=true&next=%2Flearn%2FcashFlow%2F1.1",
     );
   });
 
@@ -230,8 +239,14 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^email$/i), "new@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
-    await user.click(
-      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
+    expect(screen.getByText(/By signing up, you agree/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute(
+      "href",
+      "/terms",
+    );
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+      "href",
+      "/privacy",
     );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
@@ -271,9 +286,6 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^email$/i), "taken@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
-    await user.click(
-      screen.getByRole("checkbox", { name: /I agree to the Terms of Service and Privacy Policy/i }),
-    );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     // The registration conflict should be shown as an error for the email field.

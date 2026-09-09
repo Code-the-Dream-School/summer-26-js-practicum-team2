@@ -12,6 +12,22 @@ import Input from "../shared/Input/Input.component";
 import Button from "../shared/Button/Button.component";
 import OAuthButtons from "../shared/OAuthButtons/OAuthButtons.component";
 
+export function AuthTermsNotice({ action = "signing up" }) {
+  return (
+    <p className="rounded-xl border border-neutral-200 bg-surface-app p-3 text-sm text-neutral-700">
+      By {action}, you agree to the{" "}
+      <Link to={ROUTES.TERMS} className="font-semibold text-primary hover:underline">
+        Terms of Service
+      </Link>{" "}
+      and{" "}
+      <Link to={ROUTES.PRIVACY} className="font-semibold text-primary hover:underline">
+        Privacy Policy
+      </Link>
+      .
+    </p>
+  );
+}
+
 export default function RegisterPage() {
   const { register: registerUser } = useAuthContext();
   const [isRegistered, setIsRegistered] = useState(false);
@@ -32,7 +48,7 @@ export default function RegisterPage() {
       password: "",
       confirmPassword: "",
       timezone: detectedTimezone,
-      tos: false,
+      tos: true,
     },
   });
 
@@ -117,25 +133,7 @@ export default function RegisterPage() {
             {...register("confirmPassword")}
           />
 
-          <label className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-surface-app p-3 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              disabled={isSubmitting}
-              className="mt-1 h-4 w-4 rounded border-neutral-300 accent-primary"
-              {...register("tos")}
-            />
-            <span>
-              I agree to the{" "}
-              <Link to={ROUTES.TERMS} className="font-semibold text-primary hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link to={ROUTES.PRIVACY} className="font-semibold text-primary hover:underline">
-                Privacy Policy
-              </Link>
-              .
-            </span>
-          </label>
+          <AuthTermsNotice action="signing up" />
           {errors.tos && <p className="text-sm font-medium text-danger">{errors.tos.message}</p>}
 
           {errors.root && (
@@ -153,12 +151,6 @@ export default function RegisterPage() {
             </Link>
           </div>
         </form>
-
-        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
-          <span className="h-px flex-1 bg-neutral-200" />
-          or
-          <span className="h-px flex-1 bg-neutral-200" />
-        </div>
         <OAuthButtons />
       </Card>
     </div>

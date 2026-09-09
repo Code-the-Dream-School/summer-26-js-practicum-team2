@@ -75,6 +75,81 @@ describe("dashboard endpoint", () => {
     );
   });
 
+  it("counts lessons completed through all of their micro-lessons", async () => {
+    const { authHeader, userId } = await createAuthedUser("dashboard-micro-progress@example.com");
+    await seedDashboardModule();
+    await UserProgress.create({
+      user_id: userId,
+      module_id: "budgeting",
+      completed_lessons: ["1.1"],
+      completed_micro_lessons: ["1.1.1", "1.2.1"],
+    });
+
+    const response = await request(app).get("/api/v1/dashboard").set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.progress).toEqual({
+      completedLessons: 2,
+      totalLessons: 2,
+      overallPercent: 100,
+    });
+  });
+
+  it("does not treat a single final micro-lesson as a completed module", async () => {
+    const { authHeader, userId } = await createAuthedUser("dashboard-final-micro-only@example.com");
+    await seedDashboardModule();
+    await UserProgress.create({
+      user_id: userId,
+      module_id: "budgeting",
+      completed_micro_lessons: ["1.2.1"],
+    });
+
+    const response = await request(app).get("/api/v1/dashboard").set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.progress).toEqual({
+      completedLessons: 1,
+      totalLessons: 2,
+      overallPercent: 50,
+    });
+  });
+
+  it("honors a persisted completed-module state when lesson content has expanded", async () => {
+    const { authHeader, userId } = await createAuthedUser("dashboard-completed-module@example.com");
+    await seedDashboardModule();
+    await UserProgress.create({
+      user_id: userId,
+      module_id: "budgeting",
+      completed_lessons: ["1.1", "1.2"],
+      is_module_completed: true,
+    });
+
+    const response = await request(app).get("/api/v1/dashboard").set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.progress.overallPercent).toBe(100);
+    expect(response.body.progress.completedLessons).toBe(2);
+  });
+
+  it("matches the learning path when the final micro-lesson marks the module complete", async () => {
+    const { authHeader, userId } = await createAuthedUser(
+      "dashboard-final-micro-progress@example.com",
+    );
+    await seedDashboardModule();
+    await UserProgress.create({
+      user_id: userId,
+      module_id: "budgeting",
+      completed_lessons: ["1.1", "1.2"],
+      completed_micro_lessons: ["1.1.1", "1.2.1"],
+    });
+
+    const response = await request(app).get("/api/v1/dashboard").set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.progress.overallPercent).toBe(100);
+    expect(response.body.progress.completedLessons).toBe(2);
+  });
+
   it("invalidates a cached dashboard after lesson completion", async () => {
     const { authHeader } = await createAuthedUser("dashboard-completion@example.com");
     await seedDashboardModule();

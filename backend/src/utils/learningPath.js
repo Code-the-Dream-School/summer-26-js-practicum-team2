@@ -1,3 +1,5 @@
+const { isLessonUnlocked } = require("./coreRules");
+
 function buildLearningPath(moduleData) {
   if (!moduleData) return [];
   return (moduleData.lessons || []).flatMap((lesson) =>
@@ -36,4 +38,27 @@ function pickCurrentNode(learningPath, progressRecord) {
   return { ...learningPath[currentIndex], isModuleComplete: false };
 }
 
-module.exports = { buildLearningPath, pickCurrentNode };
+// Use the same step progress as the learning path, while preserving older saved lesson cursors.
+function getCurrentLessonId(moduleData, progressRecord) {
+  const lessons = moduleData?.lessons || [];
+  const currentNode = pickCurrentNode(buildLearningPath(moduleData), progressRecord);
+  const currentIndex = lessons.findIndex((lesson) => lesson.id === currentNode?.lessonId);
+  const savedIndex = lessons.findIndex((lesson) => lesson.id === progressRecord?.course_lesson_id);
+  return lessons[Math.max(0, currentIndex, savedIndex)]?.id ?? null;
+}
+
+function isLessonAccessible(moduleData, progressRecord, lessonId) {
+  const lessonSequence = (moduleData?.lessons || []).map((lesson) => lesson.id);
+  const lessonIndex = lessonSequence.indexOf(lessonId);
+  if (lessonIndex < 0) return false;
+
+  const currentIndex = lessonSequence.indexOf(getCurrentLessonId(moduleData, progressRecord));
+  const completedLessons = progressRecord?.completed_lessons || [];
+  return (
+    lessonIndex <= currentIndex ||
+    completedLessons.includes(lessonId) ||
+    isLessonUnlocked({ lessonId, lessonSequence, completedLessons })
+  );
+}
+
+module.exports = { buildLearningPath, pickCurrentNode, getCurrentLessonId, isLessonAccessible };

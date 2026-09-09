@@ -13,10 +13,12 @@ test("learners can start Google or GitHub sign-in from the login page", async ({
 
   await expect(
     page.getByRole("link", { name: "Continue with Google" }),
-  ).toHaveAttribute("href", "/api/v1/auth/google");
+  ).toHaveAttribute("href", "/api/v1/auth/google?tos=true");
   await expect(
     page.getByRole("link", { name: "Continue with GitHub" }),
-  ).toHaveAttribute("href", "/api/v1/auth/github");
+  ).toHaveAttribute("href", "/api/v1/auth/github?tos=true");
+  await expect(page.getByText(/By logging in, you agree/)).toBeVisible();
+  await expect(page.getByText("or", { exact: true })).toHaveCount(1);
 });
 
 test("learners see a clear message after a failed provider sign-in", async ({

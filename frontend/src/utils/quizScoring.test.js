@@ -23,7 +23,7 @@ describe("aggregateLessonScore", () => {
 
     const result = aggregateLessonScore(submissions, 0.7);
 
-    // 5/6 = 83%, above the 70% threshold overall
+    // 5/6 = 83%, above the 70% threshold overall.
     expect(result.percentage).toBe(83);
     expect(result.passed).toBe(true);
   });

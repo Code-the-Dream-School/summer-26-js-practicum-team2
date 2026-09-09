@@ -354,6 +354,8 @@ exports.submitQuiz = async (req, res, next) => {
 
       const alreadyCompletedMicro =
         existingProgress?.completed_micro_lessons?.includes(microLessonId) || false;
+      const alreadyCompletedLesson =
+        existingProgress?.completed_lessons?.includes(lessonId) || Boolean(previousPass);
 
       const update = {
         $addToSet: {
@@ -429,15 +431,15 @@ exports.submitQuiz = async (req, res, next) => {
       const isLessonFullyCompleted =
         allMicroLessonsIds.length > 0 &&
         allMicroLessonsIds.every((id) => userCompletedMicros.has(id));
+      const isFinalLessonQuiz = allMicroLessonsIds.at(-1) === microLessonId;
 
-      // parent lesson will be considered complete only if all micro lessons are finished
-      if (isLessonFullyCompleted) {
-        const alreadyCompleted = updatedProgress.completed_lessons?.includes(lessonId) || false;
-
+      // A passed final quiz completes the parent lesson even when the learner
+      // reaches it with an incomplete earlier micro-lesson.
+      if (isLessonFullyCompleted || isFinalLessonQuiz) {
         const lessonXp = calculateXpDelta({
           eventType: "lesson_complete",
           currentTotal: currentTotal + quizPassXp.amount + perfectXp.amount,
-          isFirstTime: !alreadyCompleted,
+          isFirstTime: !alreadyCompletedLesson,
         });
 
         await UserProgress.findOneAndUpdate(

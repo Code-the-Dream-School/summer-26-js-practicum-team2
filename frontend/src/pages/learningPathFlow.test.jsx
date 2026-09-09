@@ -107,6 +107,32 @@ describe("learning path page", () => {
     });
   });
 
+  it("does not mark the trail complete when only its final step is complete", async () => {
+    api.getLessonProgress.mockResolvedValueOnce({
+      currentModule: "cashFlow",
+      currentLessonId: "1.1",
+      currentMicroLessonId: "1.1.3",
+      completedMicroLessons: ["1.1.3"],
+      completedLessons: [],
+      isModuleCompleted: false,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/learn"]}>
+        <Routes>
+          <Route path="/learn" element={<LearningPathPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole("progressbar", { name: "Module progress" })).toHaveAttribute(
+      "aria-valuenow",
+      "0",
+    );
+    expect(screen.getByText("Keep growing!")).toBeInTheDocument();
+    expect(screen.queryByText("Trail complete!")).not.toBeInTheDocument();
+  });
+
   it("shows step details in the note and navigates to the selected lesson", async () => {
     const user = userEvent.setup();
 

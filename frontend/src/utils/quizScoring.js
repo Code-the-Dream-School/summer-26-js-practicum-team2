@@ -94,7 +94,6 @@ export function aggregateLessonScore(submissions = [], passThreshold = 0.7) {
   const score = totalQuestions === 0 ? 0 : correctCount / totalQuestions;
   // The percentage is the score expressed as a whole number, and the pass/fail status is determined by the threshold.
   const percentage = Math.round(score * 100);
-  // The pass/fail status is determined by whether the score meets or exceeds the threshold, and there are questions to evaluate.
   const passed = totalQuestions > 0 && score >= passThreshold;
 
   return { percentage, passed, totalQuestions, missedCount, correctCount };

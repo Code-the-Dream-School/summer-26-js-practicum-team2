@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import OAuthButtons from "./OAuthButtons.component";
@@ -35,47 +34,35 @@ describe("OAuthButtons", () => {
 
     renderOAuthButtons();
 
+    expect(screen.queryByText("or")).not.toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "Continue with Google" })).toBeInTheDocument();
+    expect(screen.getByText("or")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Continue with GitHub" })).not.toBeInTheDocument();
   });
 
-  it("passes Terms consent to the OAuth provider when the checkbox is checked", async () => {
-    const user = userEvent.setup();
+  it("includes Terms agreement in provider links without a separate checkbox", async () => {
     mockGetOAuthProviders.mockResolvedValue({ google: true, github: true });
 
     renderOAuthButtons();
 
     const googleLink = await screen.findByRole("link", { name: "Continue with Google" });
-    expect(googleLink).toHaveAttribute("href", "/api/v1/auth/google");
-
-    // After checking the Terms checkbox, the OAuth URLs should include the tos parameter
-    await user.click(
-      screen.getByRole("checkbox", { name: "Agree to Terms of Service and Privacy Policy" }),
-    );
     expect(googleLink).toHaveAttribute("href", "/api/v1/auth/google?tos=true");
     expect(screen.getByRole("link", { name: "Continue with GitHub" })).toHaveAttribute(
       "href",
       "/api/v1/auth/github?tos=true",
     );
 
-    // After unchecking, the URLs should not include the tos parameter
-    await user.click(
-      screen.getByRole("checkbox", { name: "Agree to Terms of Service and Privacy Policy" }),
-    );
-    expect(googleLink).toHaveAttribute("href", "/api/v1/auth/google");
-    expect(screen.getByRole("link", { name: "Continue with GitHub" })).toHaveAttribute(
-      "href",
-      "/api/v1/auth/github",
-    );
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 
   it("hides all OAuth actions when provider availability cannot be loaded", async () => {
     mockGetOAuthProviders.mockRejectedValue(new Error("Unavailable"));
 
-    renderOAuthButtons();
-
-    await vi.waitFor(() => {
-      expect(screen.queryByRole("link", { name: /Continue with/i })).not.toBeInTheDocument();
+    await act(async () => {
+      renderOAuthButtons();
     });
+
+    expect(screen.queryByRole("link", { name: /Continue with/i })).not.toBeInTheDocument();
+    expect(screen.queryByText("or")).not.toBeInTheDocument();
   });
 });

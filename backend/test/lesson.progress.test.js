@@ -5,6 +5,8 @@ const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
+const LessonModule = require("../src/models/LessonModule.model");
+const QuizAttempt = require("../src/models/QuizAttempt.model");
 
 useTestDb();
 
@@ -45,6 +47,25 @@ describe("lesson progress regression coverage (backend)", () => {
     // The default progress should also be saved instead of only being returned by the API.
     const records = await UserProgress.find({ user_id: userId, module_id: "cashFlow" });
     expect(records).toHaveLength(1);
+  });
+
+  it("backfills lesson completion from a passed final quiz", async () => {
+    const { authHeader, userId } = await createAuthedUser("final-quiz-progress@example.com");
+    await QuizAttempt.create({
+      user_id: userId,
+      module_id: "cashFlow",
+      lesson_id: "1.6",
+      micro_lesson_id: "1.6.2",
+      submitted_at: new Date(),
+      passed: true,
+    });
+
+    const response = await request(app)
+      .get("/api/v1/lessons/progress?moduleId=cashFlow")
+      .set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.completedLessons).toContain("1.6");
   });
 
   it("persists lesson, micro-lesson, and chunk index updates", async () => {
@@ -144,6 +165,75 @@ describe("lesson progress regression coverage (backend)", () => {
 });
 
 describe("micro-lesson completion rewards", () => {
+  it("completes a lesson when the aggregate quiz score passes", async () => {
+    await LessonModule.create({
+      id: "aggregate-scoring",
+      title: "Aggregate scoring",
+      lessons: [
+        {
+          id: "1.1",
+          passingScore: 70,
+          microLessons: [
+            {
+              id: "1.1.2",
+              microLessonContent: [
+                { type: "knowledgeCheck", id: "q1" },
+                { type: "knowledgeCheck", id: "q2" },
+                { type: "knowledgeCheck", id: "q3" },
+              ],
+            },
+            {
+              id: "1.1.4",
+              microLessonContent: [
+                { type: "knowledgeCheck", id: "q4" },
+                { type: "knowledgeCheck", id: "q5" },
+                { type: "knowledgeCheck", id: "q6" },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    const { authHeader, userId } = await createAuthedUser("aggregate-completion@example.com");
+    const answers = (questionIds, correctCount) =>
+      questionIds.map((question_id, index) => ({
+        question_id,
+        selected_choice_ids: [index < correctCount ? "a" : "b"],
+        is_correct: index < correctCount,
+      }));
+
+    await QuizAttempt.create([
+      {
+        user_id: userId,
+        module_id: "aggregate-scoring",
+        lesson_id: "1.1",
+        micro_lesson_id: "1.1.2",
+        submitted_at: new Date(),
+        score: 67,
+        passed: false,
+        answers: answers(["q1", "q2", "q3"], 2),
+      },
+      {
+        user_id: userId,
+        module_id: "aggregate-scoring",
+        lesson_id: "1.1",
+        micro_lesson_id: "1.1.4",
+        submitted_at: new Date(),
+        score: 100,
+        passed: true,
+        answers: answers(["q4", "q5", "q6"], 3),
+      },
+    ]);
+
+    const response = await request(app)
+      .post("/api/v1/lessons/progress/complete")
+      .set("Authorization", authHeader)
+      .send({ moduleId: "aggregate-scoring", lessonId: "1.1" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.completedLessons).toContain("1.1");
+  });
+
   it("rejects completion before passing a knowledge check", async () => {
     const { authHeader, userId } = await createAuthedUser("completion-check@example.com");
     const response = await request(app)

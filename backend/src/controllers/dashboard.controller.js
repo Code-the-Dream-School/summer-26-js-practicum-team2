@@ -10,13 +10,9 @@ const { dashboardEventSchema, validateRequest } = require("../validation/userVal
 const { getUserXpTotal } = require("../services/xp.service");
 const { getDisplayStreak } = require("../utils/streaks");
 
-const DASHBOARD_CACHE_TTL_MS = 30 * 1000;
 const DEFAULT_MODULE_ID = "cashFlow";
-const dashboardCache = new Map();
 
-function invalidateDashboardCache(userId) {
-  dashboardCache.delete(String(userId));
-}
+function invalidateDashboardCache() {}
 
 function getModuleLessons(module) {
   return module?.lessons || [];
@@ -32,8 +28,16 @@ function findMicroLesson(module, lessonId, microLessonId) {
 
 function buildUnit(module, progressRecord) {
   const lessons = getModuleLessons(module);
-  const completedSet = new Set(progressRecord?.completed_lessons || []);
-  const completedLessons = lessons.filter((lesson) => completedSet.has(lesson.id)).length;
+  const completedLessonIds = new Set(progressRecord?.completed_lessons || []);
+  const completedMicroLessonIds = new Set(progressRecord?.completed_micro_lessons || []);
+  const isModuleComplete = Boolean(progressRecord?.is_module_completed);
+  const completedLessons = lessons.filter(
+    (lesson) =>
+      isModuleComplete ||
+      completedLessonIds.has(lesson.id) ||
+      (lesson.microLessons?.length > 0 &&
+        lesson.microLessons.every((microLesson) => completedMicroLessonIds.has(microLesson.id))),
+  ).length;
 
   return {
     id: module.id,
@@ -147,12 +151,10 @@ async function reconcileProgressFromPassedAttempts(userId, modules) {
       const module = modules.find((item) => item.id === moduleId);
       const completedLessons = getModuleLessons(module)
         .filter((lesson) => {
-          const quizMicroLessons = lesson.microLessons?.filter((micro) =>
-            micro.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
-          );
+          const finalMicroLesson = lesson.microLessons?.at(-1);
           return (
-            quizMicroLessons?.length > 0 &&
-            quizMicroLessons.every((micro) => microLessonIds.includes(micro.id))
+            finalMicroLesson?.microLessonContent?.some((item) => item.type === "knowledgeCheck") &&
+            microLessonIds.includes(finalMicroLesson.id)
           );
         })
         .map((lesson) => lesson.id);
@@ -197,13 +199,6 @@ async function getRecentActivity(userId, modulesById) {
 exports.getDashboard = async (req, res, next) => {
   try {
     const userId = String(req.user.id);
-    const cached = dashboardCache.get(userId);
-    if (cached && cached.expiresAt > Date.now()) {
-      return res
-        .set("Cache-Control", "private, max-age=30")
-        .status(StatusCodes.OK)
-        .json(cached.payload);
-    }
 
     const user = await User.findById(userId).select("name streak timezone earned_badges");
     if (!user) {
@@ -239,15 +234,10 @@ exports.getDashboard = async (req, res, next) => {
       units,
       recentActivity,
       meta: {
-        cachedForMs: DASHBOARD_CACHE_TTL_MS,
         generatedAt: new Date().toISOString(),
       },
     };
-    dashboardCache.set(userId, {
-      payload,
-      expiresAt: Date.now() + DASHBOARD_CACHE_TTL_MS,
-    });
-    return res.set("Cache-Control", "private, max-age=30").status(StatusCodes.OK).json(payload);
+    return res.set("Cache-Control", "no-store").status(StatusCodes.OK).json(payload);
   } catch (error) {
     return next(error);
   }

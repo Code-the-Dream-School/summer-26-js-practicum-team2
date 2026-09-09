@@ -82,6 +82,12 @@ test("signed-in learners can reach their profile from the mobile menu", async ({
       body: JSON.stringify({ user }),
     }),
   );
+  await page.route("**/api/v1/dashboard", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ progress: { overallPercent: 25 } }),
+    }),
+  );
   await page.route("**/api/v1/onboarding", (route) =>
     route.fulfill({
       contentType: "application/json",

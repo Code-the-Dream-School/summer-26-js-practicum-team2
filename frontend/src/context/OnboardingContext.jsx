@@ -15,7 +15,7 @@ export { ONBOARDING_STEPS } from "../features/onboarding/onboarding.constants";
 const OnboardingContext = createContext(null);
 
 export function OnboardingProvider({ children }) {
-  const { csrfToken } = useAuthContext();
+  const { csrfToken, isAuthenticated } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(null); //when you are waiting for user's response
   const navigate = useNavigate();
 
@@ -30,6 +30,10 @@ export function OnboardingProvider({ children }) {
   });
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     async function fetchOnboardingState() {
       try {
         const response = await apiGetOnboardingState();
@@ -51,7 +55,7 @@ export function OnboardingProvider({ children }) {
       }
     }
     fetchOnboardingState();
-  }, []);
+  }, [isAuthenticated]);
   const startOnboarding = async () => {
     setCurrentStep(0);
     localStorage.setItem("sprout_onboarding_complete", "false");
