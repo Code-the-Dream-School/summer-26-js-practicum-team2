@@ -35,9 +35,43 @@ function shapeProgress(progressRecord) {
   };
 }
 
+async function reconcileFinalQuizCompletions(userId, moduleData, progressRecord) {
+  const finalQuizMicroLessonIds = (moduleData.lessons || [])
+    .map((lesson) => lesson.microLessons?.at(-1))
+    .filter((microLesson) =>
+      microLesson?.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
+    )
+    .map((microLesson) => microLesson.id);
+
+  if (finalQuizMicroLessonIds.length === 0) return progressRecord;
+
+  const passedFinalQuizzes = await QuizAttempt.find({
+    user_id: userId,
+    module_id: moduleData.id,
+    micro_lesson_id: { $in: finalQuizMicroLessonIds },
+    passed: true,
+    submitted_at: { $ne: null },
+  }).select("micro_lesson_id");
+  const passedFinalQuizIds = new Set(passedFinalQuizzes.map((attempt) => attempt.micro_lesson_id));
+  const completedLessons = (moduleData.lessons || [])
+    .filter((lesson) => passedFinalQuizIds.has(lesson.microLessons?.at(-1)?.id))
+    .map((lesson) => lesson.id);
+
+  if (completedLessons.length === 0) return progressRecord;
+
+  return UserProgress.findOneAndUpdate(
+    { _id: progressRecord._id },
+    { $addToSet: { completed_lessons: { $each: completedLessons } } },
+    { returnDocument: "after" },
+  );
+}
+
 exports.getLessonModules = async (req, res, next) => {
   try {
+    // Only fetch the fields needed for the module picker / learning path.
+    // `lean()` returns plain objects since these records are only being read.
     const modules = await LessonModule.find({}).select("id title lessons").sort({ id: 1 }).lean();
+
     return res.status(StatusCodes.OK).json({
       modules: modules.map(({ id, title, lessons }) => ({
         id,
@@ -54,19 +88,26 @@ exports.getLessonModules = async (req, res, next) => {
 // Returns the path to the learner's most recently touched, currently-unlocked lesson.
 exports.getLastLesson = async (req, res, next) => {
   try {
-    const progressRecord = await UserProgress.findOne({ user_id: req.user.id })
+    const progressRecord = await UserProgress.findOne({
+      user_id: req.user.id,
+    })
       .sort({ updated_at: -1 })
       .lean();
 
+    // A brand-new learner has no progress yet, so fall back to the
+    // first lesson in the default module instead of returning a dead end.
     if (!progressRecord) {
       const firstModule = await getModule(DEFAULT_MODULE_ID);
       const firstLessonId = firstModule?.lessons?.[0]?.id;
+
       return res.status(StatusCodes.OK).json({
         lastLessonPath:
           firstModule && firstLessonId ? `/learn/${firstModule.id}/${firstLessonId}` : null,
       });
     }
 
+    // Resolve the most appropriate lesson from saved progress rather than
+    // blindly trusting the stored lesson ID, which may now be stale or locked.
     const moduleData = await getModule(progressRecord.module_id);
     const lessonId = getCurrentLessonId(moduleData, progressRecord);
 
@@ -103,12 +144,16 @@ exports.getLesson = async (req, res, next) => {
       module_id: moduleId,
     });
 
+    // Enforce learning-path progression on the backend as well as the UI
+    // so a learner cannot skip locked lessons by typing the URL directly.
     if (!isLessonAccessible(moduleData, progressRecord, lessonId)) {
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "Complete the previous lesson to unlock this one.",
       });
     }
 
+    // Strip answer keys and other protected content before sending lesson
+    // data to the browser.
     return res.status(StatusCodes.OK).json({
       moduleData: sanitizeModuleData(moduleData),
       lessonData: sanitizeLessonData(lessonData),
@@ -153,6 +198,7 @@ exports.getPublicLesson = async (req, res, next) => {
 exports.getLessonProgress = async (req, res, next) => {
   try {
     const moduleId = req.query.moduleId;
+
     if (!moduleId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "A moduleId is required to load lesson progress.",
@@ -170,12 +216,17 @@ exports.getLessonProgress = async (req, res, next) => {
       module_id: moduleId,
     });
 
+    // Reading progress also initializes a record for first-time learners,
+    // giving later progress updates a consistent document to work with.
     if (!progressRecord) {
       progressRecord = await UserProgress.create({
         user_id: req.user.id,
         module_id: moduleId,
       });
     }
+
+    const moduleData = await getModule(moduleId);
+    progressRecord = await reconcileFinalQuizCompletions(req.user.id, moduleData, progressRecord);
 
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
   } catch (error) {
@@ -187,6 +238,7 @@ exports.getLessonProgress = async (req, res, next) => {
 exports.completeMicroLesson = async (req, res, next) => {
   try {
     const { moduleId = DEFAULT_MODULE_ID, microLessonId } = req.body ?? {};
+
     if (
       typeof moduleId !== "string" ||
       typeof microLessonId !== "string" ||
@@ -196,13 +248,21 @@ exports.completeMicroLesson = async (req, res, next) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "A moduleId and microLessonId are required." });
     }
+
     const moduleData = await getModule(moduleId);
+
+    // Micro-lessons are nested under lessons, so flatten the module before
+    // locating the requested micro-lesson by ID.
     const micro = moduleData?.lessons
       ?.flatMap((lesson) => lesson.microLessons || [])
       .find((item) => item.id === microLessonId);
+
     if (!micro) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "Micro-lesson not found." });
     }
+
+    // Quiz-bearing micro-lessons cannot be marked complete until the learner
+    // has a submitted passing attempt recorded by the backend.
     if (micro.microLessonContent?.some((item) => item.type === "knowledgeCheck")) {
       const passedAttempt = await QuizAttempt.exists({
         user_id: req.user.id,
@@ -211,10 +271,11 @@ exports.completeMicroLesson = async (req, res, next) => {
         passed: true,
         submitted_at: { $ne: null },
       });
+
       if (!passedAttempt) {
-        return res
-          .status(StatusCodes.CONFLICT)
-          .json({ message: "Pass every knowledge check before completing this micro-lesson." });
+        return res.status(StatusCodes.CONFLICT).json({
+          message: "Pass every knowledge check before completing this micro-lesson.",
+        });
       }
     }
 
@@ -223,6 +284,8 @@ exports.completeMicroLesson = async (req, res, next) => {
       module_id: moduleId,
     });
 
+    // Track whether this is genuinely a first completion so repeated requests
+    // do not extend the learner's streak more than once.
     const alreadyCompleted = progress?.completed_micro_lessons?.includes(microLessonId) || false;
 
     const updatedProgress = await UserProgress.findOneAndUpdate(
@@ -231,6 +294,8 @@ exports.completeMicroLesson = async (req, res, next) => {
         module_id: moduleId,
       },
       {
+        // `$addToSet` makes completion idempotent: retries will not create
+        // duplicate micro-lesson IDs in the progress document.
         $addToSet: {
           completed_micro_lessons: microLessonId,
         },
@@ -246,7 +311,7 @@ exports.completeMicroLesson = async (req, res, next) => {
 
     let streakAward = null;
 
-    //If this is first completion, udpate the streak and award the badge
+    // Only a first-time completion should advance the streak.
     if (!alreadyCompleted) {
       streakAward = await updateUserStreak(req.user.id);
     }
@@ -281,6 +346,7 @@ exports.updateLessonProgress = async (req, res, next) => {
     }
 
     const validatedBody = validateRequest(res, lessonProgressSchema, req.body);
+
     if (!validatedBody) return;
 
     const {
@@ -296,24 +362,39 @@ exports.updateLessonProgress = async (req, res, next) => {
       });
     }
 
+    // Build the update dynamically so callers can save only the portion
+    // of their position that actually changed.
     const update = {};
+
     if (validatedLessonId) {
       update.course_lesson_id = validatedLessonId;
     }
+
     if (validatedMicroLessonId) {
       update.current_micro_lesson_id = validatedMicroLessonId;
     }
+
     if (typeof currentChunkIndex === "number") {
       update.current_chunk_index = currentChunkIndex;
     }
+
     if (typeof currentChunkIndex === "number") {
       update.current_chunk_index = currentChunkIndex;
     }
 
     const progressRecord = await UserProgress.findOneAndUpdate(
-      { user_id: req.user.id, module_id: moduleId },
-      { $set: update },
-      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+      {
+        user_id: req.user.id,
+        module_id: moduleId,
+      },
+      {
+        $set: update,
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+        setDefaultsOnInsert: true,
+      },
     );
 
     invalidateDashboardCache(req.user.id);
@@ -327,7 +408,9 @@ exports.updateLessonProgress = async (req, res, next) => {
 exports.completeLesson = async (req, res, next) => {
   try {
     const validatedBody = validateRequest(res, lessonCompletionSchema, req.body);
+
     if (!validatedBody) return;
+
     const { moduleId, lessonId } = validatedBody;
     const moduleData = await getModule(moduleId);
 
@@ -338,6 +421,7 @@ exports.completeLesson = async (req, res, next) => {
     }
 
     const lesson = (moduleData.lessons || []).find((item) => item.id === lessonId);
+
     if (!lesson) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `Lesson '${lessonId}' was not found in module '${moduleId}'.`,
@@ -345,6 +429,9 @@ exports.completeLesson = async (req, res, next) => {
     }
 
     const microLessonIds = (lesson.microLessons || []).map((microLesson) => microLesson.id);
+
+    // Only micro-lessons containing knowledge checks participate in the
+    // lesson-level quiz completion gate.
     const quizMicroLessonIds = (lesson.microLessons || [])
       .filter((microLesson) =>
         microLesson.microLessonContent?.some((item) => item.type === "knowledgeCheck"),
@@ -352,49 +439,120 @@ exports.completeLesson = async (req, res, next) => {
       .map((microLesson) => microLesson.id);
 
     if (quizMicroLessonIds.length > 0) {
-      const passedAttempts = await QuizAttempt.find({
+      // Load every submitted attempt so retries can be considered when
+      // determining the learner's best result for each quiz.
+      const submittedAttempts = await QuizAttempt.find({
         user_id: req.user.id,
         module_id: moduleId,
         lesson_id: lessonId,
-        micro_lesson_id: { $in: quizMicroLessonIds },
-        passed: true,
-        submitted_at: { $ne: null },
-      }).select("micro_lesson_id");
-      const passedMicroLessonIds = new Set(
-        passedAttempts.map((attempt) => attempt.micro_lesson_id),
-      );
+        micro_lesson_id: {
+          $in: quizMicroLessonIds,
+        },
+        submitted_at: {
+          $ne: null,
+        },
+      }).select("micro_lesson_id score passed answers");
 
-      if (!quizMicroLessonIds.every((microLessonId) => passedMicroLessonIds.has(microLessonId))) {
+      // A learner may retry a quiz. Keep only the highest-scoring submitted
+      // attempt for each quiz micro-lesson.
+      const bestAttempts = new Map();
+
+      for (const attempt of submittedAttempts) {
+        const currentBest = bestAttempts.get(attempt.micro_lesson_id);
+
+        if (!currentBest || attempt.score > currentBest.score) {
+          bestAttempts.set(attempt.micro_lesson_id, attempt);
+        }
+      }
+
+      // Count questions across every quiz in the lesson. This lets the final
+      // lesson score be weighted by number of questions instead of averaging
+      // quiz percentages equally.
+      const quizQuestions = (lesson.microLessons || [])
+        .filter((microLesson) => quizMicroLessonIds.includes(microLesson.id))
+        .flatMap((microLesson) =>
+          (microLesson.microLessonContent || []).filter((item) => item.type === "knowledgeCheck"),
+        );
+
+      const totalQuestions = quizQuestions.length;
+
+      // Count correct answers from each quiz's best attempt.
+      const correctAnswers = [...bestAttempts.values()].reduce((total, attempt) => {
+        if (attempt.answers?.length > 0) {
+          return total + attempt.answers.filter((answer) => answer.is_correct).length;
+        }
+
+        // Older attempts may only have the passed flag. Preserve their
+        // previously recorded full-credit result during migration.
+        return (
+          total +
+          (attempt.passed
+            ? quizQuestions.filter((question) =>
+                question.id.startsWith(`${attempt.micro_lesson_id}-`),
+              ).length
+            : 0)
+        );
+      }, 0);
+
+      // Example: 2/3 on one quiz + 3/3 on another = 5/6 = 83%.
+      // `passingScore` is stored as a percentage, so normalize it to 0–1.
+      const aggregateScore = totalQuestions ? correctAnswers / totalQuestions : 0;
+
+      const passThreshold = (lesson.passingScore ?? 70) / 100;
+
+      // Require both:
+      // 1. at least one submitted attempt for every quiz micro-lesson, and
+      // 2. an aggregate question-weighted score that meets the lesson threshold.
+      if (bestAttempts.size < quizMicroLessonIds.length || aggregateScore < passThreshold) {
         return res.status(StatusCodes.CONFLICT).json({
           message: "Pass every knowledge check before completing this lesson.",
         });
       }
     }
 
+    // Finishing a lesson leaves the saved resume position at the end of
+    // that lesson while resetting its chunk position.
     const positionUpdate = {
       course_lesson_id: lessonId,
       current_chunk_index: 0,
     };
+
     if (microLessonIds.length > 0) {
       positionUpdate.current_micro_lesson_id = microLessonIds[microLessonIds.length - 1];
     }
 
+    // Mark the lesson and all of its micro-lessons complete in one atomic
+    // progress update. `$addToSet` keeps retries idempotent.
     const progressUpdate = {
       $set: positionUpdate,
       $addToSet: {
         completed_lessons: lessonId,
       },
     };
+
     if (microLessonIds.length > 0) {
-      progressUpdate.$addToSet.completed_micro_lessons = { $each: microLessonIds };
+      progressUpdate.$addToSet.completed_micro_lessons = {
+        $each: microLessonIds,
+      };
     }
 
     const progressRecord = await UserProgress.findOneAndUpdate(
-      { user_id: req.user.id, module_id: moduleId },
+      {
+        user_id: req.user.id,
+        module_id: moduleId,
+      },
       progressUpdate,
-      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+      {
+        upsert: true,
+        returnDocument: "after",
+        setDefaultsOnInsert: true,
+      },
     );
+
+    // Recalculate module completion from the source module definition so
+    // adding/removing lessons does not rely on a stale completion count.
     const completedLessonIds = new Set(progressRecord.completed_lessons || []);
+
     const isModuleCompleted =
       moduleData.lessons.length > 0 &&
       moduleData.lessons.every((moduleLesson) => completedLessonIds.has(moduleLesson.id));
@@ -405,13 +563,15 @@ exports.completeLesson = async (req, res, next) => {
     }
 
     invalidateDashboardCache(req.user.id);
+
     return res.status(StatusCodes.OK).json(shapeProgress(progressRecord));
   } catch (error) {
     return next(error);
   }
 };
 
-//For restarting lesson progress when the start over button is clicked
+// Restart the learner's saved position at the beginning of the selected module.
+// This resets position only; it does not erase completion history.
 exports.restartLessonProgress = async (req, res, next) => {
   try {
     const { moduleId = DEFAULT_MODULE_ID } = req.body;
@@ -424,6 +584,7 @@ exports.restartLessonProgress = async (req, res, next) => {
       });
     }
 
+    // Restart from the first lesson and its first micro-lesson.
     const firstLesson = moduleData.lessons?.[0];
     const firstMicroLesson = firstLesson?.microLessons?.[0];
 
@@ -456,7 +617,10 @@ exports.restartLessonProgress = async (req, res, next) => {
 // Upserts a complete lesson module from a trusted operator request.
 exports.importLessonModule = async (req, res, next) => {
   try {
+    // Support either a parsed JSON request body or a multipart-uploaded
+    // JSON file. Uploaded file content takes precedence when present.
     let importBody = req.body;
+
     if (req.file) {
       if (!req.file.originalname.toLowerCase().endsWith(".json")) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -465,6 +629,8 @@ exports.importLessonModule = async (req, res, next) => {
       }
 
       try {
+        // Multer keeps the uploaded file in memory, so decode the buffer
+        // before validating it against the lesson module schema.
         importBody = JSON.parse(req.file.buffer.toString("utf8"));
       } catch {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -474,15 +640,27 @@ exports.importLessonModule = async (req, res, next) => {
     }
 
     const validatedBody = validateRequest(res, lessonImportSchema, importBody);
+
     if (!validatedBody) return;
 
+    // Import behaves like "create or replace by module ID", allowing admins
+    // to update an existing curriculum module with the same endpoint.
     const lessonModule = await LessonModule.findOneAndUpdate(
-      { id: validatedBody.id },
+      {
+        id: validatedBody.id,
+      },
       validatedBody,
-      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+      {
+        upsert: true,
+        returnDocument: "after",
+        setDefaultsOnInsert: true,
+      },
     ).lean();
 
+    // getModule() is cached, so invalidate this module immediately or the app
+    // could continue serving the pre-import curriculum until the cache expires.
     clearModuleCache(validatedBody.id);
+
     return res.status(StatusCodes.OK).json(lessonModule);
   } catch (error) {
     return next(error);

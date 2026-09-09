@@ -92,6 +92,29 @@ describe("quiz XP awards", () => {
     );
   });
 
+  it("marks the lesson complete when only its final quiz micro-lesson is passed", async () => {
+    const attempt = {
+      attempt_number: 1,
+      submitted_at: null,
+      save: jest.fn(),
+    };
+
+    QuizAttempt.findOne
+      .mockResolvedValueOnce(attempt)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null);
+    UserProgress.findOne.mockResolvedValue({ completed_micro_lessons: [] });
+    UserProgress.findOneAndUpdate.mockResolvedValue({
+      completed_micro_lessons: ["1.2.3"],
+      completed_lessons: [],
+    });
+
+    await submitQuiz(req, res, next);
+
+    expect(UserProgress.findOneAndUpdate).toHaveBeenCalledTimes(2);
+    expect(UserProgress.findOneAndUpdate.mock.calls[1][1].$addToSet.completed_lessons).toBe("1.2");
+  });
+
   it("awards quiz pass XP on first successful pass", async () => {
     const attempt = {
       attempt_number: 1,

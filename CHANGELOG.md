@@ -5,9 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- ## [Unreleased] -->
+## [Unreleased]
 
-<!-- --- -->
+### Added
+
+- Added a Playwright regression that completes the full curriculum, verifies a 67% quiz followed by a 100% quiz produces a passing aggregate score, and confirms the final lesson can be completed.
+
+### Fixed
+
+- Restored aggregate lesson scoring so completion is based on the combined question score across the lesson's quizzes instead of requiring every individual quiz to pass.
+- Fixed lesson completion rejecting a valid aggregate pass when one quiz is below the threshold, such as 67% plus 100% producing an 83% lesson score.
+
+---
 
 ## [0.9.1] - 2026-09-09
 

@@ -95,6 +95,25 @@ describe("dashboard endpoint", () => {
     });
   });
 
+  it("does not treat a single final micro-lesson as a completed module", async () => {
+    const { authHeader, userId } = await createAuthedUser("dashboard-final-micro-only@example.com");
+    await seedDashboardModule();
+    await UserProgress.create({
+      user_id: userId,
+      module_id: "budgeting",
+      completed_micro_lessons: ["1.2.1"],
+    });
+
+    const response = await request(app).get("/api/v1/dashboard").set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body.progress).toEqual({
+      completedLessons: 1,
+      totalLessons: 2,
+      overallPercent: 50,
+    });
+  });
+
   it("honors a persisted completed-module state when lesson content has expanded", async () => {
     const { authHeader, userId } = await createAuthedUser("dashboard-completed-module@example.com");
     await seedDashboardModule();
