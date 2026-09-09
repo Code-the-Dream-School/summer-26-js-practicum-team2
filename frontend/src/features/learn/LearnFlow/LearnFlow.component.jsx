@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { ROUTES } from "../../../app/router/routes";
@@ -86,6 +86,8 @@ export default function LearnFlow({
   const [phase, setPhase] = useState("lesson");
   const [isComplete, setIsComplete] = useState(false);
   const completionRequestRef = useRef(false);
+  const [completionStatus, setCompletionStatus] = useState("pending");
+  const [completionError, setCompletionError] = useState("");
   // Graded results keyed by micro-lesson, so the completion card can report the whole lesson.
   const [submissions, setSubmissions] = useState({});
   const [completedAttempts, setCompletedAttempts] = useState([]);
@@ -182,20 +184,34 @@ export default function LearnFlow({
   // Only a passing lesson unlocks the next one.
   const canContinue = !hasQuiz || gradedPassed;
 
-  useEffect(() => {
-    if (!isComplete || !canContinue || !canSyncProgress || completionRequestRef.current) {
-      return;
-    }
-
+  const saveLessonCompletion = useCallback(() => {
+    if (completionRequestRef.current) return;
     completionRequestRef.current = true;
     completeLesson({
       moduleId: learnData.moduleId,
       lessonId: learnData.id,
       csrfToken,
-    }).catch(() => {
-      completionRequestRef.current = false;
-    });
-  }, [canContinue, canSyncProgress, csrfToken, isComplete, learnData.id, learnData.moduleId]);
+    }).then(
+      () => setCompletionStatus("saved"),
+      (error) => {
+        completionRequestRef.current = false;
+        setCompletionError(error.message || "We could not save your progress. Please try again.");
+        setCompletionStatus("error");
+      },
+    );
+  }, [csrfToken, learnData.id, learnData.moduleId]);
+
+  useEffect(() => {
+    if (isComplete && canContinue && canSyncProgress) {
+      void saveLessonCompletion();
+    }
+  }, [canContinue, canSyncProgress, isComplete, saveLessonCompletion]);
+
+  function retryLessonCompletion() {
+    setCompletionError("");
+    setCompletionStatus("pending");
+    void saveLessonCompletion();
+  }
 
   const continuePath = learnData.nextLessonId
     ? `${ROUTES.LEARN}/${learnData.moduleId}/${learnData.nextLessonId}`
@@ -314,6 +330,9 @@ export default function LearnFlow({
     setChunkIndex(0);
     setPhase("lesson");
     setIsComplete(false);
+    completionRequestRef.current = false;
+    setCompletionStatus("pending");
+    setCompletionError("");
     setIsReviewing(false);
     quiz.reset();
   }
@@ -360,9 +379,9 @@ export default function LearnFlow({
             <p className="text-foreground">{getAllCaughtUpPhrase()}</p>
           )}
 
-          {quiz.errorMessage ? (
+          {completionError || quiz.errorMessage ? (
             <p role="alert" className="text-sm font-medium text-danger">
-              {quiz.errorMessage}
+              {completionError || quiz.errorMessage}
             </p>
           ) : null}
 
@@ -378,9 +397,19 @@ export default function LearnFlow({
                 Register to keep learning
               </Button>
             ) : canContinue ? (
-              <Button as={Link} to={continuePath} variant="quiz">
-                Continue
-              </Button>
+              canSyncProgress && completionStatus !== "saved" ? (
+                <Button
+                  variant="quiz"
+                  disabled={completionStatus === "pending"}
+                  onClick={retryLessonCompletion}
+                >
+                  {completionStatus === "error" ? "Retry saving" : "Saving progress…"}
+                </Button>
+              ) : (
+                <Button as={Link} to={continuePath} variant="quiz">
+                  Continue
+                </Button>
+              )
             ) : (
               <Button as={Link} to={ROUTES.LEARN} variant="quizSecondary">
                 Back to learning path
