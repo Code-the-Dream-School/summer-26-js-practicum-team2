@@ -96,14 +96,18 @@ test.describe("learn flow under slow API responses", () => {
     ).toBeVisible();
 
     const finish = page.getByRole("button", { name: "Finish lesson" });
-    await finish.click();
-    await finish.click({ force: true, noWaitAfter: true });
+    await finish.dblclick();
 
     await expect(page.getByRole("link", { name: "Continue" })).toBeVisible();
     await expectNoQuizCompletionError(page);
 
     expect(
       state.completedLessons.filter((entry) => entry.lessonId === "1.2"),
+    ).toHaveLength(1);
+    expect(
+      state.completedMicroLessons.filter(
+        (entry) => entry.microLessonId === "1.2.1",
+      ),
     ).toHaveLength(1);
   });
 
