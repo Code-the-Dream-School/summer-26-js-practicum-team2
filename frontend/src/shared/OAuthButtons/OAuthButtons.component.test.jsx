@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import OAuthButtons from "./OAuthButtons.component";
@@ -34,7 +34,9 @@ describe("OAuthButtons", () => {
 
     renderOAuthButtons();
 
+    expect(screen.queryByText("or")).not.toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "Continue with Google" })).toBeInTheDocument();
+    expect(screen.getByText("or")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Continue with GitHub" })).not.toBeInTheDocument();
   });
 
@@ -56,10 +58,11 @@ describe("OAuthButtons", () => {
   it("hides all OAuth actions when provider availability cannot be loaded", async () => {
     mockGetOAuthProviders.mockRejectedValue(new Error("Unavailable"));
 
-    renderOAuthButtons();
-
-    await vi.waitFor(() => {
-      expect(screen.queryByRole("link", { name: /Continue with/i })).not.toBeInTheDocument();
+    await act(async () => {
+      renderOAuthButtons();
     });
+
+    expect(screen.queryByRole("link", { name: /Continue with/i })).not.toBeInTheDocument();
+    expect(screen.queryByText("or")).not.toBeInTheDocument();
   });
 });

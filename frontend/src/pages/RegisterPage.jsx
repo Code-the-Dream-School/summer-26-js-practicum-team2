@@ -151,12 +151,6 @@ export default function RegisterPage() {
             </Link>
           </div>
         </form>
-
-        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
-          <span className="h-px flex-1 bg-neutral-200" />
-          or
-          <span className="h-px flex-1 bg-neutral-200" />
-        </div>
         <OAuthButtons />
       </Card>
     </div>

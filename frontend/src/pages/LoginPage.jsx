@@ -97,11 +97,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
-          <span className="h-px flex-1 bg-neutral-200" />
-          or
-          <span className="h-px flex-1 bg-neutral-200" />
-        </div>
         <OAuthButtons next={next} />
 
         <div className="mt-4 flex items-center justify-between text-small">

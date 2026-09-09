@@ -29,19 +29,26 @@ export default function OAuthButtons({ next }) {
   if (!availableProviders.length) return null;
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2">
-        {availableProviders.map(([provider, label]) => (
-          <Button
-            key={provider}
-            as="a"
-            href={getOAuthUrl(provider, true, next)}
-            variant="secondary"
-          >
-            Continue with {label}
-          </Button>
-        ))}
+    <>
+      <div className="my-6 flex items-center gap-3 text-small text-neutral-500">
+        <span className="h-px flex-1 bg-neutral-200" />
+        or
+        <span className="h-px flex-1 bg-neutral-200" />
       </div>
-    </div>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
+          {availableProviders.map(([provider, label]) => (
+            <Button
+              key={provider}
+              as="a"
+              href={getOAuthUrl(provider, true, next)}
+              variant="secondary"
+            >
+              Continue with {label}
+            </Button>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
