@@ -353,7 +353,7 @@ exports.completeLesson = async (req, res, next) => {
     const validatedBody = validateRequest(res, lessonCompletionSchema, req.body);
     if (!validatedBody) return;
     const { moduleId, lessonId } = validatedBody;
-    const moduleData = await LessonModule.findOne({ id: moduleId }).select("lessons").lean();
+    const moduleData = await getModule(moduleId);
 
     if (!moduleData) {
       return res.status(StatusCodes.NOT_FOUND).json({
