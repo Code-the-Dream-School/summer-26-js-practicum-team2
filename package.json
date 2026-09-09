@@ -46,7 +46,10 @@
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
     "test:backend": "npm --prefix backend test",
     "test:frontend": "npm --prefix frontend test",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=chromium",
+    "test:e2e:slow": "playwright test --project=chromium-slow-4g --project=chromium-fast-3g --project=chromium-slow-3g",
+    "test:e2e:latency": "playwright test --project=learn-flow-latency",
+    "test:e2e:all": "playwright test",
     "test": "npm run test:backend && npm run test:frontend",
     "start:backend": "npm --prefix backend start",
     "build:frontend": "npm --prefix frontend run build"
