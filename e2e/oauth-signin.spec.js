@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures/network.js";
 
 test("learners can start Google or GitHub sign-in from the login page", async ({
   page,

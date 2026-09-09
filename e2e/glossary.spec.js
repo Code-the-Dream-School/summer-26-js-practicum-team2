@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures/network.js";
 import budgetingModule from "../shared/content/budgeting.json" with { type: "json" };
 
 const sampleLessonUrl = "/learn/cashFlow/1.1?sample=true";
