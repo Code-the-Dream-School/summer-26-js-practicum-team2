@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [Unreleased]
+## [1.0.2] - 2026-09-09
 
 ### Added
 
 - Added Playwright projects that emulate throttled networks and CPU so slow-connection glitches can be reproduced locally.
 - Added a learn flow latency end-to-end suite that injects per-endpoint API delays to catch slow-network races.
+- Added a `verify` script that formats, lints, and runs the unit and full end-to-end suites in one command.
 
 ### Changed
 

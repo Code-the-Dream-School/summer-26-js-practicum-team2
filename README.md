@@ -114,6 +114,15 @@ npm run dev
 - Frontend runs on: http://localhost:5173
 - Backend runs on: http://localhost:8080
 
+Before opening a pull request, run the full check:
+
+```bash
+npm run verify
+```
+
+It formats, lints, runs the backend and frontend unit suites, and runs every Playwright project,
+including the throttled-network and learn flow latency runs.
+
 For full setup, scripts, testing, and API details, see:
 
 - [Documentation Index](docs/README.md)
