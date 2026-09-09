@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [Unreleased]
+
+### Added
+
+- Added Playwright projects that emulate throttled networks and CPU so slow-connection glitches can be reproduced locally.
+- Added a learn flow latency end-to-end suite that injects per-endpoint API delays to catch slow-network races.
+
+### Changed
+
+- Changed end-to-end runs to test a production build served by Vite preview instead of the development server.
+
+### Fixed
+
+- Prevented duplicate knowledge check, quiz result, and lesson completion submissions when a button is clicked twice on a slow connection.
+- Prevented duplicate admin dashboard requests and onboarding step syncs while a request is still in flight.
+
+---
+
 ## [1.0.1] - 2026-09-09
 
 ### Added
