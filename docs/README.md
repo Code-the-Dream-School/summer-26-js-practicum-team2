@@ -10,6 +10,7 @@ This folder contains project documentation for setup, testing, API usage, and te
 - [Write Endpoint Validation](write-endpoint-validation.md)
 - [Team and Collaboration Workflow](contributing-workflow.md)
 - [Roadmap and Known Limitations](roadmap.md)
+- [Rollback Procedure](rollback.md)
 
 ## Content Accuracy
 
