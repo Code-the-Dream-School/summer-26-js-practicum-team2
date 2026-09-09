@@ -9,12 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added a Playwright regression that completes the full curriculum, verifies a 67% quiz followed by a 100% quiz produces a passing aggregate score, and confirms the final lesson can be completed.
+- Added Playwright coverage for completing the full curriculum, including weighted quiz scoring and final-lesson persistence.
+- Added backend regression coverage for dashboard progress, final-quiz completion reconciliation, and idempotent quiz rewards.
+- Added frontend regression coverage for final-lesson dashboard navigation, completion saves, failed-quiz retries, and learning-path progress states.
+
+### Changed
+
+- Learning-path progress now uses completed lessons, matching the dashboard percentage and completion state.
+- Completing the final lesson now takes learners to the dashboard after progress is saved.
+- Failed final quizzes can be retried directly from the results screen.
 
 ### Fixed
 
 - Restored aggregate lesson scoring so completion is based on the combined question score across the lesson's quizzes instead of requiring every individual quiz to pass.
-- Fixed lesson completion rejecting a valid aggregate pass when one quiz is below the threshold, such as 67% plus 100% producing an 83% lesson score.
+- Fixed final quiz passes not marking their parent lesson complete, which left completed learners at 83% progress.
+- Backfilled completed lessons for existing learners with a recorded passed final quiz.
+- Prevented stale dashboard responses after lesson completion by disabling dashboard response caching.
+- Prevented duplicate lesson XP when a passed final quiz is submitted again.
 
 ---
 
