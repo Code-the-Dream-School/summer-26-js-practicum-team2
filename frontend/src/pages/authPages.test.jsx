@@ -129,8 +129,14 @@ describe("auth pages", () => {
       "/api/v1/auth/github?tos=true",
     );
     expect(screen.getByText(/By logging in, you agree/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute("href", "/terms");
-    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/privacy");
+    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute(
+      "href",
+      "/terms",
+    );
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+      "href",
+      "/privacy",
+    );
   });
 
   it("passes the requested destination into the real OAuth start URL", async () => {
@@ -234,8 +240,14 @@ describe("auth pages", () => {
     await user.type(screen.getByLabelText(/^password$/i), "SecurePass123!");
     await user.type(screen.getByLabelText(/^confirm password$/i), "SecurePass123!");
     expect(screen.getByText(/By signing up, you agree/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute("href", "/terms");
-    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/privacy");
+    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute(
+      "href",
+      "/terms",
+    );
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+      "href",
+      "/privacy",
+    );
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     // Make sure registration receives the values entered in the form.
