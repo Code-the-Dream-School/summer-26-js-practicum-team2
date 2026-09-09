@@ -1,0 +1,386 @@
+import { expect, test } from "@playwright/test";
+
+const lessonIds = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6"];
+const moduleId = "cashFlow";
+const quizCompletionError =
+  "Pass every knowledge check before completing this lesson.";
+
+const quizQuestions = [
+  { id: "1.1.2-q1", prompt: "First quiz question", correctChoice: "a" },
+  { id: "1.1.2-q2", prompt: "Second quiz question", correctChoice: "a" },
+  { id: "1.1.2-q3", prompt: "Third quiz question", correctChoice: "a" },
+];
+
+const secondQuizQuestions = [
+  { id: "1.1.4-q1", prompt: "Fourth quiz question", correctChoice: "a" },
+  { id: "1.1.4-q2", prompt: "Fifth quiz question", correctChoice: "a" },
+  { id: "1.1.4-q3", prompt: "Sixth quiz question", correctChoice: "a" },
+];
+
+// Allows the mocked /check endpoint to look up the expected answer
+// regardless of which knowledge check the question belongs to.
+const firstLessonQuestions = new Map(
+  [...quizQuestions, ...secondQuizQuestions].map((question) => [
+    question.id,
+    question,
+  ]),
+);
+
+function buildMicroLesson(id, title, questions = []) {
+  return {
+    id,
+    title,
+    microLessonContent: [
+      { type: "paragraph", text: `${title} content.` },
+      ...questions.map((question) => ({
+        type: "knowledgeCheck",
+        id: question.id,
+        question: question.prompt,
+        questionType: "multipleChoice",
+        answerChoices: [
+          { key: "a", text: "Correct answer" },
+          { key: "b", text: "Distractor" },
+        ],
+        correctResponse: question.correctChoice,
+        explanation: "Answer feedback.",
+      })),
+    ],
+  };
+}
+
+function buildCurriculum() {
+  return {
+    id: moduleId,
+    title: "Budgeting and Cash Flow Basics",
+    lessons: lessonIds.map((lessonId, index) => ({
+      id: lessonId,
+      title: `Lesson ${lessonId}`,
+      learningGoal: `Learn the goals of lesson ${lessonId}.`,
+      passingScore: 70,
+
+      // Only lesson 1.1 needs quizzes for this regression test.
+      // The remaining lessons just need enough content to exercise
+      // normal lesson completion and navigation.
+      microLessons:
+        index === 0
+          ? [
+              buildMicroLesson("1.1.2", "First quiz", quizQuestions),
+              buildMicroLesson("1.1.4", "Second quiz", secondQuizQuestions),
+            ]
+          : [buildMicroLesson(`${lessonId}.1`, `Lesson ${lessonId} step`)],
+    })),
+  };
+}
+
+async function prepareCurriculumSession(page) {
+  const curriculum = buildCurriculum();
+
+  // These arrays act as spies for mocked API calls so the test can verify
+  // what the frontend actually submitted during the full curriculum flow.
+  const submittedQuizzes = [];
+  const completedLessons = [];
+  const completedMicroLessons = [];
+
+  // Seed auth before the app loads so ProtectedRoute sees an authenticated
+  // learner immediately instead of redirecting to login during hydration.
+  await page.addInitScript(() => {
+    window.sessionStorage.setItem(
+      "sprout.auth",
+      JSON.stringify({
+        user: {
+          id: "curriculum-learner",
+          name: "Curriculum Learner",
+          email: "curriculum@example.com",
+        },
+        csrfToken: "test-csrf-token",
+      }),
+    );
+  });
+
+  await page.route("**/api/v1/profile", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        user: {
+          id: "curriculum-learner",
+          name: "Curriculum Learner",
+          email: "curriculum@example.com",
+        },
+      }),
+    }),
+  );
+
+  // Mark onboarding complete so the test reaches the learning experience
+  // without being redirected into the onboarding flow.
+  await page.route("**/api/v1/onboarding", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ onboarding: { is_completed: true } }),
+    }),
+  );
+
+  await page.route("**/api/v1/lessons/**", async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (request.method() === "GET") {
+      // Lesson detail requests end with the lesson ID:
+      // /api/v1/lessons/cashFlow/1.1 -> "1.1"
+      const lessonId = url.pathname.split("/").pop();
+      const lessonData = curriculum.lessons.find(
+        (lesson) => lesson.id === lessonId,
+      );
+
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          moduleData: curriculum,
+          lessonData,
+          progress: null,
+        }),
+      });
+      return;
+    }
+
+    if (
+      request.method() === "POST" &&
+      url.pathname.endsWith("/progress/complete")
+    ) {
+      const body = request.postDataJSON();
+
+      if (body.lessonId === "1.1") {
+        const aggregateScore =
+          submittedQuizzes.reduce((total, quiz) => total + quiz.score, 0) /
+          submittedQuizzes.length;
+        if (submittedQuizzes.length < 2 || aggregateScore < 70) {
+          await route.fulfill({
+            status: 409,
+            contentType: "application/json",
+            body: JSON.stringify({ message: quizCompletionError }),
+          });
+          return;
+        }
+      }
+
+      // Capture lesson completion requests for assertions at the end.
+      completedLessons.push(body);
+
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({ completedLessons: [body.lessonId] }),
+      });
+      return;
+    }
+
+    if (request.method() === "POST" && url.pathname.endsWith("/complete")) {
+      const body = request.postDataJSON();
+
+      // This endpoint represents individual micro-lesson completion,
+      // rather than completion of the entire lesson.
+      completedMicroLessons.push(body);
+
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({ rewards: [] }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({}),
+    });
+  });
+
+  await page.route("**/api/v1/quizzes/**", async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (request.method() === "POST" && url.pathname.endsWith("/check")) {
+      const { questionId, choiceIds } = request.postDataJSON();
+      const question = firstLessonQuestions.get(questionId);
+
+      // Knowledge checks are single-choice, so an answer only counts as
+      // correct when exactly one choice was submitted and it matches.
+      const isCorrect =
+        choiceIds.length === 1 && choiceIds[0] === question.correctChoice;
+
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          isCorrect,
+          correctChoiceIds: [question.correctChoice],
+          explanation: "Answer feedback.",
+        }),
+      });
+      return;
+    }
+
+    if (request.method() === "POST" && url.pathname.endsWith("/start")) {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({ attemptId: "test-attempt" }),
+      });
+      return;
+    }
+
+    if (request.method() === "POST" && url.pathname.includes("/submit")) {
+      const body = request.postDataJSON();
+
+      // Both mocked quizzes use the same attempt ID, so identify which quiz
+      // is being submitted by checking whether its answers contain the
+      // first question from quiz 1.
+      const questions =
+        body.attemptId === "test-attempt" && body.answers["1.1.2-q1"]
+          ? quizQuestions
+          : secondQuizQuestions;
+
+      const correctCount = questions.filter((question) => {
+        const choices = body.answers[question.id] ?? [];
+        return choices.length === 1 && choices[0] === question.correctChoice;
+      }).length;
+
+      const score = Math.round((correctCount / questions.length) * 100);
+
+      // For a URL ending in /<microLessonId>/submit, the second-to-last segment identifies which quiz produced this score.
+      submittedQuizzes.push({
+        microLessonId: url.pathname.split("/").slice(-2)[0],
+        score,
+        passed: score >= 70,
+      });
+
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          score,
+          passed: score >= 70,
+          missed: [],
+          reviews: [],
+        }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({}),
+    });
+  });
+
+  await page.route("**/api/v1/lessons/progress", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({}),
+    }),
+  );
+
+  return { submittedQuizzes, completedLessons, completedMicroLessons };
+}
+
+async function answerQuiz(page, choices, finalQuestion) {
+  for (const [index, choice] of choices.entries()) {
+    await page.getByRole("radio", { name: choice }).click();
+    await page.getByRole("button", { name: "Check answer" }).click();
+
+    // The last question of the final quiz transitions to results.
+    // Every other answered question advances with "Continue".
+    const nextButtonName =
+      index === choices.length - 1 && finalQuestion
+        ? "View results"
+        : "Continue";
+
+    await expect(
+      page.getByRole("button", { name: nextButtonName }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: nextButtonName }).click();
+  }
+}
+
+async function expectNoQuizCompletionError(page) {
+  await expect(
+    page.getByText(quizCompletionError, { exact: true }),
+  ).not.toBeVisible();
+}
+
+test("completes the curriculum with weighted quiz scoring and the final lesson", async ({
+  page,
+}) => {
+  const state = await prepareCurriculumSession(page);
+
+  await page.goto("/learn/cashFlow/1.1");
+  await expect(page.getByRole("heading", { name: "Lesson 1.1" })).toBeVisible();
+
+  // Quiz 1: 2/3 correct = 67%, which fails its individual 70% threshold.
+  await page.getByRole("button", { name: "Quick check" }).click();
+  await answerQuiz(
+    page,
+    ["Distractor", "Correct answer", "Correct answer"],
+    false,
+  );
+
+  // Quiz 2: 3/3 correct = 100%.
+  await page.getByRole("button", { name: "Quick check" }).click();
+  await answerQuiz(
+    page,
+    ["Correct answer", "Correct answer", "Correct answer"],
+    true,
+  );
+
+  // Across all six questions the learner answered 5 correctly:
+  // 5 / 6 = 83%, so the lesson's weighted score passes.
+  await expect(page.getByText("Score: 83% — Pass")).toBeVisible();
+  await expectNoQuizCompletionError(page);
+
+  // Verify the frontend still submitted each individual quiz with
+  // its own independent score instead of incorrectly assigning 83% to both.
+  expect(state.submittedQuizzes).toEqual([
+    expect.objectContaining({
+      microLessonId: "1.1.2",
+      score: 67,
+      passed: false,
+    }),
+    expect.objectContaining({
+      microLessonId: "1.1.4",
+      score: 100,
+      passed: true,
+    }),
+  ]);
+
+  await page.getByRole("link", { name: "Continue" }).click();
+
+  // Walk through every remaining lesson to verify navigation and ensure the final lesson can complete without requiring another quiz.
+  for (const lessonId of lessonIds.slice(1)) {
+    await expect(page).toHaveURL(new RegExp(`/learn/${moduleId}/${lessonId}$`));
+
+    await expect(
+      page.getByRole("heading", { name: `Lesson ${lessonId}` }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Finish lesson" }).click();
+    await expectNoQuizCompletionError(page);
+
+    // The final lesson intentionally has no Continue link because there is no next lesson in the module.
+    if (lessonId !== lessonIds.at(-1)) {
+      await expect(page.getByRole("link", { name: "Continue" })).toBeVisible();
+      await page.getByRole("link", { name: "Continue" }).click();
+    }
+  }
+
+  // The exact end-of-curriculum copy can vary, so accept any supported message that clearly communicates that no lessons remain.
+  await expect(
+    page.getByText(
+      /reviewed every|all caught up|no more lessons|completed all available|up to date|all lessons are done|finished all the lessons|reached the end/i,
+    ),
+  ).toBeVisible();
+
+  await expectNoQuizCompletionError(page);
+
+  // Most importantly, confirm the final lesson was actually persisted as complete rather than merely rendering the end-state UI.
+  expect(state.completedLessons).toEqual(
+    expect.arrayContaining([{ moduleId, lessonId: "1.6" }]),
+  );
+
+  // Each lesson produces micro-lesson completion events, so there should be more completion calls than there are top-level lessons.
+  expect(state.completedMicroLessons.length).toBeGreaterThan(lessonIds.length);
+});
