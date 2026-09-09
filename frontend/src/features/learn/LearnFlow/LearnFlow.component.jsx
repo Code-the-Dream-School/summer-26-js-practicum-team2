@@ -92,6 +92,7 @@ export default function LearnFlow({
   const [submissions, setSubmissions] = useState({});
   const [completedAttempts, setCompletedAttempts] = useState([]);
   const [isReviewing, setIsReviewing] = useState(false);
+  const [isAdvancing, setIsAdvancing] = useState(false);
   const [feedbackMode, setFeedbackMode] = useState(() => getQuizFeedbackPreference());
 
   const currentStep = lessonSteps[stepIndex];
@@ -250,6 +251,8 @@ export default function LearnFlow({
   }
 
   async function goForward() {
+    if (isAdvancing) return;
+
     if (chunkIndex < chunks.length - 1) {
       setChunkIndex((current) => current + 1);
       return;
@@ -262,7 +265,12 @@ export default function LearnFlow({
       return;
     }
 
-    void advanceStep();
+    setIsAdvancing(true);
+    try {
+      await advanceStep();
+    } finally {
+      setIsAdvancing(false);
+    }
   }
 
   async function advanceQuiz() {
@@ -543,7 +551,7 @@ export default function LearnFlow({
               <Button variant="quizSecondary" disabled={isFirstChunk} onClick={goBack}>
                 Previous
               </Button>
-              <Button variant="quiz" className="min-w-36" onClick={goForward}>
+              <Button variant="quiz" className="min-w-36" loading={isAdvancing} onClick={goForward}>
                 {isLastChunkOfStep && currentStepQuestions.length > 0
                   ? "Quick check"
                   : isLastChunkOfStep && isLastStep
