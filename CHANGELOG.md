@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [1.0.0] - 2026-09-09
+
+### Added
+
+- Added a progress-aware browser favicon that changes as authenticated learners complete more of the course.
+- Added an installable web app manifest, standalone display configuration, theme metadata, and a completed-plant app icon.
+- Added search engine metadata, Open Graph and Twitter sharing cards, canonical URL metadata, and WebApplication structured data.
+- Added regression coverage for progress favicon selection and authenticated end-to-end dashboard data fixtures.
+
+### Changed
+
+- Set the completed plant as the default favicon and installed-app icon for visitors and installed clients.
+
+### Fixed
+
+- Prevented signed-out visitors from requesting protected onboarding state and producing expected 401 console errors.
+- Updated end-to-end curriculum completion coverage for the dashboard continuation shown after the final lesson.
+
+---
+
 ## [0.9.2] - 2026-09-09
 
 ### Added
