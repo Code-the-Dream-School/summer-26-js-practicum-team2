@@ -32,8 +32,18 @@ function findMicroLesson(module, lessonId, microLessonId) {
 
 function buildUnit(module, progressRecord) {
   const lessons = getModuleLessons(module);
-  const completedSet = new Set(progressRecord?.completed_lessons || []);
-  const completedLessons = lessons.filter((lesson) => completedSet.has(lesson.id)).length;
+  const completedLessonIds = new Set(progressRecord?.completed_lessons || []);
+  const completedMicroLessonIds = new Set(progressRecord?.completed_micro_lessons || []);
+  const finalMicroLessonId = lessons.at(-1)?.microLessons?.at(-1)?.id;
+  const isModuleComplete =
+    Boolean(progressRecord?.is_module_completed) || completedMicroLessonIds.has(finalMicroLessonId);
+  const completedLessons = lessons.filter(
+    (lesson) =>
+      isModuleComplete ||
+      completedLessonIds.has(lesson.id) ||
+      (lesson.microLessons?.length > 0 &&
+        lesson.microLessons.every((microLesson) => completedMicroLessonIds.has(microLesson.id))),
+  ).length;
 
   return {
     id: module.id,

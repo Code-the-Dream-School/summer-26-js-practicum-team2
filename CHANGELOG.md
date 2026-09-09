@@ -9,10 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
-## [0.9.1] - 2026-09-08
+## [0.9.1] - 2026-09-09
 
 ### Fixed
 
+- Fixed dashboard curriculum progress showing 67% after the learning path reached 100% by aligning lesson completion with completed micro-lessons and persisted module completion.
 - Fixed final lesson completion when a learner has passed every quiz but resumed from persisted micro-lesson progress. Lesson scoring now requires each knowledge check to pass and includes previously completed quiz micro-lessons.
 - Fixed a critical lesson-navigation regression that showed "Lesson unavailable" when learners advanced to the next lesson or opened their current lesson. Access checks now recognize saved lesson and micro-lesson progress, preserving access to previously reached lessons when older completion records are incomplete while keeping future lessons subject to unlock rules.
 - Aligned the "Current Lesson" destination with the learning path's step progress, preserving valid saved positions and falling back to an existing lesson when a saved lesson ID is no longer valid.
@@ -34,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## [0.9.0] - 2026-09-08
- 
+
 ### Added
 
 - Added a learning path header card with the module progress bar, percentage complete, guide artwork, and an encouraging trail summary.
@@ -45,7 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added regression coverage for opening the step details note, including the locked-step explanation.
 - Added an authenticated endpoint that resumes learners at their most recently touched, currently unlocked lesson, with safe fallbacks for stale or missing progress.
 - Added regression coverage for lesson access guards and resume-path fallbacks.
-
 
 ### Changed
 
