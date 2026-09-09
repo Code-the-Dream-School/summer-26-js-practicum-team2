@@ -181,8 +181,18 @@ export default function LearnFlow({
     learnData.passThreshold,
   );
   const hasQuiz = learnData.questions.length > 0;
+  const quizMicroLessonIds = new Set(learnData.questions.map((question) => question.lessonStepId));
+  const passedQuizMicroLessonIds = new Set([
+    ...(savedProgress?.completedMicroLessons ?? []),
+    ...Object.entries(submissions)
+      .filter(([, submission]) => submission?.passed)
+      .map(([microLessonId]) => microLessonId),
+  ]);
+  const allQuizMicroLessonsPassed = [...quizMicroLessonIds].every((microLessonId) =>
+    passedQuizMicroLessonIds.has(microLessonId),
+  );
   // Only a passing lesson unlocks the next one.
-  const canContinue = !hasQuiz || gradedPassed;
+  const canContinue = !hasQuiz || (gradedPassed && allQuizMicroLessonsPassed);
 
   const saveLessonCompletion = useCallback(() => {
     if (completionRequestRef.current) return;
@@ -278,6 +288,7 @@ export default function LearnFlow({
     setSubmissions((current) => {
       const nextSubmission = {
         ...submission,
+        microLessonId: currentMicroLessonId,
         totalQuestions: currentStepQuestions.length,
       };
       const previousSubmission = current[currentMicroLessonId];

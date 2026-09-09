@@ -12,10 +12,10 @@ describe("aggregateLessonScore", () => {
 
     // 16 correct / 17 total = 94%, not the weighted average of ~92%
     expect(result.percentage).toBe(94);
-    expect(result.passed).toBe(true);
+    expect(result.passed).toBe(false);
   });
 
-  it("passes on the combined score even if one sub-quiz individually scored below threshold", () => {
+  it("fails when one sub-quiz individually scores below threshold", () => {
     const submissions = [
       { totalQuestions: 3, missed: ["q1"] }, // 2/3 = 67%, would fail alone
       { totalQuestions: 3, missed: [] }, // 3/3 = 100%
@@ -23,9 +23,9 @@ describe("aggregateLessonScore", () => {
 
     const result = aggregateLessonScore(submissions, 0.7);
 
-    // 5/6 = 83%, above the 70% threshold overall
+    // 5/6 = 83%, but the backend requires every knowledge check to pass.
     expect(result.percentage).toBe(83);
-    expect(result.passed).toBe(true);
+    expect(result.passed).toBe(false);
   });
 
   it("fails when the combined score is below the pass threshold", () => {
