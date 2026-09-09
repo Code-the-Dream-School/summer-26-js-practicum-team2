@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [0.9.1] - 2026-09-08
+
+### Fixed
+
+- Fixed a critical lesson-navigation regression that showed "Lesson unavailable" when learners advanced to the next lesson or opened their current lesson. Access checks now recognize saved lesson and micro-lesson progress, preserving access to previously reached lessons when older completion records are incomplete while keeping future lessons subject to unlock rules.
+- Aligned the "Current Lesson" destination with the learning path's step progress, preserving valid saved positions and falling back to an existing lesson when a saved lesson ID is no longer valid.
+- Prevented the "Continue" link from opening the next lesson before completion finishes saving.
+- Fixed completion of bundled lessons when modules have not been seeded in the database by using the same content lookup as lesson loading.
+
+### Added
+
+- Added a "Saving progress…" state and visible completion errors with a "Retry saving" action.
+- Added backend regression coverage for advancing across lesson boundaries, resuming stale progress, reviewing completed lessons, resolving current-lesson redirects, and completing bundled content.
+- Added frontend regression coverage for delayed completion saves and retrying failed saves before enabling the next lesson.
+
+### Changed
+
+- Upgraded Vitest and its V8 coverage package to 5.0.0 and updated Playwright, Jest, form handling, validation, database, rate-limiting, and lint dependencies.
+- Moved weekly Dependabot updates to Tuesday and grouped Vitest packages into a single dependency update.
+- Defined explicit CI token permissions and updated the browser-test dependency cache to use the frontend lockfile.
+
+---
+
 ## [0.9.0] - 2026-09-08
  
 ### Added
