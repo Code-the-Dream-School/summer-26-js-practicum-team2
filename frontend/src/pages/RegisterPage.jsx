@@ -31,6 +31,7 @@ export function AuthTermsNotice({ action = "signing up" }) {
 export default function RegisterPage() {
   const { register: registerUser } = useAuthContext();
   const [isRegistered, setIsRegistered] = useState(false);
+  const [verificationUrl, setVerificationUrl] = useState(null);
   const placeholder = useMemo(() => pickPlaceholderIdentity(), []);
   const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
@@ -61,7 +62,8 @@ export default function RegisterPage() {
 
   const onSubmit = async (values) => {
     try {
-      await registerUser(values);
+      const response = await registerUser(values);
+      setVerificationUrl(response?.verificationUrl || null);
       setIsRegistered(true);
     } catch (err) {
       // Only the server can know an email is already taken.
@@ -77,10 +79,22 @@ export default function RegisterPage() {
     return (
       <div className="mx-auto max-w-md py-8">
         <Card>
-          <h1 className="font-heading text-h2 font-bold text-heading">Check your email</h1>
-          <p className="mt-2 text-neutral-600">
-            We sent a verification link. Open it to finish setting up your account.
-          </p>
+          <h1 className="font-heading text-h2 font-bold text-heading">
+            {verificationUrl ? "Verify your email" : "Check your email"}
+          </h1>
+          {verificationUrl ? (
+            <p className="mt-2 text-neutral-600">
+              Email delivery isn&apos;t configured. Verify your account using this link:{" "}
+              <a href={verificationUrl} className="font-semibold text-primary underline">
+                Verify your email address
+              </a>
+              .
+            </p>
+          ) : (
+            <p className="mt-2 text-neutral-600">
+              We sent a verification link. Open it to finish setting up your account.
+            </p>
+          )}
           <Link to={ROUTES.LOGIN} className="mt-4 inline-block text-primary underline">
             Back to login
           </Link>

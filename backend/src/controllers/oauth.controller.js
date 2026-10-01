@@ -1,6 +1,7 @@
 const { getAuthenticationFailure, issueAuthenticatedSession } = require("../utils/authSession.js");
 
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const CLIENT_URL =
+  process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:5173";
 
 const OAUTH_PUBLIC_ERROR_CODES = Object.freeze({
   OAUTH_VERIFIED_EMAIL_REQUIRED: "oauth_email_required",

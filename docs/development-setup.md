@@ -139,20 +139,26 @@ which is consumed after one use. New OAuth accounts require a verified provider 
 explicit Terms of Service and Privacy Policy acknowledgement beside the social sign-in buttons.
 A failed or cancelled attempt returns to the login page with a safe OAuth error code.
 
-### Production OAuth Configuration
+### Render Deployment
 
-For each deployed environment, set `CLIENT_URL` to the frontend origin, `API_URL` to the
-public backend origin, and `CORS_ORIGINS` to include the frontend origin. Register the
-corresponding deployed callback URL for each provider:
+The Render Blueprint in `render.yaml` installs the backend runtime dependencies, builds the
+Vite frontend, and starts the Express server. In production, Express serves the built frontend
+and API from the same Render URL. Vite remains the local development server.
+
+Set the required backend secrets and configuration in the Render service environment, including
+`MONGO_URI`, `JWT_SECRET`, and any email or OAuth credentials. `CLIENT_URL` and `API_URL`
+default to Render's `RENDER_EXTERNAL_URL`, so OAuth redirects and account emails use the deployed
+origin. Set `CORS_ORIGINS` only when additional browser origins need access. Register the deployed
+callback URL for each OAuth provider:
 
 ```text
 <API_URL>/api/v1/auth/google/callback
 <API_URL>/api/v1/auth/github/callback
 ```
 
-Use HTTPS in production and update the provider dashboard before deploying a changed frontend or
-backend URL. Session and OAuth state cookies are marked `Secure` in production. Never put OAuth
-client secrets in frontend environment variables.
+Use HTTPS in production and update the provider dashboard if the Render URL changes. Session and
+OAuth state cookies are marked `Secure` in production. Never put OAuth client secrets in frontend
+environment variables.
 
 ### Testing OAuth
 

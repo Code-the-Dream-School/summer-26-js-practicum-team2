@@ -18,7 +18,8 @@ const {
   validateRequest,
 } = require("../validation/userValidation.js");
 const { getAuthenticationFailure } = require("../utils/authSession.js");
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const CLIENT_URL =
+  process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:5173";
 const IS_DEV_ENV = process.env.NODE_ENV !== "production";
 const accountStateLookup = {
   is_deleted: { $in: [true, false, null] },
@@ -98,7 +99,7 @@ const register = async (req, res, next) => {
     }
     const verifyUrl = `${CLIENT_URL}/verify?token=${verificationToken}`;
 
-    await sendVerificationEmail(
+    const emailDelivery = await sendVerificationEmail(
       newUser.email,
       "Verify your email address",
       `Hello ${newUser.name || ""},\n\nPlease verify your account by clicking this link: ${verifyUrl}`,
@@ -109,7 +110,9 @@ const register = async (req, res, next) => {
     );
 
     return res.status(StatusCodes.CREATED).json({
-      message: "Registration successful. Please check for verification email.",
+      message: emailDelivery.skipped
+        ? "Registration successful. Use the verification link to activate your account."
+        : "Registration successful. Please check for verification email.",
       user: {
         id: newUser._id,
         name: newUser.name,
@@ -120,6 +123,7 @@ const register = async (req, res, next) => {
         created_at: newUser.createdAt || newUser.created_at,
       },
       ...(IS_DEV_ENV ? { devVerification: { token: verificationToken, verifyUrl } } : {}),
+      ...(emailDelivery.skipped ? { verificationUrl: verifyUrl } : {}),
     });
   } catch (err) {
     return next(err);
