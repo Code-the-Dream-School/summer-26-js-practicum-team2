@@ -83,6 +83,22 @@ exports.getLessonModules = async (req, res, next) => {
   }
 };
 
+exports.getPublicLessonModules = async (_req, res, next) => {
+  try {
+    const modules = await LessonModule.find({}).select("id title lessons").sort({ id: 1 }).lean();
+
+    return res.status(StatusCodes.OK).json({
+      modules: modules.map(({ id, title, lessons }) => ({
+        id,
+        title,
+        firstLessonId: lessons?.[0]?.id ?? null,
+      })),
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // GET /api/v1/lessons/last
 // Returns the path to the learner's most recently touched, currently-unlocked lesson.
 exports.getLastLesson = async (req, res, next) => {

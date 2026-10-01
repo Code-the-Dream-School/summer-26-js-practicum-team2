@@ -5,7 +5,7 @@ const app = require("../src/app");
 const LessonModule = require("../src/models/LessonModule.model");
 const { createAuthedUser } = require("./helpers/authTestHelpers");
 const { withAuth, withSessionCsrf } = require("./helpers/requestTestHelpers");
-const cashFlow = require("../../shared/content/examples/finance-literacy/budgeting.json");
+const cashFlow = require("./fixtures/budgetingModule.json");
 
 useTestDb();
 

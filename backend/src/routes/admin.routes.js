@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const { importLessonModule } = require("../controllers/lesson.controller");
+const { listAvatarAssets, uploadAvatarAsset } = require("../controllers/contentAsset.controller");
 const {
   getAdminStatus,
   listUsers,
@@ -42,6 +43,8 @@ router.patch("/deletions/approve/:userId", approveDeleteAccount);
 router.patch("/deletions/deny/:userId", rejectDeleteAccount);
 router.patch("/deletions/reactivate/:userId", reactivateUserAcct);
 router.get("/modules", listModules);
+router.get("/assets/avatars", listAvatarAssets);
+router.post("/assets/avatars", upload.single("file"), uploadAvatarAsset);
 router.get("/modules/:moduleId", getModule);
 router.post("/modules", createModule);
 router.patch("/modules/:moduleId", updateModule);

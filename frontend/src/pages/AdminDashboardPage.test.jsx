@@ -5,12 +5,14 @@ import AdminDashboardPage from "./AdminDashboardPage";
 import { useAuthContext } from "../context/AuthContext";
 import {
   approveDeleteAccount,
+  getAdminAvatarAssets,
   getAdminModules,
   getAdminUsers,
   getPendingDeleteAccount,
   rejectDeleteAccount,
   setAdminUserDisabled,
   setAdminUserDeleted,
+  uploadAdminAvatar,
 } from "../services/api";
 
 vi.mock("../context/AuthContext", () => ({
@@ -23,6 +25,7 @@ vi.mock("../services/api", () => ({
   createAdminModule: vi.fn(),
   deleteAdminLesson: vi.fn(),
   deleteAdminModule: vi.fn(),
+  getAdminAvatarAssets: vi.fn(),
   getAdminModules: vi.fn(),
   getAdminUsers: vi.fn(),
   getPendingDeleteAccount: vi.fn(),
@@ -36,6 +39,7 @@ vi.mock("../services/api", () => ({
   updateAdminLesson: vi.fn(),
   updateAdminModule: vi.fn(),
   updateAdminUserRole: vi.fn(),
+  uploadAdminAvatar: vi.fn(),
   verifyAdminUserEmail: vi.fn(),
 }));
 
@@ -56,6 +60,7 @@ describe("AdminDashboardPage", () => {
       ],
     });
     getAdminModules.mockResolvedValue({ modules: [] });
+    getAdminAvatarAssets.mockResolvedValue({ assets: [] });
     getPendingDeleteAccount.mockResolvedValue({
       users: [
         {
@@ -79,6 +84,33 @@ describe("AdminDashboardPage", () => {
       },
     });
     rejectDeleteAccount.mockResolvedValue({});
+  });
+
+  it("shows a copyable lesson schema and lets admins upload avatars", async () => {
+    const user = userEvent.setup();
+    const uploadedAvatar = {
+      id: "avatar-1",
+      name: "nova.webp",
+      url: "/api/v1/assets/avatar-1",
+    };
+    uploadAdminAvatar.mockResolvedValue(uploadedAvatar);
+    getAdminAvatarAssets.mockResolvedValue({ assets: [uploadedAvatar] });
+
+    render(<AdminDashboardPage />);
+
+    await user.click(await screen.findByText("Lesson JSON schema and example"));
+    expect(screen.getByText(/"microLessonContent"/, { selector: "pre" })).toBeInTheDocument();
+
+    const avatarFile = new File(["image"], "nova.webp", { type: "image/webp" });
+    await user.upload(screen.getByLabelText("Upload avatar"), avatarFile);
+
+    await waitFor(() => {
+      expect(uploadAdminAvatar).toHaveBeenCalledWith({
+        file: avatarFile,
+        csrfToken: "csrf-token",
+      });
+      expect(screen.getByText("/api/v1/assets/avatar-1")).toBeInTheDocument();
+    });
   });
 
   it("passes the pending user's ID and CSRF token to deletion approval", async () => {

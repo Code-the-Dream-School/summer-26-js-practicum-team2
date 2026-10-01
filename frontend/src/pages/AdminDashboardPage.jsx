@@ -6,6 +6,7 @@ import {
   createAdminModule,
   deleteAdminLesson,
   deleteAdminModule,
+  getAdminAvatarAssets,
   getAdminModules,
   getAdminUsers,
   getPendingDeleteAccount,
@@ -19,12 +20,58 @@ import {
   updateAdminModule,
   updateAdminLesson,
   updateAdminUserRole,
+  uploadAdminAvatar,
   verifyAdminUserEmail,
 } from "../services/api";
 import Card from "../shared/Card/Card.component";
 import Button from "../shared/Button/Button.component";
 
 const emptyModule = { id: "", title: "", lessons: [] };
+const lessonModuleTemplate = {
+  id: "getting-started",
+  title: "Getting started",
+  lessons: [
+    {
+      id: "1.1",
+      title: "Your first lesson",
+      learningGoal: "Describe what the learner will understand.",
+      estimatedMin: 5,
+      passingScore: 70,
+      accuracy_reviewed_by: "Reviewer name",
+      accuracy_reviewed_at: "2026-10-01",
+      microLessons: [
+        {
+          id: "1.1.1",
+          title: "A short step",
+          microLessonContent: [
+            { type: "paragraph", text: "Introduce one idea in clear language." },
+            {
+              type: "knowledgeCheck",
+              id: "1.1.1-q1",
+              questionType: "multipleChoice",
+              question: "Which answer matches the lesson?",
+              answerChoices: [
+                { key: "a", text: "Correct answer" },
+                { key: "b", text: "Another answer" },
+              ],
+              correctResponse: "a",
+              explanation: "Explain why the answer is correct.",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  characters: [
+    {
+      characterId: "guide",
+      name: "Guide",
+      imagePath: "/api/v1/assets/replace-with-uploaded-avatar-id",
+    },
+  ],
+  glossary: [{ term: "Example term", definition: "Add a concise definition." }],
+  worksCited: [],
+};
 const lessonBlockTypes = [
   "paragraph",
   "characterIntro",
@@ -41,6 +88,7 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState([]);
   const [pendingDeletions, setPendingDeletions] = useState([]);
   const [modules, setModules] = useState([]);
+  const [avatarAssets, setAvatarAssets] = useState([]);
   const [selectedModuleId, setSelectedModuleId] = useState("");
   const [moduleForm, setModuleForm] = useState(emptyModule);
   const [lessonTitle, setLessonTitle] = useState("");
@@ -54,14 +102,16 @@ export default function AdminDashboardPage() {
   const loadData = useCallback(async () => {
     setState((current) => ({ ...current, isLoading: true, error: "" }));
     try {
-      const [userPayload, modulePayload, deletionPayload] = await Promise.all([
+      const [userPayload, modulePayload, deletionPayload, avatarPayload] = await Promise.all([
         getAdminUsers(),
         getAdminModules(),
         getPendingDeleteAccount(),
+        getAdminAvatarAssets(),
       ]);
       setUsers(userPayload.users ?? []);
       setPendingDeletions(deletionPayload.users ?? []);
       setModules(modulePayload.modules ?? []);
+      setAvatarAssets(avatarPayload.assets ?? []);
       setSelectedModuleId((current) => current || modulePayload.modules?.[0]?.id || "");
       setState((current) => ({ ...current, isLoading: false }));
     } catch (error) {
@@ -87,6 +137,11 @@ export default function AdminDashboardPage() {
     setSelectedModuleId((current) =>
       nextModules.some((module) => module.id === current) ? current : (nextModules[0]?.id ?? ""),
     );
+  }, []);
+
+  const refreshAvatarAssets = useCallback(async () => {
+    const payload = await getAdminAvatarAssets();
+    setAvatarAssets(payload.assets ?? []);
   }, []);
 
   function updateUserInList(updatedUser) {
@@ -584,6 +639,61 @@ export default function AdminDashboardPage() {
         ) : null}
       </Card>
 
+      <Card className="space-y-4">
+        <div>
+          <h2 className="font-heading text-h3 font-bold text-heading">Avatar library</h2>
+          <p className="mt-1 text-sm text-neutral-600">
+            Upload PNG, JPEG, or WebP avatars, then use their URLs in each module's `characters`
+            array.
+          </p>
+        </div>
+        <label className="inline-flex w-fit cursor-pointer items-center rounded-md border border-primary px-4 py-2 font-semibold text-primary">
+          Upload avatar
+          <input
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            disabled={isRunningAction}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) {
+                void runAction(() => uploadAdminAvatar({ file, csrfToken }), "Avatar uploaded.", {
+                  applyResult: refreshAvatarAssets,
+                  refresh: false,
+                });
+              }
+              event.target.value = "";
+            }}
+          />
+        </label>
+        {avatarAssets.length ? (
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {avatarAssets.map((asset) => (
+              <li key={asset.id} className="flex min-w-0 items-center gap-3 rounded-lg border p-3">
+                <img
+                  src={asset.url}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-full border border-neutral-200 object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-heading">{asset.name}</p>
+                  <code className="block truncate text-xs text-neutral-600">{asset.url}</code>
+                  <Button
+                    variant="ghost"
+                    className="mt-1 min-h-8 px-2 py-1 text-xs underline"
+                    onClick={() => void navigator.clipboard.writeText(asset.url)}
+                  >
+                    Copy avatar URL
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-neutral-600">No avatars uploaded yet.</p>
+        )}
+      </Card>
+
       <Card className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-h3 font-bold text-heading">Lesson modules</h2>
@@ -609,6 +719,19 @@ export default function AdminDashboardPage() {
             </label>
           </div>
         </div>
+        <details className="rounded-lg border border-primary/15 bg-surface-inset p-4">
+          <summary className="cursor-pointer font-semibold text-heading">
+            Lesson JSON schema and example
+          </summary>
+          <p className="my-3 text-sm text-neutral-700">
+            Import a module JSON with `id`, `title`, and `lessons`. Each lesson contains
+            `microLessons`; each step uses `microLessonContent` blocks. Uploaded avatar URLs go in
+            `characters[].imagePath`, and the matching `characterId` can be used in lesson blocks.
+          </p>
+          <pre className="max-h-96 overflow-auto rounded-md bg-surface-app p-3 text-xs text-foreground">
+            {JSON.stringify(lessonModuleTemplate, null, 2)}
+          </pre>
+        </details>
         <div className="grid gap-5 lg:grid-cols-[minmax(0,18rem)_1fr]">
           <div className="space-y-2">
             {modules.map((module) => (

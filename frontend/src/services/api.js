@@ -16,6 +16,14 @@ const ACCOUNT_INVALIDATING_CODES = new Set([
   "ACCOUNT_DELETED",
   "SESSION_INVALIDATED",
 ]);
+
+export const resolveAssetUrl = (assetPath) => {
+  if (typeof assetPath !== "string" || !assetPath) return null;
+  if (/^(https?:|data:|blob:)/i.test(assetPath)) return assetPath;
+  if (!assetPath.startsWith("/api/")) return assetPath;
+  return `${API_BASE_URL}${assetPath}`;
+};
+
 let currentCsrfToken = null;
 export const AUTH_EXPIRED_EVENT = "openquiz:auth-expired";
 export const CSRF_TOKEN_UPDATED_EVENT = "openquiz:csrf-token-updated";
@@ -296,6 +304,21 @@ export const reactivateUserAcct = (userId, csrfToken) =>
 export const getAdminModules = () =>
   apiRequest("/modules", { method: "GET", basePath: ADMIN_BASE_PATH });
 
+export const getAdminAvatarAssets = () =>
+  apiRequest("/assets/avatars", { method: "GET", basePath: ADMIN_BASE_PATH });
+
+export const uploadAdminAvatar = ({ file, csrfToken }) => {
+  const body = new FormData();
+  body.append("file", file);
+
+  return apiRequest("/assets/avatars", {
+    method: "POST",
+    csrfToken,
+    body,
+    basePath: ADMIN_BASE_PATH,
+  });
+};
+
 export const seedAdminRandomUsers = (csrfToken, count = 10) =>
   apiRequest("/users/seed-random", {
     method: "POST",
@@ -446,6 +469,9 @@ export const getLesson = (moduleId, lessonId) =>
 
 export const getLessonModules = () =>
   apiRequest("/modules", { method: "GET", basePath: LESSONS_BASE_PATH });
+
+export const getPublicLessonModules = () =>
+  apiRequest("/public/modules", { method: "GET", basePath: LESSONS_BASE_PATH });
 
 export const getPublicLesson = (moduleId, lessonId) =>
   apiRequest(`/public/${encodeURIComponent(moduleId)}/${encodeURIComponent(lessonId)}`, {

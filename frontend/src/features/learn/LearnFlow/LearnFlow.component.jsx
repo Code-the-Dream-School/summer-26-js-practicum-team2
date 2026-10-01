@@ -8,6 +8,7 @@ import {
   completeLesson,
   updateLessonProgress,
   restartLessonProgress,
+  resolveAssetUrl,
 } from "../../../services/api";
 import { useQuiz } from "../../../hooks/useQuiz";
 import { getQuizFeedbackPreference } from "../../../utils/quizFeedbackPreference";
@@ -29,7 +30,7 @@ import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.componen
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
 
-function resolveCharacter(characterId, characterImages = {}, guideImage) {
+function resolveCharacter(characterId, characterImages = {}, guideImage, characters = []) {
   if (!characterId) {
     return {
       image: guideImage,
@@ -37,9 +38,10 @@ function resolveCharacter(characterId, characterImages = {}, guideImage) {
     };
   }
 
+  const character = characters.find((item) => item.characterId === characterId);
   return {
-    image: characterImages[characterId] ?? guideImage,
-    alt: characterId.charAt(0).toUpperCase() + characterId.slice(1),
+    image: resolveAssetUrl(characterImages[characterId] ?? character?.imagePath ?? guideImage),
+    alt: character?.name ?? characterId.charAt(0).toUpperCase() + characterId.slice(1),
   };
 }
 
@@ -59,6 +61,7 @@ function getSubmissionScore(submission) {
 
 export default function LearnFlow({
   learnData,
+  blockRenderers,
   characterImages,
   guideImage,
   savedProgress = null,
@@ -166,6 +169,7 @@ export default function LearnFlow({
     quiz.currentQuestion?.characterId ?? currentChunk?.characterId ?? currentStep?.characterId,
     characterImages,
     guideImage,
+    learnData.module?.characters,
   );
 
   const isFirstChunk = stepIndex === 0 && chunkIndex === 0;
@@ -530,6 +534,7 @@ export default function LearnFlow({
               eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
               content={currentChunk ? [currentChunk] : []}
               module={learnData.module}
+              blockRenderers={blockRenderers}
               characterImage={character.image}
               characterAlt={character.alt}
               bubbleText={

@@ -24,4 +24,15 @@ export function applyInstanceTheme() {
     const value = import.meta.env[environmentKey]?.trim();
     if (value) root.style.setProperty(cssProperty, value);
   }
+
+  const faviconUrl = import.meta.env.VITE_APP_FAVICON_URL?.trim();
+  if (faviconUrl) {
+    let favicon = document.querySelector('link[rel="icon"]');
+    if (!favicon) {
+      favicon = document.createElement("link");
+      favicon.rel = "icon";
+      document.head.append(favicon);
+    }
+    favicon.href = faviconUrl;
+  }
 }

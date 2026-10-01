@@ -8,7 +8,7 @@ jest.mock("../src/models/QuizAttempt.model");
 jest.mock("../src/models/UserProgress.model");
 jest.mock("../src/models/XpEvent.model");
 jest.mock("../src/utils/content", () => ({
-  getModule: jest.fn().mockResolvedValue(require("../../shared/content/examples/finance-literacy/budgeting.json")),
+  getModule: jest.fn().mockResolvedValue(require("./fixtures/budgetingModule.json")),
 }));
 jest.mock("../src/services/badge.service", () => ({
   awardEligibleBadges: jest.fn().mockResolvedValue([]),
