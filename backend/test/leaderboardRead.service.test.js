@@ -42,14 +42,14 @@ describe("leaderboard read service", () => {
     const currentUserId = new mongoose.Types.ObjectId();
     mockCurrentUser({ leaderboard_opt_in: true });
     const topEntry = {
-      userId: new mongoose.Types.ObjectId(),
+      isCurrentUser: false,
       displayName: "Avery",
       avatarUrl: null,
       weeklyXp: 400,
       rank: 1,
     };
     const currentEntry = {
-      userId: currentUserId,
+      isCurrentUser: true,
       displayName: "Maya",
       avatarUrl: "https://example.com/maya.png",
       weeklyXp: 25,
@@ -83,7 +83,7 @@ describe("leaderboard read service", () => {
         {
           $project: {
             _id: 0,
-            userId: "$user_id",
+            isCurrentUser: { $eq: ["$user_id", currentUserId] },
             displayName: "$user.name",
             avatarUrl: "$user.avatar_url",
             weeklyXp: "$xp_total",
@@ -92,6 +92,7 @@ describe("leaderboard read service", () => {
         },
       ]),
     );
+    expect(JSON.stringify(result)).not.toContain(currentUserId.toString());
     expect(JSON.stringify(pipeline)).not.toContain("email");
   });
 

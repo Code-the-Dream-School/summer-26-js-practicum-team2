@@ -82,17 +82,19 @@ describe("leaderboard API", () => {
     expect(response.body.optedIn).toBe(true);
     expect(response.body.entries).toHaveLength(20);
     expect(response.body.entries[0]).toMatchObject({
+      isCurrentUser: false,
       displayName: "Learner 1",
       weeklyXp: 500,
       rank: 1,
     });
     expect(response.body.currentUser).toMatchObject({
-      userId: currentUser._id.toString(),
+      isCurrentUser: true,
       displayName: "Current Learner",
       avatarUrl: "https://example.com/current.png",
       weeklyXp: 1,
       rank: 22,
     });
+    expect(JSON.stringify(response.body)).not.toContain(currentUser._id.toString());
     expect(JSON.stringify(response.body)).not.toContain("@example.com");
     expect(JSON.stringify(response.body)).not.toContain("email");
   });
