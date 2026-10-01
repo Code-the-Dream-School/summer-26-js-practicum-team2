@@ -5,7 +5,8 @@ const ContentAsset = require("../models/ContentAsset.model");
 
 const imageSignatures = {
   "image/png": (buffer) =>
-    buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
+    buffer.length >= 8 &&
+    buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
   "image/jpeg": (buffer) =>
     buffer.length >= 3 && buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255,
   "image/webp": (buffer) =>
@@ -50,7 +51,10 @@ exports.uploadAvatarAsset = async (req, res, next) => {
       });
     }
 
-    const name = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120);
+    const name = path
+      .basename(file.originalname)
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(0, 120);
     const asset = await ContentAsset.create({
       asset_id: randomUUID(),
       name: name || "avatar",

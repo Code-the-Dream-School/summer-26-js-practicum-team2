@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [1.0.3] - 2026-10-01
+
+### Added
+
+- Added an open.quiz orientation instance with its own database, preserved green theme, logo, and Nova/Kit lesson avatars.
+- Added guest lesson discovery, sample previews, admin lesson JSON guidance, and persistent avatar uploads.
+- Added a generic lesson table format and an orientation module covering the platform's core layers.
+
+### Changed
+
+- Replaced the active Sprout finance demo with the open.quiz orientation sample; legacy finance data now exists only as backend test fixtures.
+- Added root instance setup and import commands for repeatable local instance creation.
+
+### Fixed
+
+- Restored the homepage's guest lesson exploration flow using public module discovery.
+
+---
+
 ## [1.0.2] - 2026-09-09
 
 ### Added

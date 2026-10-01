@@ -68,10 +68,7 @@ describe("HomePage", () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByRole("img", { name: "Nova" })).toHaveAttribute(
-      "src",
-      "/nova.svg",
-    );
+    expect(await screen.findByRole("img", { name: "Nova" })).toHaveAttribute("src", "/nova.svg");
     expect(screen.getByRole("img", { name: "Kit" })).toHaveAttribute("src", "/kit.svg");
   });
 });

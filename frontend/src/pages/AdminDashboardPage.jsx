@@ -657,11 +657,10 @@ export default function AdminDashboardPage() {
             onChange={(event) => {
               const file = event.target.files?.[0];
               if (file) {
-                void runAction(
-                  () => uploadAdminAvatar({ file, csrfToken }),
-                  "Avatar uploaded.",
-                  { applyResult: refreshAvatarAssets, refresh: false },
-                );
+                void runAction(() => uploadAdminAvatar({ file, csrfToken }), "Avatar uploaded.", {
+                  applyResult: refreshAvatarAssets,
+                  refresh: false,
+                });
               }
               event.target.value = "";
             }}
