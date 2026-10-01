@@ -20,3 +20,11 @@ defaults.
 The finance package supplies its specialized lesson blocks and character artwork only when
 `VITE_CONTENT_PACKAGE=finance-literacy` is selected. Other deployments can choose different content
 packages and theme values without editing core source.
+
+## Brand Assets
+
+Set `VITE_APP_LOGO_URL`, `VITE_APP_HERO_IMAGE_URL`, and `VITE_APP_FAVICON_URL` in
+`settings.env` to brand this instance with its own images. Put local files under `frontend/public`
+and reference them by URL (for example, `/instance-assets/logo.svg`), or use an absolute HTTPS URL.
+The header falls back to the configured app name and the homepage omits its image when no graphic is
+configured.

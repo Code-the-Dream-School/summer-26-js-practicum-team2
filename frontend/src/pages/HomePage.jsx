@@ -1,11 +1,38 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
+import { APP_HERO_IMAGE_URL } from "../app/instanceAssets";
+import { getPublicLessonModules } from "../services/api";
 import Button from "../shared/Button/Button.component";
 import Card from "../shared/Card/Card.component";
 
 export default function HomePage() {
   const { isAuthenticated } = useAuthContext();
+  const [sampleLessonPath, setSampleLessonPath] = useState(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (isAuthenticated) return undefined;
+
+    void getPublicLessonModules()
+      .then(({ modules = [] }) => {
+        const firstModule = modules.find((module) => module.firstLessonId);
+        if (isActive && firstModule) {
+          setSampleLessonPath(
+            `/learn/${encodeURIComponent(firstModule.id)}/${encodeURIComponent(firstModule.firstLessonId)}?sample=true`,
+          );
+        }
+      })
+      .catch(() => {
+        if (isActive) setSampleLessonPath(null);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [isAuthenticated]);
 
   return (
     <>
@@ -32,16 +59,30 @@ export default function HomePage() {
             >
               {isAuthenticated ? "Start learning" : "Register to start learning"}
             </Button>
-            <Button
-              as={Link}
-              to={isAuthenticated ? ROUTES.LAST_LESSON : ROUTES.LEARN}
-              variant="secondary"
-              className="px-6 py-2.5"
-            >
-              {isAuthenticated ? "Jump Back in" : "Explore lessons"}
-            </Button>
+            {isAuthenticated ? (
+              <Button as={Link} to={ROUTES.LAST_LESSON} variant="secondary" className="px-6 py-2.5">
+                Jump Back in
+              </Button>
+            ) : sampleLessonPath ? (
+              <Button as={Link} to={sampleLessonPath} variant="secondary" className="px-6 py-2.5">
+                Explore lessons
+              </Button>
+            ) : (
+              <Button variant="secondary" className="px-6 py-2.5" disabled>
+                No lessons available
+              </Button>
+            )}
           </div>
         </div>
+        {APP_HERO_IMAGE_URL ? (
+          <div className="mt-8 flex w-full justify-center lg:mt-0 lg:w-2/5">
+            <img
+              src={APP_HERO_IMAGE_URL}
+              alt=""
+              className="aspect-[4/3] max-h-80 w-full max-w-md object-contain"
+            />
+          </div>
+        ) : null}
       </section>
 
       <section id="benefits" className="py-12 md:py-20" aria-labelledby="benefits-title">
