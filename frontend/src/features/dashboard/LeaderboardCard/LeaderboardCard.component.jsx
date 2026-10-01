@@ -63,9 +63,7 @@ export default function LeaderboardCard({ leaderboard }) {
   }
 
   const visibleEntries = entries.slice(0, 20);
-  const currentUserIsVisible = visibleEntries.some(
-    (entry) => String(entry.userId) === String(currentUser?.userId),
-  );
+  const currentUserIsVisible = visibleEntries.some((entry) => entry.isCurrentUser);
 
   return (
     <Card>
@@ -78,9 +76,9 @@ export default function LeaderboardCard({ leaderboard }) {
         <ol className="mt-4 space-y-2" aria-label="Weekly XP rankings">
           {visibleEntries.map((entry) => (
             <LeaderboardEntry
-              key={entry.userId}
+              key={`${entry.rank}-${entry.displayName}-${entry.avatarUrl ?? "initials"}-${entry.weeklyXp}`}
               entry={entry}
-              isCurrentUser={String(entry.userId) === String(currentUser?.userId)}
+              isCurrentUser={entry.isCurrentUser}
             />
           ))}
         </ol>

@@ -11,7 +11,7 @@ const renderCard = (leaderboard) =>
   );
 
 const entry = (overrides = {}) => ({
-  userId: "user-1",
+  isCurrentUser: false,
   displayName: "Avery",
   avatarUrl: null,
   weeklyXp: 125,
@@ -31,7 +31,12 @@ describe("LeaderboardCard", () => {
   });
 
   it("marks the learner in the top list and repeats their rank in the summary strip", () => {
-    const currentUser = entry({ userId: "current", displayName: "Maya", rank: 2, weeklyXp: 90 });
+    const currentUser = entry({
+      isCurrentUser: true,
+      displayName: "Maya",
+      rank: 2,
+      weeklyXp: 90,
+    });
     renderCard({
       optedIn: true,
       entries: [entry(), currentUser],
@@ -46,7 +51,7 @@ describe("LeaderboardCard", () => {
   });
 
   it("shows the learner's rank when they are outside the top 20", () => {
-    const currentUser = entry({ userId: "current", displayName: "Maya", rank: 24, weeklyXp: 25 });
+    const currentUser = entry({ displayName: "Maya", rank: 24, weeklyXp: 25 });
     renderCard({ optedIn: true, entries: [entry()], currentUser });
 
     expect(screen.getByText("You are #24")).toBeInTheDocument();

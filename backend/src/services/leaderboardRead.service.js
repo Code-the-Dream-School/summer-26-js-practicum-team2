@@ -71,7 +71,7 @@ async function getLeaderboardForUser({
     {
       $project: {
         _id: 0,
-        userId: "$user_id",
+        isCurrentUser: { $eq: ["$user_id", currentUserId] },
         displayName: "$user.name",
         avatarUrl: "$user.avatar_url",
         weeklyXp: "$xp_total",
@@ -81,7 +81,7 @@ async function getLeaderboardForUser({
     {
       $facet: {
         entries: [{ $limit: entryLimit }],
-        currentUser: [{ $match: { userId: currentUserId } }, { $limit: 1 }],
+        currentUser: [{ $match: { isCurrentUser: true } }, { $limit: 1 }],
       },
     },
   ]);
