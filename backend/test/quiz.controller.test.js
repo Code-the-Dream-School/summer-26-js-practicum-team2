@@ -107,6 +107,9 @@ describe("quiz XP awards", () => {
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(null);
     UserProgress.findOne.mockResolvedValue({ completed_micro_lessons: [] });
+    awardXp
+      .mockResolvedValueOnce({ duplicate: false, event: { awarded_xp: 10 } })
+      .mockResolvedValueOnce({ duplicate: false, event: { awarded_xp: 20 } });
     UserProgress.findOneAndUpdate.mockResolvedValue({
       completed_micro_lessons: ["1.2.3"],
       completed_lessons: [],
