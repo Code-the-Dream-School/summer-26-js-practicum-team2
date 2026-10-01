@@ -1,5 +1,4 @@
 const LessonModule = require("../models/LessonModule.model");
-const defaultModule = require("../../../shared/content/budgeting.json");
 
 let moduleCache = new Map();
 
@@ -8,22 +7,17 @@ const getModule = async (moduleId) => {
     return moduleCache.get(moduleId);
   }
 
-  const databaseModule = await LessonModule.findOne({ id: moduleId }).lean();
-  const moduleData = databaseModule
-    ? moduleId === defaultModule.id
-      ? {
-          ...databaseModule,
-          glossary: databaseModule.glossary ?? defaultModule.glossary,
-          worksCited: databaseModule.worksCited ?? defaultModule.worksCited,
-        }
-      : databaseModule
-    : moduleId === defaultModule.id
-      ? defaultModule
-      : null;
+  const moduleData = await LessonModule.findOne({ id: moduleId }).lean();
   if (moduleData) {
     moduleCache.set(moduleId, moduleData);
   }
   return moduleData;
+};
+
+const getDefaultModule = async () => {
+  const configuredModuleId = process.env.DEFAULT_MODULE_ID?.trim();
+  const query = configuredModuleId ? { id: configuredModuleId } : {};
+  return LessonModule.findOne(query).sort({ id: 1 }).lean();
 };
 
 const getLesson = async (moduleId, lessonId) => {
@@ -64,6 +58,7 @@ const sanitizeModuleData = (moduleData) => ({
 
 module.exports = {
   getModule,
+  getDefaultModule,
   getLesson,
   sanitizeLessonData,
   sanitizeModuleData,

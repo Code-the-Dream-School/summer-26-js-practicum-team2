@@ -2,7 +2,7 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\
 const AUTH_BASE_PATH = `${API_BASE_URL}/api/v1/auth`;
 const USERS_BASE_PATH = `${API_BASE_URL}/api/v1/users`;
 const DASHBOARD_BASE_PATH = `${API_BASE_URL}/api/v1/dashboard`;
-const DASHBOARD_CACHE_KEY_PREFIX = "sprout.dashboard.";
+const DASHBOARD_CACHE_KEY_PREFIX = "openquiz.dashboard.";
 const LESSONS_BASE_PATH = `${API_BASE_URL}/api/v1/lessons`;
 const QUIZZES_BASE_PATH = `${API_BASE_URL}/api/v1/quizzes`;
 const ONBOARDING_BASE_PATH = `${API_BASE_URL}/api/v1/onboarding`;
@@ -17,8 +17,8 @@ const ACCOUNT_INVALIDATING_CODES = new Set([
   "SESSION_INVALIDATED",
 ]);
 let currentCsrfToken = null;
-export const AUTH_EXPIRED_EVENT = "sprout:auth-expired";
-export const CSRF_TOKEN_UPDATED_EVENT = "sprout:csrf-token-updated";
+export const AUTH_EXPIRED_EVENT = "openquiz:auth-expired";
+export const CSRF_TOKEN_UPDATED_EVENT = "openquiz:csrf-token-updated";
 
 export const setCsrfToken = (csrfToken) => {
   currentCsrfToken = csrfToken ?? null;
@@ -304,13 +304,6 @@ export const seedAdminRandomUsers = (csrfToken, count = 10) =>
     basePath: ADMIN_BASE_PATH,
   });
 
-export const seedAdminBudgetingModule = (csrfToken) =>
-  apiRequest("/modules/seed-budgeting", {
-    method: "POST",
-    csrfToken,
-    basePath: ADMIN_BASE_PATH,
-  });
-
 export const createAdminModule = ({ module, csrfToken }) =>
   apiRequest("/modules", { method: "POST", csrfToken, body: module, basePath: ADMIN_BASE_PATH });
 
@@ -412,7 +405,7 @@ export const importAdminLessonModule = ({ file, csrfToken }) => {
 };
 
 export const notifyProfileChange = (detail = {}) => {
-  window.dispatchEvent(new CustomEvent("sprout:profile-updated", { detail }));
+  window.dispatchEvent(new CustomEvent("openquiz:profile-updated", { detail }));
 };
 
 export const notifyDashboardProgressChanged = (detail = {}) => {
@@ -427,7 +420,7 @@ export const notifyDashboardProgressChanged = (detail = {}) => {
     // Browser storage can be unavailable without affecting the progress refresh event.
   }
 
-  window.dispatchEvent(new CustomEvent("sprout:progress-updated", { detail }));
+  window.dispatchEvent(new CustomEvent("openquiz:progress-updated", { detail }));
 };
 
 export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
@@ -442,7 +435,7 @@ export const trackDashboardEvent = async ({ type, csrfToken, ...payload }) => {
 };
 
 export const clearDashboardCache = (userId) => {
-  window.sessionStorage.removeItem(`sprout.dashboard.${userId}`);
+  window.sessionStorage.removeItem(`${DASHBOARD_CACHE_KEY_PREFIX}${userId}`);
 };
 
 export const getLesson = (moduleId, lessonId) =>

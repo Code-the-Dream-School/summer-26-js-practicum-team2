@@ -25,7 +25,7 @@ quizEvents.on("quiz_fail", ({ userId, microLessonId }) => {
 const QuizAttempt = require("../models/QuizAttempt.model");
 const UserProgress = require("../models/UserProgress.model");
 const { invalidateDashboardCache } = require("./dashboard.controller");
-const { getModule } = require("../utils/content");
+const { getModule, getDefaultModule } = require("../utils/content");
 const {
   quizStartSchema,
   quizCheckSchema,
@@ -51,7 +51,8 @@ const arraysMatch = (arr1 = [], arr2 = []) => {
 };
 //search inside modules => lessons ....knowledge check
 const getQuestionsFromLesson = async (moduleId, microLessonId) => {
-  const moduleData = await getModule(moduleId || "cashFlow");
+  const resolvedModuleId = moduleId || (await getDefaultModule())?.id;
+  const moduleData = resolvedModuleId ? await getModule(resolvedModuleId) : null;
   if (!moduleData) return [];
 
   //search inside the modules to get the lessons and then inside lessons to get microlessons which then include the knowledgechecks
@@ -67,7 +68,8 @@ const getQuestionsFromLesson = async (moduleId, microLessonId) => {
 
 // get all micro-lesson IDS that belong to a specific lesson ID
 const getMicroLessonIdsForLesson = async (moduleId, lessonId) => {
-  const moduleData = await getModule(moduleId || "cashFlow");
+  const resolvedModuleId = moduleId || (await getDefaultModule())?.id;
+  const moduleData = resolvedModuleId ? await getModule(resolvedModuleId) : null;
   if (!moduleData) return [];
   const lesson = (moduleData.lessons || []).find((l) => l.id === lessonId);
 
@@ -82,9 +84,13 @@ exports.getUserProgress = async (req, res, next) => {
 
     let progressRecord = await UserProgress.findOne({ user_id: req.user.id });
     if (!progressRecord) {
+      const defaultModule = await getDefaultModule();
+      if (!defaultModule) {
+        return res.status(StatusCodes.OK).json({ module_id: null, xp: xpTotal });
+      }
       progressRecord = await UserProgress.create({
         user_id: req.user.id,
-        module_id: "cashFlow",
+        module_id: defaultModule.id,
       });
     }
     return res.status(StatusCodes.OK).json({

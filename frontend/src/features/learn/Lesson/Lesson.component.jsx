@@ -6,7 +6,6 @@ function LessonComponent({
   eyebrow,
   content = [],
   module,
-  characterVariant = "beaver",
   characterImage,
   characterAlt = "Lesson guide",
   bubbleText,
@@ -24,7 +23,6 @@ function LessonComponent({
       </div>
 
       <LessonGuideCharacter
-        variant={characterVariant}
         imageSrc={characterImage}
         imageAlt={characterAlt}
         bubbleText={bubbleText}

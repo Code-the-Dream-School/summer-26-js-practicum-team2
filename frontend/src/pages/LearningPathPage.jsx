@@ -7,9 +7,6 @@ import Button from "../shared/Button/Button.component";
 import EmptyState from "../shared/EmptyState/EmptyState.component";
 import Modal from "../shared/Modal/Modal.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
-import abigailImg from "../assets/abigail.webp";
-import ramonaImg from "../assets/ramona.webp";
 
 // Vertical distance between node centers, in rem.
 const NODE_SPACING_REM = 8.75;
@@ -304,7 +301,7 @@ function LearningPathPage() {
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
           <EmptyState
             className="border-primary/20 bg-surface-inset py-16"
-            icon={<img src={dabbingBeaverImg} alt="" className="h-14 w-14 object-contain" />}
+            icon="📚"
             title="Content coming soon"
             message="New lessons are being prepared. Check back soon for something new to explore."
           />
@@ -330,39 +327,18 @@ function LearningPathPage() {
           <div className="pointer-events-none absolute -left-8 -top-8 h-28 w-28 rounded-full bg-accent/15" />
           <div className="pointer-events-none absolute -bottom-12 -right-8 h-36 w-36 rounded-full bg-circle-completed/20" />
 
-          <img
-            src={abigailImg}
-            alt=""
-            aria-hidden="true"
-            className="absolute -bottom-2 left-5 hidden w-28 drop-shadow-sm md:block lg:left-12 lg:w-32"
-          />
-          <img
-            src={ramonaImg}
-            alt=""
-            aria-hidden="true"
-            className="absolute -bottom-2 right-5 hidden w-28 drop-shadow-sm md:block lg:right-12 lg:w-32"
-          />
-
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-            Your learning adventure
-          </p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Learning path</p>
           <h1 className="mt-2 font-heading text-[2rem] font-bold leading-tight tracking-tight text-learning-path-heading sm:text-[2.5rem]">
-            Personal Finance
+            {currentModule.title}
           </h1>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-learning-path-muted">
-            Follow the trail, grow your skills, and build money confidence one quick lesson at a
-            time.
+            {currentModule.description || "Choose a lesson to continue learning."}
           </p>
 
-          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-full bg-white/80 p-2 pr-4 shadow-sm">
-            <img
-              src={dabbingBeaverImg}
-              alt="Sprout, your learning guide"
-              className="h-11 w-11 object-contain"
-            />
+          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-lg bg-white/80 p-3 shadow-sm">
             <div className="min-w-0 flex-1 text-left">
               <div className="flex items-center justify-between gap-3 text-xs font-semibold text-learning-path-heading">
-                <span>{isModuleComplete ? "Trail complete!" : "Keep growing!"}</span>
+                <span>{isModuleComplete ? "Module complete" : "Keep going"}</span>
                 <span>{progressPercent}%</span>
               </div>
               <div

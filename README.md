@@ -1,18 +1,15 @@
-# Sprout
+# open.quiz
 
-**Plant your money. Watch it grow.**
+open.quiz is an open-source learning platform for creating and delivering structured lessons,
+interactive quizzes, and learner progress tracking. Content modules are managed independently from
+the core authentication, assessment, and progress services.
 
-Sprout is a friendly, gamified money-basics app for college freshmen and
-recent grads. Bite-sized lessons (3–5 min) with instant-feedback quizzes
-and a per-lesson plant-growth reward loop help first-paycheck learners
-feel in control of their money — without a lecture.
+## Project Areas
 
-## 🚀 Live Demo
-
-- **Frontend Live Site:** https://sprout-ctd.netlify.app/
-- **Frontend Repo:** https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/tree/main/frontend
-- **Backend Live Site:** https://sprout-backend-x46w.onrender.com
-- **Backend Repo:** https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/tree/main/backend
+- **Core:** accounts, roles, lesson delivery, quiz scoring, and progress.
+- **Content:** create modules in the admin area or import a package. Example curricula live under
+  `shared/content/examples` and are not installed automatically.
+- **Presentation:** the frontend accepts instance-level app-name and theme CSS overrides.
 
 ## 🤝 Community Standards
 
@@ -26,20 +23,11 @@ feel in control of their money — without a lecture.
 - [Content Accuracy Policy](docs/content-accuracy-policy.md)
 - [Content Accuracy Checklist](docs/content-accuracy-checklist.md)
 
-## 🧠 Problem Statement
+## Purpose
 
-Most young adults handle their first checking account, paycheck, and rent
-payment with no formal money education. Existing personal-finance apps
-either lecture, push wealth-management products, or assume the user already
-speaks fluent finance — none of which fits a college freshman or a
-first-paycheck recent grad.
-
-- **Who is this for?** Single moms (Persona A, "Working Single Mom of Two") and Freshman in College (Persona B, "College Freshman").
-- **Pain point:** They want to feel smarter about money but don't want a
-  lecture, an advisor pitch, or a 30-minute reading assignment. They want a way to learn in between classes or shifts
-- **Why this matters:** Small, confident money habits formed early
-  compound. Sprout keeps the learning loop short (3–5 min per lesson) and
-  makes the reward visible via the plant-growth mechanic.
+The platform is intended to support different subjects and visual identities without requiring
+source changes for each curriculum. The finance-literacy material is one optional example, not the
+default experience.
 
 ## 🎯 Features
 
@@ -135,7 +123,7 @@ For full setup, scripts, testing, and API details, see:
 ## 🙌 Acknowledgments
 
 - Code the Dream mentors and practicum staff for guidance and review support
-- The Sprout contributor team for collaborative design, implementation, and testing
+- Contributors for collaborative design, implementation, and testing
 - The maintainers of key open-source tools used in this project, including React, Vite, Express, MongoDB, Jest, Vitest, and Postman
 
 ## 📄 License

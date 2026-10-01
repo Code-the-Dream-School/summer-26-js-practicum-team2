@@ -35,8 +35,8 @@ export default function MainLayout() {
   const { hasToasts, currentToast, addRewards, closeToast } = useRewardQueue();
   useEffect(() => {
     const handleRewards = (event) => addRewards(event.detail?.rewards);
-    window.addEventListener("sprout:progress-updated", handleRewards);
-    return () => window.removeEventListener("sprout:progress-updated", handleRewards);
+    window.addEventListener("openquiz:progress-updated", handleRewards);
+    return () => window.removeEventListener("openquiz:progress-updated", handleRewards);
   }, [addRewards]);
   //add for admin update
   const isAdmin = user?.role === "admin";

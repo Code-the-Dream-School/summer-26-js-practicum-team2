@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
+import { APP_NAME } from "../../../app/router/routes";
 import GlossaryModal from "../../../features/learn/GlossaryModal/GlossaryModal.component.jsx";
 import glossaryIcon from "../../../assets/glossary_icon.svg";
 
@@ -53,8 +54,7 @@ export default function Footer({ glossary = [], worksCited = [] }) {
         </nav>
 
         <p className="max-w-3xl rounded-2xl border border-neutral-200 bg-surface-raised px-4 py-3 text-sm leading-6 text-neutral-700 shadow-sm">
-          Disclaimer: Sprout is an educational product and not financial advice. Use the lessons to
-          build knowledge, but consult a qualified professional for personal financial decisions.
+          Learning materials are provided for educational purposes.
         </p>
 
         {showGlossary && (
@@ -79,8 +79,7 @@ export default function Footer({ glossary = [], worksCited = [] }) {
         )}
 
         <p className="text-xs text-neutral-400">
-          &copy; {copyrightYear} Sprout — Code the Dream Summer Practicum '26 | Counting Cents and
-          Making Sense.
+          &copy; {copyrightYear} {APP_NAME}
         </p>
       </div>
     </footer>

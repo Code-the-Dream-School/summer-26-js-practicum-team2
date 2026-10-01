@@ -1,5 +1,5 @@
 import { expect, test } from "./fixtures/network.js";
-import budgetingModule from "../shared/content/budgeting.json" with { type: "json" };
+import budgetingModule from "../shared/content/examples/finance-literacy/budgeting.json" with { type: "json" };
 
 const sampleLessonUrl = "/learn/cashFlow/1.1?sample=true";
 const sampleLesson = budgetingModule.lessons.find(({ id }) => id === "1.1");

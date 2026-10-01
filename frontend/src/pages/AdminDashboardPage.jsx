@@ -13,7 +13,6 @@ import {
   importAdminLessonModule,
   rejectDeleteAccount,
   resetAdminUserProgress,
-  seedAdminBudgetingModule,
   seedAdminRandomUsers,
   setAdminUserDisabled,
   setAdminUserDeleted,
@@ -34,7 +33,6 @@ const lessonBlockTypes = [
   "unorderedList",
   "knowledgeCheck",
   "table",
-  "budget-summary",
 ];
 const getUserId = (user) => String(user?.id || user?._id || "");
 
@@ -263,19 +261,6 @@ export default function AdminDashboardPage() {
         const choices = [...(content[blockIndex].answerChoices ?? [])];
         choices[choiceIndex] = { ...choices[choiceIndex], [field]: value };
         content[blockIndex] = { ...content[blockIndex], answerChoices: choices };
-        return { ...microLesson, microLessonContent: content };
-      }),
-    }));
-  }
-
-  function updateBlockDraftShow(microLessonId, blockIndex, key, value) {
-    updateLessonDraft((lesson) => ({
-      ...lesson,
-      microLessons: (lesson.microLessons ?? []).map((microLesson) => {
-        if (microLesson.id !== microLessonId) return microLesson;
-        const content = [...(microLesson.microLessonContent ?? [])];
-        const block = content[blockIndex] ?? {};
-        content[blockIndex] = { ...block, show: { ...(block.show ?? {}), [key]: value } };
         return { ...microLesson, microLessonContent: content };
       }),
     }));
@@ -603,19 +588,6 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-h3 font-bold text-heading">Lesson modules</h2>
           <div className="flex flex-wrap gap-3">
-            <Button
-              variant="primary"
-              loading={isRunningAction}
-              onClick={() =>
-                void runAction(
-                  () => seedAdminBudgetingModule(csrfToken),
-                  "Budgeting module seeded.",
-                  { applyResult: refreshModules, refresh: false },
-                )
-              }
-            >
-              Seed budgeting
-            </Button>
             <label className="cursor-pointer rounded-md border border-primary px-4 py-2 font-semibold text-primary">
               Upload JSON
               <input
@@ -1056,50 +1028,27 @@ export default function AdminDashboardPage() {
                                     />
                                   </label>
                                 </div>
-                              ) : block.type === "table" || block.type === "budget-summary" ? (
+                              ) : block.type === "table" ? (
                                 <div className="grid gap-2 sm:grid-cols-2">
                                   <label className="space-y-1 text-sm text-heading">
-                                    Table/Budget ID
+                                    Table ID
                                     <input
                                       className="w-full rounded-md border border-primary/20 px-3 py-2"
-                                      value={block.tableId ?? block.budgetId ?? ""}
+                                      value={block.tableId ?? ""}
                                       onChange={(event) =>
                                         updateBlockField(
                                           microLesson.id,
                                           blockIndex,
-                                          block.type === "table" ? "tableId" : "budgetId",
+                                          "tableId",
                                           event.target.value,
                                         )
                                       }
                                     />
                                   </label>
-                                  {block.type === "budget-summary" ? (
-                                    <div className="space-y-1 text-sm text-heading">
-                                      Show sections
-                                      {["income", "totals", "cashFlow"].map((key) => (
-                                        <label key={key} className="flex gap-2 font-normal">
-                                          <input
-                                            type="checkbox"
-                                            checked={Boolean(block.show?.[key])}
-                                            onChange={(event) =>
-                                              updateBlockDraftShow(
-                                                microLesson.id,
-                                                blockIndex,
-                                                key,
-                                                event.target.checked,
-                                              )
-                                            }
-                                          />
-                                          {key}
-                                        </label>
-                                      ))}
-                                    </div>
-                                  ) : (
-                                    <p className="text-xs text-foreground">
-                                      Edit table headers and reference IDs in the advanced JSON
-                                      editor.
-                                    </p>
-                                  )}
+                                  <p className="text-xs text-foreground">
+                                    Edit table headers and reference IDs in the advanced JSON
+                                    editor.
+                                  </p>
                                 </div>
                               ) : (
                                 <p className="text-xs text-foreground">

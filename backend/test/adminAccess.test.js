@@ -257,18 +257,13 @@ describe("admin access boundary", () => {
     expect(deletedLesson.status).toBe(200);
   });
 
-  test("prevents duplicate budgeting seed imports", async () => {
+  test("does not expose a built-in budgeting seed route", async () => {
     const admin = await createUser("admin");
     const response = await request(app)
       .post("/api/v1/admin/modules/seed-budgeting")
       .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`);
 
-    expect(response.status).toBe(201);
-
-    const duplicate = await request(app)
-      .post("/api/v1/admin/modules/seed-budgeting")
-      .set("Authorization", `Bearer ${tokenFor(admin._id, "admin")}`);
-    expect(duplicate.status).toBe(409);
+    expect(response.status).toBe(404);
   });
 
   test("supports verification, reversible deletion, and confirmed hard deletion", async () => {

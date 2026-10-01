@@ -5,7 +5,7 @@ const { useTestDb } = require("./setup");
 const app = require("../src/app");
 const User = require("../src/models/User.model");
 const LessonModule = require("../src/models/LessonModule.model");
-const budgetingModule = require("../../shared/content/budgeting.json");
+const budgetingModule = require("../../shared/content/examples/finance-literacy/budgeting.json");
 const {
   registerSchema,
   passwordSchema,

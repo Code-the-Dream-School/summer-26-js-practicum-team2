@@ -11,6 +11,9 @@ const XpEvent = require("../src/models/XpEvent.model");
 jest.mock("../src/models/User.model");
 jest.mock("../src/models/UserProgress.model");
 jest.mock("../src/models/XpEvent.model");
+jest.mock("../src/utils/content", () => ({
+  getDefaultModule: jest.fn().mockResolvedValue({ id: "example-module" }),
+}));
 
 jest.mock("../src/validation/userValidation.js", () => ({
   updateOnboardingProgressSchema: {

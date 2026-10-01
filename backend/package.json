@@ -1,12 +1,12 @@
 {
-  "name": "sprout-backend",
+  "name": "open-quiz-backend",
   "version": "0.0.0",
-  "description": "This is the backend code for a financial literacy app created for Code the Dream's Summer Practicum 2026",
+  "description": "Backend services for the open.quiz learning platform",
   "keywords": [
     "backend",
     "mongodb",
     "cloud",
-    "financial-literacy",
+    "learning-platform",
     "collab",
     "team",
     "group"
@@ -49,7 +49,7 @@
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
     "multer": "^2.4.0",
-    "sprout": "file:.."
+    "open.quiz": "file:.."
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

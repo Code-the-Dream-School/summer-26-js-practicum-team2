@@ -109,7 +109,7 @@ export async function prepareCurriculumSession(page, delays = {}) {
   // learner immediately instead of redirecting to login during hydration.
   await page.addInitScript(() => {
     window.sessionStorage.setItem(
-      "sprout.auth",
+      "openquiz.auth",
       JSON.stringify({
         user: {
           id: "curriculum-learner",
