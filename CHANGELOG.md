@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- --- -->
 
+## [1.0.4] - 2026-10-01
+
+### Added
+
+- Added a Render deployment that builds the Vite frontend and serves it from the Express backend.
+- Added a clickable email verification link to registration when Brevo delivery is unavailable.
+
+### Changed
+
+- Switched production frontend, API, OAuth, and verification flows to a same-origin Render service.
+- Removed the Netlify-only redirect configuration.
+
 ## [1.0.3] - 2026-10-01
 
 ### Added

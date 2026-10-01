@@ -1,6 +1,6 @@
 {
   "name": "open.quiz",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "description": "Open Quiz is a full-stack quiz platform featuring guided learning paths, interactive quizzes, and progress tracking, built with React, Node.js, and Express.",
   "keywords": [
@@ -54,7 +54,8 @@
     "test": "npm run test:backend && npm run test:frontend",
     "verify": "npm run format && npm run lint && npm test && npm run test:e2e:all",
     "start:backend": "npm --prefix backend start",
-    "build:frontend": "npm --prefix frontend run build"
+    "build:frontend": "npm --prefix frontend run build",
+    "build": "npm run build:frontend"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

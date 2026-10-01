@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("node:fs");
+const path = require("node:path");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -37,7 +39,11 @@ const parseAllowedOrigins = () => {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-  const fallbackOrigins = [process.env.CLIENT_URL, "http://localhost:5173"].filter(Boolean);
+  const fallbackOrigins = [
+    process.env.CLIENT_URL,
+    process.env.RENDER_EXTERNAL_URL,
+    "http://localhost:5173",
+  ].filter(Boolean);
 
   return [...new Set([...configuredOrigins, ...fallbackOrigins])];
 };
@@ -85,11 +91,26 @@ app.use("/api/v1/quizzes", quizPublicRoutes);
 app.use("/api/v1/quizzes", jwtMiddleware, quizRoutes);
 app.use("/api/v1/onboarding", onboardingRoutes);
 app.use("/api/v1/admin", jwtMiddleware, requireAdmin, adminRoutes);
-// Root route
-app.get("/", (req, res) => {
-  // Redirect to the frontend application
-  res.redirect(process.env.CLIENT_URL);
-});
+const frontendBuildPath = path.resolve(__dirname, "../../frontend/dist");
+if (process.env.NODE_ENV === "production" && fs.existsSync(frontendBuildPath)) {
+  app.use(express.static(frontendBuildPath));
+  app.get(/.*/, (req, res, next) => {
+    if (
+      req.path === "/api" ||
+      req.path.startsWith("/api/") ||
+      req.path === "/health" ||
+      !req.accepts("html")
+    ) {
+      return next();
+    }
+
+    return res.sendFile(path.join(frontendBuildPath, "index.html"));
+  });
+} else if (process.env.NODE_ENV !== "production") {
+  app.get("/", (req, res) => {
+    res.redirect(process.env.CLIENT_URL || "http://localhost:5173");
+  });
+}
 
 // Error Handling Middleware
 app.use(notFoundMiddleware);
