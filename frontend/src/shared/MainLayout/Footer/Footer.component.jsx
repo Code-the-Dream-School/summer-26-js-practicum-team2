@@ -10,7 +10,7 @@ const footerNavLinks = [
   { label: "Terms", to: "/terms" },
   {
     label: "GitHub",
-    href: "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2",
+    href: "https://github.com/journey-to-code-org/open.quiz",
   },
 ];
 
