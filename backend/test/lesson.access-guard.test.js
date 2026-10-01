@@ -7,7 +7,7 @@ const User = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
 const QuizAttempt = require("../src/models/QuizAttempt.model");
 const LessonModule = require("../src/models/LessonModule.model");
-const cashFlow = require("../../shared/content/examples/finance-literacy/budgeting.json");
+const cashFlow = require("./fixtures/budgetingModule.json");
 
 useTestDb();
 

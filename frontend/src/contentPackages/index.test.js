@@ -3,10 +3,11 @@ import { loadContentPackage } from "./index";
 
 describe("content package loader", () => {
   it("loads registered packages from their package directory", async () => {
-    const financePackage = await loadContentPackage("finance-literacy");
+    const introductionPackage = await loadContentPackage("openquiz-introduction");
 
-    expect(financePackage.lessonBlockRenderers["budget-summary"]).toBeTypeOf("function");
-    expect(financePackage.characterImages).toHaveProperty("abigail");
+    expect(introductionPackage.lessonBlockRenderers.characterIntro).toBeTypeOf("function");
+    expect(introductionPackage.characterImages).toHaveProperty("nova");
+    expect(introductionPackage.characterImages).toHaveProperty("kit");
   });
 
   it("returns null for an unknown package ID", async () => {

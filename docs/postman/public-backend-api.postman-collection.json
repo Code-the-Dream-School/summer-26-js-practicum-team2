@@ -100,9 +100,16 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/lessons/public/cashFlow/1.1",
+              "raw": "{{baseUrl}}/api/v1/lessons/public/openQuizIntroduction/1.1",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "lessons", "public", "cashFlow", "1.1"]
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                "public",
+                "openQuizIntroduction",
+                "1.1"
+              ]
             }
           },
           "response": []
@@ -144,7 +151,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"moduleId\": \"cashFlow\",\n  \"microLessonId\": \"1.1.2\",\n  \"questionId\": \"1.1.2-q3\",\n  \"choiceIds\": \"a\"\n}",
+              "raw": "{\n  \"moduleId\": \"openQuizIntroduction\",\n  \"microLessonId\": \"1.1.2\",\n  \"questionId\": \"1.1.2-q1\",\n  \"choiceIds\": \"b\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

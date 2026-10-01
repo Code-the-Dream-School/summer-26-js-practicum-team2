@@ -25,9 +25,9 @@ the core authentication, assessment, and progress services.
 
 ## Purpose
 
-The platform is intended to support different subjects and visual identities without requiring
-source changes for each curriculum. The finance-literacy material is one optional example, not the
-default experience.
+The platform supports different subjects and visual identities without requiring source changes for
+each curriculum. The included open.quiz orientation package demonstrates the platform; deployments
+can import their own content packages.
 
 ## 🎯 Features
 

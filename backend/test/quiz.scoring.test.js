@@ -8,7 +8,7 @@ const User = require("../src/models/User.model");
 const UserProgress = require("../src/models/UserProgress.model");
 const LessonModule = require("../src/models/LessonModule.model");
 const { createAuthedUser } = require("./helpers/authTestHelpers");
-const cashFlow = require("../../shared/content/examples/finance-literacy/budgeting.json");
+const cashFlow = require("./fixtures/budgetingModule.json");
 
 useTestDb();
 
