@@ -200,7 +200,7 @@ describe("learn flow", () => {
       })),
     };
 
-    window.localStorage.setItem("sprout-quiz-feedback-preference", "end");
+    window.localStorage.setItem("openquiz-quiz-feedback-preference", "end");
     api.updateLessonProgress.mockResolvedValue({});
     api.startQuiz.mockResolvedValue({ attemptId: "attempt-1" });
     api.submitQuiz.mockResolvedValue({

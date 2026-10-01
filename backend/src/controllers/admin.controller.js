@@ -25,7 +25,6 @@ const {
   adminLessonSchema,
   validateRequest,
 } = require("../validation/userValidation");
-const budgetingModule = require("../../../shared/content/budgeting.json");
 
 const safeUser = (user) => ({
   _id: user._id,
@@ -504,19 +503,6 @@ const deleteModule = async (req, res, next) => {
   }
 };
 
-const seedBudgetingModule = async (req, res, next) => {
-  try {
-    if (await LessonModule.exists({ id: budgetingModule.id })) {
-      return res.status(StatusCodes.CONFLICT).json({ message: "Lesson module already exists." });
-    }
-    const module = await LessonModule.create(budgetingModule);
-    clearModuleCache(budgetingModule.id);
-    return res.status(StatusCodes.CREATED).json(module);
-  } catch (error) {
-    return next(error);
-  }
-};
-
 const createLesson = async (req, res, next) => {
   try {
     const body = validateRequest(res, adminLessonSchema, req.body);
@@ -602,7 +588,6 @@ module.exports = {
   createModule,
   updateModule,
   deleteModule,
-  seedBudgetingModule,
   createLesson,
   updateLesson,
   deleteLesson,

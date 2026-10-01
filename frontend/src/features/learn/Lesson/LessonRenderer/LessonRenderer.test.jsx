@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import LessonRenderer from "./LessonRenderer.component";
+import { lessonBlockRenderers } from "../../../../contentPackages/examples/finance-literacy";
 
 // Provide the table and budget data needed by the lesson content that depends on module data.
 const moduleData = {
@@ -37,6 +38,14 @@ describe("LessonRenderer", () => {
     expect(screen.getByText("Paragraph text")).toBeInTheDocument();
 
     rerender(<LessonRenderer content={{ type: "characterIntro", text: "Meet Abigail" }} />);
+    expect(screen.queryByText("Meet Abigail")).not.toBeInTheDocument();
+
+    rerender(
+      <LessonRenderer
+        content={{ type: "characterIntro", text: "Meet Abigail" }}
+        blockRenderers={lessonBlockRenderers}
+      />,
+    );
     expect(screen.getByText("Meet Abigail")).toBeInTheDocument();
 
     rerender(
@@ -78,7 +87,7 @@ describe("LessonRenderer", () => {
     );
     expect(screen.getByRole("table", { name: "Monthly income" })).toHaveTextContent("$2,000.00");
 
-    // Budget summaries should pull the requested values from the matching budget.
+    // Specialized blocks render only when their package supplies a renderer.
     rerender(
       <LessonRenderer
         content={{
@@ -87,6 +96,7 @@ describe("LessonRenderer", () => {
           show: { income: true, totals: true, cashFlow: true },
         }}
         module={moduleData}
+        blockRenderers={lessonBlockRenderers}
       />,
     );
     expect(screen.getByRole("heading", { name: "Sample budget" })).toBeInTheDocument();

@@ -59,6 +59,6 @@ describe("DashboardPage", () => {
     );
     expect(screen.getByText("Overall progress")).toBeInTheDocument();
     expect(screen.getByText("1 of 4 lessons complete")).toBeInTheDocument();
-    expect(screen.getByText("$")).toBeInTheDocument();
+    expect(screen.getByText("B")).toBeInTheDocument();
   });
 });

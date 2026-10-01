@@ -99,15 +99,15 @@ export default function DashboardPage() {
         <EmptyState
           icon="🌱"
           title="Welcome to your progress dashboard"
-          message="Ready to start? Begin with Budgeting Basics"
+          message="Ready to start? Choose a lesson to begin."
           action={
             <Button
               as={Link}
-              to={nextAction?.href || "/learn/cashFlow/1.1"}
+              to={nextAction?.href || "/learn"}
               variant="primary"
               className="px-5 py-2.5"
             >
-              Begin with Budgeting Basics
+              Explore lessons
             </Button>
           }
         />

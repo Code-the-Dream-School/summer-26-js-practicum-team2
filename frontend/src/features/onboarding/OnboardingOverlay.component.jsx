@@ -1,6 +1,8 @@
+import { APP_NAME } from "../../app/router/routes";
+
 const STEP_CONTENT = {
   0: {
-    title: "Welcome to Sprout!",
+    title: `Welcome to ${APP_NAME}!`,
     text: "Your email has been successfully verified! This is your dashboard where you can see your achievements.Let's kick things off with a quick tour. Click 'Next Step' to hop straight over to your profile manager layout.",
   },
   1: {

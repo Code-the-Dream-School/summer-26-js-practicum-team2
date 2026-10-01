@@ -30,7 +30,6 @@ vi.mock("../services/api", () => ({
   importAdminLessonModule: vi.fn(),
   rejectDeleteAccount: vi.fn(),
   resetAdminUserProgress: vi.fn(),
-  seedAdminBudgetingModule: vi.fn(),
   seedAdminRandomUsers: vi.fn(),
   setAdminUserDisabled: vi.fn(),
   setAdminUserDeleted: vi.fn(),

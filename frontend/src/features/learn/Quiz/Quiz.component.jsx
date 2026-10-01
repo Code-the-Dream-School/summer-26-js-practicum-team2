@@ -13,7 +13,6 @@ function QuizComponent({
   onChange,
   rightAnswerIcon,
   wrongAnswerIcon,
-  characterVariant = "beaver",
   characterImage,
   characterAlt = "Lesson guide",
   reviewMode = false,
@@ -99,18 +98,13 @@ function QuizComponent({
         })}
       </div>
       {reviewAnswer && reviewMode ? (
-        <LessonGuideCharacter
-          variant={characterVariant}
-          imageSrc={characterImage}
-          imageAlt={characterAlt}
-        >
+        <LessonGuideCharacter imageSrc={characterImage} imageAlt={characterAlt}>
           <div className="space-y-3">
             <ExpandableWhy explanation={reviewAnswer.explanation} />
           </div>
         </LessonGuideCharacter>
       ) : reviewAnswer ? (
         <LessonGuideCharacter
-          variant={characterVariant}
           imageSrc={characterImage}
           imageAlt={characterAlt}
           bubbleText={getEncouragingPhrase(reviewAnswer.isCorrect)}

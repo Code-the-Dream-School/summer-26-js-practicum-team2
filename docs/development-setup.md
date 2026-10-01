@@ -156,7 +156,7 @@ client secrets in frontend environment variables.
 
 ### Testing OAuth
 
-Automated tests verify Sprout's OAuth routes, callback handling, and frontend states without
+Automated tests verify the platform's OAuth routes, callback handling, and frontend states without
 using real Google or GitHub accounts. Run `npm run test:backend`, `npm run test:frontend`,
 and `npm run test:e2e` to include their respective OAuth coverage.
 

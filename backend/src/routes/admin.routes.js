@@ -16,7 +16,6 @@ const {
   createModule,
   updateModule,
   deleteModule,
-  seedBudgetingModule,
   createLesson,
   updateLesson,
   deleteLesson,
@@ -43,7 +42,6 @@ router.patch("/deletions/approve/:userId", approveDeleteAccount);
 router.patch("/deletions/deny/:userId", rejectDeleteAccount);
 router.patch("/deletions/reactivate/:userId", reactivateUserAcct);
 router.get("/modules", listModules);
-router.post("/modules/seed-budgeting", seedBudgetingModule);
 router.get("/modules/:moduleId", getModule);
 router.post("/modules", createModule);
 router.patch("/modules/:moduleId", updateModule);

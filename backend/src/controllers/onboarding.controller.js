@@ -2,6 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const { updateOnboardingProgressSchema } = require("../validation/userValidation.js");
 const User = require("../models/User.model.js");
 const UserProgress = require("../models/UserProgress.model.js");
+const { getDefaultModule } = require("../utils/content");
 
 const { calculateXpDelta } = require("../utils/coreRules");
 const XpEvent = require("../models/XpEvent.model");
@@ -186,11 +187,14 @@ const updateOnboardingProgress = async (req, res, next) => {
             reference_id: "onboarding",
           });
         }
-        await UserProgress.findOneAndUpdate(
-          { user_id: userId },
-          { $inc: { xp: xpAwarded } },
-          { upsert: true, returnDocument: "after" },
-        );
+        const defaultModule = await getDefaultModule();
+        if (defaultModule) {
+          await UserProgress.findOneAndUpdate(
+            { user_id: userId, module_id: defaultModule.id },
+            { $inc: { xp: xpAwarded } },
+            { upsert: true, returnDocument: "after" },
+          );
+        }
       }
     }
     user.markModified("onboarding");

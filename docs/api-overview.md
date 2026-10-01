@@ -29,8 +29,8 @@ POST   /api/v1/profile/progress/reset
 POST   /api/v1/profile/password
 POST   /api/v1/profile/request-deletion
 
-GET    /api/v1/lessons/cashFlow/1.1
-GET    /api/v1/lessons/progress?moduleId=cashFlow
+GET    /api/v1/lessons/:moduleId/:lessonId
+GET    /api/v1/lessons/progress?moduleId=:moduleId
 PATCH  /api/v1/lessons/progress
 PATCH  /api/v1/lessons/progress/restart
 ```
@@ -87,9 +87,8 @@ invalidate a session.
 send `null` or an empty string to return to the initials-based avatar. File uploads are not part
 of this endpoint.
 
-## Lesson Content Fallback
+## Lesson Content
 
-MongoDB lesson modules are preferred. When no module has been seeded, dashboard and direct
-`cashFlow` lesson requests can use the bundled default Cash Flow content. Learning-path module
-discovery remains database-driven, so an unseeded learning path clearly asks an administrator to
-seed or import content.
+Lesson modules are loaded from the instance database. An empty database has no implicit curriculum;
+an administrator must create or import a module before learners can access lessons. Example
+curricula are kept under `shared/content/examples` and are not loaded automatically.

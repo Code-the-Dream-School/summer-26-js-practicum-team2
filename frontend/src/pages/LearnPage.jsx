@@ -14,9 +14,6 @@ import { normalizeLearnData, selectRandomLesson } from "../features/learn/normal
 import LearnFlow from "../features/learn/LearnFlow/LearnFlow.component";
 import Card from "../shared/Card/Card.component";
 import Skeleton from "../shared/Skeleton/Skeleton.component";
-import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
-import abigailImg from "../assets/abigail.webp";
-import ramonaImg from "../assets/ramona.webp";
 
 export default function LearnPage() {
   const { isAuthenticated, isHydrating, csrfToken, refreshProfile } = useAuthContext();
@@ -63,12 +60,6 @@ export default function LearnPage() {
         }
       : learnData;
   }, [isAuthenticated, learnData]);
-
-  const characterImages = {
-    abigail: abigailImg,
-    ramona: ramonaImg,
-    beaver: dabbingBeaverImg,
-  };
 
   useEffect(() => {
     if (typeof setCurrentModuleResources !== "function") {
@@ -128,8 +119,6 @@ export default function LearnPage() {
         <LearnFlow
           key={`${learnData.moduleId}:${learnData.id}`}
           learnData={sampleLearnData}
-          characterImages={characterImages}
-          guideImage={dabbingBeaverImg}
           isReadOnly
         />
       </>
@@ -140,8 +129,6 @@ export default function LearnPage() {
     <LearnFlow
       key={`${learnData.moduleId}:${learnData.id}:${selectedMicroLessonId ?? "resume"}`}
       learnData={learnData}
-      characterImages={characterImages}
-      guideImage={dabbingBeaverImg}
       savedProgress={progress}
       selectedMicroLessonId={selectedMicroLessonId}
       csrfToken={csrfToken}

@@ -15,31 +15,30 @@ export const ROUTES = {
   ADMIN_DASHBOARD: "/admin/dashboard",
 };
 
-// Link target, not a <Route path> — the query string opts into the unauthenticated preview.
-export const FIRST_LESSON_LINK = "/learn/cashFlow/1.1";
-export const SAMPLE_LESSON_LINK = `${FIRST_LESSON_LINK}?sample=true`;
+export const APP_NAME = import.meta.env.VITE_APP_NAME?.trim() || "open.quiz";
 
 // External link for the "Report a bug" CTA on error pages (404/500).
 export const REPORT_BUG_LINK =
   "https://github.com/Code-the-Dream-School/summer-26-js-practicum-team2/issues/new?template=bug_report.md";
 
 const TITLES = {
-  [ROUTES.HOME]: "Sprout — Counting Cents and Making Sense",
-  [ROUTES.LOGIN]: "Log in — Sprout",
-  [ROUTES.REGISTER]: "Create an account — Sprout",
-  [ROUTES.VERIFY_EMAIL]: "Verify your email — Sprout",
-  [ROUTES.OAUTH_CALLBACK]: "Signing you in — Sprout",
-  [ROUTES.PASSWORD_RESET]: "Reset your password — Sprout",
-  [ROUTES.DASHBOARD]: "Dashboard — Sprout",
-  [ROUTES.PROFILE]: "Profile — Sprout",
-  [ROUTES.LEARN]: "Learning path — Sprout",
-  [ROUTES.PRIVACY]: "Privacy policy — Sprout",
-  [ROUTES.TERMS]: "Terms of service — Sprout",
-  [ROUTES.ADMIN_DASHBOARD]: "Admin Dashboard - Sprout",
+  [ROUTES.HOME]: APP_NAME,
+  [ROUTES.LOGIN]: `Log in — ${APP_NAME}`,
+  [ROUTES.REGISTER]: `Create an account — ${APP_NAME}`,
+  [ROUTES.VERIFY_EMAIL]: `Verify your email — ${APP_NAME}`,
+  [ROUTES.OAUTH_CALLBACK]: `Signing you in — ${APP_NAME}`,
+  [ROUTES.PASSWORD_RESET]: `Reset your password — ${APP_NAME}`,
+  [ROUTES.DASHBOARD]: `Dashboard — ${APP_NAME}`,
+  [ROUTES.PROFILE]: `Profile — ${APP_NAME}`,
+  [ROUTES.LEARN]: `Learning path — ${APP_NAME}`,
+  [ROUTES.PRIVACY]: `Privacy policy — ${APP_NAME}`,
+  [ROUTES.TERMS]: `Terms of service — ${APP_NAME}`,
+  [ROUTES.ADMIN_DASHBOARD]: `Admin dashboard — ${APP_NAME}`,
 };
 
 export function getRouteTitle(pathname) {
   return (
-    TITLES[pathname] ?? (pathname.startsWith("/learn/") ? "Lesson — Sprout" : "Not found — Sprout")
+    TITLES[pathname] ??
+    (pathname.startsWith("/learn/") ? `Lesson — ${APP_NAME}` : `Not found — ${APP_NAME}`)
   );
 }

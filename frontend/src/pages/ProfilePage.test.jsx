@@ -59,7 +59,7 @@ describe("ProfilePage", () => {
       profile = { ...profile, avatar_url: avatarUrl };
       return { message: "Avatar URL saved.", avatar_url: avatarUrl };
     });
-    window.localStorage.removeItem("sprout-quiz-feedback-preference");
+    window.localStorage.removeItem("openquiz-quiz-feedback-preference");
   });
 
   it("saves identity, goals, and preferences with refreshed values and toasts", async () => {
@@ -193,7 +193,7 @@ describe("ProfilePage", () => {
     await user.click(screen.getByRole("button", { name: "Toggle" }));
 
     expect(screen.getByText("Feedback: At the end")).toBeInTheDocument();
-    expect(window.localStorage.getItem("sprout-quiz-feedback-preference")).toBe("end");
+    expect(window.localStorage.getItem("openquiz-quiz-feedback-preference")).toBe("end");
   });
 
   it("shows a retryable load error instead of placeholder profile details", async () => {

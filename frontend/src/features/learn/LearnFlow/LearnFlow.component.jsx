@@ -29,18 +29,16 @@ import LessonControlPanel from "./LessonControlPanel/LessonControlPanel.componen
 import rightAnswerIcon from "../../../assets/right_answer.svg";
 import wrongAnswerIcon from "../../../assets/wrong_answer.svg";
 
-function resolveCharacter(characterId, characterImages, guideImage) {
+function resolveCharacter(characterId, characterImages = {}, guideImage) {
   if (!characterId) {
     return {
-      variant: "beaver",
-      image: characterImages.beaver ?? guideImage,
-      alt: "Sprout lesson guide",
+      image: guideImage,
+      alt: "Lesson guide",
     };
   }
 
   return {
-    variant: characterId,
-    image: characterImages[characterId] ?? characterImages.beaver ?? guideImage,
+    image: characterImages[characterId] ?? guideImage,
     alt: characterId.charAt(0).toUpperCase() + characterId.slice(1),
   };
 }
@@ -475,7 +473,6 @@ export default function LearnFlow({
               onChange={(choiceIds) => quiz.selectChoice(quiz.currentQuestion.id, choiceIds)}
               rightAnswerIcon={rightAnswerIcon}
               wrongAnswerIcon={wrongAnswerIcon}
-              characterVariant={character.variant}
               characterImage={character.image}
               characterAlt={character.alt}
             />
@@ -533,7 +530,6 @@ export default function LearnFlow({
               eyebrow={`Lesson ${stepIndex + 1} of ${lessonSteps.length} • Step ${chunkIndex + 1} of ${Math.max(chunks.length, 1)}`}
               content={currentChunk ? [currentChunk] : []}
               module={learnData.module}
-              characterVariant={character.variant}
               characterImage={character.image}
               characterAlt={character.alt}
               bubbleText={

@@ -1,11 +1,8 @@
 import { Link } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
-import { ROUTES, SAMPLE_LESSON_LINK } from "../app/router/routes";
+import { ROUTES } from "../app/router/routes";
 import Button from "../shared/Button/Button.component";
 import Card from "../shared/Card/Card.component";
-import dabbingBeaverImg from "../assets/dabbingBeaver.svg";
-import abigailImg from "../assets/abigail.webp";
-import ramonaImg from "../assets/ramona.webp";
 
 export default function HomePage() {
   const { isAuthenticated } = useAuthContext();
@@ -18,11 +15,11 @@ export default function HomePage() {
       >
         <div className="flex max-w-2xl flex-col space-y-5">
           <h1 className="font-heading text-h1 font-bold tracking-tight text-heading">
-            Master money in five minutes a day.
+            Build a learning habit, one short lesson at a time.
           </h1>
           <p className="max-w-2xl text-body leading-normal text-foreground">
-            Bite-sized lessons on budgeting, saving, and credit — built for students and new grads
-            starting out on their own.
+            Short lessons and interactive quizzes help you make progress on topics that matter to
+            you.
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
@@ -37,34 +34,13 @@ export default function HomePage() {
             </Button>
             <Button
               as={Link}
-              to={isAuthenticated ? ROUTES.LAST_LESSON : SAMPLE_LESSON_LINK}
+              to={isAuthenticated ? ROUTES.LAST_LESSON : ROUTES.LEARN}
               variant="secondary"
               className="px-6 py-2.5"
             >
-              {isAuthenticated ? "Jump Back in" : "See a sample lesson"}
+              {isAuthenticated ? "Jump Back in" : "Explore lessons"}
             </Button>
           </div>
-        </div>
-
-        <div className="mt-8 flex w-full max-w-md items-center justify-center gap-4 md:py-3 lg:max-w-xl">
-          <img
-            src={dabbingBeaverImg}
-            alt="An approachable beaver mascot greeting you"
-            className="h-auto w-1/5 object-contain"
-            loading="eager"
-          />
-          <img
-            src={abigailImg}
-            alt="Female avatar in a blue sweater greeting you"
-            className="h-auto w-1/5 object-contain"
-            loading="eager"
-          />
-          <img
-            src={ramonaImg}
-            alt="Female avatar in a purple sweater greeting you"
-            className="h-auto w-1/5 object-contain"
-            loading="eager"
-          />
         </div>
       </section>
 
@@ -82,9 +58,9 @@ export default function HomePage() {
             <div className="mb-4 text-3xl" aria-hidden="true">
               ⚡
             </div>
-            <h3 className="mb-2 text-xl font-semibold text-heading">No Jargon</h3>
+            <h3 className="mb-2 text-xl font-semibold text-heading">Clear lessons</h3>
             <p className="leading-normal text-foreground">
-              Learn budgeting basics without the finance jargon.
+              Break complex topics into manageable ideas.
             </p>
           </Card>
           <Card className="flex flex-col items-center p-6 text-center">
@@ -102,7 +78,7 @@ export default function HomePage() {
             </div>
             <h3 className="mb-2 text-xl font-semibold text-heading">100% Free</h3>
             <p className="leading-normal text-foreground">
-              Free forever — no bank account required.
+              Learn at your own pace, with progress saved automatically.
             </p>
           </Card>
         </div>
@@ -122,8 +98,8 @@ export default function HomePage() {
           {[
             {
               step: 1,
-              title: "Pick a Topic",
-              body: "Choose from modules covering topics such as Budgeting, Credit Cards, or Savings.",
+              title: "Choose a topic",
+              body: "Explore learning modules built around a subject you care about.",
             },
             {
               step: 2,
@@ -163,8 +139,7 @@ export default function HomePage() {
             <Card className="p-6">
               <h4 className="mb-2 text-lg font-semibold text-heading">1. Is it free?</h4>
               <p className="leading-normal text-foreground">
-                Yes — every lesson, quiz, and badge is free. There's no paid tier and no ads. We
-                built this so anyone starting out can learn money basics without a paywall.
+                Lessons, quizzes, and progress tracking are available in one place.
               </p>
             </Card>
             <Card className="p-6">
@@ -177,9 +152,8 @@ export default function HomePage() {
             <Card className="p-6">
               <h4 className="mb-2 text-lg font-semibold text-heading">3. Who is it for?</h4>
               <p className="leading-normal text-foreground">
-                It's designed for first-time earners: students opening their first checking account
-                and recent grads getting their first paycheck. No prior finance knowledge is
-                assumed.
+                Anyone can use the learning modules configured for this instance. No prior
+                experience is assumed.
               </p>
             </Card>
           </div>

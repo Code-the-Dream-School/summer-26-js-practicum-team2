@@ -31,7 +31,7 @@ const startServer = async () => {
   });
 
   app.listen(PORT, () => {
-    console.log(`Sprout API listening on http://localhost:${PORT}`);
+    console.log(`open.quiz API listening on http://localhost:${PORT}`);
   });
 };
 

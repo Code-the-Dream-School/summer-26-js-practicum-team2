@@ -15,7 +15,7 @@ test("saving a display name updates the header avatar", async ({ page }) => {
   // Seed the authenticated session before the app loads so the test starts on the profile page as a logged-in learner.
   await page.addInitScript((user) => {
     window.sessionStorage.setItem(
-      "sprout.auth",
+      "openquiz.auth",
       JSON.stringify({ user, csrfToken: "test-csrf-token" }),
     );
   }, profile);
