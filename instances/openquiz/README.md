@@ -13,10 +13,11 @@ core.
    for a hosted database.
 3. Start the instance with `npm run dev:openquiz`; the site uses `http://localhost:5180` and the API
    uses `http://localhost:8081`.
-4. In another terminal, run `npm run instance:seed:openquiz` to import the orientation curriculum.
-5. Open the site and choose **Explore lessons** to preview the first lesson without an account.
-6. Register an account and promote the first administrator through a trusted database bootstrap
-   process. The platform does not yet include first-admin onboarding.
+4. Register the first account; the first registered account is automatically made an administrator.
+   Verify its email using the development link printed by the backend.
+5. Import a lesson module JSON and upload avatar images from the admin dashboard. To install the
+   included orientation content instead, run `npm run instance:seed:openquiz` in another terminal.
+6. Open the site and choose **Explore lessons** to preview the first lesson without an account.
 
 ## Brand Assets
 

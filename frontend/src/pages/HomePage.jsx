@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useAuthContext } from "../context/AuthContext";
 import { ROUTES } from "../app/router/routes";
 import { APP_HERO_IMAGE_URL } from "../app/instanceAssets";
+import { loadContentPackage } from "../contentPackages";
 import { getPublicLessonModules } from "../services/api";
 import Button from "../shared/Button/Button.component";
 import Card from "../shared/Card/Card.component";
@@ -10,6 +11,7 @@ import Card from "../shared/Card/Card.component";
 export default function HomePage() {
   const { isAuthenticated } = useAuthContext();
   const [sampleLessonPath, setSampleLessonPath] = useState(null);
+  const [lessonCharacters, setLessonCharacters] = useState([]);
 
   useEffect(() => {
     let isActive = true;
@@ -33,6 +35,26 @@ export default function HomePage() {
       isActive = false;
     };
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    let isActive = true;
+    const packageId = import.meta.env.VITE_CONTENT_PACKAGE?.trim();
+    if (!packageId) return undefined;
+
+    void loadContentPackage(packageId)
+      .then((contentPackage) => {
+        if (isActive) {
+          setLessonCharacters(Object.entries(contentPackage?.characterImages ?? {}));
+        }
+      })
+      .catch(() => {
+        if (isActive) setLessonCharacters([]);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <>
@@ -73,6 +95,20 @@ export default function HomePage() {
               </Button>
             )}
           </div>
+          {lessonCharacters.length ? (
+            <div aria-label="Lesson characters" className="mt-3 flex items-center gap-3">
+              {lessonCharacters.map(([characterId, imageUrl]) => (
+                <img
+                  key={characterId}
+                  src={imageUrl}
+                  alt={characterId.charAt(0).toUpperCase() + characterId.slice(1)}
+                  title={characterId.charAt(0).toUpperCase() + characterId.slice(1)}
+                  className="h-14 w-14 rounded-full border-2 border-surface-raised object-cover shadow-sm"
+                />
+              ))}
+              <span className="text-sm font-semibold text-heading">Meet your lesson guides</span>
+            </div>
+          ) : null}
         </div>
         {APP_HERO_IMAGE_URL ? (
           <div className="mt-8 flex w-full justify-center lg:mt-0 lg:w-2/5">
